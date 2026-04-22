@@ -1,11 +1,12 @@
 "use client";
 
+import { Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import ProjectForm from "@/components/staff/ProjectForm";
 import type { ProjectFormData } from "@/components/staff/ProjectForm";
 
-export default function NewProjectPage() {
+function NewProjectContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialClientId = searchParams.get("client_id");
@@ -54,5 +55,13 @@ export default function NewProjectPage() {
 
       <ProjectForm onSubmit={handleCreate} submitLabel="Créer le projet" initialClientId={initialClientId} />
     </div>
+  );
+}
+
+export default function NewProjectPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: 40, color: "#86868B" }}>Chargement…</div>}>
+      <NewProjectContent />
+    </Suspense>
   );
 }
