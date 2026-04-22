@@ -1,0 +1,69 @@
+import { NextRequest, NextResponse } from "next/server";
+import { getStaffMember } from "@/lib/staff-auth";
+import { createAdminClient } from "@/lib/supabase/admin";
+
+export async function GET(request: NextRequest) {
+  const staff = await getStaffMember();
+  if (!staff) {
+    return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  }
+
+  const admin = createAdminClient();
+  if (!admin) {
+    return NextResponse.json({ error: "Config serveur manquante" }, { status: 500 });
+  }
+
+  const { searchParams } = request.nextUrl;
+  const search = searchParams.get("search");
+  const status = searchParams.get("status");
+  const digital_level = searchParams.get("digital_level");
+  const sector = searchParams.get("sector");
+  const connection = searchParams.get("connection");
+  const devices = searchParams.get("devices");
+  const browsers = searchParams.get("browsers");
+
+  let query = admin
+    .from("testers")
+    .select("id, email, first_name, last_name, phone, job_title, sector, company_size, digital_level, tools, browsers, devices, phone_model, mobile_os, connection, availability, interests, ux_experience, status, profile_completed, created_at, tier, quality_score, missions_completed, total_earned, persona_id, persona_locked, persona:tester_personas(id, slug, name)")
+    .order("created_at", { ascending: false });
+
+  if (status && status !== "all") {
+    query = query.eq("status", status);
+  } else {
+    query = query.in("status", ["active", "pending"]);
+  }
+
+  if (digital_level) {
+    query = query.eq("digital_level", digital_level);
+  }
+
+  if (sector) {
+    query = query.eq("sector", sector);
+  }
+
+  if (connection) {
+    query = query.eq("connection", connection);
+  }
+
+  if (devices) {
+    query = query.contains("devices", [devices]);
+  }
+
+  if (browsers) {
+    query = query.contains("browsers", [browsers]);
+  }
+
+  if (search) {
+    query = query.or(
+      `first_name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%`
+    );
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json(data ?? []);
+}

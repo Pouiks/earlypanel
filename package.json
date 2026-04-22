@@ -9,9 +9,20 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.10.2",
+    "@supabase/supabase-js": "^2.103.3",
+    "@tiptap/extension-link": "^3.22.4",
+    "@tiptap/extension-placeholder": "^3.22.4",
+    "@tiptap/extension-underline": "^3.22.4",
+    "@tiptap/pm": "^3.22.4",
+    "@tiptap/react": "^3.22.4",
+    "@tiptap/starter-kit": "^3.22.4",
     "next": "16.2.4",
+    "pdf-lib": "^1.17.1",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "resend": "^6.12.2",
+    "stripe": "^22.0.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

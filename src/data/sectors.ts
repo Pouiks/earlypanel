@@ -1,0 +1,17 @@
+export const sectors: string[] = [
+  "SaaS B2B",
+  "E-commerce",
+  "Fintech",
+  "Healthtech",
+  "RH & recrutement",
+  "Logistique",
+  "Éducation",
+  "Immobilier",
+  "Juridique & compliance",
+  "Marketplace",
+  "Application mobile",
+  "Industrie 4.0",
+  "Assurance",
+  "Banque & crédit",
+  "Retail & grande distribution",
+];
