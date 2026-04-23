@@ -39,6 +39,7 @@ export default function Step1Personal({ data, onNext, loading }: Step1Props) {
   const [city, setCity] = useState(data.city || "");
   const [postalCode, setPostalCode] = useState(data.postal_code || "");
   const [linkedin, setLinkedin] = useState(data.linkedin_url || "");
+  const [gender, setGender] = useState(data.gender || "");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   function handleSubmit(e: React.FormEvent) {
@@ -59,6 +60,7 @@ export default function Step1Personal({ data, onNext, loading }: Step1Props) {
       city: city.trim() || null,
       postal_code: postalCode.trim() || null,
       linkedin_url: linkedin.trim() || null,
+      gender: (gender as Tester["gender"]) || null,
     });
   }
 
@@ -95,6 +97,20 @@ export default function Step1Personal({ data, onNext, loading }: Step1Props) {
           <label style={labelStyle}>Date de naissance <span style={{ color: "#86868B", fontWeight: 400 }}>(optionnel)</span></label>
           <input style={inputStyle} type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} />
         </div>
+      </div>
+      <div style={{ marginBottom: 16 }}>
+        <label style={labelStyle}>Genre <span style={{ color: "#86868B", fontWeight: 400 }}>(optionnel)</span></label>
+        <select
+          value={gender}
+          onChange={(e) => setGender(e.target.value)}
+          style={{ ...inputStyle, cursor: "pointer", color: gender ? "#1d1d1f" : "#86868B" }}
+        >
+          <option value="">Je ne souhaite pas répondre</option>
+          <option value="female">Femme</option>
+          <option value="male">Homme</option>
+          <option value="non_binary">Non-binaire</option>
+          <option value="prefer_not_to_say">Préfère ne pas répondre</option>
+        </select>
       </div>
       <div style={{ marginBottom: 16 }}>
         <label style={labelStyle}>Adresse <span style={{ color: "#86868B", fontWeight: 400 }}>(optionnel)</span></label>

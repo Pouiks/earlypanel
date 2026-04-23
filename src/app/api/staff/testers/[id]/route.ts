@@ -47,6 +47,7 @@ export async function PATCH(
   const allowed: Record<string, unknown> = {};
   if ("persona_id" in body) allowed.persona_id = body.persona_id;
   if ("persona_locked" in body) allowed.persona_locked = !!body.persona_locked;
+  if ("gender" in body) allowed.gender = body.gender || null;
 
   if (Object.keys(allowed).length === 0) {
     return NextResponse.json({ error: "Aucun champ modifiable" }, { status: 400 });

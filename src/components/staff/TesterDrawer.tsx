@@ -1,11 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import type { Tester } from "@/types/tester";
+import { useCallback, useEffect, useState } from "react";
+import type { Tester, TesterGender, TesterPersona } from "@/types/tester";
+
+const GENDER_LABELS: Record<string, string> = {
+  female: "Femme",
+  male: "Homme",
+  non_binary: "Non-binaire",
+  prefer_not_to_say: "Préfère ne pas répondre",
+};
 
 interface TesterDrawerProps {
   testerId: string | null;
   onClose: () => void;
+}
+
+interface PersonaOption extends TesterPersona {
+  tester_count?: number;
 }
 
 function Badge({ children, color = "#0A7A5A", bg = "#f0faf5" }: { children: React.ReactNode; color?: string; bg?: string }) {
@@ -40,19 +51,34 @@ function InfoLine({ label, value }: { label: string; value: string | null | unde
 
 export default function TesterDrawer({ testerId, onClose }: TesterDrawerProps) {
   const [tester, setTester] = useState<Tester | null>(null);
+  const [personas, setPersonas] = useState<PersonaOption[]>([]);
   const [loading, setLoading] = useState(false);
+  const [savingPersona, setSavingPersona] = useState(false);
 
-  useEffect(() => {
+  const fetchDrawerData = useCallback(async () => {
     if (!testerId) {
       setTester(null);
+      setPersonas([]);
       return;
     }
+
     setLoading(true);
-    fetch(`/api/staff/testers/${testerId}`)
-      .then((r) => r.ok ? r.json() : null)
-      .then((data) => setTester(data))
-      .finally(() => setLoading(false));
+    try {
+      const [testerRes, personasRes] = await Promise.all([
+        fetch(`/api/staff/testers/${testerId}`),
+        fetch("/api/staff/personas"),
+      ]);
+
+      setTester(testerRes.ok ? await testerRes.json() : null);
+      setPersonas(personasRes.ok ? await personasRes.json() : []);
+    } finally {
+      setLoading(false);
+    }
   }, [testerId]);
+
+  useEffect(() => {
+    fetchDrawerData();
+  }, [fetchDrawerData]);
 
   if (!testerId) return null;
 
@@ -116,6 +142,115 @@ export default function TesterDrawer({ testerId, onClose }: TesterDrawerProps) {
               <Section title="Identité">
                 <InfoLine label="Téléphone" value={tester.phone} />
                 <InfoLine label="LinkedIn" value={tester.linkedin_url} />
+                <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "0.5px solid rgba(0,0,0,0.04)", alignItems: "center" }}>
+                  <span style={{ fontSize: 13, color: "#86868B" }}>Genre</span>
+                  <select
+                    value={tester.gender || ""}
+                    onChange={async (e) => {
+                      const val = e.target.value as TesterGender | "";
+                      const res = await fetch(`/api/staff/testers/${tester.id}`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ gender: val || null }),
+                      });
+                      if (res.ok) {
+                        setTester({ ...tester, gender: val || null } as Tester);
+                      }
+                    }}
+                    style={{
+                      fontSize: 13, fontWeight: 500, color: "#1d1d1f",
+                      background: "#f5f5f7", border: "0.5px solid rgba(0,0,0,0.08)",
+                      borderRadius: 6, padding: "4px 8px", fontFamily: "inherit",
+                      cursor: "pointer",
+                    }}
+                  >
+                    <option value="">–</option>
+                    {Object.entries(GENDER_LABELS).map(([val, label]) => (
+                      <option key={val} value={val}>{label}</option>
+                    ))}
+                  </select>
+                </div>
+              </Section>
+
+              <Section title="Persona">
+                <div style={{ marginBottom: 10 }}>
+                  <span style={{ fontSize: 12, color: "#86868B", display: "block", marginBottom: 6 }}>
+                    Persona attribué
+                  </span>
+                  <select
+                    value={tester.persona_id || ""}
+                    disabled={savingPersona}
+                    onChange={async (e) => {
+                      const personaId = e.target.value || null;
+                      setSavingPersona(true);
+                      const res = await fetch(`/api/staff/testers/${tester.id}`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ persona_id: personaId }),
+                      });
+                      if (res.ok) {
+                        setTester({ ...tester, persona_id: personaId } as Tester);
+                      }
+                      setSavingPersona(false);
+                    }}
+                    style={{
+                      width: "100%",
+                      fontSize: 13,
+                      fontWeight: 500,
+                      color: "#1d1d1f",
+                      background: "#f5f5f7",
+                      border: "0.5px solid rgba(0,0,0,0.08)",
+                      borderRadius: 8,
+                      padding: "10px 12px",
+                      fontFamily: "inherit",
+                      cursor: savingPersona ? "wait" : "pointer",
+                    }}
+                  >
+                    <option value="">Aucun persona</option>
+                    {personas.map((persona) => (
+                      <option key={persona.id} value={persona.id}>
+                        {persona.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <label
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    fontSize: 13,
+                    color: "#1d1d1f",
+                    marginBottom: 8,
+                    cursor: savingPersona ? "wait" : "pointer",
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={!!tester.persona_locked}
+                    disabled={savingPersona}
+                    onChange={async (e) => {
+                      const locked = e.target.checked;
+                      setSavingPersona(true);
+                      const res = await fetch(`/api/staff/testers/${tester.id}`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ persona_locked: locked }),
+                      });
+                      if (res.ok) {
+                        setTester({ ...tester, persona_locked: locked } as Tester);
+                      }
+                      setSavingPersona(false);
+                    }}
+                    style={{ accentColor: "#0A7A5A" }}
+                  />
+                  Verrouiller ce persona manuellement
+                </label>
+
+                <div style={{ fontSize: 12, color: "#86868B", lineHeight: 1.5 }}>
+                  Quand il est verrouillé, les recomputations automatiques ne remplacent plus le persona choisi.
+                </div>
               </Section>
 
               <Section title="Professionnel">

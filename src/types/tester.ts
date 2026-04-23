@@ -1,4 +1,5 @@
 export type TesterStatus = "pending" | "active" | "suspended" | "rejected";
+export type TesterGender = "female" | "male" | "non_binary" | "prefer_not_to_say";
 
 export interface TesterPersona {
   id: string;
@@ -53,6 +54,7 @@ export interface Tester {
   auth_user_id: string | null;
   profile_completed: boolean;
   profile_step: number;
+  gender?: TesterGender | null;
   persona_id: string | null;
   persona_locked: boolean;
   persona?: TesterPersona | null;

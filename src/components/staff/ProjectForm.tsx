@@ -36,6 +36,18 @@ export interface ProjectFormData {
   /** Montant de base affiché en euros dans le formulaire ; envoyé en centimes par le parent */
   base_reward_cents?: number | null;
   client_id?: string | null;
+
+  business_objective?: string;
+  scope_included?: string[];
+  scope_excluded?: string[];
+  client_guidelines?: string;
+  test_type?: string;
+  audit_enabled?: boolean;
+  audit_performance_score?: number | null;
+  audit_accessibility_score?: number | null;
+  audit_seo_score?: number | null;
+  audit_best_practices_score?: number | null;
+  audit_findings?: string[];
 }
 
 interface ClientLite {
@@ -209,6 +221,19 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
       : ""
   );
 
+  const [businessObjective, setBusinessObjective] = useState(initialData?.business_objective ?? "");
+  const [scopeIncluded, setScopeIncluded] = useState<string[]>(initialData?.scope_included?.length ? initialData.scope_included : [""]);
+  const [scopeExcluded, setScopeExcluded] = useState<string[]>(initialData?.scope_excluded?.length ? initialData.scope_excluded : [""]);
+  const [clientGuidelines, setClientGuidelines] = useState(initialData?.client_guidelines ?? "");
+  const [testType, setTestType] = useState<string>(initialData?.test_type ?? "unmoderated");
+  const [auditEnabled, setAuditEnabled] = useState(initialData?.audit_enabled ?? false);
+  const [auditPerformance, setAuditPerformance] = useState<string>(initialData?.audit_performance_score?.toString() ?? "");
+  const [auditAccessibility, setAuditAccessibility] = useState<string>(initialData?.audit_accessibility_score?.toString() ?? "");
+  const [auditSeo, setAuditSeo] = useState<string>(initialData?.audit_seo_score?.toString() ?? "");
+  const [auditBestPractices, setAuditBestPractices] = useState<string>(initialData?.audit_best_practices_score?.toString() ?? "");
+  const [auditFindings, setAuditFindings] = useState<string[]>(initialData?.audit_findings?.length ? initialData.audit_findings : [""]);
+  const [reportSectionOpen, setReportSectionOpen] = useState(false);
+
   const [urls, setUrls] = useState<string[]>(initialData?.urls?.length ? initialData.urls : [""]);
 
   const initQuestions = initialData?.questions?.length
@@ -232,6 +257,18 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
     next[i] = val;
     setUrls(next);
   }
+
+  function addScopeIncluded() { setScopeIncluded([...scopeIncluded, ""]); }
+  function removeScopeIncluded(i: number) { setScopeIncluded(scopeIncluded.filter((_, idx) => idx !== i)); }
+  function updateScopeIncluded(i: number, val: string) { const n = [...scopeIncluded]; n[i] = val; setScopeIncluded(n); }
+
+  function addScopeExcluded() { setScopeExcluded([...scopeExcluded, ""]); }
+  function removeScopeExcluded(i: number) { setScopeExcluded(scopeExcluded.filter((_, idx) => idx !== i)); }
+  function updateScopeExcluded(i: number, val: string) { const n = [...scopeExcluded]; n[i] = val; setScopeExcluded(n); }
+
+  function addFinding() { setAuditFindings([...auditFindings, ""]); }
+  function removeFinding(i: number) { setAuditFindings(auditFindings.filter((_, idx) => idx !== i)); }
+  function updateFinding(i: number, val: string) { const n = [...auditFindings]; n[i] = val; setAuditFindings(n); }
 
   function addQuestion() { setQuestions([...questions, ""]); }
   function removeQuestion(i: number) { setQuestions(questions.filter((_, idx) => idx !== i)); }
@@ -295,6 +332,17 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
         target_sector_restricted: targetSectorRestricted,
         target_locations: targetLocations,
         client_id: clientId,
+        business_objective: businessObjective.trim() || undefined,
+        scope_included: scopeIncluded.filter((s) => s.trim()),
+        scope_excluded: scopeExcluded.filter((s) => s.trim()),
+        client_guidelines: clientGuidelines.trim() || undefined,
+        test_type: testType,
+        audit_enabled: auditEnabled,
+        audit_performance_score: auditEnabled && auditPerformance ? parseInt(auditPerformance) : null,
+        audit_accessibility_score: auditEnabled && auditAccessibility ? parseInt(auditAccessibility) : null,
+        audit_seo_score: auditEnabled && auditSeo ? parseInt(auditSeo) : null,
+        audit_best_practices_score: auditEnabled && auditBestPractices ? parseInt(auditBestPractices) : null,
+        audit_findings: auditEnabled ? auditFindings.filter((f) => f.trim()) : [],
       });
     } finally {
       setSaving(false);
@@ -619,6 +667,173 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
         >
           + Ajouter une question
         </button>
+      </div>
+
+      {/* SECTION: Contexte du rapport (repliable) */}
+      <div style={sectionStyle}>
+        <button
+          type="button"
+          onClick={() => setReportSectionOpen(!reportSectionOpen)}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            background: "none",
+            border: "none",
+            padding: 0,
+            cursor: "pointer",
+            fontFamily: "inherit",
+          }}
+        >
+          <h2 style={{ ...sectionTitleStyle, marginBottom: 0 }}>Contexte du rapport</h2>
+          <span style={{ fontSize: 14, color: "#86868B", transition: "transform 200ms", transform: reportSectionOpen ? "rotate(180deg)" : "rotate(0)" }}>▼</span>
+        </button>
+        <p style={{ fontSize: 12, color: "#86868B", margin: "6px 0 0" }}>
+          Ces champs alimentent le rapport de mission livré au client. Optionnels à la création, ils peuvent être complétés plus tard.
+        </p>
+
+        {reportSectionOpen && (
+          <div style={{ marginTop: 20 }}>
+            <div style={{ marginBottom: 16 }}>
+              <label style={labelStyle}>Objectif business du test</label>
+              <textarea
+                value={businessObjective}
+                onChange={(e) => setBusinessObjective(e.target.value)}
+                placeholder="Pourquoi ce test ? Quel enjeu business le client cherche-t-il à résoudre ?"
+                rows={3}
+                style={{ ...inputStyle, resize: "vertical" }}
+                onFocus={(e) => e.currentTarget.style.borderColor = "#0A7A5A"}
+                onBlur={(e) => e.currentTarget.style.borderColor = "rgba(0,0,0,0.12)"}
+              />
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <label style={labelStyle}>Périmètre inclus</label>
+              {scopeIncluded.map((item, i) => (
+                <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+                  <input
+                    type="text"
+                    value={item}
+                    onChange={(e) => updateScopeIncluded(i, e.target.value)}
+                    placeholder={`Parcours ou fonctionnalité ${i + 1}`}
+                    style={{ ...inputStyle, flex: 1 }}
+                    onFocus={(e) => e.currentTarget.style.borderColor = "#0A7A5A"}
+                    onBlur={(e) => e.currentTarget.style.borderColor = "rgba(0,0,0,0.12)"}
+                  />
+                  {scopeIncluded.length > 1 && (
+                    <button type="button" onClick={() => removeScopeIncluded(i)} style={{ padding: "0 14px", fontSize: 18, color: "#e53e3e", background: "#fef2f2", border: "none", borderRadius: 10, cursor: "pointer" }}>&times;</button>
+                  )}
+                </div>
+              ))}
+              <button type="button" onClick={addScopeIncluded} style={{ padding: "6px 14px", fontSize: 12, fontWeight: 600, color: "#0A7A5A", background: "#f0faf5", border: "1.5px solid #0A7A5A", borderRadius: 980, cursor: "pointer", fontFamily: "inherit" }}>+ Ajouter</button>
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <label style={labelStyle}>Périmètre exclu (hors scope)</label>
+              {scopeExcluded.map((item, i) => (
+                <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+                  <input
+                    type="text"
+                    value={item}
+                    onChange={(e) => updateScopeExcluded(i, e.target.value)}
+                    placeholder={`Hors périmètre ${i + 1}`}
+                    style={{ ...inputStyle, flex: 1 }}
+                    onFocus={(e) => e.currentTarget.style.borderColor = "#0A7A5A"}
+                    onBlur={(e) => e.currentTarget.style.borderColor = "rgba(0,0,0,0.12)"}
+                  />
+                  {scopeExcluded.length > 1 && (
+                    <button type="button" onClick={() => removeScopeExcluded(i)} style={{ padding: "0 14px", fontSize: 18, color: "#e53e3e", background: "#fef2f2", border: "none", borderRadius: 10, cursor: "pointer" }}>&times;</button>
+                  )}
+                </div>
+              ))}
+              <button type="button" onClick={addScopeExcluded} style={{ padding: "6px 14px", fontSize: 12, fontWeight: 600, color: "#0A7A5A", background: "#f0faf5", border: "1.5px solid #0A7A5A", borderRadius: 980, cursor: "pointer", fontFamily: "inherit" }}>+ Ajouter</button>
+            </div>
+
+            <div style={{ marginBottom: 16 }}>
+              <label style={labelStyle}>Consignes du client</label>
+              <textarea
+                value={clientGuidelines}
+                onChange={(e) => setClientGuidelines(e.target.value)}
+                placeholder="Ton souhaité, points d'attention, sensibilité à certains aspects…"
+                rows={3}
+                style={{ ...inputStyle, resize: "vertical" }}
+                onFocus={(e) => e.currentTarget.style.borderColor = "#0A7A5A"}
+                onBlur={(e) => e.currentTarget.style.borderColor = "rgba(0,0,0,0.12)"}
+              />
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 16 }}>
+              <div>
+                <label style={labelStyle}>Type de test</label>
+                <select
+                  value={testType}
+                  onChange={(e) => setTestType(e.target.value)}
+                  style={{ ...inputStyle, cursor: "pointer" }}
+                >
+                  <option value="unmoderated">Non modéré</option>
+                  <option value="moderated">Modéré</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ ...labelStyle, display: "flex", alignItems: "center", gap: 10, marginTop: 24 }}>
+                  <input
+                    type="checkbox"
+                    checked={auditEnabled}
+                    onChange={(e) => setAuditEnabled(e.target.checked)}
+                    style={{ width: 16, height: 16, accentColor: "#0A7A5A" }}
+                  />
+                  Inclure un audit Lighthouse
+                </label>
+              </div>
+            </div>
+
+            {auditEnabled && (
+              <div style={{ marginTop: 20, padding: 16, background: "#f5f5f7", borderRadius: 12, border: "0.5px solid rgba(0,0,0,0.06)" }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: "#1d1d1f", marginBottom: 12, display: "block" }}>Scores Lighthouse (0-100)</span>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 10, marginBottom: 14 }}>
+                  {([
+                    { label: "Performance", value: auditPerformance, setter: setAuditPerformance },
+                    { label: "Accessibilité", value: auditAccessibility, setter: setAuditAccessibility },
+                    { label: "SEO", value: auditSeo, setter: setAuditSeo },
+                    { label: "Bonnes pratiques", value: auditBestPractices, setter: setAuditBestPractices },
+                  ] as const).map((field) => (
+                    <div key={field.label}>
+                      <label style={{ ...labelStyle, fontSize: 11 }}>{field.label}</label>
+                      <input
+                        type="number" min={0} max={100}
+                        value={field.value}
+                        onChange={(e) => field.setter(e.target.value)}
+                        placeholder="—"
+                        style={{ ...inputStyle, textAlign: "center" }}
+                        onFocus={(e) => e.currentTarget.style.borderColor = "#0A7A5A"}
+                        onBlur={(e) => e.currentTarget.style.borderColor = "rgba(0,0,0,0.12)"}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <span style={{ fontSize: 12, fontWeight: 600, color: "#6e6e73", marginBottom: 8, display: "block" }}>Constats (findings)</span>
+                {auditFindings.map((finding, i) => (
+                  <div key={i} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+                    <input
+                      type="text"
+                      value={finding}
+                      onChange={(e) => updateFinding(i, e.target.value)}
+                      placeholder="Images non optimisées — 14 images servies dans un format non adapté…"
+                      style={{ ...inputStyle, flex: 1, fontSize: 13 }}
+                      onFocus={(e) => e.currentTarget.style.borderColor = "#0A7A5A"}
+                      onBlur={(e) => e.currentTarget.style.borderColor = "rgba(0,0,0,0.12)"}
+                    />
+                    {auditFindings.length > 1 && (
+                      <button type="button" onClick={() => removeFinding(i)} style={{ padding: "0 14px", fontSize: 18, color: "#e53e3e", background: "#fef2f2", border: "none", borderRadius: 10, cursor: "pointer" }}>&times;</button>
+                    )}
+                  </div>
+                ))}
+                <button type="button" onClick={addFinding} style={{ padding: "6px 14px", fontSize: 12, fontWeight: 600, color: "#0A7A5A", background: "#f0faf5", border: "1.5px solid #0A7A5A", borderRadius: 980, cursor: "pointer", fontFamily: "inherit" }}>+ Constat</button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* SECTION: Ciblage */}

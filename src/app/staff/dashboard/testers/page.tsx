@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import TesterDrawer from "@/components/staff/TesterDrawer";
 
 interface TesterRow {
   id: string;
@@ -50,6 +51,7 @@ export default function StaffTestersPage() {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState("active");
   const [search, setSearch] = useState("");
+  const [drawerId, setDrawerId] = useState<string | null>(null);
 
   useEffect(() => {
     load();
@@ -166,12 +168,16 @@ export default function StaffTestersPage() {
             return (
               <div
                 key={t.id}
+                onClick={() => setDrawerId(t.id)}
                 style={{
                   display: "grid", gridTemplateColumns: "1.5fr 1.2fr 0.8fr 0.8fr 0.8fr 0.8fr",
                   gap: 12, padding: "14px 20px",
                   borderBottom: "0.5px solid rgba(0,0,0,0.04)",
                   alignItems: "center", fontSize: 13, color: "#1d1d1f",
+                  cursor: "pointer", transition: "background 100ms",
                 }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = "#fafafa")}
+                onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
               >
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
@@ -214,6 +220,8 @@ export default function StaffTestersPage() {
           })}
         </div>
       )}
+
+      <TesterDrawer testerId={drawerId} onClose={() => { setDrawerId(null); load(); }} />
     </div>
   );
 }

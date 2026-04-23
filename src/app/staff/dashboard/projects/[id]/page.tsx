@@ -10,6 +10,8 @@ import ProjectQuestionsTab from "@/components/staff/ProjectQuestionsTab";
 import ProjectNdaTab from "@/components/staff/ProjectNdaTab";
 import ProjectAnswersTab from "@/components/staff/ProjectAnswersTab";
 import ProjectPayoutsTab from "@/components/staff/ProjectPayoutsTab";
+import ProjectReviewTab from "@/components/staff/ProjectReviewTab";
+import ProjectReportTab from "@/components/staff/ProjectReportTab";
 import type { ProjectFormData } from "@/components/staff/ProjectForm";
 import type { Project, ProjectStatus } from "@/types/staff";
 
@@ -29,15 +31,17 @@ const STATUS_COLORS: Record<ProjectStatus, { bg: string; text: string }> = {
 
 const ALL_STATUSES: ProjectStatus[] = ["draft", "active", "closed", "archived"];
 
-type TabId = "info" | "testers" | "nda" | "questionnaire" | "answers" | "payouts";
+type TabId = "info" | "testers" | "nda" | "questionnaire" | "answers" | "review" | "payouts" | "report";
 
 const TABS: { id: TabId; label: string }[] = [
   { id: "info", label: "Informations" },
   { id: "testers", label: "Testeurs" },
   { id: "nda", label: "NDA" },
-  { id: "questionnaire", label: "Questionnaire" },
+  { id: "questionnaire", label: "Scénarios" },
   { id: "answers", label: "Réponses" },
+  { id: "review", label: "Dépouillement" },
   { id: "payouts", label: "Versements" },
+  { id: "report", label: "Rapport" },
 ];
 
 export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -283,7 +287,9 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         />
       )}
       {activeTab === "answers" && <ProjectAnswersTab projectId={id} />}
+      {activeTab === "review" && <ProjectReviewTab projectId={id} />}
       {activeTab === "payouts" && <ProjectPayoutsTab projectId={id} />}
+      {activeTab === "report" && <ProjectReportTab projectId={id} />}
     </div>
   );
 }
