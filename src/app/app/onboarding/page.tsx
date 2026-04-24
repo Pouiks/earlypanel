@@ -61,6 +61,7 @@ export default function OnboardingPage() {
 
       setToast({ visible: true, message: "Étape sauvegardée ✓" });
       setCurrentStep(step + 1);
+      window.scrollTo({ top: 0 });
     } catch (err) {
       setToast({ visible: true, message: `Erreur: ${err instanceof Error ? err.message : "Réessayez"}` });
     } finally {
@@ -92,7 +93,7 @@ export default function OnboardingPage() {
         totalSteps={5}
         title={title}
         subtitle={subtitle}
-        onBack={() => setCurrentStep((s) => Math.max(1, s - 1))}
+        onBack={() => { setCurrentStep((s) => Math.max(1, s - 1)); window.scrollTo({ top: 0 }); }}
         showBack={currentStep > 1}
       >
         {currentStep === 1 && (

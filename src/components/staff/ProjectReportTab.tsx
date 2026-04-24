@@ -85,12 +85,18 @@ type LocalVerbatim = ReportFrictionVerbatim & { _key: string };
 type LocalFriction = Omit<ReportFriction, "verbatims"> & { _key: string; verbatims: LocalVerbatim[] };
 type LocalReco = ReportRecommendation & { _key: string };
 
+interface CheckItem {
+  label: string;
+  done: boolean;
+}
+
 export default function ProjectReportTab({ projectId }: Props) {
   const [report, setReport] = useState<ProjectReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [panel, setPanel] = useState<PanelTester[]>([]);
+  const [hoverChecklist, setHoverChecklist] = useState(false);
 
   // Summary state
   const [deliveryDate, setDeliveryDate] = useState("");
@@ -691,43 +697,102 @@ export default function ProjectReportTab({ projectId }: Props) {
       </div>
 
       {/* ========== EXPORT ========== */}
-      <div style={{
-        ...card, background: "#f0faf5", border: "1.5px solid rgba(10,122,90,0.2)",
-      }}>
-        <h3 style={{ fontSize: 14, fontWeight: 700, color: "#1d1d1f", margin: "0 0 4px" }}>Export &amp; Livrables</h3>
-        <p style={{ fontSize: 12, color: "#86868B", margin: "0 0 16px" }}>
-          Le JSON est le format d&apos;entrée pour le skill Claude (génération PDF). Le CSV contient les réponses brutes anonymisées.
-        </p>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <a
-            href={`/api/staff/projects/${projectId}/export?format=json`}
-            download
-            style={{
-              display: "inline-flex", alignItems: "center", gap: 8,
-              padding: "10px 20px", fontSize: 13, fontWeight: 700,
-              color: "#fff", background: "#0A7A5A",
-              border: "none", borderRadius: 980, textDecoration: "none",
-              cursor: "pointer", fontFamily: "inherit", transition: "all 200ms",
-            }}
-          >
-            Télécharger le JSON rapport
-          </a>
-          <a
-            href={`/api/staff/projects/${projectId}/export?format=csv`}
-            download
-            style={{
-              display: "inline-flex", alignItems: "center", gap: 8,
-              padding: "10px 20px", fontSize: 13, fontWeight: 700,
-              color: "#1d1d1f", background: "#fff",
-              border: "1px solid rgba(0,0,0,0.12)", borderRadius: 980,
-              textDecoration: "none", cursor: "pointer", fontFamily: "inherit",
-              transition: "all 200ms",
-            }}
-          >
-            Télécharger le CSV réponses
-          </a>
-        </div>
-      </div>
+      {(() => {
+        const checks: CheckItem[] = [
+          { label: "Date de livraison", done: !!deliveryDate.trim() },
+          { label: "Verdict (synthèse executive)", done: !!verdict.trim() },
+          { label: "Au moins 1 chiffre clé", done: keyFigures.some((kf) => kf.value.trim() && kf.label.trim()) },
+          { label: "Au moins 1 action prioritaire", done: topActions.some((a) => a.trim()) },
+          { label: "Au moins 1 friction renseignée", done: frictions.some((f) => f.title.trim()) },
+          { label: "Au moins 1 recommandation", done: recos.some((r) => r.title.trim()) },
+          { label: "Matrice impact/effort remplie", done: Object.values(matrix).some((arr) => arr.length > 0) },
+        ];
+        const missing = checks.filter((c) => !c.done);
+        const allDone = missing.length === 0;
+
+        return (
+          <div style={{
+            ...card,
+            background: allDone ? "#f0faf5" : "#f5f5f7",
+            border: allDone ? "1.5px solid rgba(10,122,90,0.2)" : "1.5px solid rgba(0,0,0,0.08)",
+          }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, color: "#1d1d1f", margin: "0 0 4px" }}>Export &amp; Livrables</h3>
+            <p style={{ fontSize: 12, color: "#86868B", margin: "0 0 16px" }}>
+              {allDone
+                ? "Toutes les étapes sont complètes. Vous pouvez générer le rapport."
+                : `${missing.length} étape${missing.length > 1 ? "s" : ""} manquante${missing.length > 1 ? "s" : ""} avant de pouvoir générer le rapport.`}
+            </p>
+
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-start" }}>
+              <div style={{ position: "relative" }}
+                onMouseEnter={() => setHoverChecklist(true)}
+                onMouseLeave={() => setHoverChecklist(false)}
+              >
+                <a
+                  href={allDone ? `/api/staff/projects/${projectId}/export?format=json` : undefined}
+                  download={allDone ? true : undefined}
+                  onClick={allDone ? undefined : (e) => e.preventDefault()}
+                  style={{
+                    display: "inline-flex", alignItems: "center", gap: 8,
+                    padding: "10px 20px", fontSize: 13, fontWeight: 700,
+                    color: allDone ? "#fff" : "#86868B",
+                    background: allDone ? "#0A7A5A" : "#e5e5e5",
+                    border: "none", borderRadius: 980, textDecoration: "none",
+                    cursor: allDone ? "pointer" : "default",
+                    fontFamily: "inherit", transition: "all 200ms",
+                  }}
+                >
+                  Générer le rapport
+                </a>
+
+                {hoverChecklist && !allDone && (
+                  <div style={{
+                    position: "absolute", top: "calc(100% + 8px)", left: 0,
+                    background: "#fff", borderRadius: 14, padding: "16px 20px",
+                    boxShadow: "0 8px 32px rgba(0,0,0,0.15)", border: "0.5px solid rgba(0,0,0,0.08)",
+                    minWidth: 280, zIndex: 50,
+                  }}>
+                    <p style={{ fontSize: 12, fontWeight: 700, color: "#1d1d1f", margin: "0 0 10px" }}>
+                      Checklist du rapport
+                    </p>
+                    {checks.map((c, i) => (
+                      <div key={i} style={{
+                        display: "flex", alignItems: "center", gap: 8,
+                        padding: "5px 0", fontSize: 13,
+                        color: c.done ? "#0A7A5A" : "#e53e3e",
+                      }}>
+                        <span style={{ fontSize: 14 }}>{c.done ? "✓" : "✗"}</span>
+                        <span style={{
+                          fontWeight: c.done ? 400 : 600,
+                          textDecoration: c.done ? "line-through" : "none",
+                          opacity: c.done ? 0.6 : 1,
+                        }}>
+                          {c.label}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <a
+                href={`/api/staff/projects/${projectId}/export?format=csv`}
+                download
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 8,
+                  padding: "10px 20px", fontSize: 13, fontWeight: 700,
+                  color: "#1d1d1f", background: "#fff",
+                  border: "1px solid rgba(0,0,0,0.12)", borderRadius: 980,
+                  textDecoration: "none", cursor: "pointer", fontFamily: "inherit",
+                  transition: "all 200ms",
+                }}
+              >
+                Télécharger le CSV réponses
+              </a>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

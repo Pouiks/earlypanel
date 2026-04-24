@@ -92,15 +92,31 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
     setEditing(false);
   }
 
+  const [reactivateModal, setReactivateModal] = useState(false);
+  const [newEndDate, setNewEndDate] = useState("");
+
   async function handleStatusChange(newStatus: ProjectStatus) {
+    if (newStatus === "active" && project?.status !== "draft") {
+      setNewEndDate("");
+      setReactivateModal(true);
+      return;
+    }
+    await applyStatusChange(newStatus);
+  }
+
+  async function applyStatusChange(newStatus: ProjectStatus, extraFields?: Record<string, unknown>) {
     const res = await fetch(`/api/staff/projects/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: newStatus }),
+      body: JSON.stringify({ status: newStatus, ...extraFields }),
     });
 
     if (res.ok) {
+      setReactivateModal(false);
       await fetchProject();
+    } else {
+      const err = await res.json();
+      alert(err.error || "Erreur");
     }
   }
 
@@ -290,6 +306,59 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
       {activeTab === "review" && <ProjectReviewTab projectId={id} />}
       {activeTab === "payouts" && <ProjectPayoutsTab projectId={id} />}
       {activeTab === "report" && <ProjectReportTab projectId={id} />}
+
+      {reactivateModal && (
+        <div style={{
+          position: "fixed", inset: 0, zIndex: 200,
+          background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center",
+        }} onClick={() => setReactivateModal(false)}>
+          <div style={{
+            background: "#fff", borderRadius: 20, padding: "32px", width: "100%", maxWidth: 400,
+            boxShadow: "0 8px 40px rgba(0,0,0,0.15)",
+          }} onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ fontSize: 17, fontWeight: 700, color: "#1d1d1f", margin: "0 0 8px" }}>
+              Réactiver le projet
+            </h3>
+            <p style={{ fontSize: 13, color: "#6e6e73", margin: "0 0 20px", lineHeight: 1.5 }}>
+              Choisissez une nouvelle date et heure de fin pour ce projet. Il sera automatiquement clôturé à cette échéance.
+            </p>
+            <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "#1d1d1f", marginBottom: 6 }}>
+              Date et heure de fin *
+            </label>
+            <input
+              type="datetime-local"
+              value={newEndDate}
+              onChange={(e) => setNewEndDate(e.target.value)}
+              min={new Date().toISOString().slice(0, 16)}
+              style={{
+                width: "100%", padding: "12px 14px", fontSize: 14,
+                border: "0.5px solid rgba(0,0,0,0.12)", borderRadius: 12,
+                outline: "none", background: "#f5f5f7", fontFamily: "inherit", boxSizing: "border-box",
+              }}
+            />
+            <div style={{ display: "flex", gap: 8, marginTop: 20, justifyContent: "flex-end" }}>
+              <button onClick={() => setReactivateModal(false)} style={{
+                padding: "10px 20px", fontSize: 13, fontWeight: 500, color: "#6e6e73",
+                background: "none", border: "1px solid rgba(0,0,0,0.12)", borderRadius: 980,
+                cursor: "pointer", fontFamily: "inherit",
+              }}>
+                Annuler
+              </button>
+              <button
+                disabled={!newEndDate}
+                onClick={() => applyStatusChange("active", { end_date: new Date(newEndDate).toISOString() })}
+                style={{
+                  padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff",
+                  background: newEndDate ? "#0A7A5A" : "#ccc", border: "none", borderRadius: 980,
+                  cursor: newEndDate ? "pointer" : "default", fontFamily: "inherit", transition: "all 200ms",
+                }}
+              >
+                Réactiver →
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

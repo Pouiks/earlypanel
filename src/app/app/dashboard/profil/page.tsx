@@ -1,10 +1,37 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useTester } from "../layout";
 import type { Tester, DigitalLevel, MobileOS, ConnectionType, Availability, UxExperience } from "@/types/tester";
 import PillSelect from "@/components/ui/PillSelect";
 import Toast from "@/components/ui/Toast";
+
+function isoToDisplay(iso: string): string {
+  if (!iso) return "";
+  const [y, m, d] = iso.split("-");
+  return d && m && y ? `${d}/${m}/${y}` : iso;
+}
+
+function displayToIso(display: string): string {
+  const clean = display.replace(/[^\d]/g, "");
+  if (clean.length === 8) {
+    const d = clean.slice(0, 2), m = clean.slice(2, 4), y = clean.slice(4, 8);
+    return `${y}-${m}-${d}`;
+  }
+  return "";
+}
+
+function formatBirthInput(raw: string, prev: string): string {
+  const digits = raw.replace(/[^\d]/g, "").slice(0, 8);
+  const wasDeleting = raw.length < prev.length;
+  let out = "";
+  for (let i = 0; i < digits.length; i++) {
+    if (i === 2 || i === 4) out += "/";
+    out += digits[i];
+  }
+  if (!wasDeleting && (digits.length === 2 || digits.length === 4)) out += "/";
+  return out;
+}
 
 const SECTORS = [
   "Tech / SaaS", "E-commerce", "Finance / Banque", "Assurance",
@@ -52,6 +79,20 @@ export default function ProfilPage() {
   const [form, setForm] = useState<Partial<Tester>>({});
 
   const hideToast = useCallback(() => setToast({ visible: false, message: "" }), []);
+
+  const [birthDisplay, setBirthDisplay] = useState("");
+  useEffect(() => {
+    if (tester?.birth_date && !birthDisplay) setBirthDisplay(isoToDisplay(tester.birth_date));
+  }, [tester?.birth_date]);
+  const handleBirthChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setBirthDisplay(prev => {
+      const next = formatBirthInput(e.target.value, prev);
+      const iso = displayToIso(next);
+      if (iso) setForm(p => ({ ...p, birth_date: iso }));
+      else if (!next) setForm(p => ({ ...p, birth_date: "" }));
+      return next;
+    });
+  }, []);
 
   const val = (key: keyof Tester) => (form[key] !== undefined ? form[key] : tester?.[key]) ?? "";
   const arrVal = (key: keyof Tester): string[] => {
@@ -248,7 +289,7 @@ export default function ProfilPage() {
         </div>
         <div style={{ marginBottom: 12 }}>
           <label style={labelStyle}>Date de naissance</label>
-          <input type="date" style={inputStyle} value={val("birth_date") as string} onChange={(e) => update("birth_date", e.target.value)} />
+          <input style={inputStyle} value={birthDisplay} onChange={handleBirthChange} placeholder="JJ/MM/AAAA" inputMode="numeric" maxLength={10} />
         </div>
         <div style={{ marginBottom: 12 }}>
           <label style={labelStyle}>Adresse</label>

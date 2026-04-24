@@ -1,7 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import type { Tester } from "@/types/tester";
+
+function isoToDisplay(iso: string): string {
+  if (!iso) return "";
+  const [y, m, d] = iso.split("-");
+  return d && m && y ? `${d}/${m}/${y}` : iso;
+}
+
+function displayToIso(display: string): string {
+  const clean = display.replace(/[^\d]/g, "");
+  if (clean.length === 8) {
+    const d = clean.slice(0, 2), m = clean.slice(2, 4), y = clean.slice(4, 8);
+    return `${y}-${m}-${d}`;
+  }
+  return "";
+}
+
+function formatBirthInput(raw: string, prev: string): string {
+  const digits = raw.replace(/[^\d]/g, "").slice(0, 8);
+  const wasDeleting = raw.length < prev.length;
+  let out = "";
+  for (let i = 0; i < digits.length; i++) {
+    if (i === 2 || i === 4) out += "/";
+    out += digits[i];
+  }
+  if (!wasDeleting && (digits.length === 2 || digits.length === 4)) out += "/";
+  return out;
+}
 
 interface Step1Props {
   data: Partial<Tester>;
@@ -34,7 +61,10 @@ export default function Step1Personal({ data, onNext, loading }: Step1Props) {
   const [firstName, setFirstName] = useState(data.first_name || "");
   const [lastName, setLastName] = useState(data.last_name || "");
   const [phone, setPhone] = useState(data.phone || "");
-  const [birthDate, setBirthDate] = useState(data.birth_date || "");
+  const [birthDisplay, setBirthDisplay] = useState(isoToDisplay(data.birth_date || ""));
+  const handleBirthChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setBirthDisplay(prev => formatBirthInput(e.target.value, prev));
+  }, []);
   const [address, setAddress] = useState(data.address || "");
   const [city, setCity] = useState(data.city || "");
   const [postalCode, setPostalCode] = useState(data.postal_code || "");
@@ -55,7 +85,7 @@ export default function Step1Personal({ data, onNext, loading }: Step1Props) {
       first_name: firstName.trim(),
       last_name: lastName.trim(),
       phone: phone.trim() || null,
-      birth_date: birthDate || null,
+      birth_date: displayToIso(birthDisplay) || null,
       address: address.trim() || null,
       city: city.trim() || null,
       postal_code: postalCode.trim() || null,
@@ -95,7 +125,7 @@ export default function Step1Personal({ data, onNext, loading }: Step1Props) {
         </div>
         <div>
           <label style={labelStyle}>Date de naissance <span style={{ color: "#86868B", fontWeight: 400 }}>(optionnel)</span></label>
-          <input style={inputStyle} type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} />
+          <input style={inputStyle} value={birthDisplay} onChange={handleBirthChange} placeholder="JJ/MM/AAAA" inputMode="numeric" maxLength={10} />
         </div>
       </div>
       <div style={{ marginBottom: 16 }}>

@@ -58,6 +58,24 @@ export default function OnboardingLayout({
         boxShadow: "0 4px 32px rgba(0,0,0,0.08)",
         padding: "40px",
       }}>
+        {showBack && step > 1 && onBack && (
+          <button
+            type="button"
+            onClick={onBack}
+            style={{
+              background: "none",
+              border: "none",
+              fontSize: 14,
+              color: "#86868B",
+              cursor: "pointer",
+              fontFamily: "inherit",
+              padding: "0 0 12px",
+              display: "block",
+            }}
+          >
+            ← Retour
+          </button>
+        )}
         <h1 style={{
           fontSize: 22,
           fontWeight: 700,
@@ -80,25 +98,6 @@ export default function OnboardingLayout({
 
         {children}
 
-        {showBack && step > 1 && onBack && (
-          <button
-            type="button"
-            onClick={onBack}
-            style={{
-              display: "block",
-              margin: "20px auto 0",
-              background: "none",
-              border: "none",
-              fontSize: 14,
-              color: "#86868B",
-              cursor: "pointer",
-              fontFamily: "inherit",
-              padding: "8px 16px",
-            }}
-          >
-            ← Retour
-          </button>
-        )}
       </div>
     </div>
   );
