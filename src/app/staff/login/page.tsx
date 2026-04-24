@@ -81,7 +81,7 @@ export default function StaffLoginPage() {
             color: "#1d1d1f",
             letterSpacing: "-0.04em",
           }}>
-            test<span style={{ color: "#0A7A5A" }}>panel</span>
+            early<span style={{ color: "#0A7A5A" }}>panel</span>
           </span>
           <div style={{
             marginTop: 6,
@@ -128,7 +128,7 @@ export default function StaffLoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="prenom@testpanel.fr"
+              placeholder="prenom@earlypanel.fr"
               required
               style={inputStyle}
               onFocus={(e) => e.currentTarget.style.borderColor = "#0A7A5A"}
@@ -207,7 +207,7 @@ export default function StaffLoginPage() {
               textDecoration: "none",
             }}
           >
-            &larr; Retour sur testpanel.fr
+            &larr; Retour sur earlypanel.fr
           </a>
         </div>
       </div>

@@ -12,23 +12,23 @@ import LeadMagnetSection from "@/components/landing/LeadMagnetSection";
 import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "testpanel — Tests utilisateurs clés en main",
+  title: "earlypanel — Tests utilisateurs clés en main",
   description:
     "Des vrais utilisateurs testent votre produit. Questionnaires ciblés, analyse actionnelle, livraison en 5 jours. Clés en main.",
-  alternates: { canonical: "https://testpanel.fr" },
+  alternates: { canonical: "https://earlypanel.fr" },
 };
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Service",
-  name: "testpanel",
+  name: "earlypanel",
   description:
     "Tests utilisateurs clés en main. Panel humain, questionnaires ciblés, rapport actionnable livré en 5 jours.",
-  url: "https://testpanel.fr",
+  url: "https://earlypanel.fr",
   provider: {
     "@type": "Organization",
-    name: "testpanel",
-    url: "https://testpanel.fr",
+    name: "earlypanel",
+    url: "https://earlypanel.fr",
   },
 };
 

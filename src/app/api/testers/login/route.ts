@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
 
     await sendEmail({
       to: email,
-      subject: "Votre lien de connexion testpanel",
+      subject: "Votre lien de connexion earlypanel",
       html: buildLoginEmail(magicLink),
     });
 
@@ -61,7 +61,7 @@ function buildLoginEmail(magicLink: string): string {
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif; max-width: 480px; margin: 0 auto; padding: 40px 24px;">
       <div style="text-align: center; margin-bottom: 32px;">
         <span style="font-size: 22px; font-weight: 700; color: #1d1d1f; letter-spacing: -0.04em;">
-          test<span style="color: #0A7A5A;">panel</span>
+          early<span style="color: #0A7A5A;">panel</span>
         </span>
       </div>
       <h1 style="font-size: 20px; font-weight: 700; color: #1d1d1f; margin: 0 0 12px; text-align: center;">

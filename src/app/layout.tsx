@@ -3,19 +3,19 @@ import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "testpanel — Tests utilisateurs clés en main",
+  title: "earlypanel — Tests utilisateurs clés en main",
   description:
     "Des vrais utilisateurs testent votre produit. Questionnaires ciblés, analyse actionnelle, livraison en 5 jours. Clés en main.",
-  metadataBase: new URL("https://testpanel.fr"),
+  metadataBase: new URL("https://earlypanel.fr"),
   openGraph: {
-    title: "testpanel — Tests utilisateurs clés en main",
+    title: "earlypanel — Tests utilisateurs clés en main",
     description:
       "Des vrais utilisateurs testent votre produit. Rapport actionnable livré en 5 jours.",
     type: "website",
-    url: "https://testpanel.fr",
+    url: "https://earlypanel.fr",
   },
   alternates: {
-    canonical: "https://testpanel.fr",
+    canonical: "https://earlypanel.fr",
   },
 };
 

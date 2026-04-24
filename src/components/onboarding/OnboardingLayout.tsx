@@ -39,7 +39,7 @@ export default function OnboardingLayout({
             color: "#1d1d1f",
             letterSpacing: "-0.04em",
           }}>
-            test<span style={{ color: "#0A7A5A" }}>panel</span>
+            early<span style={{ color: "#0A7A5A" }}>panel</span>
           </span>
         </a>
       </div>

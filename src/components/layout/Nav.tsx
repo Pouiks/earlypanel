@@ -1,18 +1,30 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
+import { BOOKING_URL } from "@/lib/cta-links";
 
 export default function Nav() {
   const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const isIndex = pathname === "/";
   const isB2B = pathname === "/entreprises";
   const isB2C = pathname === "/testeurs";
 
+  useEffect(() => { setMenuOpen(false); }, [pathname]);
+
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = ""; };
+    }
+  }, [menuOpen]);
+
   return (
     <nav className="nav">
       <Link href="/" className="logo">
-        test<em>panel</em>
+        early<em>panel</em>
       </Link>
 
       {isIndex && (
@@ -50,11 +62,45 @@ export default function Nav() {
             Rejoindre le panel
           </button>
         ) : (
-          <button className="nav-cta">
+          <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="nav-cta">
             {isB2B ? "Démarrer un projet" : "Lancer un test"}
-          </button>
+          </a>
         )}
       </div>
+
+      <button
+        className={`nav-burger${menuOpen ? " open" : ""}`}
+        onClick={() => setMenuOpen(o => !o)}
+        aria-label="Menu"
+        aria-expanded={menuOpen}
+      >
+        <span /><span /><span />
+      </button>
+
+      {menuOpen && (
+        <div className="mobile-menu" onClick={() => setMenuOpen(false)}>
+          <div className="mobile-menu-inner" onClick={e => e.stopPropagation()}>
+            <Link href="/" onClick={() => setMenuOpen(false)}>Accueil</Link>
+            <Link href="/entreprises" onClick={() => setMenuOpen(false)}>Entreprises</Link>
+            <Link href="/testeurs" onClick={() => setMenuOpen(false)}>Devenir testeur</Link>
+            {isIndex && <>
+              <a href="#process" onClick={() => setMenuOpen(false)}>Comment ça marche</a>
+              <a href="#tarifs" onClick={() => setMenuOpen(false)}>Tarifs</a>
+            </>}
+            <div className="mobile-menu-cta">
+              {isB2C ? (
+                <button className="nav-cta" onClick={() => { setMenuOpen(false); document.getElementById("register")?.scrollIntoView({ behavior: "smooth" }); }}>
+                  Rejoindre le panel
+                </button>
+              ) : (
+                <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="nav-cta" onClick={() => setMenuOpen(false)}>
+                  {isB2B ? "Démarrer un projet" : "Lancer un test"}
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

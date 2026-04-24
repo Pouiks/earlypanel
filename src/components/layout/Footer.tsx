@@ -11,7 +11,7 @@ export default function Footer({ variant = "index" }: FooterProps) {
         <div className="footer-grid">
           <div className="footer-brand">
             <Link href="/" className="footer-logo">
-              test<em>panel</em>
+              early<em>panel</em>
             </Link>
             <p>
               {variant === "index"
@@ -53,7 +53,7 @@ export default function Footer({ variant = "index" }: FooterProps) {
                   <li><a href="#">Politique de confidentialité</a></li>
                   <li><a href="#">CGV</a></li>
                   <li><a href="#">RGPD</a></li>
-                  <li><a href="#">contact@testpanel.fr</a></li>
+                  <li><a href="#">contact@earlypanel.fr</a></li>
                 </ul>
               </div>
             </>
@@ -84,7 +84,7 @@ export default function Footer({ variant = "index" }: FooterProps) {
                   <li><a href="#">Mentions légales</a></li>
                   <li><a href="#">Confidentialité</a></li>
                   <li><a href="#">CGV</a></li>
-                  <li><a href="#">contact@testpanel.fr</a></li>
+                  <li><a href="#">contact@earlypanel.fr</a></li>
                 </ul>
               </div>
             </>
@@ -115,14 +115,14 @@ export default function Footer({ variant = "index" }: FooterProps) {
                   <li><a href="#">Mentions légales</a></li>
                   <li><a href="#">Confidentialité</a></li>
                   <li><a href="#">CGU</a></li>
-                  <li><a href="#">contact@testpanel.fr</a></li>
+                  <li><a href="#">contact@earlypanel.fr</a></li>
                 </ul>
               </div>
             </>
           )}
         </div>
         <div className="footer-bottom">
-          <p>© 2025 testpanel · Tous droits réservés</p>
+          <p>© 2025 earlypanel · Tous droits réservés</p>
           <div className="footer-legal">
             <a href="#">Mentions légales</a>
             <a href="#">Confidentialité</a>

@@ -62,7 +62,7 @@ export default function LoginPage() {
             color: "#1d1d1f",
             letterSpacing: "-0.04em",
           }}>
-            test<span style={{ color: "#0A7A5A" }}>panel</span>
+            early<span style={{ color: "#0A7A5A" }}>panel</span>
           </span>
         </div>
 
@@ -210,7 +210,7 @@ export default function LoginPage() {
               textDecoration: "none",
             }}
           >
-            ← Retour sur testpanel.fr
+            ← Retour sur earlypanel.fr
           </a>
         </div>
       </div>

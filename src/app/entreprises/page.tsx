@@ -11,10 +11,10 @@ import CtaFinal from "@/components/b2b/CtaFinal";
 import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "testpanel — Pour les entreprises",
+  title: "earlypanel — Pour les entreprises",
   description:
     "Startups, scale-ups, agences, éditeurs SaaS — on teste vos POC, maquettes, URLs de recette et produits live avec les bons profils.",
-  alternates: { canonical: "https://testpanel.fr/entreprises" },
+  alternates: { canonical: "https://earlypanel.fr/entreprises" },
 };
 
 const faqB2B = [

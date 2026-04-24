@@ -3,7 +3,7 @@ export default function DifferentiatorsSection() {
     <section className="diff-section">
       <div className="diff-inner">
         <div className="diff-left">
-          <div className="sec-eye">Pourquoi testpanel</div>
+          <div className="sec-eye">Pourquoi earlypanel</div>
           <div className="sec-title">Ce qu&apos;aucun outil self-service ne peut vous offrir.</div>
           <div className="diff-list">
             <div className="diff-item">
@@ -54,12 +54,12 @@ export default function DifferentiatorsSection() {
         </div>
         <div className="diff-right">
           <p style={{ fontSize: "12px", fontWeight: 700, color: "var(--gray-light)", letterSpacing: ".08em", textTransform: "uppercase" as const, marginBottom: "1.5rem" }}>
-            testpanel vs. outils self-service
+            earlypanel vs. outils self-service
           </p>
           <div className="compare-header">
             <span style={{ flex: 1.5 }}>Critère</span>
             <span>Outils classiques</span>
-            <span>testpanel</span>
+            <span>earlypanel</span>
           </div>
           <div className="diff-compare">
             <div className="compare-row"><div className="compare-label" style={{ flex: 1.5 }}>Profil testeur</div><div className="compare-them">Panel ouvert</div><div className="compare-us">Sélection manuelle</div></div>

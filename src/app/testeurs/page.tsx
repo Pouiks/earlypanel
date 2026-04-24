@@ -10,10 +10,10 @@ import FaqAccordion from "@/components/ui/FaqAccordion";
 import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "testpanel — Devenir testeur rémunéré",
+  title: "earlypanel — Devenir testeur rémunéré",
   description:
     "Rejoignez notre panel de testeurs. Donnez votre avis sur des apps et sites web, jusqu'à 100€ par mission selon votre profil.",
-  alternates: { canonical: "https://testpanel.fr/testeurs" },
+  alternates: { canonical: "https://earlypanel.fr/testeurs" },
 };
 
 const faqB2C = [

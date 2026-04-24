@@ -12,7 +12,7 @@
 --       "password": "MonMotDePasse123",
 --       "first_name": "Virgile",
 --       "last_name": "Joinville",
---       "setup_key": "testpanel-setup-2026"
+--       "setup_key": "earlypanel-setup-2026"
 --     }'
 --
 -- Ou en PowerShell :
@@ -20,7 +20,7 @@
 --   Invoke-RestMethod -Uri "http://localhost:3000/api/staff/setup" `
 --     -Method POST `
 --     -ContentType "application/json" `
---     -Body '{"email":"virgilejoinville@gmail.com","password":"MonMotDePasse123","first_name":"Virgile","last_name":"Joinville","setup_key":"testpanel-setup-2026"}'
+--     -Body '{"email":"virgilejoinville@gmail.com","password":"MonMotDePasse123","first_name":"Virgile","last_name":"Joinville","setup_key":"earlypanel-setup-2026"}'
 --
 -- Cette route crée l'utilisateur dans auth.users avec le mot de passe,
 -- attribue le rôle "staff" dans app_metadata,

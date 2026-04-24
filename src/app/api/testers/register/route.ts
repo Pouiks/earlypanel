@@ -74,8 +74,8 @@ export async function POST(request: NextRequest) {
       to: email,
       toName: first_name ? `${first_name} ${last_name || ""}`.trim() : undefined,
       subject: first_name
-        ? `${first_name}, complétez votre profil testpanel →`
-        : "Complétez votre profil testpanel →",
+        ? `${first_name}, complétez votre profil earlypanel →`
+        : "Complétez votre profil earlypanel →",
       html: buildWelcomeEmail(magicLink, first_name || undefined),
     });
 

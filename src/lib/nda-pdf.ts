@@ -126,7 +126,7 @@ export async function generateNdaPdf(params: NdaPdfParams): Promise<Uint8Array> 
 
   // Header bar
   page.drawRectangle({ x: 0, y: 842 - 60, width: 595, height: 60, color: green });
-  page.drawText("testpanel", { x: PAGE_MARGIN, y: 842 - 40, size: 18, font: fontBold, color: rgb(1, 1, 1) });
+  page.drawText("earlypanel", { x: PAGE_MARGIN, y: 842 - 40, size: 18, font: fontBold, color: rgb(1, 1, 1) });
 
   const refText = params.variables.nda_ref || "NDA";
   page.drawText(refText, {
@@ -196,7 +196,7 @@ export async function generateNdaPdf(params: NdaPdfParams): Promise<Uint8Array> 
       "",
       "Le signataire a déclaré avoir lu et accepté les termes du présent",
       "accord de confidentialité en cliquant sur le bouton « Signer ce document »",
-      "dans son espace personnel testpanel.",
+      "dans son espace personnel earlypanel.",
       "",
       "Ce document fait foi de preuve de consentement au sens du règlement",
       "eIDAS (signature électronique simple).",
@@ -216,7 +216,7 @@ export async function generateNdaPdf(params: NdaPdfParams): Promise<Uint8Array> 
   const pages = doc.getPages();
   for (let i = 0; i < pages.length; i++) {
     const p = pages[i];
-    const footerText = `testpanel — Confidentiel — ${v.nda_ref} — Page ${i + 1}/${pages.length}`;
+    const footerText = `earlypanel — Confidentiel — ${v.nda_ref} — Page ${i + 1}/${pages.length}`;
     p.drawText(footerText, { x: PAGE_MARGIN, y: 25, size: 8, font, color: rgb(0.6, 0.6, 0.6) });
   }
 
@@ -282,8 +282,8 @@ export function defaultNdaHtml(): string {
 
 <p><strong>Entre les soussignés :</strong></p>
 
-<p><strong>testpanel</strong>, société par actions simplifiée, représentée dans le cadre de la mission référencée <strong>{{project_ref}}</strong>,</p>
-<p>ci-après dénommée <strong>« testpanel »</strong>,</p>
+<p><strong>earlypanel</strong>, société par actions simplifiée, représentée dans le cadre de la mission référencée <strong>{{project_ref}}</strong>,</p>
+<p>ci-après dénommée <strong>« earlypanel »</strong>,</p>
 
 <p><strong>ET</strong></p>
 
@@ -292,7 +292,7 @@ export function defaultNdaHtml(): string {
 <p>Ci-après collectivement désignées <strong>« les Parties »</strong>.</p>
 
 <h2>PRÉAMBULE</h2>
-<p>Dans le cadre de la mission de test utilisateur référencée <strong>{{project_ref}}</strong>, portant sur le produit digital <strong>« {{project_title}} »</strong> développé par la société <strong>{{company_name}}</strong> (ci-après « le Client »), testpanel souhaite faire appel aux services du Testeur pour réaliser une session de test et répondre à un questionnaire d'évaluation.</p>
+<p>Dans le cadre de la mission de test utilisateur référencée <strong>{{project_ref}}</strong>, portant sur le produit digital <strong>« {{project_title}} »</strong> développé par la société <strong>{{company_name}}</strong> (ci-après « le Client »), earlypanel souhaite faire appel aux services du Testeur pour réaliser une session de test et répondre à un questionnaire d'évaluation.</p>
 <p>Le Testeur sera amené à accéder à des informations, fonctionnalités et interfaces non encore rendues publiques, susceptibles de constituer des informations confidentielles au sens du présent accord.</p>
 
 <h2>ARTICLE 1 — DÉFINITION DES INFORMATIONS CONFIDENTIELLES</h2>
@@ -311,19 +311,19 @@ export function defaultNdaHtml(): string {
 <li>Ne pas publier, partager ou évoquer publiquement les fonctionnalités, interfaces ou contenus auxquels il a accès</li>
 <li>N'utiliser les Informations Confidentielles qu'aux seules fins d'exécution de la mission de test</li>
 <li>Ne pas réaliser de captures d'écran, enregistrements vidéo ou audio de l'interface testée, sauf autorisation écrite</li>
-<li>Informer immédiatement testpanel en cas de divulgation accidentelle ou non autorisée</li>
+<li>Informer immédiatement earlypanel en cas de divulgation accidentelle ou non autorisée</li>
 <p>Ces obligations s'appliquent pendant toute la durée de la mission et pendant une période de <strong>2 (deux) ans</strong> à compter de la fin de la mission.</p>
 
 <h2>ARTICLE 3 — PROPRIÉTÉ INTELLECTUELLE</h2>
-<p>Le Testeur reconnaît que l'ensemble des Informations Confidentielles demeurent la propriété exclusive de testpanel et/ou du Client.</p>
-<p>Les réponses, observations et retours fournis par le Testeur dans le cadre de la mission deviennent la propriété de testpanel, qui peut les transmettre au Client sous forme anonymisée ou pseudonymisée.</p>
+<p>Le Testeur reconnaît que l'ensemble des Informations Confidentielles demeurent la propriété exclusive de earlypanel et/ou du Client.</p>
+<p>Les réponses, observations et retours fournis par le Testeur dans le cadre de la mission deviennent la propriété de earlypanel, qui peut les transmettre au Client sous forme anonymisée ou pseudonymisée.</p>
 
 <h2>ARTICLE 4 — DONNÉES PERSONNELLES</h2>
-<p>Dans le cadre du présent accord, testpanel traite des données personnelles relatives au Testeur conformément au Règlement Général sur la Protection des Données (RGPD) et à la politique de confidentialité disponible sur testpanel.fr.</p>
-<p>Le Testeur dispose d'un droit d'accès, de rectification et de suppression de ses données en écrivant à contact@testpanel.fr.</p>
+<p>Dans le cadre du présent accord, earlypanel traite des données personnelles relatives au Testeur conformément au Règlement Général sur la Protection des Données (RGPD) et à la politique de confidentialité disponible sur earlypanel.fr.</p>
+<p>Le Testeur dispose d'un droit d'accès, de rectification et de suppression de ses données en écrivant à contact@earlypanel.fr.</p>
 
 <h2>ARTICLE 5 — RESPONSABILITÉ ET SANCTIONS</h2>
-<p>Toute violation des obligations de confidentialité pourra engager la responsabilité civile et, le cas échéant, pénale du Testeur. testpanel se réserve le droit de suspendre l'accès à la plateforme et de réclamer réparation du préjudice subi.</p>
+<p>Toute violation des obligations de confidentialité pourra engager la responsabilité civile et, le cas échéant, pénale du Testeur. earlypanel se réserve le droit de suspendre l'accès à la plateforme et de réclamer réparation du préjudice subi.</p>
 
 <h2>ARTICLE 6 — DURÉE ET LOI APPLICABLE</h2>
 <p>Le présent accord prend effet à la date de sa signature et demeure en vigueur pendant <strong>2 (deux) ans</strong> après la fin de la mission. Il est soumis au droit français. Tout litige sera porté devant les tribunaux compétents de Paris.</p>

@@ -102,7 +102,7 @@ export async function POST(
       await sendEmail({
         to: tester.email,
         toName: `${tester.first_name} ${tester.last_name}`,
-        subject: `NDA à signer — ${project?.title || "Mission testpanel"}`,
+        subject: `NDA à signer — ${project?.title || "Mission earlypanel"}`,
         html: buildNdaNotificationEmail(
           tester.first_name || "",
           project?.title || "votre mission",
@@ -140,7 +140,7 @@ function buildNdaNotificationEmail(
     <tr><td align="center">
       <table width="100%" style="max-width:520px;background:#fff;border-radius:20px;overflow:hidden;">
         <tr><td style="background:#0A7A5A;padding:24px 32px;">
-          <span style="font-size:18px;font-weight:700;color:#fff;letter-spacing:-0.5px;">test<span style="color:#2DD4A0;">panel</span></span>
+          <span style="font-size:18px;font-weight:700;color:#fff;letter-spacing:-0.5px;">early<span style="color:#2DD4A0;">panel</span></span>
         </td></tr>
         <tr><td style="padding:32px;">
           <p style="font-size:16px;color:#1d1d1f;margin:0 0 16px;font-weight:600;">Bonjour ${firstName},</p>
@@ -152,7 +152,7 @@ function buildNdaNotificationEmail(
           <p style="font-size:12px;color:#86868B;line-height:1.5;margin:28px 0 0;">Si vous n'êtes pas concerné par cette demande, ignorez cet email.</p>
         </td></tr>
         <tr><td style="padding:20px 32px;border-top:0.5px solid rgba(0,0,0,0.08);">
-          <p style="font-size:11px;color:#86868B;margin:0;">testpanel · Made in France</p>
+          <p style="font-size:11px;color:#86868B;margin:0;">earlypanel · Made in France</p>
         </td></tr>
       </table>
     </td></tr>
