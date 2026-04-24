@@ -16,7 +16,7 @@ interface SendEmailParams {
 function getFrom(): string {
   const configured = process.env.RESEND_FROM_EMAIL?.trim();
   if (configured) return configured;
-  return "earlypanel <onboarding@resend.dev>";
+  return "earlypanel <noreply@earlypanel.fr>";
 }
 
 export async function sendEmail({ to, subject, html, toName, attachments }: SendEmailParams) {
