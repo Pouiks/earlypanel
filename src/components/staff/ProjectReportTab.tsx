@@ -7,6 +7,7 @@ import type {
   ReportRecommendation, ReportImpactEffortMatrix,
   Severity, Impact, Priority, TechEffort,
 } from "@/types/staff";
+import { useConfirm } from "@/components/ui/ConfirmModal";
 
 interface Props {
   projectId: string;
@@ -97,6 +98,7 @@ export default function ProjectReportTab({ projectId }: Props) {
   const [saved, setSaved] = useState(false);
   const [panel, setPanel] = useState<PanelTester[]>([]);
   const [hoverChecklist, setHoverChecklist] = useState(false);
+  const { notify, ConfirmModal } = useConfirm();
 
   // Summary state
   const [deliveryDate, setDeliveryDate] = useState("");
@@ -308,7 +310,7 @@ export default function ProjectReportTab({ projectId }: Props) {
       setSaved(true);
     } else {
       const err = await res.json();
-      alert(err.error || "Erreur lors de l'enregistrement");
+      await notify({ title: "Erreur", message: err.error || "Erreur lors de l'enregistrement" });
     }
   }
 
@@ -793,6 +795,7 @@ export default function ProjectReportTab({ projectId }: Props) {
           </div>
         );
       })()}
+      <ConfirmModal />
     </div>
   );
 }

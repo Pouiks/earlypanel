@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useConfirm } from "@/components/ui/ConfirmModal";
 
 interface PayoutRow {
   id: string;
@@ -34,6 +35,7 @@ export default function ProjectPayoutsTab({ projectId }: ProjectPayoutsTabProps)
   const [saving, setSaving] = useState(false);
   const [paying, setPaying] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const { confirm, ConfirmModal } = useConfirm();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -109,7 +111,12 @@ export default function ProjectPayoutsTab({ projectId }: ProjectPayoutsTabProps)
       setMessage("Sélectionnez au moins un versement en attente.");
       return;
     }
-    if (!confirm(`Déclencher ${ids.length} versement(s) ?`)) return;
+    const ok = await confirm({
+      title: `Déclencher ${ids.length} versement(s) ?`,
+      message: "Les transferts Stripe seront initialisés immédiatement.",
+      confirmLabel: "Déclencher",
+    });
+    if (!ok) return;
     setPaying(true);
     setMessage(null);
     try {
@@ -267,6 +274,7 @@ export default function ProjectPayoutsTab({ projectId }: ProjectPayoutsTabProps)
           </tbody>
         </table>
       </div>
+      <ConfirmModal />
     </div>
   );
 }

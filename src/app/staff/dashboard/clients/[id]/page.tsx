@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import type { B2BClient } from "@/types/client";
+import { useConfirm } from "@/components/ui/ConfirmModal";
 
 interface LinkedProject {
   id: string;
@@ -38,6 +39,7 @@ export default function ClientDetailPage() {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<Partial<B2BClient>>({});
   const [busy, setBusy] = useState(false);
+  const { confirm, ConfirmModal } = useConfirm();
 
   useEffect(() => {
     load();
@@ -85,7 +87,13 @@ export default function ClientDetailPage() {
   }
 
   async function remove() {
-    if (!confirm("Supprimer ce client ? Les projets liés seront détachés (non supprimés).")) return;
+    const ok = await confirm({
+      title: "Supprimer ce client ?",
+      message: "Les projets liés seront détachés (non supprimés).",
+      confirmLabel: "Supprimer",
+      danger: true,
+    });
+    if (!ok) return;
     setBusy(true);
     try {
       const res = await fetch(`/api/staff/clients/${params.id}`, { method: "DELETE" });
@@ -256,6 +264,7 @@ export default function ClientDetailPage() {
           </div>
         )}
       </div>
+      <ConfirmModal />
     </div>
   );
 }

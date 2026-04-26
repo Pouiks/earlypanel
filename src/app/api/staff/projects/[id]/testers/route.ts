@@ -70,7 +70,31 @@ export async function POST(
     return NextResponse.json({ error: "Statut projet incompatible" }, { status: 400 });
   }
 
-  const rows = tester_ids.map((tester_id: string) => ({
+  // Garde-fou : on n'assigne que des testeurs actifs avec un profil complet.
+  // Cela bloque les comptes pending, suspended, rejected, banned, ou les profils incomplets.
+  const { data: candidates } = await admin
+    .from("testers")
+    .select("id, status, profile_completed")
+    .in("id", tester_ids);
+
+  const eligible = (candidates ?? []).filter(
+    (t) => t.status === "active" && t.profile_completed === true
+  );
+  const eligibleIds = eligible.map((t) => t.id);
+  const rejectedIds = tester_ids.filter((id: string) => !eligibleIds.includes(id));
+
+  if (eligibleIds.length === 0) {
+    return NextResponse.json(
+      {
+        error:
+          "Aucun testeur eligible : seuls les testeurs avec status=active et profil complet peuvent etre assignes.",
+        rejected_tester_ids: rejectedIds,
+      },
+      { status: 400 }
+    );
+  }
+
+  const rows = eligibleIds.map((tester_id: string) => ({
     project_id: id,
     tester_id,
     status: "selected",
@@ -85,5 +109,11 @@ export async function POST(
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json(data, { status: 201 });
+  return NextResponse.json(
+    {
+      assigned: data ?? [],
+      rejected_tester_ids: rejectedIds,
+    },
+    { status: 201 }
+  );
 }

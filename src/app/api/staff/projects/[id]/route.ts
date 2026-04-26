@@ -56,6 +56,25 @@ export async function PATCH(
   const { questions, ...projectData } = body;
 
   if (Object.keys(projectData).length > 0) {
+    // Garde-fou : ne pas autoriser un retour vers "draft" si des testeurs ont deja avance.
+    if ("status" in projectData && projectData.status === "draft") {
+      const { count: activePtCount } = await admin
+        .from("project_testers")
+        .select("id", { count: "exact", head: true })
+        .eq("project_id", id)
+        .neq("status", "selected");
+
+      if (activePtCount && activePtCount > 0) {
+        return NextResponse.json(
+          {
+            error:
+              "Impossible de repasser le projet en brouillon : des testeurs ont deja avance dans le workflow.",
+          },
+          { status: 409 }
+        );
+      }
+    }
+
     if ("start_date" in projectData || "end_date" in projectData) {
       const { data: existing } = await admin
         .from("projects")
@@ -102,6 +121,40 @@ export async function PATCH(
   }
 
   if (questions !== undefined && Array.isArray(questions)) {
+    // Garde-fou critique : la FK project_tester_answers.question_id ON DELETE CASCADE
+    // detruirait toutes les reponses si on supprime les questions.
+    const { count: answersCount } = await admin
+      .from("project_tester_answers")
+      .select("id", { count: "exact", head: true })
+      .eq("project_id", id);
+
+    if (answersCount && answersCount > 0) {
+      return NextResponse.json(
+        {
+          error:
+            "Impossible de modifier les questions : des reponses ont deja ete soumises. Utilisez la gestion des cas d'usage pour des modifications ciblees.",
+        },
+        { status: 409 }
+      );
+    }
+
+    // Si le projet utilise des cas d'usage, refuser pour eviter d'orpheliner les questions.
+    const { count: ucQuestionsCount } = await admin
+      .from("project_questions")
+      .select("id", { count: "exact", head: true })
+      .eq("project_id", id)
+      .not("use_case_id", "is", null);
+
+    if (ucQuestionsCount && ucQuestionsCount > 0) {
+      return NextResponse.json(
+        {
+          error:
+            "Ce projet utilise des cas d'usage. Modifiez les questions via la gestion des use cases.",
+        },
+        { status: 409 }
+      );
+    }
+
     await admin
       .from("project_questions")
       .delete()
@@ -142,6 +195,38 @@ export async function DELETE(
   }
 
   const { id } = await params;
+
+  // Garde-fou : refuser la suppression si des testeurs ont commence le projet.
+  // On autorise la suppression d'un brouillon avec uniquement des "selected" (rien n'a ete envoye).
+  const { count: activePtCount } = await admin
+    .from("project_testers")
+    .select("id", { count: "exact", head: true })
+    .eq("project_id", id)
+    .neq("status", "selected");
+
+  if (activePtCount && activePtCount > 0) {
+    return NextResponse.json(
+      {
+        error: `Impossible de supprimer : ${activePtCount} testeur(s) ont deja participe a ce projet. Archivez-le plutot.`,
+      },
+      { status: 409 }
+    );
+  }
+
+  // Refuser aussi la suppression d'un projet qui a deja eu des paiements.
+  const { count: payoutCount } = await admin
+    .from("tester_payouts")
+    .select("id", { count: "exact", head: true })
+    .eq("project_id", id);
+
+  if (payoutCount && payoutCount > 0) {
+    return NextResponse.json(
+      {
+        error: "Impossible de supprimer : des versements existent pour ce projet. Archivez-le plutot.",
+      },
+      { status: 409 }
+    );
+  }
 
   const { error } = await admin
     .from("projects")

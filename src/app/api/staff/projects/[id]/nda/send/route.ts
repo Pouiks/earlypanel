@@ -3,6 +3,7 @@ import { getStaffMember } from "@/lib/staff-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/email";
 import { projectAllowsNdaSend, projectIsClosedForCampaign } from "@/lib/project-lifecycle";
+import { tryGetAppUrl } from "@/lib/app-url";
 
 export async function POST(
   request: NextRequest,
@@ -41,6 +42,23 @@ export async function POST(
   }
 
   if (projRow.status === "draft") {
+    // Garde-fou : ne pas activer un projet sans question, sinon les testeurs verront un ecran vide
+    // et la soumission echouera avec "Aucune question".
+    const { count: questionsCount } = await admin
+      .from("project_questions")
+      .select("id", { count: "exact", head: true })
+      .eq("project_id", id);
+
+    if (!questionsCount || questionsCount === 0) {
+      return NextResponse.json(
+        {
+          error:
+            "Impossible d'activer le projet : ajoutez au moins une question avant d'envoyer le NDA.",
+        },
+        { status: 400 }
+      );
+    }
+
     await admin.from("projects").update({ status: "active" }).eq("id", id);
   }
 
@@ -75,7 +93,7 @@ export async function POST(
         .single();
 
       if (!pt || pt.status !== "selected") {
-        results.push({ tester_id: testerId, success: false, error: "Testeur non éligible" });
+        results.push({ tester_id: testerId, success: false, error: "Testeur non eligible" });
         continue;
       }
 
@@ -90,33 +108,82 @@ export async function POST(
         continue;
       }
 
-      await admin
+      const appUrl = tryGetAppUrl();
+      if (!appUrl) {
+        console.error("[nda/send] APP_URL missing in prod");
+        results.push({ tester_id: testerId, success: false, error: "Service indisponible" });
+        continue;
+      }
+      const docLink = `${appUrl}/app/dashboard/documents`;
+
+      // G5 : envoyer l'email AVANT toute mise a jour de statut. Si l'envoi
+      // echoue, on ne marque pas le testeur en `nda_sent`, ce qui permet une
+      // re-tentative ulterieure sans laisser le testeur en etat "envoye sans
+      // email".
+      try {
+        await sendEmail({
+          to: tester.email,
+          toName: `${tester.first_name} ${tester.last_name}`,
+          subject: `NDA a signer - ${project?.title || "Mission earlypanel"}`,
+          html: buildNdaNotificationEmail(
+            tester.first_name || "",
+            project?.title || "votre mission",
+            project?.company_name || "",
+            docLink
+          ),
+        });
+      } catch (mailErr) {
+        // Log detaille cote serveur, message generique cote client (G5).
+        console.error("[nda/send] Email send failed for", testerId, mailErr);
+        results.push({
+          tester_id: testerId,
+          success: false,
+          error: "Envoi de l'email impossible. Reessayez plus tard.",
+        });
+        continue;
+      }
+
+      // G6 : transition atomique selected -> nda_sent. Le filtre `.eq("status","selected")`
+      // empeche un double envoi si une autre requete concurrente a deja modifie le statut.
+      const { data: updatedRows, error: updateError } = await admin
         .from("project_testers")
         .update({ status: "nda_sent", nda_sent_at: new Date().toISOString() })
         .eq("project_id", id)
-        .eq("tester_id", testerId);
+        .eq("tester_id", testerId)
+        .eq("status", "selected")
+        .select("id");
 
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-      const docLink = `${appUrl}/app/dashboard/documents`;
+      if (updateError) {
+        console.error("[nda/send] DB update failed AFTER email sent for", testerId, updateError.message);
+        // L'email est deja parti : on ne peut pas le rollback. On signale a
+        // l'operateur via les logs ; cote API on remonte un succes partiel.
+        results.push({
+          tester_id: testerId,
+          success: false,
+          error: "Email envoye mais statut non mis a jour. Contactez le support.",
+        });
+        continue;
+      }
 
-      await sendEmail({
-        to: tester.email,
-        toName: `${tester.first_name} ${tester.last_name}`,
-        subject: `NDA à signer — ${project?.title || "Mission earlypanel"}`,
-        html: buildNdaNotificationEmail(
-          tester.first_name || "",
-          project?.title || "votre mission",
-          project?.company_name || "",
-          docLink
-        ),
-      });
+      if (!updatedRows || updatedRows.length === 0) {
+        // Race: statut change entre la lecture et l'update. Email parti quand meme.
+        console.warn("[nda/send] Race: status changed after email send for", testerId);
+        results.push({
+          tester_id: testerId,
+          success: false,
+          error: "Statut testeur modifie entre temps. Email envoye, statut non mis a jour.",
+        });
+        continue;
+      }
 
       results.push({ tester_id: testerId, success: true });
     } catch (err) {
+      // Message generique cote API : on ne fuite pas l'erreur interne (G5/G13).
+      console.error("[nda/send] Unexpected error for", testerId, err);
       results.push({
         tester_id: testerId,
         success: false,
-        error: err instanceof Error ? err.message : "Erreur inconnue",
+        error: "Erreur lors de l'envoi du NDA.",
       });
     }
   }

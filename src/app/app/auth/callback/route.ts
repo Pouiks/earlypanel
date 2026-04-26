@@ -1,6 +1,7 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { backfillConnectionIfStuck } from "@/lib/tester-activation-repair";
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
@@ -69,11 +70,22 @@ export async function GET(request: NextRequest) {
   if (admin) {
     const { data: tester } = await admin
       .from("testers")
-      .select("profile_completed")
+      .select("id, profile_completed, status, connection, profile_step")
       .eq("auth_user_id", user.id)
       .maybeSingle();
 
-    profileCompleted = tester?.profile_completed ?? false;
+    if (tester) {
+      const { applied, profile_completed_after } = await backfillConnectionIfStuck(admin, {
+        id: tester.id,
+        status: tester.status,
+        connection: tester.connection,
+        profile_step: tester.profile_step,
+        profile_completed: tester.profile_completed,
+      });
+      profileCompleted = applied
+        ? (profile_completed_after ?? false)
+        : (tester.profile_completed ?? false);
+    }
   }
 
   const redirectUrl = profileCompleted ? "/app/dashboard" : "/app/onboarding";
@@ -87,6 +99,8 @@ export async function GET(request: NextRequest) {
     path: "/",
     httpOnly: true,
     sameSite: "lax",
+    // SECURITE : flag `secure` en production (HTTPS uniquement).
+    secure: process.env.NODE_ENV === "production",
     maxAge: 60 * 60 * 24 * 7,
   });
 

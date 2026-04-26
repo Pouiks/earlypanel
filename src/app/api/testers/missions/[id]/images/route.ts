@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getAuthedTester } from "@/lib/tester-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { projectAllowsTesterWork } from "@/lib/project-lifecycle";
+import { projectAllowsTesterWorkWithGrace } from "@/lib/project-lifecycle";
 import {
   detectImageMime,
   extensionForMime,
@@ -84,11 +84,17 @@ export async function POST(
       .select("end_date, status")
       .eq("id", projectId)
       .single();
-    if (!projectAllowsTesterWork(project?.status as string)) {
-      return NextResponse.json({ error: "Le projet n'est pas ouvert aux tests" }, { status: 403 });
-    }
-    if (project?.end_date && new Date(project.end_date) < new Date()) {
-      return NextResponse.json({ error: "Délai dépassé" }, { status: 400 });
+    // Fenetre de grace 24h post-cloture pour ne pas perdre l'upload d'un testeur en cours.
+    if (
+      !projectAllowsTesterWorkWithGrace(
+        project?.status as string,
+        (project?.end_date as string | null) ?? null
+      )
+    ) {
+      return NextResponse.json(
+        { error: "Le projet n'accepte plus de modifications (delai depasse au-dela de la grace 24h)" },
+        { status: 403 }
+      );
     }
 
     const { data: question } = await admin
@@ -111,6 +117,8 @@ export async function POST(
       );
     }
 
+    // G7 : pre-check tolerant des plafonds (UX rapide), MAIS la verite vient
+    // de la RPC atomique ci-dessous qui re-controle sous verrou DB.
     const { data: answers } = await admin
       .from("project_tester_answers")
       .select("question_id, image_urls")
@@ -155,23 +163,64 @@ export async function POST(
       return NextResponse.json({ error: "Erreur upload" }, { status: 500 });
     }
 
-    // Upsert answer with new image path
-    if (currentAnswer) {
-      const newPaths = [...(currentAnswer.image_urls as string[]), path];
-      await admin
-        .from("project_tester_answers")
-        .update({ image_urls: newPaths })
-        .eq("project_id", projectId)
-        .eq("tester_id", authed.testerId)
-        .eq("question_id", questionId);
-    } else {
-      await admin.from("project_tester_answers").insert({
-        project_id: projectId,
-        tester_id: authed.testerId,
-        question_id: questionId,
-        answer_text: "",
-        image_urls: [path],
-      });
+    // G7 : ajout atomique du path dans image_urls via RPC (verrou ligne + check
+    // plafond a l'interieur de la transaction). Evite le lost-update si deux
+    // uploads concurrents lisent la meme liste avant ecriture.
+    const { error: rpcErr } = await admin.rpc("append_image_to_answer", {
+      p_project_id: projectId,
+      p_tester_id: authed.testerId,
+      p_question_id: questionId,
+      p_path: path,
+      p_max_per_question: MAX_IMAGES_PER_QUESTION,
+      p_max_per_mission: MAX_IMAGES_PER_MISSION,
+    });
+
+    if (rpcErr) {
+      // Detection des erreurs metier (plafond depasse cote DB sous verrou).
+      if (rpcErr.message?.includes("images_per_question_limit_exceeded")) {
+        await admin.storage.from(BUCKET).remove([path]).catch(() => {});
+        return NextResponse.json(
+          { error: `Maximum ${MAX_IMAGES_PER_QUESTION} images par question atteint` },
+          { status: 400 }
+        );
+      }
+      if (rpcErr.message?.includes("images_per_mission_limit_exceeded")) {
+        await admin.storage.from(BUCKET).remove([path]).catch(() => {});
+        return NextResponse.json(
+          { error: `Maximum ${MAX_IMAGES_PER_MISSION} images par mission atteint` },
+          { status: 400 }
+        );
+      }
+
+      // Fallback non-atomique si la migration 020 n'est pas encore deployee.
+      // On utilise les donnees relues plus haut (`answers`) ; ce chemin reste
+      // race-prone mais maintient la compat tant que la RPC n'est pas en prod.
+      console.warn("[images/upload] append_image_to_answer RPC indispo, fallback:", rpcErr.message);
+      if (currentAnswer) {
+        const newPaths = [...(currentAnswer.image_urls as string[]), path];
+        const { error: updErr } = await admin
+          .from("project_tester_answers")
+          .update({ image_urls: newPaths })
+          .eq("project_id", projectId)
+          .eq("tester_id", authed.testerId)
+          .eq("question_id", questionId);
+        if (updErr) {
+          await admin.storage.from(BUCKET).remove([path]).catch(() => {});
+          return NextResponse.json({ error: "Erreur enregistrement" }, { status: 500 });
+        }
+      } else {
+        const { error: insErr } = await admin.from("project_tester_answers").insert({
+          project_id: projectId,
+          tester_id: authed.testerId,
+          question_id: questionId,
+          answer_text: "",
+          image_urls: [path],
+        });
+        if (insErr) {
+          await admin.storage.from(BUCKET).remove([path]).catch(() => {});
+          return NextResponse.json({ error: "Erreur enregistrement" }, { status: 500 });
+        }
+      }
     }
 
     // Signed URL pour affichage immediat
@@ -230,23 +279,41 @@ export async function DELETE(
       return NextResponse.json({ error: "Mission non modifiable" }, { status: 409 });
     }
 
-    const { data: answer } = await admin
-      .from("project_tester_answers")
-      .select("id, image_urls")
-      .eq("project_id", projectId)
-      .eq("tester_id", authed.testerId)
-      .eq("question_id", questionId)
-      .maybeSingle();
+    // G7 : suppression atomique via RPC (array_remove sous verrou ligne).
+    // Le storage.remove est best-effort : meme s'il echoue, on a deja retire
+    // le path de la liste de la reponse.
+    const { error: rpcErr } = await admin.rpc("remove_image_from_answer", {
+      p_project_id: projectId,
+      p_tester_id: authed.testerId,
+      p_question_id: questionId,
+      p_path: path,
+    });
 
-    if (!answer) return NextResponse.json({ error: "Reponse introuvable" }, { status: 404 });
+    if (rpcErr) {
+      if (rpcErr.message?.includes("answer_not_found")) {
+        return NextResponse.json({ error: "Reponse introuvable" }, { status: 404 });
+      }
 
-    const newPaths = (answer.image_urls as string[]).filter((p) => p !== path);
+      // Fallback non-atomique si la migration 020 n'est pas encore deployee.
+      console.warn("[images/delete] remove_image_from_answer RPC indispo, fallback:", rpcErr.message);
+      const { data: answer } = await admin
+        .from("project_tester_answers")
+        .select("id, image_urls")
+        .eq("project_id", projectId)
+        .eq("tester_id", authed.testerId)
+        .eq("question_id", questionId)
+        .maybeSingle();
 
-    await admin.storage.from(BUCKET).remove([path]);
-    await admin
-      .from("project_tester_answers")
-      .update({ image_urls: newPaths })
-      .eq("id", answer.id);
+      if (!answer) return NextResponse.json({ error: "Reponse introuvable" }, { status: 404 });
+
+      const newPaths = (answer.image_urls as string[]).filter((p) => p !== path);
+      await admin
+        .from("project_tester_answers")
+        .update({ image_urls: newPaths })
+        .eq("id", answer.id);
+    }
+
+    await admin.storage.from(BUCKET).remove([path]).catch(() => {});
 
     return NextResponse.json({ success: true });
   } catch (err) {

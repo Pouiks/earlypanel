@@ -22,9 +22,36 @@ async function getSupabaseClient() {
 }
 
 async function sha256(data: Uint8Array): Promise<string> {
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data.buffer as ArrayBuffer);
+  // G4 : data.buffer peut etre plus grand que la vue (cas d'un Uint8Array slice).
+  // On copie les octets utiles dans un nouveau Uint8Array pour ne hasher QUE
+  // la zone correspondant a la vue, et eviter aussi les soucis de typage avec
+  // SharedArrayBuffer (digest n'accepte que ArrayBuffer / ArrayBufferView).
+  const exact = new Uint8Array(data.byteLength);
+  exact.set(data);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", exact);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function ensureDocumentsBucketPrivate(
+  admin: ReturnType<typeof createAdminClient>
+): Promise<void> {
+  if (!admin) return;
+  const { data: buckets } = await admin.storage.listBuckets();
+  const existing = buckets?.find((b) => b.name === "documents");
+  if (!existing) {
+    // G4 : bucket doit etre PRIVE (les NDA contiennent des donnees personnelles).
+    await admin.storage.createBucket("documents", { public: false });
+    return;
+  }
+  if (existing.public) {
+    // Bucket cree historiquement en public : on le bascule en prive (best-effort).
+    try {
+      await admin.storage.updateBucket("documents", { public: false });
+    } catch (err) {
+      console.error("[NDA sign] Failed to flip documents bucket to private", err);
+    }
+  }
 }
 
 export async function POST(
@@ -101,10 +128,7 @@ export async function POST(
   const documentHash = await sha256(pdfBytes);
   const filePath = `ndas/${projectId}/${tester.id}_${Date.now()}.pdf`;
 
-  const { data: buckets } = await admin.storage.listBuckets();
-  if (!buckets?.find((b) => b.name === "documents")) {
-    await admin.storage.createBucket("documents", { public: true });
-  }
+  await ensureDocumentsBucketPrivate(admin);
 
   const { error: uploadError } = await admin.storage
     .from("documents")
@@ -113,36 +137,62 @@ export async function POST(
       upsert: true,
     });
 
-  let documentUrl = "";
   if (uploadError) {
+    // G4 : si l'upload echoue, on REFUSE de signer. Sans PDF stocke, marquer
+    // le NDA comme signe rendrait la preuve juridique incomplete et empecherait
+    // toute reprise (puisque la transition `nda_sent -> nda_signed` est unique).
     console.error("[NDA sign] Storage upload failed:", uploadError.message);
-    documentUrl = `storage-error://${filePath}`;
-  } else {
-    const { data: urlData } = admin.storage.from("documents").getPublicUrl(filePath);
-    documentUrl = urlData.publicUrl;
+    return NextResponse.json(
+      { error: "Stockage du document indisponible. Reessayez dans quelques instants." },
+      { status: 503 }
+    );
   }
 
-  const { error: updateError } = await admin
+  // G4 : on stocke le PATH dans le bucket prive (et non une URL publique).
+  // Le prefixe `storage:` permet a /api/testers/documents de detecter qu'il
+  // doit generer une URL signee a la volee. Les URL publiques historiques
+  // restent lisibles tant qu'elles n'ont pas ce prefixe.
+  const documentRef = `storage:${filePath}`;
+
+  // G6 : transition atomique nda_sent -> nda_signed. Le filtre `.eq("status", "nda_sent")`
+  // garantit qu'un second appel concurrent qui ne trouve plus la ligne en
+  // nda_sent ne re-signe pas le meme NDA.
+  const { data: updatedRows, error: updateError } = await admin
     .from("project_testers")
     .update({
       status: "nda_signed",
       nda_signed_at: signedAt,
-      nda_document_url: documentUrl,
+      nda_document_url: documentRef,
       nda_signer_ip: ip,
       nda_signer_user_agent: userAgent,
       nda_document_hash: documentHash,
     })
     .eq("project_id", projectId)
-    .eq("tester_id", tester.id);
+    .eq("tester_id", tester.id)
+    .eq("status", "nda_sent")
+    .select("id");
 
   if (updateError) {
     return NextResponse.json({ error: updateError.message }, { status: 500 });
   }
 
+  if (!updatedRows || updatedRows.length === 0) {
+    // Race ou re-tentative : la ligne n'est plus en nda_sent.
+    return NextResponse.json(
+      { error: "Le NDA n'est plus a l'etat 'envoye' (deja signe ou expire)" },
+      { status: 409 }
+    );
+  }
+
+  // Genere l'URL signee retournee a l'UI (TTL court = 1h).
+  const { data: signedUrlData } = await admin.storage
+    .from("documents")
+    .createSignedUrl(filePath, 60 * 60);
+
   return NextResponse.json({
     success: true,
     signed_at: signedAt,
-    document_url: documentUrl,
+    document_url: signedUrlData?.signedUrl ?? null,
     document_hash: documentHash,
     nda_ref: variables.nda_ref,
   });

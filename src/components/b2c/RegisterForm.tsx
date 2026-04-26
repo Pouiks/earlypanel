@@ -11,6 +11,9 @@ export default function RegisterForm() {
   const [email, setEmail] = useState("");
   const [formState, setFormState] = useState<FormState>("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  // G3 : si le backend repond mock:true (env dev sans Supabase), on n'affiche
+  // pas le message trompeur "verifiez votre boite mail".
+  const [mockMode, setMockMode] = useState(false);
 
   function selectDigital(level: string) {
     setDigitalLevel(level);
@@ -46,6 +49,7 @@ export default function RegisterForm() {
         throw new Error(data.error || "Erreur lors de l'inscription");
       }
 
+      setMockMode(data?.mock === true);
       setFormState("success");
     } catch (err) {
       setFormState("error");
@@ -79,7 +83,7 @@ export default function RegisterForm() {
           letterSpacing: "-0.04em",
           margin: "0 0 6px",
         }}>
-          Vous y êtes presque !
+          {mockMode ? "Mode demo activé" : "Vous y êtes presque !"}
         </h3>
 
         <p style={{
@@ -88,65 +92,73 @@ export default function RegisterForm() {
           lineHeight: 1.6,
           margin: "0 0 20px",
         }}>
-          Un lien de connexion a été envoyé à
-          <br />
-          <span style={{
-            display: "inline-block",
-            marginTop: 6,
-            padding: "6px 16px",
-            background: "var(--green-bg)",
-            color: "var(--green)",
-            borderRadius: "var(--pill)",
-            fontSize: 13,
-            fontWeight: 600,
-          }}>
-            {email}
-          </span>
+          {mockMode ? (
+            <>L&apos;inscription a été simulée pour {email}. Aucun email n&apos;a été envoyé (mode développement).</>
+          ) : (
+            <>
+              Un lien de connexion a été envoyé à
+              <br />
+              <span style={{
+                display: "inline-block",
+                marginTop: 6,
+                padding: "6px 16px",
+                background: "var(--green-bg)",
+                color: "var(--green)",
+                borderRadius: "var(--pill)",
+                fontSize: 13,
+                fontWeight: 600,
+              }}>
+                {email}
+              </span>
+            </>
+          )}
         </p>
 
-        <div style={{
-          background: "#f5f5f7",
-          borderRadius: 12,
-          padding: "16px 20px",
-          textAlign: "left",
-          marginBottom: 20,
-        }}>
-          <p style={{ fontSize: 13, fontWeight: 600, color: "var(--black)", margin: "0 0 10px" }}>
-            Prochaines étapes :
-          </p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {[
-              { num: "1", text: "Ouvrez votre boîte mail" },
-              { num: "2", text: "Cliquez sur le lien de connexion" },
-              { num: "3", text: "Complétez votre profil en 5 min" },
-            ].map((step) => (
-              <div key={step.num} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{
-                  width: 22,
-                  height: 22,
-                  borderRadius: "50%",
-                  background: "var(--green)",
-                  color: "#fff",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 11,
-                  fontWeight: 700,
-                  flexShrink: 0,
-                }}>
-                  {step.num}
-                </span>
-                <span style={{ fontSize: 13, color: "var(--black)" }}>{step.text}</span>
-              </div>
-            ))}
+        {!mockMode && (
+          <div style={{
+            background: "#f5f5f7",
+            borderRadius: 12,
+            padding: "16px 20px",
+            textAlign: "left",
+            marginBottom: 20,
+          }}>
+            <p style={{ fontSize: 13, fontWeight: 600, color: "var(--black)", margin: "0 0 10px" }}>
+              Prochaines étapes :
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {[
+                { num: "1", text: "Ouvrez votre boîte mail" },
+                { num: "2", text: "Cliquez sur le lien de connexion" },
+                { num: "3", text: "Complétez votre profil en 5 min" },
+              ].map((step) => (
+                <div key={step.num} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{
+                    width: 22,
+                    height: 22,
+                    borderRadius: "50%",
+                    background: "var(--green)",
+                    color: "#fff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    flexShrink: 0,
+                  }}>
+                    {step.num}
+                  </span>
+                  <span style={{ fontSize: 13, color: "var(--black)" }}>{step.text}</span>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         <p style={{ fontSize: 11, color: "var(--gray-light)", margin: 0, lineHeight: 1.5 }}>
-          Vous n&apos;avez pas reçu l&apos;email ? Vérifiez vos spams ou{" "}
+          {mockMode ? "" : <>Vous n&apos;avez pas reçu l&apos;email ? Vérifiez vos spams ou{" "}</>}
           <button
             type="button"
-            onClick={() => { setFormState("idle"); setEmail(""); }}
+            onClick={() => { setFormState("idle"); setEmail(""); setMockMode(false); }}
             style={{
               background: "none",
               border: "none",
@@ -159,7 +171,7 @@ export default function RegisterForm() {
               textDecoration: "underline",
             }}
           >
-            réessayez avec un autre email
+            {mockMode ? "Recommencer" : "réessayez avec un autre email"}
           </button>
         </p>
       </div>

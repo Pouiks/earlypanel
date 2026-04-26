@@ -102,8 +102,21 @@ export async function GET() {
         };
       }
 
+      // G4 : si la valeur stockee est un path (`storage:...`), on genere une
+      // URL signee a la volee (TTL 1h) car le bucket `documents` est prive.
+      // Les anciennes valeurs (URL publiques) sont retournees telles quelles.
+      let resolvedDocumentUrl: string | null = pt.nda_document_url ?? null;
+      if (typeof resolvedDocumentUrl === "string" && resolvedDocumentUrl.startsWith("storage:")) {
+        const path = resolvedDocumentUrl.slice("storage:".length);
+        const { data: signed } = await admin.storage
+          .from("documents")
+          .createSignedUrl(path, 60 * 60);
+        resolvedDocumentUrl = signed?.signedUrl ?? null;
+      }
+
       results.push({
         ...pt,
+        nda_document_url: resolvedDocumentUrl,
         project: project ? { title: project.title, company_name: project.company_name } : null,
         nda: resolvedNda || null,
       });

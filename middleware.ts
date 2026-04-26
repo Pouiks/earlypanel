@@ -32,6 +32,13 @@ export async function middleware(request: NextRequest) {
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseKey) {
+    // SECURITE : en production, l'absence de config Supabase ne doit PAS ouvrir
+    // toutes les routes protegees. Fail-closed : on redirige vers la page de login.
+    // En dev, on laisse passer pour eviter de bloquer l'environnement local sans .env.
+    if (process.env.NODE_ENV === "production") {
+      const loginPath = pathname.startsWith("/staff") ? "/staff/login" : "/app/login";
+      return NextResponse.redirect(new URL(loginPath, request.url));
+    }
     return NextResponse.next();
   }
 
@@ -69,7 +76,35 @@ export async function middleware(request: NextRequest) {
     if (pathname.startsWith("/app")) {
       return NextResponse.redirect(new URL("/staff/dashboard", request.url));
     }
-    // Staff accessing /staff/* => allowed
+
+    // G16 : verification DB que l'utilisateur est bien dans `staff_members`.
+    // Sans ce check, un compte auth dont le role staff a ete revoque mais dont
+    // le JWT n'a pas encore expire pourrait continuer d'acceder. Cache via le
+    // cookie `tp-staff-ok` pendant 5 minutes pour eviter une requete DB par
+    // page (compromis perf/secu raisonnable).
+    if (pathname.startsWith("/staff")) {
+      const staffCookie = request.cookies.get("tp-staff-ok")?.value;
+      if (staffCookie !== "true") {
+        const { data: member } = await supabase
+          .from("staff_members")
+          .select("id")
+          .eq("auth_user_id", user.id)
+          .maybeSingle();
+        if (!member) {
+          return NextResponse.redirect(new URL("/staff/login", request.url));
+        }
+        response.cookies.set("tp-staff-ok", "true", {
+          path: "/",
+          httpOnly: true,
+          sameSite: "lax",
+          secure: process.env.NODE_ENV === "production",
+          // M6 : TTL court (2 min) pour reduire la fenetre pendant laquelle un
+          // staff revoque conserve l'acces aux pages /staff/*. Les API staff
+          // refont un check DB a chaque requete via getStaffMember().
+          maxAge: 60 * 2,
+        });
+      }
+    }
     return response;
   }
 
@@ -94,6 +129,8 @@ export async function middleware(request: NextRequest) {
       path: "/",
       httpOnly: true,
       sameSite: "lax",
+      // SECURITE : flag `secure` en production pour empecher l'envoi en HTTP clair.
+      secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24 * 7,
     });
   }

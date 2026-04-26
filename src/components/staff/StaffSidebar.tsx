@@ -93,6 +93,7 @@ export default function StaffSidebar() {
         <button
           onClick={() => {
             document.cookie = "tp-profile=; path=/; max-age=0";
+            document.cookie = "tp-staff-ok=; path=/; max-age=0";
             window.location.href = "/staff/login";
           }}
           style={{

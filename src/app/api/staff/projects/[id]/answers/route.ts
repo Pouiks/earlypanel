@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getStaffMember } from "@/lib/staff-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { computeDefaultRewardCents, type TierRewardsMap } from "@/lib/reward-calculator";
+import { checkOrigin, forbiddenOriginResponse } from "@/lib/csrf";
 
 const BUCKET = "mission-images";
 
@@ -76,6 +77,8 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!checkOrigin(request)) return forbiddenOriginResponse();
+
   const staff = await getStaffMember();
   if (!staff) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 
@@ -89,8 +92,21 @@ export async function PATCH(
   const note = typeof body?.note === "string" ? body.note : null;
   const sloppy = body?.sloppy === true;
 
-  if (!ptId || rating < 1 || rating > 5) {
-    return NextResponse.json({ error: "project_tester_id et rating 1-5 requis" }, { status: 400 });
+  // G10 : valider le rating de maniere stricte (entier 1..5, rejette NaN,
+  // decimales et valeurs hors plage).
+  if (!ptId || !Number.isInteger(rating) || rating < 1 || rating > 5) {
+    return NextResponse.json(
+      { error: "project_tester_id et rating (entier 1-5) requis" },
+      { status: 400 }
+    );
+  }
+
+  // G10 : borner staff_note pour eviter les payloads enormes.
+  if (note !== null && note.length > 4000) {
+    return NextResponse.json(
+      { error: "Note trop longue (max 4000 caracteres)" },
+      { status: 400 }
+    );
   }
 
   const { data: pt } = await admin
@@ -106,15 +122,50 @@ export async function PATCH(
     return NextResponse.json({ error: "Seules les missions soumises peuvent être notées" }, { status: 409 });
   }
 
-  const alreadyRated = pt.staff_rating != null;
-
-  await admin
+  // G6 : claim atomique du "premier rating". On tente d'ecrire la note avec
+  // le filtre `staff_rating IS NULL` ; si 0 ligne est modifiee, c'est qu'un
+  // autre appel concurrent a deja note. Cela empeche la double application
+  // du delta de score / increment missions_completed.
+  const { data: claimedRows, error: claimErr } = await admin
     .from("project_testers")
     .update({ staff_rating: rating, staff_note: note })
-    .eq("id", ptId);
+    .eq("id", ptId)
+    .eq("status", "completed")
+    .is("staff_rating", null)
+    .select("id");
+
+  if (claimErr) {
+    console.error("[answers/PATCH] claim error:", claimErr.message);
+    return NextResponse.json({ error: "Erreur lors de la notation" }, { status: 500 });
+  }
+
+  const isFirstRating = !!claimedRows && claimedRows.length === 1;
+
+  if (!isFirstRating) {
+    // Mise a jour ulterieure (correction d'une note existante) : on met juste
+    // a jour rating/note sans relancer le scoring.
+    const { error: updErr } = await admin
+      .from("project_testers")
+      .update({ staff_rating: rating, staff_note: note })
+      .eq("id", ptId);
+    if (updErr) {
+      console.error("[answers/PATCH] update error:", updErr.message);
+      return NextResponse.json({ error: "Erreur lors de la mise a jour" }, { status: 500 });
+    }
+  }
+
+  // BUG #10 : on lit le tier AVANT toute modification de score, pour que la recompense
+  // refletre le travail realise dans le tier d'origine et ne change pas si le delta
+  // pousse le testeur dans un tier superieur.
+  const { data: testerBeforeScoring } = await admin
+    .from("testers")
+    .select("tier")
+    .eq("id", pt.tester_id)
+    .maybeSingle();
+  const rewardTier = testerBeforeScoring?.tier ?? "standard";
 
   // Appliquer delta seulement a la premiere notation (evite double compte)
-  if (!alreadyRated) {
+  if (isFirstRating) {
     let delta = 0;
     let reason = "";
     if (sloppy) {
@@ -140,18 +191,25 @@ export async function PATCH(
       });
     }
 
-    // Incrementer compteur missions si bon travail
+    // BUG #9 : increment atomique via RPC (evite la race condition read-then-write).
     if (!sloppy && rating >= 3) {
-      const { data: t } = await admin
-        .from("testers")
-        .select("missions_completed")
-        .eq("id", pt.tester_id)
-        .maybeSingle();
-      const current = t?.missions_completed ?? 0;
-      await admin
-        .from("testers")
-        .update({ missions_completed: current + 1 })
-        .eq("id", pt.tester_id);
+      const { error: incErr } = await admin.rpc("increment_missions_completed", {
+        p_tester_id: pt.tester_id,
+      });
+      if (incErr) {
+        // Fallback non atomique si la migration RPC n'est pas encore deployee.
+        console.warn("[answers/PATCH] increment_missions_completed RPC indispo, fallback:", incErr.message);
+        const { data: t } = await admin
+          .from("testers")
+          .select("missions_completed")
+          .eq("id", pt.tester_id)
+          .maybeSingle();
+        const current = t?.missions_completed ?? 0;
+        await admin
+          .from("testers")
+          .update({ missions_completed: current + 1 })
+          .eq("id", pt.tester_id);
+      }
     }
   }
 
@@ -161,16 +219,10 @@ export async function PATCH(
     .eq("id", projectId)
     .single();
 
-  const { data: testerRow } = await admin
-    .from("testers")
-    .select("tier")
-    .eq("id", pt.tester_id)
-    .maybeSingle();
-
   let calculated = computeDefaultRewardCents({
     baseRewardCents: projectRow?.base_reward_cents ?? null,
     tierRewards: (projectRow?.tier_rewards as TierRewardsMap) ?? null,
-    tier: testerRow?.tier ?? "standard",
+    tier: rewardTier,
     staffRating: rating,
   });
   if (sloppy) calculated = 0;

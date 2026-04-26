@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import CountdownTimer from "@/components/ui/CountdownTimer";
-import ImageUploader from "@/components/mission/ImageUploader";
+import MissionQuestionWizard from "@/components/mission/MissionQuestionWizard";
 
 interface UploadedImage { path: string; signed_url: string | null }
 interface MissionAnswer {
@@ -13,6 +13,11 @@ interface MissionAnswer {
 }
 interface MissionDetail {
   tester_id: string;
+  tester: {
+    first_name: string | null;
+    last_name: string | null;
+    job_title: string | null;
+  } | null;
   tester_status: string;
   nda_signed_at: string | null;
   completed_at: string | null;
@@ -431,100 +436,41 @@ export default function MissionDetailPage() {
 
       {/* Formulaire reponses */}
       {(inProgress || completed) && questions.length > 0 && (
-        <div style={sectionStyle}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
-            <h2 style={{ fontSize: 16, fontWeight: 700, color: "#1d1d1f", margin: 0 }}>
-              Vos réponses ({totalAnswered} / {questions.length})
-            </h2>
-            {inProgress && (
-              <span style={{ fontSize: 12, color: "#86868b" }}>
-                Auto-save activé · 3 images max par question
-              </span>
-            )}
-          </div>
-
-          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-            {questions.map((q, i) => {
-              const savingState = savingMap[q.id] || "idle";
-              const text = drafts[q.id] || "";
-              const imgs = imagesByQ[q.id] || [];
-              return (
-                <div
-                  key={q.id}
-                  style={{
-                    padding: 16, background: "#f5f5f7", borderRadius: 14,
-                  }}
-                >
-                  <div style={{ display: "flex", gap: 12, marginBottom: 12 }}>
-                    <span style={{
-                      minWidth: 28, height: 28, display: "flex",
-                      alignItems: "center", justifyContent: "center",
-                      fontSize: 12, fontWeight: 700, color: "#0A7A5A",
-                      background: "#fff", borderRadius: 8,
-                    }}>{i + 1}</span>
-                    <p style={{ fontSize: 14, color: "#1d1d1f", margin: 0, lineHeight: 1.5, fontWeight: 600, flex: 1 }}>
-                      {q.question_text}
-                    </p>
-                    {inProgress && (
-                      <span style={{ fontSize: 11, color: savingState === "saved" ? "#0A7A5A" : "#86868b" }}>
-                        {savingState === "saving" && "Sauvegarde…"}
-                        {savingState === "saved" && "✓ Enregistré"}
-                      </span>
-                    )}
-                  </div>
-
-                  <textarea
-                    value={text}
-                    onChange={(e) => handleDraftChange(q.id, e.target.value)}
-                    onBlur={() => handleDraftBlur(q.id)}
-                    disabled={!inProgress}
-                    placeholder="Décrivez le comportement rencontré le plus précisément possible"
-                    rows={5}
-                    style={{
-                      width: "100%", padding: "12px 14px", fontSize: 14,
-                      border: "0.5px solid rgba(0,0,0,0.12)", borderRadius: 10,
-                      outline: "none", background: inProgress ? "#fff" : "#fafafa",
-                      fontFamily: "inherit", boxSizing: "border-box",
-                      resize: "vertical", lineHeight: 1.5, color: "#1d1d1f",
-                    }}
-                  />
-
-                  <div style={{ marginTop: 12 }}>
-                    <ImageUploader
-                      missionId={projectId}
-                      questionId={q.id}
-                      images={imgs}
-                      onChange={(next) => setImagesByQ((m) => ({ ...m, [q.id]: next }))}
-                      disabled={!inProgress}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
+        <div style={{ marginBottom: 16 }}>
           {inProgress && (
-            <div style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-end" }}>
-              {!allAnswered && (
-                <span style={{ fontSize: 12, color: "#d97706" }}>
-                  Toutes les questions doivent être remplies avant soumission.
-                </span>
-              )}
-              <button
-                onClick={() => setShowSubmitModal(true)}
-                disabled={!allAnswered}
-                style={{
-                  padding: "14px 28px",
-                  background: allAnswered ? "#0A7A5A" : "#d1d5db",
-                  color: "#fff", borderRadius: 980, fontSize: 14, fontWeight: 700,
-                  border: "none", cursor: allAnswered ? "pointer" : "not-allowed",
-                  fontFamily: "inherit",
-                }}
-              >
-                Soumettre ma mission
-              </button>
-            </div>
+            <p
+              style={{
+                fontSize: 12,
+                color: "#6e6e73",
+                margin: "0 0 12px",
+                textAlign: "center",
+                maxWidth: 640,
+                marginLeft: "auto",
+                marginRight: "auto",
+              }}
+            >
+              Auto-save activé · 3 images max par question
+            </p>
           )}
+          <MissionQuestionWizard
+            projectId={projectId}
+            projectTitle={project.title}
+            categoryLabel={project.sector?.trim() || "Votre mission"}
+            questions={questions}
+            tester={mission.tester}
+            drafts={drafts}
+            onDraftChange={handleDraftChange}
+            onDraftBlur={handleDraftBlur}
+            savingByQuestion={savingMap}
+            imagesByQ={imagesByQ}
+            onImagesChange={(qid, next) =>
+              setImagesByQ((m) => ({ ...m, [qid]: next }))
+            }
+            inProgress={inProgress}
+            completed={completed}
+            allAnswered={allAnswered}
+            onOpenSubmit={() => setShowSubmitModal(true)}
+          />
         </div>
       )}
 

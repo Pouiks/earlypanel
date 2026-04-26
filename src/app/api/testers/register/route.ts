@@ -1,9 +1,21 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail, buildWelcomeEmail } from "@/lib/email";
+import { tryGetAppUrl } from "@/lib/app-url";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 export async function POST(request: NextRequest) {
   try {
+    // M4 : rate limit anti-bot. 5 inscriptions par heure et par IP.
+    const ip = getClientIp(request);
+    const rl = rateLimit(`register:${ip}`, { windowMs: 60 * 60 * 1000, max: 5 });
+    if (!rl.ok) {
+      return NextResponse.json(
+        { error: "Trop d'inscriptions, reessayez plus tard" },
+        { status: 429, headers: { "Retry-After": String(Math.ceil(rl.retryAfterMs / 1000)) } }
+      );
+    }
+
     const { email, first_name, last_name } = await request.json();
 
     if (!email || typeof email !== "string") {
@@ -13,23 +25,63 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // G10 : validation regex sommaire pour eviter les payloads bidons.
+    const emailNormalized = email.trim().toLowerCase();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailNormalized)) {
+      return NextResponse.json({ error: "Email invalide" }, { status: 400 });
+    }
+
     const adminClient = createAdminClient();
 
     if (!adminClient) {
-      console.warn("[Register] Supabase not configured — mock mode");
+      // G14 : en production, l'absence de client admin est une erreur de
+      // configuration (pas un mode mock silencieux).
+      if (process.env.NODE_ENV === "production") {
+        console.error("[Register] Admin client unavailable in production");
+        return NextResponse.json(
+          { error: "Service indisponible. Reessayez plus tard." },
+          { status: 503 }
+        );
+      }
+      console.warn("[Register] Supabase not configured — mock mode (dev only)");
       return NextResponse.json({ success: true, mock: true });
+    }
+
+    // G3 : detection prealable des doublons cote `testers` pour eviter de
+    // creer un user auth orphelin si la table testers a deja une ligne.
+    const { data: existingTester } = await adminClient
+      .from("testers")
+      .select("id, auth_user_id")
+      .eq("email", emailNormalized)
+      .maybeSingle();
+
+    if (existingTester) {
+      return NextResponse.json(
+        { error: "Cet email est deja enregistre. Connectez-vous depuis votre espace." },
+        { status: 409 }
+      );
     }
 
     const { data: authData, error: authError } =
       await adminClient.auth.admin.createUser({
-        email,
+        email: emailNormalized,
         email_confirm: false,
       });
 
     if (authError) {
-      if (authError.message?.includes("already been registered")) {
+      // G3 : detection multi-codes (selon version supabase) au lieu d'un
+      // simple .includes("already been registered").
+      const msg = authError.message || "";
+      const code = (authError as { code?: string }).code || "";
+      if (
+        code === "email_exists" ||
+        code === "user_already_exists" ||
+        /already.+registered/i.test(msg) ||
+        /already.+exists/i.test(msg)
+      ) {
         return NextResponse.json(
-          { error: "Cet email est déjà enregistré. Connectez-vous depuis votre espace." },
+          { error: "Cet email est deja enregistre. Connectez-vous depuis votre espace." },
           { status: 409 }
         );
       }
@@ -38,10 +90,13 @@ export async function POST(request: NextRequest) {
 
     const userId = authData.user.id;
 
+    // G3 : insertion testers transactionnelle. Si elle echoue, on doit
+    // rollback la creation auth pour eviter un user auth orphelin qui
+    // bloquerait toute reinscription future avec le meme email.
     const { error: insertError } = await adminClient
       .from("testers")
       .insert({
-        email,
+        email: emailNormalized,
         auth_user_id: userId,
         first_name: first_name || null,
         last_name: last_name || null,
@@ -51,27 +106,46 @@ export async function POST(request: NextRequest) {
         source: "landing",
       });
 
-    if (insertError) throw insertError;
+    if (insertError) {
+      console.error("[Register] testers insert failed, rolling back auth user", insertError.message);
+      try {
+        await adminClient.auth.admin.deleteUser(userId);
+      } catch (rollbackErr) {
+        console.error("[Register] Auth rollback FAILED — orphan user", userId, rollbackErr);
+      }
+      return NextResponse.json(
+        { error: "Erreur lors de la creation du profil. Reessayez." },
+        { status: 500 }
+      );
+    }
+
+    const appUrl = tryGetAppUrl();
+    if (!appUrl) {
+      console.error("[Register] APP_URL missing in prod");
+      return NextResponse.json(
+        { error: "Service indisponible. Reessayez plus tard." },
+        { status: 500 }
+      );
+    }
 
     const { data: linkData, error: linkError } =
       await adminClient.auth.admin.generateLink({
         type: "magiclink",
-        email,
+        email: emailNormalized,
         options: {
-          redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/app/auth/callback`,
+          redirectTo: `${appUrl}/app/auth/callback`,
         },
       });
 
     if (linkError) throw linkError;
 
-    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
     const hashedToken = linkData.properties?.hashed_token;
     const magicLink = hashedToken
       ? `${appUrl}/app/auth/callback?token_hash=${encodeURIComponent(hashedToken)}&type=magiclink`
       : linkData.properties?.action_link || "";
 
     await sendEmail({
-      to: email,
+      to: emailNormalized,
       toName: first_name ? `${first_name} ${last_name || ""}`.trim() : undefined,
       subject: first_name
         ? `${first_name}, complétez votre profil earlypanel →`

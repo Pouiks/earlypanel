@@ -1,7 +1,25 @@
 /**
  * Calcul remuneration par defaut (centimes). Override possible cote staff avant paiement.
+ *
+ * IMPORTANT - Conventions d'unites monetaires :
+ * - `tester_payouts.calculated_amount_cents` / `final_amount_cents`           : CENTIMES (INTEGER)
+ * - `projects.base_reward_cents`, `projects.tier_rewards.{standard,expert,premium}` : CENTIMES (INTEGER)
+ * - `testers.total_earned`                                                    : EUROS (NUMERIC, decimale)
+ *
+ * La colonne `total_earned` est en EUROS par convention historique (BUG #15).
+ * Toujours convertir avec `centsToEuros()` avant d'incrementer.
  */
 export type TesterTier = "standard" | "expert" | "premium" | string;
+
+/**
+ * Convertit des centimes vers des euros (decimal). A utiliser pour incrementer
+ * `testers.total_earned` qui est stocke en EUROS, contrairement aux autres montants
+ * de la base qui sont tous en centimes.
+ */
+export function centsToEuros(cents: number): number {
+  if (!Number.isFinite(cents)) return 0;
+  return cents / 100;
+}
 
 export interface TierRewardsMap {
   standard?: number;

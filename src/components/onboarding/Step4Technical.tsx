@@ -45,15 +45,21 @@ export default function Step4Technical({ data, onNext, loading }: Step4Props) {
   const [phoneModel, setPhoneModel] = useState(data.phone_model || "");
   const [mobileOs, setMobileOs] = useState<string>(data.mobile_os || "");
   const [connection, setConnection] = useState<string>(data.connection || "");
+  const [connectionError, setConnectionError] = useState("");
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!connection) {
+      setConnectionError("Choisissez votre type de connexion internet (requis).");
+      return;
+    }
+    setConnectionError("");
     onNext({
       browsers,
       devices,
       phone_model: phoneModel.trim() || null,
       mobile_os: mobileOs || null,
-      connection: (connection as ConnectionType) || null,
+      connection: connection as ConnectionType,
     });
   }
 
@@ -79,12 +85,22 @@ export default function Step4Technical({ data, onNext, loading }: Step4Props) {
         <PillSelect options={MOBILE_OS} value={mobileOs} onChange={(v) => setMobileOs(v as string)} />
       </div>
 
-      <div style={{ marginBottom: 28 }}>
+      <div style={{ marginBottom: 12 }}>
         <label style={labelStyle}>Type de connexion principal</label>
-        <PillSelect options={CONNECTIONS} value={connection} onChange={(v) => setConnection(v as string)} />
+        <PillSelect
+          options={CONNECTIONS}
+          value={connection}
+          onChange={(v) => {
+            setConnection(v as string);
+            if (v) setConnectionError("");
+          }}
+        />
+        {connectionError && (
+          <p style={{ fontSize: 13, color: "#dc2626", marginTop: 8, marginBottom: 0 }}>{connectionError}</p>
+        )}
       </div>
 
-      <button type="submit" disabled={loading} style={{
+      <button type="submit" disabled={loading || !connection} style={{
         width: "100%",
         padding: "14px",
         background: "#0A7A5A",

@@ -14,6 +14,7 @@ import ProjectReviewTab from "@/components/staff/ProjectReviewTab";
 import ProjectReportTab from "@/components/staff/ProjectReportTab";
 import type { ProjectFormData } from "@/components/staff/ProjectForm";
 import type { Project, ProjectStatus } from "@/types/staff";
+import { useConfirm } from "@/components/ui/ConfirmModal";
 
 const STATUS_LABELS: Record<ProjectStatus, string> = {
   draft: "Brouillon",
@@ -52,6 +53,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [activeTab, setActiveTab] = useState<TabId>("info");
+  const { confirm, notify, ConfirmModal } = useConfirm();
 
   useEffect(() => {
     fetchProject();
@@ -84,7 +86,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
     if (!res.ok) {
       const err = await res.json();
-      alert(err.error || "Erreur lors de la mise à jour");
+      await notify({ title: "Erreur", message: err.error || "Erreur lors de la mise à jour" });
       return;
     }
 
@@ -116,12 +118,18 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
       await fetchProject();
     } else {
       const err = await res.json();
-      alert(err.error || "Erreur");
+      await notify({ title: "Erreur", message: err.error || "Erreur" });
     }
   }
 
   async function handleDelete() {
-    if (!confirm("Supprimer ce projet ? Cette action est irréversible.")) return;
+    const ok = await confirm({
+      title: "Supprimer ce projet ?",
+      message: "Cette action est irréversible.",
+      confirmLabel: "Supprimer",
+      danger: true,
+    });
+    if (!ok) return;
 
     setDeleting(true);
     const res = await fetch(`/api/staff/projects/${id}`, { method: "DELETE" });
@@ -129,7 +137,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
       router.push("/staff/dashboard");
     } else {
       setDeleting(false);
-      alert("Erreur lors de la suppression");
+      await notify({ title: "Erreur", message: "Erreur lors de la suppression" });
     }
   }
 
@@ -359,6 +367,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
           </div>
         </div>
       )}
+      <ConfirmModal />
     </div>
   );
 }

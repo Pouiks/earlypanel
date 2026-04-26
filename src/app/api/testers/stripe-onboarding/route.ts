@@ -2,9 +2,18 @@ import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { stripe } from "@/lib/stripe";
-import { USE_MOCK_DATA } from "@/lib/mock";
+import { USE_MOCK_DATA, isMockUnsafeInProd } from "@/lib/mock";
+import { tryGetAppUrl } from "@/lib/app-url";
 
 export async function POST() {
+  if (isMockUnsafeInProd()) {
+    console.error("[stripe-onboarding] Supabase config missing in production");
+    return NextResponse.json(
+      { error: "Service indisponible. Reessayez plus tard." },
+      { status: 503 }
+    );
+  }
+
   if (USE_MOCK_DATA) {
     return NextResponse.json({
       url: "https://connect.stripe.com/setup/e/mock",
@@ -74,7 +83,14 @@ export async function POST() {
       .eq("auth_user_id", user.id);
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const appUrl = tryGetAppUrl();
+  if (!appUrl) {
+    console.error("[stripe-onboarding] APP_URL missing in prod");
+    return NextResponse.json(
+      { error: "Service indisponible. Reessayez plus tard." },
+      { status: 500 }
+    );
+  }
 
   const accountLink = await stripe.accountLinks.create({
     account: accountId,

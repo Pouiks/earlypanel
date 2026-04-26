@@ -22,10 +22,19 @@ export async function GET(request: NextRequest) {
   const devices = searchParams.get("devices");
   const browsers = searchParams.get("browsers");
 
+  // G11 : pagination defensive. Defaults large pour preserver la compat UI
+  // (l'UI consomme un array sans pagination), mais bornee a 5000 lignes max
+  // pour empecher un DoS si le panel grossit.
+  const limitRaw = Number(searchParams.get("limit"));
+  const offsetRaw = Number(searchParams.get("offset"));
+  const limit = Number.isInteger(limitRaw) && limitRaw > 0 ? Math.min(limitRaw, 5000) : 1000;
+  const offset = Number.isInteger(offsetRaw) && offsetRaw >= 0 ? offsetRaw : 0;
+
   let query = admin
     .from("testers")
     .select("id, email, first_name, last_name, phone, job_title, sector, company_size, digital_level, tools, browsers, devices, phone_model, mobile_os, connection, availability, interests, ux_experience, status, profile_completed, created_at, tier, quality_score, missions_completed, total_earned, persona_id, persona_locked, persona:tester_personas(id, slug, name)")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(offset, offset + limit - 1);
 
   if (status && status !== "all") {
     query = query.eq("status", status);

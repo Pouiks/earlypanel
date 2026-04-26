@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useConfirm } from "@/components/ui/ConfirmModal";
 
 interface NdaDocument {
   id: string;
@@ -18,6 +19,7 @@ export default function DocumentsPage() {
   const [loading, setLoading] = useState(true);
   const [signing, setSigning] = useState<string | null>(null);
   const [previewDoc, setPreviewDoc] = useState<NdaDocument | null>(null);
+  const { confirm, notify, ConfirmModal } = useConfirm();
 
   useEffect(() => {
     fetchDocuments();
@@ -32,7 +34,13 @@ export default function DocumentsPage() {
   }
 
   async function handleSign(projectId: string) {
-    if (!confirm("En cliquant sur « Confirmer », vous déclarez avoir lu et accepter les termes de cet accord de confidentialité.")) return;
+    const ok = await confirm({
+      title: "Signer le NDA",
+      message:
+        "En cliquant sur « Confirmer », vous déclarez avoir lu et accepter les termes de cet accord de confidentialité.",
+      confirmLabel: "Confirmer",
+    });
+    if (!ok) return;
 
     setSigning(projectId);
     try {
@@ -42,7 +50,7 @@ export default function DocumentsPage() {
         setPreviewDoc(null);
       } else {
         const err = await res.json();
-        alert(err.error || "Erreur lors de la signature");
+        await notify({ title: "Erreur", message: err.error || "Erreur lors de la signature" });
       }
     } finally {
       setSigning(null);
@@ -324,6 +332,7 @@ export default function DocumentsPage() {
           </div>
         </div>
       )}
+      <ConfirmModal />
     </div>
   );
 }

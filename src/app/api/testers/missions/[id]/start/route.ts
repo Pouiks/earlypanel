@@ -60,17 +60,30 @@ export async function POST(
       );
     }
 
-    const { error: updateErr } = await admin
+    // G6 : transition atomique. Le filtre `.in("status", ["nda_signed","invited"])`
+    // garantit qu'un double-clic ou deux requetes concurrentes ne creent pas
+    // deux `started_at` differents (lost-update sur le timestamp de demarrage).
+    const { data: updatedRows, error: updateErr } = await admin
       .from("project_testers")
       .update({
         status: "in_progress",
         started_at: now.toISOString(),
       })
-      .eq("id", pt.id);
+      .eq("id", pt.id)
+      .in("status", ["nda_signed", "invited"])
+      .select("id");
 
     if (updateErr) {
       console.error("[mission/start] update error:", updateErr);
       return NextResponse.json({ error: "Erreur démarrage" }, { status: 500 });
+    }
+
+    if (!updatedRows || updatedRows.length === 0) {
+      // Quelqu'un a deja demarre la mission entre la lecture et l'update.
+      return NextResponse.json(
+        { error: "Mission deja demarree par une autre requete" },
+        { status: 409 }
+      );
     }
 
     return NextResponse.json({ success: true, started_at: now.toISOString() });

@@ -16,10 +16,23 @@ export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const status = searchParams.get("status");
 
+  // G11 : pagination defensive (defaults preservent la compat avec l'UI qui
+  // consomme un array). Bornage dur a 2000 pour empecher un DoS futur.
+  const limitRaw = Number(searchParams.get("limit"));
+  const offsetRaw = Number(searchParams.get("offset"));
+  const limit = Number.isInteger(limitRaw) && limitRaw > 0 ? Math.min(limitRaw, 2000) : 500;
+  const offset = Number.isInteger(offsetRaw) && offsetRaw >= 0 ? offsetRaw : 0;
+
+  // W7 : verifie cote UI (staff/dashboard/page.tsx) qu'aucun fetch
+  // /api/staff/projects/[id]/testers n'est declenche par card. Aujourd'hui le
+  // dashboard liste juste les projets (titre, statut, nb questions), donc pas
+  // de N+1. Si on rajoute plus tard "X testers" sur la card, il faudra etendre
+  // le select avec `project_testers(count)` pour eviter un fetch par projet.
   let query = admin
     .from("projects")
     .select("*, project_questions(id)")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(offset, offset + limit - 1);
 
   if (status && status !== "all") {
     query = query.eq("status", status);

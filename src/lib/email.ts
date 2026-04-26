@@ -1,4 +1,7 @@
 import { Resend } from "resend";
+import { logger } from "@/lib/logger";
+
+const log = logger("email");
 
 interface Attachment {
   filename: string;
@@ -26,15 +29,10 @@ export async function sendEmail({ to, subject, html, toName, attachments }: Send
   const keyPreview = apiKey
     ? `${apiKey.slice(0, 8)}...${apiKey.slice(-4)}`
     : "(absente)";
-  console.log(
-    `[Email] -> from="${from}" to="${to}" subject="${subject}" key=${keyPreview}`
-  );
+  log.info("send attempt", { from, to, subject, key_preview: keyPreview });
 
   if (!apiKey) {
-    console.warn("[Email] RESEND_API_KEY manquante — email NON envoye:", {
-      to,
-      subject,
-    });
+    log.warn("RESEND_API_KEY manquante — email NON envoye", { to, subject });
     return { success: true, mock: true as const };
   }
 
@@ -50,7 +48,7 @@ export async function sendEmail({ to, subject, html, toName, attachments }: Send
   });
 
   if (error) {
-    console.error("[Email] Resend a refuse l'envoi:", {
+    log.error("Resend a refuse l'envoi", {
       to,
       subject,
       from,
@@ -60,7 +58,7 @@ export async function sendEmail({ to, subject, html, toName, attachments }: Send
     throw new Error(`Resend: ${error.message}`);
   }
 
-  console.log(`[Email] OK id=${data?.id} to="${to}"`);
+  log.info("sent", { id: data?.id, to });
   return { success: true, messageId: data?.id };
 }
 

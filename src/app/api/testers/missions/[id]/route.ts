@@ -38,7 +38,7 @@ export async function GET(
 
     const { data: tester } = await admin
       .from("testers")
-      .select("id")
+      .select("id, first_name, last_name, job_title")
       .eq("auth_user_id", user.id)
       .maybeSingle();
 
@@ -115,6 +115,11 @@ export async function GET(
 
     return NextResponse.json({
       tester_id: tester.id,
+      tester: {
+        first_name: tester.first_name,
+        last_name: tester.last_name,
+        job_title: tester.job_title,
+      },
       tester_status: pt.status,
       nda_signed_at: pt.nda_signed_at,
       invited_at: pt.invited_at,

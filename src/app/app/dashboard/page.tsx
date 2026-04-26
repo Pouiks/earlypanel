@@ -68,8 +68,10 @@ export default function DashboardHome() {
           Bonjour {tester.first_name}
         </h1>
         <p style={{ fontSize: 15, color: "#6e6e73", margin: 0 }}>
-          {tester.status === "pending"
-            ? "Votre profil est en cours de validation (48h)"
+          {tester.status === "pending" && !tester.profile_completed
+            ? "Terminez l’inscription : votre compte s’activera automatiquement (aucune attente côté équipe)."
+            : tester.status === "pending" && tester.profile_completed
+            ? "Profil prêt. Si le compte n’est toujours pas indiqué comme actif, actualisez la page."
             : tester.status === "suspended"
             ? "Votre compte est suspendu. Contactez le support pour toute réactivation."
             : "Bienvenue dans votre espace testeur"
@@ -77,7 +79,7 @@ export default function DashboardHome() {
         </p>
       </div>
 
-      <StatusBanner status={tester.status} />
+      <StatusBanner status={tester.status} profileCompleted={tester.profile_completed} />
 
       {/* Mission en evidence */}
       {featured && (

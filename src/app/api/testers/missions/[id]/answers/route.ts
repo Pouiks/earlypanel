@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getAuthedTester } from "@/lib/tester-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { projectAllowsTesterWork } from "@/lib/project-lifecycle";
+import { projectAllowsTesterWorkWithGrace } from "@/lib/project-lifecycle";
 
 /**
  * PUT : upsert d'une reponse texte pour une question.
@@ -54,12 +54,18 @@ export async function PUT(
       .eq("id", projectId)
       .single();
 
-    if (!projectAllowsTesterWork(project?.status as string)) {
-      return NextResponse.json({ error: "Le projet n'est pas ouvert aux tests" }, { status: 403 });
-    }
-
-    if (project?.end_date && new Date(project.end_date) < new Date()) {
-      return NextResponse.json({ error: "Délai dépassé" }, { status: 400 });
+    // On accorde une fenetre de grace de 24h apres end_date pour ne pas perdre le brouillon
+    // d'un testeur en cours quand le cron `close-expired` ferme le projet en cours de route.
+    if (
+      !projectAllowsTesterWorkWithGrace(
+        project?.status as string,
+        (project?.end_date as string | null) ?? null
+      )
+    ) {
+      return NextResponse.json(
+        { error: "Le projet n'est plus ouvert aux modifications (delai depasse au-dela de la grace)" },
+        { status: 403 }
+      );
     }
 
     const { data: question } = await admin

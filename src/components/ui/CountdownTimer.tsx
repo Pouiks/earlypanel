@@ -57,7 +57,14 @@ export default function CountdownTimer({
     }, interval);
 
     return () => clearInterval(id);
-  }, [targetDate.getTime()]); // eslint-disable-line react-hooks/exhaustive-deps
+    // W6 : volontaire. On utilise `targetDate.getTime()` au lieu de l'objet
+    // pour avoir une dep stable (sinon un nouvel objet Date a chaque render
+    // relancerait l'effet en boucle). `onExpire` est volontairement exclu :
+    // si le parent passe une nouvelle reference a chaque render, ca thrashe-
+    // rait l'interval. Le snapshot du callback au moment de l'effet est OK
+    // pour ce composant simple (1 callback final, pas de logique reactive).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetDate.getTime()]);
 
   if (tl.expired) {
     return (

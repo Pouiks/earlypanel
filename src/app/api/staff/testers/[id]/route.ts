@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStaffMember } from "@/lib/staff-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { logStaffAction } from "@/lib/audit";
 
 export async function GET(
   _request: NextRequest,
@@ -61,5 +62,18 @@ export async function PATCH(
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  await logStaffAction(
+    {
+      staff_id: staff.id,
+      staff_email: staff.email,
+      action: "tester.update",
+      entity_type: "tester",
+      entity_id: id,
+      metadata: { fields: Object.keys(allowed) },
+    },
+    request
+  );
+
   return NextResponse.json(data);
 }

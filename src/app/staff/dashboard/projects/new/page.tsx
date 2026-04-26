@@ -5,11 +5,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import ProjectForm from "@/components/staff/ProjectForm";
 import type { ProjectFormData } from "@/components/staff/ProjectForm";
+import { useConfirm } from "@/components/ui/ConfirmModal";
 
 function NewProjectContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialClientId = searchParams.get("client_id");
+  const { notify, ConfirmModal } = useConfirm();
 
   async function handleCreate(data: ProjectFormData) {
     const res = await fetch("/api/staff/projects", {
@@ -20,7 +22,7 @@ function NewProjectContent() {
 
     if (!res.ok) {
       const err = await res.json();
-      alert(err.error || "Erreur lors de la création");
+      await notify({ title: "Erreur", message: err.error || "Erreur lors de la création" });
       return;
     }
 
@@ -54,6 +56,7 @@ function NewProjectContent() {
       </h1>
 
       <ProjectForm onSubmit={handleCreate} submitLabel="Créer le projet" initialClientId={initialClientId} />
+      <ConfirmModal />
     </div>
   );
 }

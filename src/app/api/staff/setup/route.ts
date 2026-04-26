@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { logStaffAction } from "@/lib/audit";
 
 export async function POST(request: NextRequest) {
   const { email, password, first_name, last_name, setup_key } = await request.json();
@@ -20,6 +21,22 @@ export async function POST(request: NextRequest) {
   const admin = createAdminClient();
   if (!admin) {
     return NextResponse.json({ error: "Supabase non configuré" }, { status: 500 });
+  }
+
+  // G16 : en production, refuser le endpoint des qu'au moins un staff existe.
+  // Ce endpoint est destine a la creation du PREMIER admin (bootstrap) ; toute
+  // creation ulterieure doit se faire via la DB ou un endpoint dedie/protege.
+  if (process.env.NODE_ENV === "production") {
+    const { count } = await admin
+      .from("staff_members")
+      .select("id", { count: "exact", head: true });
+    if ((count ?? 0) > 0) {
+      console.warn("[staff/setup] Refus en production : staff deja existant");
+      return NextResponse.json(
+        { error: "Endpoint indisponible : un compte staff existe deja. Contactez un administrateur." },
+        { status: 403 }
+      );
+    }
   }
 
   const { data: authData, error: authError } = await admin.auth.admin.createUser({
@@ -53,6 +70,18 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({ error: insertError.message }, { status: 500 });
         }
 
+        await logStaffAction(
+          {
+            staff_id: null,
+            staff_email: email,
+            action: "staff.setup_existing_user_promoted",
+            entity_type: "auth_user",
+            entity_id: existingUser.id,
+            metadata: { method: "promote" },
+          },
+          request
+        );
+
         return NextResponse.json({
           success: true,
           message: "Utilisateur existant mis à jour avec le rôle staff",
@@ -76,6 +105,18 @@ export async function POST(request: NextRequest) {
   if (insertError) {
     return NextResponse.json({ error: insertError.message }, { status: 500 });
   }
+
+  await logStaffAction(
+    {
+      staff_id: null,
+      staff_email: email,
+      action: "staff.setup_initial_admin",
+      entity_type: "auth_user",
+      entity_id: authData.user.id,
+      metadata: { method: "create" },
+    },
+    request
+  );
 
   return NextResponse.json({
     success: true,

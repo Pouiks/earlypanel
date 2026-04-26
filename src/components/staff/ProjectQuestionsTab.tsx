@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import type { ProjectUseCase } from "@/types/staff";
+import { useConfirm } from "@/components/ui/ConfirmModal";
 
 interface ProjectQuestionsTabProps {
   projectId: string;
@@ -77,6 +78,7 @@ export default function ProjectQuestionsTab({ projectId, onUpdate }: ProjectQues
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const { notify, ConfirmModal } = useConfirm();
 
   const fetchUseCases = useCallback(async () => {
     setLoading(true);
@@ -229,7 +231,7 @@ export default function ProjectQuestionsTab({ projectId, onUpdate }: ProjectQues
       onUpdate();
     } else {
       const err = await res.json();
-      alert(err.error || "Erreur lors de l'enregistrement");
+      await notify({ title: "Erreur", message: err.error || "Erreur lors de l'enregistrement" });
     }
   }
 
@@ -423,6 +425,7 @@ export default function ProjectQuestionsTab({ projectId, onUpdate }: ProjectQues
       <button onClick={addUseCase} style={{ ...smallBtn, padding: "10px 24px", fontSize: 14, marginTop: 4 }}>
         + Ajouter un cas d&apos;usage
       </button>
+      <ConfirmModal />
     </div>
   );
 }

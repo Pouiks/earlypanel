@@ -1,6 +1,21 @@
 import type { Tester } from "@/types/tester";
 
-export const USE_MOCK_DATA = !process.env.NEXT_PUBLIC_SUPABASE_URL;
+// M5 : le mode mock ne doit JAMAIS s'activer en production. Si la
+// configuration Supabase est manquante en prod, on refuse explicitement
+// (les routes appelantes renverront 503) au lieu de basculer silencieusement
+// sur des donnees fictives.
+export const USE_MOCK_DATA =
+  !process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NODE_ENV !== "production";
+
+// Helper a appeler en haut des routes mock-aware : permet de detecter le cas
+// "config manquante en prod" et de retourner une 503 plutot que d'executer
+// la logique normale (qui finirait par crasher avec un message obscur).
+export function isMockUnsafeInProd(): boolean {
+  return (
+    !process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    process.env.NODE_ENV === "production"
+  );
+}
 
 export const MOCK_TESTER: Tester = {
   id: "mock-tester-001",

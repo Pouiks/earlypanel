@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { USE_MOCK_DATA, updateMockTester } from "@/lib/mock";
+import { USE_MOCK_DATA, updateMockTester, isMockUnsafeInProd } from "@/lib/mock";
 
 const REQUIRED_TEXT_FIELDS = [
   "first_name", "last_name", "phone",
@@ -25,6 +25,13 @@ function isProfileComplete(profile: Record<string, unknown>): boolean {
 }
 
 export async function PATCH(request: NextRequest) {
+  if (isMockUnsafeInProd()) {
+    console.error("[onboarding/step] Supabase config missing in production");
+    return NextResponse.json(
+      { error: "Service indisponible. Reessayez plus tard." },
+      { status: 503 }
+    );
+  }
   if (USE_MOCK_DATA) {
     const body = await request.json();
     const isLast = body.step === 5;
@@ -73,12 +80,31 @@ export async function PATCH(request: NextRequest) {
 
   const { step, data } = await request.json();
 
-  if (!step || typeof step !== "number" || step < 1 || step > 5) {
+  // G10 : valider strictement l'etape (entier 1..5).
+  if (!Number.isInteger(step) || step < 1 || step > 5) {
     return NextResponse.json({ error: "Étape invalide" }, { status: 400 });
   }
 
-  const forbidden = ["id", "created_at", "email", "auth_user_id"];
-  forbidden.forEach((key) => delete data[key]);
+  // G10 : data doit etre un objet plain. On rejette null/undefined/array.
+  if (!data || typeof data !== "object" || Array.isArray(data)) {
+    return NextResponse.json({ error: "Donnees invalides" }, { status: 400 });
+  }
+
+  const forbidden = ["id", "created_at", "email", "auth_user_id", "status", "tier", "quality_score", "missions_completed", "total_earned", "stripe_account_id", "payment_setup", "profile_completed", "persona_id", "persona_locked", "source"];
+  forbidden.forEach((key) => delete (data as Record<string, unknown>)[key]);
+
+  // Le trigger BDD `auto_activate_tester` exige `connection` non vide ; sans cela
+  // le testeur reste en pending. Etape 4 = seul endroit du wizard qui le pose.
+  const validConnections = new Set<string>(["Fibre", "ADSL", "4G/5G"]);
+  if (step === 4) {
+    const c = (data as Record<string, unknown>).connection;
+    if (typeof c !== "string" || !validConnections.has(c)) {
+      return NextResponse.json(
+        { error: "Type de connexion requis (Fibre, ADSL ou 4G/5G)." },
+        { status: 400 }
+      );
+    }
+  }
 
   const updatePayload: Record<string, unknown> = {
     ...data,
@@ -87,8 +113,9 @@ export async function PATCH(request: NextRequest) {
   };
 
   if (step === 5) {
-    updatePayload.profile_completed = true;
-
+    // Ne PAS forcer profile_completed=true ici : le trigger `auto_activate_tester` (DB)
+    // est le seul a poser profile_completed=true ET status='active' atomiquement,
+    // et uniquement quand tous les champs requis sont presents.
     const { error: updateError } = await supabase
       .from("testers")
       .update(updatePayload)
@@ -98,26 +125,54 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: updateError.message }, { status: 500 });
     }
 
+    // Relire le profil pour connaitre l'etat reel apres declenchement du trigger.
     const { data: fullProfile } = await supabase
       .from("testers")
       .select("*")
       .eq("auth_user_id", user.id)
       .single();
 
-    if (fullProfile && isProfileComplete(fullProfile)) {
-      await supabase
-        .from("testers")
-        .update({ status: "active" })
-        .eq("auth_user_id", user.id);
-    }
+    const reallyComplete = !!fullProfile && fullProfile.profile_completed === true;
 
-    cookieStore.set("tp-profile", "true", {
+    // Le cookie reflete l'etat reel : si le profil n'est pas complet, le middleware
+    // continuera de rediriger vers /app/onboarding pour combler les manques.
+    cookieStore.set("tp-profile", String(reallyComplete), {
       path: "/",
       httpOnly: true,
       sameSite: "lax",
+      // SECURITE : flag `secure` en production (HTTPS uniquement).
+      secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 24 * 7,
     });
-    return NextResponse.json({ success: true, redirect: "/app/dashboard" });
+
+    if (reallyComplete) {
+      return NextResponse.json({
+        success: true,
+        profile_completed: true,
+        redirect: "/app/dashboard",
+      });
+    }
+
+    // Profil incomplet : remonter clairement les champs manquants pour aider l'UX.
+    const missing: string[] = [];
+    if (fullProfile) {
+      for (const field of REQUIRED_TEXT_FIELDS) {
+        if (!fullProfile[field]) missing.push(field);
+      }
+      for (const field of REQUIRED_ARRAY_FIELDS) {
+        const arr = fullProfile[field];
+        if (!Array.isArray(arr) || arr.length === 0) missing.push(field);
+      }
+    }
+
+    return NextResponse.json(
+      {
+        error: `Profil incomplet : champs manquants (${missing.join(", ")}). Revenez en arriere pour les completer.`,
+        profile_completed: false,
+        missing_fields: missing,
+      },
+      { status: 400 }
+    );
   }
 
   const { error } = await supabase

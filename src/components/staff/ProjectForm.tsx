@@ -206,6 +206,11 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
     if (!initialClientId || clients.length === 0) return;
     const c = clients.find((x) => x.id === initialClientId);
     if (c) applyClient(c);
+    // W6 : volontaire. `applyClient` lit les states contact* pour ne pas
+    // ecraser une saisie en cours, mais on veut que cet effet ne se declenche
+    // qu'au chargement initial des clients ou au changement de l'ID prefill.
+    // L'inclure dans les deps relancerait l'auto-fill apres chaque keystroke
+    // et causerait une boucle de rendu.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clients, initialClientId]);
   const [startDate, setStartDate] = useState(() =>

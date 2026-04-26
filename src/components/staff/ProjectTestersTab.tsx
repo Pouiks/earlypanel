@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import type { Tester } from "@/types/tester";
 import TesterDrawer from "./TesterDrawer";
+import { useConfirm } from "@/components/ui/ConfirmModal";
 
 interface AssignedTester {
   id: string;
@@ -246,6 +247,7 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
   const [showAssigned, setShowAssigned] = useState(false);
   const [sortKey, setSortKey] = useState<string>("last_name");
   const [sortAsc, setSortAsc] = useState(true);
+  const { notify, ConfirmModal } = useConfirm();
 
   const assignedTesterIds = new Set(assigned.map((a) => a.tester_id));
 
@@ -347,7 +349,10 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
     });
 
     if (eligible.length === 0) {
-      alert("Aucun testeur éligible (seuls les testeurs en statut « Sélectionné » peuvent recevoir le NDA).");
+      await notify({
+        title: "Aucun testeur éligible",
+        message: "Seuls les testeurs en statut « Sélectionné » peuvent recevoir le NDA.",
+      });
       return;
     }
 
@@ -359,12 +364,15 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
 
     if (!res.ok) {
       const err = await res.json();
-      alert(err.error || "Erreur lors de l'envoi");
+      await notify({ title: "Erreur", message: err.error || "Erreur lors de l'envoi" });
       return;
     }
 
     const result = await res.json();
-    alert(`NDA envoyé à ${result.sent}/${result.total} testeur(s)`);
+    await notify({
+      title: "NDA envoyé",
+      message: `NDA envoyé à ${result.sent}/${result.total} testeur(s).`,
+    });
 
     setSelected(new Set());
     await fetchAssigned();
@@ -641,6 +649,7 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
       )}
 
       <TesterDrawer testerId={drawerId} onClose={() => setDrawerId(null)} />
+      <ConfirmModal />
     </div>
   );
 }

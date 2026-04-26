@@ -160,7 +160,36 @@ export async function PUT(
     .map((u: { id: string }) => u.id)
     .filter((uid: string) => !existingUcIds.includes(uid));
 
+  // Garde-fou : refuser la suppression d'un UC dont les questions ont deja recu des reponses.
+  // La FK project_questions.use_case_id ON DELETE SET NULL preserve les questions,
+  // mais l'utilisateur perdrait sa structure d'UC tout en laissant des questions orphelines.
   if (toDelete.length > 0) {
+    const { data: ucQuestions } = await admin
+      .from("project_questions")
+      .select("id, use_case_id")
+      .in("use_case_id", toDelete);
+
+    const questionIds = (ucQuestions ?? []).map((q) => q.id);
+    if (questionIds.length > 0) {
+      const { count: answersCount } = await admin
+        .from("project_tester_answers")
+        .select("id", { count: "exact", head: true })
+        .in("question_id", questionIds);
+
+      if (answersCount && answersCount > 0) {
+        return NextResponse.json(
+          {
+            error:
+              "Impossible de supprimer un cas d'usage dont les questions ont deja recu des reponses.",
+          },
+          { status: 409 }
+        );
+      }
+
+      // Aucune reponse : supprimer aussi explicitement les questions de ces UC pour eviter les orphelins.
+      await admin.from("project_questions").delete().in("use_case_id", toDelete);
+    }
+
     await admin.from("project_use_cases").delete().in("id", toDelete);
   }
 
@@ -207,16 +236,59 @@ export async function PUT(
     }
 
     if (uc.questions !== undefined) {
-      await admin.from("project_questions").delete().eq("use_case_id", ucId);
-      if (uc.questions.length > 0) {
-        const rows = uc.questions.map((q, i) => ({
-          project_id: projectId,
-          use_case_id: ucId,
-          position: i,
-          question_text: q.question_text,
-          question_hint: q.question_hint || null,
-        }));
-        await admin.from("project_questions").insert(rows);
+      // Diff base sur les ids pour preserver les reponses existantes.
+      const { data: existingQs } = await admin
+        .from("project_questions")
+        .select("id")
+        .eq("use_case_id", ucId);
+
+      const existingIds = new Set((existingQs ?? []).map((q: { id: string }) => q.id));
+      const incomingIds = new Set(
+        uc.questions.filter((q) => q.id).map((q) => q.id as string)
+      );
+      const questionsToDelete = [...existingIds].filter((qid) => !incomingIds.has(qid));
+
+      if (questionsToDelete.length > 0) {
+        // Garde-fou : refuser de supprimer une question deja repondue.
+        const { count: answersOnDeleted } = await admin
+          .from("project_tester_answers")
+          .select("id", { count: "exact", head: true })
+          .in("question_id", questionsToDelete);
+
+        if (answersOnDeleted && answersOnDeleted > 0) {
+          return NextResponse.json(
+            {
+              error:
+                "Impossible de supprimer une question : des reponses ont deja ete soumises pour celle-ci.",
+            },
+            { status: 409 }
+          );
+        }
+
+        await admin.from("project_questions").delete().in("id", questionsToDelete);
+      }
+
+      // UPDATE des questions existantes, INSERT des nouvelles, en preservant l'ordre fourni.
+      for (let i = 0; i < uc.questions.length; i++) {
+        const q = uc.questions[i];
+        if (q.id && existingIds.has(q.id)) {
+          await admin
+            .from("project_questions")
+            .update({
+              question_text: q.question_text,
+              question_hint: q.question_hint || null,
+              position: i,
+            })
+            .eq("id", q.id);
+        } else {
+          await admin.from("project_questions").insert({
+            project_id: projectId,
+            use_case_id: ucId,
+            position: i,
+            question_text: q.question_text,
+            question_hint: q.question_hint || null,
+          });
+        }
       }
     }
   }
