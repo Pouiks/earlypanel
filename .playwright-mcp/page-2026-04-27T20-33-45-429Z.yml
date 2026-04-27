@@ -1,0 +1,77 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - link "earlypanel" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e5]: earlypanel
+      - navigation [ref=e6]:
+        - link "🏠 Tableau de bord" [ref=e7] [cursor=pointer]:
+          - /url: /app/dashboard
+          - generic [ref=e8]: 🏠
+          - generic [ref=e9]: Tableau de bord
+        - link "📋 Mes missions 1" [ref=e41] [cursor=pointer]:
+          - /url: /app/dashboard/missions
+          - generic [ref=e11]: 📋
+          - generic [ref=e12]: Mes missions
+          - generic [ref=e42]: "1"
+        - link "💰 Mes gains" [ref=e13] [cursor=pointer]:
+          - /url: /app/dashboard/gains
+          - generic [ref=e14]: 💰
+          - generic [ref=e15]: Mes gains
+        - link "👤 Mon profil" [ref=e16] [cursor=pointer]:
+          - /url: /app/dashboard/profil
+          - generic [ref=e17]: 👤
+          - generic [ref=e18]: Mon profil
+        - link "📄 Mes documents" [ref=e19] [cursor=pointer]:
+          - /url: /app/dashboard/documents
+          - generic [ref=e20]: 📄
+          - generic [ref=e21]: Mes documents
+      - button "🚪 Déconnexion" [ref=e23] [cursor=pointer]:
+        - generic [ref=e24]: 🚪
+        - text: Déconnexion
+    - generic [ref=e25]:
+      - banner [ref=e26]:
+        - button "E2E Test-mohn80u3 ET" [ref=e43] [cursor=pointer]:
+          - generic [ref=e44]: E2E Test-mohn80u3
+          - generic [ref=e29]: ET
+      - generic [ref=e30]:
+        - button "← Retour aux missions" [ref=e45] [cursor=pointer]
+        - generic [ref=e46]:
+          - generic [ref=e47]:
+            - heading "[E2E TEST] Demo Project mohn80u3" [level=1] [ref=e48]
+            - paragraph [ref=e49]: Demo Company SAS · PROJ-00003 · Tech / SaaS
+            - paragraph [ref=e50]: Du 27 avril 2026 à 02:00 au 11 mai 2026 à 02:00
+          - generic [ref=e52]: Soumise le 27/04/2026
+        - paragraph [ref=e134]: Mission soumise. Vos réponses sont en attente de validation par l'équipe.
+        - generic [ref=e55]:
+          - heading "Description de la mission" [level=2] [ref=e56]
+          - generic [ref=e57]: Projet de démonstration créé par /api/admin/seed-demo. À supprimer via /api/admin/cleanup-demo.
+        - generic [ref=e78]:
+          - generic "[E2E TEST] Demo Project mohn80u3" [ref=e84]: Session · [E2E TEST] Demo Project mohn80u3
+          - generic [ref=e85]:
+            - generic [ref=e86]:
+              - generic [ref=e87]: Question 1 sur 1
+              - generic [ref=e89]: 100%
+            - progressbar [ref=e90]
+          - generic [ref=e92]:
+            - generic [ref=e95]: Tech / SaaS
+            - generic [ref=e96]: Décrivez votre première impression sur l'application en 2-3 phrases.
+            - paragraph [ref=e97]: Pensez aux étapes, aux messages, au contexte. Les captures d'écran aident l'équipe.
+            - textbox "Décrivez le comportement rencontré le plus précisément possible…" [disabled] [ref=e98]: "Première impression : interface claire et épurée, l'onboarding est fluide. La hiérarchie visuelle aide à se repérer rapidement, mais le bouton CTA principal pourrait être plus visible. La typographie est lisible et le contraste correct sur fond clair."
+            - generic [ref=e100]: 251 caractères
+            - generic [ref=e106]:
+              - button "← Précédent" [disabled] [ref=e107]
+              - generic [ref=e108]: 1 / 1
+            - paragraph [ref=e135]: Mission soumise — lecture seule
+          - generic [ref=e112]:
+            - generic [ref=e113]:
+              - generic [ref=e114]: ET
+              - generic [ref=e115]:
+                - strong [ref=e116]: E2E T.
+                - text: · Testeur QA
+            - generic "Contexte de ce navigateur" [ref=e117]:
+              - img [ref=e118]
+              - text: Ordinateur · Chrome
+  - button "Open Next.js Dev Tools" [ref=e36] [cursor=pointer]:
+    - img [ref=e37]
+  - alert [ref=e40]

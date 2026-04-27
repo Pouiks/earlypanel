@@ -1,0 +1,35 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - link "earlypanel Staff" [ref=e4] [cursor=pointer]:
+        - /url: /staff/dashboard
+        - generic [ref=e5]: earlypanel
+        - generic [ref=e6]: Staff
+      - navigation [ref=e7]:
+        - link "📂 Projets" [ref=e8] [cursor=pointer]:
+          - /url: /staff/dashboard
+          - generic [ref=e9]: 📂
+          - text: Projets
+        - link "🏢 Clients B2B" [ref=e10] [cursor=pointer]:
+          - /url: /staff/dashboard/clients
+          - generic [ref=e11]: 🏢
+          - text: Clients B2B
+        - link "🧑‍🔬 Testeurs" [ref=e12] [cursor=pointer]:
+          - /url: /staff/dashboard/testers
+          - generic [ref=e13]: 🧑‍🔬
+          - text: Testeurs
+        - link "👥 Personas" [ref=e14] [cursor=pointer]:
+          - /url: /staff/dashboard/personas
+          - generic [ref=e15]: 👥
+          - text: Personas
+      - button "🚪 Déconnexion" [ref=e17] [cursor=pointer]:
+        - generic [ref=e18]: 🚪
+        - text: Déconnexion
+    - generic [ref=e19]:
+      - banner [ref=e20]:
+        - button "ST" [ref=e22] [cursor=pointer]:
+          - generic [ref=e23]: ST
+      - generic [ref=e24]: Chargement…
+  - button "Open Next.js Dev Tools" [ref=e30] [cursor=pointer]:
+    - img [ref=e31]
+  - alert [ref=e34]

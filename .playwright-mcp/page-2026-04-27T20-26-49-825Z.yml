@@ -1,0 +1,214 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - link "earlypanel Staff" [ref=e4] [cursor=pointer]:
+        - /url: /staff/dashboard
+        - generic [ref=e5]: earlypanel
+        - generic [ref=e6]: Staff
+      - navigation [ref=e7]:
+        - link "📂 Projets" [ref=e8] [cursor=pointer]:
+          - /url: /staff/dashboard
+          - generic [ref=e9]: 📂
+          - text: Projets
+        - link "🏢 Clients B2B" [ref=e10] [cursor=pointer]:
+          - /url: /staff/dashboard/clients
+          - generic [ref=e11]: 🏢
+          - text: Clients B2B
+        - link "🧑‍🔬 Testeurs" [ref=e12] [cursor=pointer]:
+          - /url: /staff/dashboard/testers
+          - generic [ref=e13]: 🧑‍🔬
+          - text: Testeurs
+        - link "👥 Personas" [ref=e14] [cursor=pointer]:
+          - /url: /staff/dashboard/personas
+          - generic [ref=e15]: 👥
+          - text: Personas
+      - button "🚪 Déconnexion" [ref=e17] [cursor=pointer]:
+        - generic [ref=e18]: 🚪
+        - text: Déconnexion
+    - generic [ref=e19]:
+      - banner [ref=e20]:
+        - button "E2E Staff ES" [ref=e35] [cursor=pointer]:
+          - generic [ref=e36]: E2E Staff
+          - generic [ref=e23]: ES
+      - generic [ref=e24]:
+        - link "← Retour aux projets" [ref=e38] [cursor=pointer]:
+          - /url: /staff/dashboard
+        - generic [ref=e39]:
+          - generic [ref=e40]:
+            - heading "[E2E TEST] Demo Project mohn80u3" [level=1] [ref=e41]
+            - generic [ref=e42]: Brouillon
+          - generic [ref=e43]:
+            - button "Modifier" [ref=e44] [cursor=pointer]
+            - button "Supprimer" [ref=e45] [cursor=pointer]
+        - generic [ref=e46]:
+          - generic [ref=e47]: "Statut :"
+          - button "Brouillon" [ref=e48] [cursor=pointer]
+          - button "Actif" [ref=e49] [cursor=pointer]
+          - button "Terminé" [ref=e50] [cursor=pointer]
+          - button "Archivé" [ref=e51] [cursor=pointer]
+        - generic [ref=e52]:
+          - strong [ref=e53]: Brouillon.
+          - text: Vous pouvez préparer testeurs et NDA. Le premier envoi de NDA passe le projet en
+          - strong [ref=e54]: Actif
+          - text: et ouvre les missions côté testeurs.
+        - generic [ref=e55]:
+          - button "Informations" [ref=e56] [cursor=pointer]
+          - button "Testeurs" [active] [ref=e57] [cursor=pointer]
+          - button "NDA" [ref=e58] [cursor=pointer]
+          - button "Scénarios" [ref=e59] [cursor=pointer]
+          - button "Réponses" [ref=e60] [cursor=pointer]
+          - button "Dépouillement" [ref=e61] [cursor=pointer]
+          - button "Versements" [ref=e62] [cursor=pointer]
+          - button "Rapport" [ref=e63] [cursor=pointer]
+        - generic [ref=e87]:
+          - generic [ref=e88]:
+            - button "Rechercher testeurs" [ref=e89] [cursor=pointer]
+            - button "Assignés (0)" [ref=e90] [cursor=pointer]
+          - generic [ref=e91]:
+            - generic [ref=e92]:
+              - generic [ref=e94]: Filtres
+              - generic [ref=e95]:
+                - button "Niveau digital ▼" [ref=e96] [cursor=pointer]:
+                  - generic [ref=e97]: Niveau digital
+                  - generic [ref=e98]: ▼
+                - generic [ref=e99]:
+                  - generic [ref=e100] [cursor=pointer]:
+                    - checkbox "Débutant" [ref=e101]
+                    - text: Débutant
+                  - generic [ref=e102] [cursor=pointer]:
+                    - checkbox "Intermédiaire" [ref=e103]
+                    - text: Intermédiaire
+                  - generic [ref=e104] [cursor=pointer]:
+                    - checkbox "Avancé" [ref=e105]
+                    - text: Avancé
+                  - generic [ref=e106] [cursor=pointer]:
+                    - checkbox "Expert" [ref=e107]
+                    - text: Expert
+              - generic [ref=e108]:
+                - button "Connexion ▼" [ref=e109] [cursor=pointer]:
+                  - generic [ref=e110]: Connexion
+                  - generic [ref=e111]: ▼
+                - generic [ref=e112]:
+                  - generic [ref=e113] [cursor=pointer]:
+                    - checkbox "Fibre" [ref=e114]
+                    - text: Fibre
+                  - generic [ref=e115] [cursor=pointer]:
+                    - checkbox "ADSL" [ref=e116]
+                    - text: ADSL
+                  - generic [ref=e117] [cursor=pointer]:
+                    - checkbox "4G/5G" [ref=e118]
+                    - text: 4G/5G
+              - generic [ref=e119]:
+                - button "Appareils ▼" [ref=e120] [cursor=pointer]:
+                  - generic [ref=e121]: Appareils
+                  - generic [ref=e122]: ▼
+                - generic [ref=e123]:
+                  - generic [ref=e124] [cursor=pointer]:
+                    - checkbox "PC Windows" [ref=e125]
+                    - text: PC Windows
+                  - generic [ref=e126] [cursor=pointer]:
+                    - checkbox "Mac" [ref=e127]
+                    - text: Mac
+                  - generic [ref=e128] [cursor=pointer]:
+                    - checkbox "PC Linux" [ref=e129]
+                    - text: PC Linux
+                  - generic [ref=e130] [cursor=pointer]:
+                    - checkbox "iPhone" [ref=e131]
+                    - text: iPhone
+                  - generic [ref=e132] [cursor=pointer]:
+                    - checkbox "Android" [ref=e133]
+                    - text: Android
+                  - generic [ref=e134] [cursor=pointer]:
+                    - checkbox "iPad" [ref=e135]
+                    - text: iPad
+                  - generic [ref=e136] [cursor=pointer]:
+                    - checkbox "Tablette Android" [ref=e137]
+                    - text: Tablette Android
+              - generic [ref=e138]:
+                - button "Navigateurs ▼" [ref=e139] [cursor=pointer]:
+                  - generic [ref=e140]: Navigateurs
+                  - generic [ref=e141]: ▼
+                - generic [ref=e142]:
+                  - generic [ref=e143] [cursor=pointer]:
+                    - checkbox "Chrome" [ref=e144]
+                    - text: Chrome
+                  - generic [ref=e145] [cursor=pointer]:
+                    - checkbox "Firefox" [ref=e146]
+                    - text: Firefox
+                  - generic [ref=e147] [cursor=pointer]:
+                    - checkbox "Safari" [ref=e148]
+                    - text: Safari
+                  - generic [ref=e149] [cursor=pointer]:
+                    - checkbox "Edge" [ref=e150]
+                    - text: Edge
+                  - generic [ref=e151] [cursor=pointer]:
+                    - checkbox "Arc" [ref=e152]
+                    - text: Arc
+              - generic [ref=e153]:
+                - button "Secteur ▼" [ref=e154] [cursor=pointer]:
+                  - generic [ref=e155]: Secteur
+                  - generic [ref=e156]: ▼
+                - generic [ref=e157]:
+                  - generic [ref=e158] [cursor=pointer]:
+                    - checkbox "Tech / IT" [ref=e159]
+                    - text: Tech / IT
+                  - generic [ref=e160] [cursor=pointer]:
+                    - checkbox "Finance / Banque" [ref=e161]
+                    - text: Finance / Banque
+                  - generic [ref=e162] [cursor=pointer]:
+                    - checkbox "Santé" [ref=e163]
+                    - text: Santé
+                  - generic [ref=e164] [cursor=pointer]:
+                    - checkbox "Commerce / Retail" [ref=e165]
+                    - text: Commerce / Retail
+                  - generic [ref=e166] [cursor=pointer]:
+                    - checkbox "Éducation" [ref=e167]
+                    - text: Éducation
+                  - generic [ref=e168] [cursor=pointer]:
+                    - checkbox "Industrie" [ref=e169]
+                    - text: Industrie
+                  - generic [ref=e170] [cursor=pointer]:
+                    - checkbox "Médias / Communication" [ref=e171]
+                    - text: Médias / Communication
+                  - generic [ref=e172] [cursor=pointer]:
+                    - checkbox "Juridique" [ref=e173]
+                    - text: Juridique
+                  - generic [ref=e174] [cursor=pointer]:
+                    - checkbox "Ressources humaines" [ref=e175]
+                    - text: Ressources humaines
+                  - generic [ref=e176] [cursor=pointer]:
+                    - checkbox "Autre" [ref=e177]
+                    - text: Autre
+            - generic [ref=e178]:
+              - textbox "Rechercher par nom ou email…" [ref=e180]
+              - generic [ref=e181]: 2 testeurs trouvés
+              - table [ref=e184]:
+                - rowgroup [ref=e192]:
+                  - row "Nom ↑ Email Appareils Niveau Secteur" [ref=e193]:
+                    - columnheader [ref=e194]:
+                      - checkbox [ref=e195]
+                    - columnheader "Nom ↑" [ref=e196] [cursor=pointer]
+                    - columnheader "Email" [ref=e197] [cursor=pointer]
+                    - columnheader "Appareils" [ref=e198]
+                    - columnheader "Niveau" [ref=e199] [cursor=pointer]
+                    - columnheader "Secteur" [ref=e200] [cursor=pointer]
+                - rowgroup [ref=e201]:
+                  - row "benjamin brunet benjaminbrunet63@gmail.com PC Windows, PC Linux debutant Industrie" [ref=e202] [cursor=pointer]:
+                    - cell [ref=e203]:
+                      - checkbox [ref=e204]
+                    - cell "benjamin brunet" [ref=e205]
+                    - cell "benjaminbrunet63@gmail.com" [ref=e206]
+                    - cell "PC Windows, PC Linux" [ref=e207]
+                    - cell "debutant" [ref=e208]
+                    - cell "Industrie" [ref=e209]
+                  - row "E2E Test-mohn80u3 hakiyoj126@soppat.com PC Windows, iPhone expert Tech / SaaS" [ref=e210] [cursor=pointer]:
+                    - cell [ref=e211]:
+                      - checkbox [ref=e212]
+                    - cell "E2E Test-mohn80u3" [ref=e213]
+                    - cell "hakiyoj126@soppat.com" [ref=e214]
+                    - cell "PC Windows, iPhone" [ref=e215]
+                    - cell "expert" [ref=e216]
+                    - cell "Tech / SaaS" [ref=e217]
+  - button "Open Next.js Dev Tools" [ref=e30] [cursor=pointer]:
+    - img [ref=e31]
+  - alert [ref=e34]

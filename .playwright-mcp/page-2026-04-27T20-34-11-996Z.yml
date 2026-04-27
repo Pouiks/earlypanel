@@ -1,0 +1,26 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]: earlypanel
+      - generic [ref=e6]: Espace Staff
+    - heading "Connexion" [level=1] [ref=e7]
+    - paragraph [ref=e8]: Entrez vos identifiants pour accéder à l'espace de gestion.
+    - generic [ref=e9]:
+      - button "Mot de passe" [ref=e10] [cursor=pointer]
+      - button "Lien magique" [ref=e11] [cursor=pointer]
+    - generic [ref=e12]:
+      - generic [ref=e13]:
+        - generic [ref=e14]: Email
+        - textbox "prenom@earlypanel.fr" [ref=e15]: feature418@gmail.com
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - generic [ref=e18]: Mot de passe
+          - link "Oublié ?" [ref=e19] [cursor=pointer]:
+            - /url: /staff/forgot
+        - textbox "••••••••" [ref=e20]: E2eTest2026!
+      - button "Se connecter" [ref=e21] [cursor=pointer]
+    - link "← Retour sur earlypanel.fr" [ref=e23] [cursor=pointer]:
+      - /url: /
+  - button "Open Next.js Dev Tools" [ref=e29] [cursor=pointer]:
+    - img [ref=e30]
+  - alert [ref=e33]

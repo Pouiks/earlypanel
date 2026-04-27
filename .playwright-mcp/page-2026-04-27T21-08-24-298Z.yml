@@ -1,0 +1,55 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - link "earlypanel" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e5]: earlypanel
+      - navigation [ref=e6]:
+        - link "🏠 Tableau de bord" [ref=e7] [cursor=pointer]:
+          - /url: /app/dashboard
+          - generic [ref=e8]: 🏠
+          - generic [ref=e9]: Tableau de bord
+        - link "📋 Mes missions" [ref=e10] [cursor=pointer]:
+          - /url: /app/dashboard/missions
+          - generic [ref=e11]: 📋
+          - generic [ref=e12]: Mes missions
+        - link "💰 Mes gains" [ref=e13] [cursor=pointer]:
+          - /url: /app/dashboard/gains
+          - generic [ref=e14]: 💰
+          - generic [ref=e15]: Mes gains
+        - link "👤 Mon profil" [ref=e16] [cursor=pointer]:
+          - /url: /app/dashboard/profil
+          - generic [ref=e17]: 👤
+          - generic [ref=e18]: Mon profil
+        - link "📄 Mes documents 1" [ref=e44] [cursor=pointer]:
+          - /url: /app/dashboard/documents
+          - generic [ref=e20]: 📄
+          - generic [ref=e21]: Mes documents
+          - generic [ref=e45]: "1"
+      - button "🚪 Déconnexion" [ref=e23] [cursor=pointer]:
+        - generic [ref=e24]: 🚪
+        - text: Déconnexion
+    - generic [ref=e25]:
+      - banner [ref=e26]:
+        - button "E2E Test-mohoq2hp ET" [ref=e46] [cursor=pointer]:
+          - generic [ref=e47]: E2E Test-mohoq2hp
+          - generic [ref=e29]: ET
+      - generic [ref=e30]:
+        - heading "Mes documents" [level=1] [ref=e31]
+        - paragraph [ref=e32]: Retrouvez vos accords de confidentialité et documents contractuels
+        - generic [ref=e61]:
+          - heading "Documents signés" [level=2] [ref=e62]
+          - generic [ref=e73]:
+            - generic [ref=e74]:
+              - generic [ref=e75]: ✅
+              - generic [ref=e76]:
+                - paragraph [ref=e77]: "[E2E TEST] Accord de confidentialité"
+                - paragraph [ref=e78]: "[E2E TEST] Demo Project mohoq2hp — Demo Company SAS"
+                - paragraph [ref=e79]: Signé le 27 avril 2026
+            - generic [ref=e80]:
+              - button "Consulter" [ref=e81] [cursor=pointer]
+              - link "Télécharger PDF" [ref=e82] [cursor=pointer]:
+                - /url: https://rghdelerogboaaexglqa.supabase.co/storage/v1/object/sign/documents/ndas/6638fe6c-fd27-4069-a070-cb6b5c0180e7/c755b390-38b6-4fab-b0bb-8f833ecf578e_1777324096753.pdf?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV8zZGExOTgwZC05MmQ3LTRjMTgtYjM5Mi01NTlmODM1MWIzNWMiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJkb2N1bWVudHMvbmRhcy82NjM4ZmU2Yy1mZDI3LTQwNjktYTA3MC1jYjZiNWMwMTgwZTcvYzc1NWIzOTAtMzhiNi00ZmFiLWIwYmItOGY4MzNlY2Y1NzhlXzE3NzczMjQwOTY3NTMucGRmIiwiaWF0IjoxNzc3MzI0MDk4LCJleHAiOjE3NzczMjc2OTh9.WrjAKcrolfXmE1vqAhtxyib5Iv9p0ZtTNPdfTOCNxr4
+  - button "Open Next.js Dev Tools" [ref=e39] [cursor=pointer]:
+    - img [ref=e40]
+  - alert [ref=e43]

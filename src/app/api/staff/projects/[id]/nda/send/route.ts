@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/email";
 import { projectAllowsNdaSend, projectIsClosedForCampaign } from "@/lib/project-lifecycle";
 import { tryGetAppUrl } from "@/lib/app-url";
+import { logStaffAction } from "@/lib/audit";
 
 export async function POST(
   request: NextRequest,
@@ -175,6 +176,24 @@ export async function POST(
         });
         continue;
       }
+
+      await logStaffAction(
+        {
+          staff_id: staff.id,
+          staff_email: staff.email,
+          action: "nda.sent",
+          entity_type: "project_tester",
+          entity_id: updatedRows[0].id as string,
+          metadata: {
+            project_id: id,
+            tester_id: testerId,
+            tester_email: tester.email,
+            project_title: project?.title ?? null,
+            nda_id: nda.id,
+          },
+        },
+        request,
+      );
 
       results.push({ tester_id: testerId, success: true });
     } catch (err) {

@@ -3,6 +3,7 @@ import { getStaffMember } from "@/lib/staff-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { projectAllowsStaffAssignTesters, projectIsClosedForCampaign } from "@/lib/project-lifecycle";
 import { REQUIRED_FIELDS, isTesterEligibleForInvitation } from "@/lib/profile-completeness";
+import { logStaffAction } from "@/lib/audit";
 
 export async function GET(
   _request: NextRequest,
@@ -118,6 +119,24 @@ export async function POST(
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  if (data && data.length > 0) {
+    await logStaffAction(
+      {
+        staff_id: staff.id,
+        staff_email: staff.email,
+        action: "project_tester.assigned",
+        entity_type: "project",
+        entity_id: id,
+        metadata: {
+          assigned_tester_ids: data.map((r) => r.tester_id),
+          rejected_tester_ids: rejectedIds,
+          assigned_count: data.length,
+        },
+      },
+      request,
+    );
   }
 
   return NextResponse.json(

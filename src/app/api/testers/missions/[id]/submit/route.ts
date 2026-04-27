@@ -3,6 +3,7 @@ import { getAuthedTester } from "@/lib/tester-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { projectAllowsTesterWorkWithGrace } from "@/lib/project-lifecycle";
 import { checkOrigin, forbiddenOriginResponse } from "@/lib/csrf";
+import { logStaffAction } from "@/lib/audit";
 
 /**
  * POST : soumet la mission. Validation stricte : chaque question doit avoir une reponse non vide.
@@ -24,7 +25,7 @@ export async function POST(
 
     const { data: pt } = await admin
       .from("project_testers")
-      .select("id, status, started_at")
+      .select("id, status, started_at, tester:testers(email)")
       .eq("project_id", projectId)
       .eq("tester_id", authed.testerId)
       .maybeSingle();
@@ -144,6 +145,24 @@ export async function POST(
       p_reason: "Soumission mission (en attente de validation staff)",
       p_project_id: projectId,
     });
+
+    const testerEmail = (pt.tester as { email?: string } | null)?.email ?? null;
+    await logStaffAction(
+      {
+        staff_id: null,
+        staff_email: testerEmail,
+        action: "mission.submitted",
+        entity_type: "project_tester",
+        entity_id: pt.id as string,
+        metadata: {
+          project_id: projectId,
+          tester_id: authed.testerId,
+          submitted_at_iso: now,
+          answer_count: questions.length,
+        },
+      },
+      request,
+    );
 
     return NextResponse.json({ success: true, submitted_at: now });
   } catch (err) {

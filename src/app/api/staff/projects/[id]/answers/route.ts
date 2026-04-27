@@ -3,6 +3,7 @@ import { getStaffMember } from "@/lib/staff-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { computeDefaultRewardCents, type TierRewardsMap } from "@/lib/reward-calculator";
 import { checkOrigin, forbiddenOriginResponse } from "@/lib/csrf";
+import { logStaffAction } from "@/lib/audit";
 
 const BUCKET = "mission-images";
 
@@ -233,20 +234,27 @@ export async function PATCH(
     .eq("project_tester_id", ptId)
     .maybeSingle();
 
+  let createdPayoutId: string | null = null;
+
   if (existingPayout?.status === "paid") {
     // Ne pas modifier un versement deja encaisse
   } else if (!existingPayout) {
-    await admin.from("tester_payouts").upsert(
-      {
-        project_id: projectId,
-        tester_id: pt.tester_id,
-        project_tester_id: ptId,
-        calculated_amount_cents: calculated,
-        final_amount_cents: calculated,
-        status: "pending",
-      },
-      { onConflict: "project_tester_id" }
-    );
+    const { data: insertedPayout } = await admin
+      .from("tester_payouts")
+      .upsert(
+        {
+          project_id: projectId,
+          tester_id: pt.tester_id,
+          project_tester_id: ptId,
+          calculated_amount_cents: calculated,
+          final_amount_cents: calculated,
+          status: "pending",
+        },
+        { onConflict: "project_tester_id" },
+      )
+      .select("id")
+      .maybeSingle();
+    createdPayoutId = insertedPayout?.id ?? null;
   } else {
     const staffOverrodeFinal =
       existingPayout.final_amount_cents !== existingPayout.calculated_amount_cents;
@@ -259,6 +267,48 @@ export async function PATCH(
         updated_at: new Date().toISOString(),
       })
       .eq("id", existingPayout.id);
+  }
+
+  await logStaffAction(
+    {
+      staff_id: staff.id,
+      staff_email: staff.email,
+      action: "project_tester.rated",
+      entity_type: "project_tester",
+      entity_id: ptId,
+      metadata: {
+        project_id: projectId,
+        tester_id: pt.tester_id,
+        rating,
+        sloppy,
+        has_note: !!note,
+        is_first_rating: isFirstRating,
+        reward_tier: rewardTier,
+      },
+    },
+    request,
+  );
+
+  if (createdPayoutId) {
+    await logStaffAction(
+      {
+        staff_id: staff.id,
+        staff_email: staff.email,
+        action: "payout.created",
+        entity_type: "tester_payout",
+        entity_id: createdPayoutId,
+        metadata: {
+          project_id: projectId,
+          tester_id: pt.tester_id,
+          project_tester_id: ptId,
+          calculated_amount_cents: calculated,
+          final_amount_cents: calculated,
+          status: "pending",
+          source: "rating",
+        },
+      },
+      request,
+    );
   }
 
   return NextResponse.json({ success: true });

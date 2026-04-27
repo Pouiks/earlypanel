@@ -1,0 +1,92 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - link "earlypanel Staff" [ref=e4] [cursor=pointer]:
+        - /url: /staff/dashboard
+        - generic [ref=e5]: earlypanel
+        - generic [ref=e6]: Staff
+      - navigation [ref=e7]:
+        - link "📂 Projets" [ref=e8] [cursor=pointer]:
+          - /url: /staff/dashboard
+          - generic [ref=e9]: 📂
+          - text: Projets
+        - link "🏢 Clients B2B" [ref=e10] [cursor=pointer]:
+          - /url: /staff/dashboard/clients
+          - generic [ref=e11]: 🏢
+          - text: Clients B2B
+        - link "🧑‍🔬 Testeurs" [ref=e12] [cursor=pointer]:
+          - /url: /staff/dashboard/testers
+          - generic [ref=e13]: 🧑‍🔬
+          - text: Testeurs
+        - link "👥 Personas" [ref=e14] [cursor=pointer]:
+          - /url: /staff/dashboard/personas
+          - generic [ref=e15]: 👥
+          - text: Personas
+      - button "🚪 Déconnexion" [ref=e17] [cursor=pointer]:
+        - generic [ref=e18]: 🚪
+        - text: Déconnexion
+    - generic [ref=e19]:
+      - banner [ref=e20]:
+        - button "E2E Staff ES" [ref=e22] [cursor=pointer]:
+          - generic [ref=e23]: E2E Staff
+          - generic [ref=e24]: ES
+      - generic [ref=e25]:
+        - generic [ref=e26]:
+          - heading "Projets" [level=1] [ref=e27]
+          - link "+ Nouveau projet" [ref=e28] [cursor=pointer]:
+            - /url: /staff/dashboard/projects/new
+        - generic [ref=e29]:
+          - button "Tous" [ref=e30] [cursor=pointer]
+          - button "Brouillons" [ref=e31] [cursor=pointer]
+          - button "Actifs" [ref=e32] [cursor=pointer]
+          - button "Terminés" [ref=e33] [cursor=pointer]
+          - button "Archivés" [ref=e34] [cursor=pointer]
+        - generic [ref=e35]:
+          - 'link "[E2E TEST] Demo Project mohn80u3 Demo Company SAS · Tech / SaaS · 1 question Fiche créée : 27 avr. 2026 Début campagne : 27 avr. 2026, 02:00|Fin campagne : 11 mai 2026, 02:00 Brouillon" [ref=e36] [cursor=pointer]':
+            - /url: /staff/dashboard/projects/4aaf06c2-6d28-42f5-a0c8-e9a33ac546f5
+            - generic [ref=e37]:
+              - generic [ref=e38]:
+                - heading "[E2E TEST] Demo Project mohn80u3" [level=3] [ref=e39]
+                - generic [ref=e40]:
+                  - generic [ref=e41]: Demo Company SAS
+                  - generic [ref=e42]: ·
+                  - generic [ref=e43]: Tech / SaaS
+                  - generic [ref=e44]: ·
+                  - generic [ref=e45]: 1 question
+                - generic [ref=e46]:
+                  - generic [ref=e47]: "Fiche créée : 27 avr. 2026"
+                  - generic [ref=e48]: "Début campagne : 27 avr. 2026, 02:00|Fin campagne : 11 mai 2026, 02:00"
+              - generic [ref=e49]: Brouillon
+          - 'link "Tunnel de réservation Uxco group · Immobilier · 5 questions Fiche créée : 24 avr. 2026 Début campagne : 24 avr. 2026, 09:00|Fin campagne : 7 mai 2026, 23:00 Actif" [ref=e50] [cursor=pointer]':
+            - /url: /staff/dashboard/projects/82f253e9-bd40-4288-8b28-79f342b994bd
+            - generic [ref=e51]:
+              - generic [ref=e52]:
+                - heading "Tunnel de réservation" [level=3] [ref=e53]
+                - generic [ref=e54]:
+                  - generic [ref=e55]: Uxco group
+                  - generic [ref=e56]: ·
+                  - generic [ref=e57]: Immobilier
+                  - generic [ref=e58]: ·
+                  - generic [ref=e59]: 5 questions
+                - generic [ref=e60]:
+                  - generic [ref=e61]: "Fiche créée : 24 avr. 2026"
+                  - generic [ref=e62]: "Début campagne : 24 avr. 2026, 09:00|Fin campagne : 7 mai 2026, 23:00"
+              - generic [ref=e63]: Actif
+          - 'link "Application mobile - Student Life Cycle Xsociety · Tech / IT · 4 questions Fiche créée : 18 avr. 2026 Début campagne : 19 avr. 2026, 09:00|Fin campagne : 22 avr. 2026, 18:00 Actif" [ref=e64] [cursor=pointer]':
+            - /url: /staff/dashboard/projects/3aa0e0ff-4d5a-4168-8220-53c57e58f817
+            - generic [ref=e65]:
+              - generic [ref=e66]:
+                - heading "Application mobile - Student Life Cycle" [level=3] [ref=e67]
+                - generic [ref=e68]:
+                  - generic [ref=e69]: Xsociety
+                  - generic [ref=e70]: ·
+                  - generic [ref=e71]: Tech / IT
+                  - generic [ref=e72]: ·
+                  - generic [ref=e73]: 4 questions
+                - generic [ref=e74]:
+                  - generic [ref=e75]: "Fiche créée : 18 avr. 2026"
+                  - generic [ref=e76]: "Début campagne : 19 avr. 2026, 09:00|Fin campagne : 22 avr. 2026, 18:00"
+              - generic [ref=e77]: Actif
+  - button "Open Next.js Dev Tools" [ref=e83] [cursor=pointer]:
+    - img [ref=e84]
+  - alert [ref=e87]

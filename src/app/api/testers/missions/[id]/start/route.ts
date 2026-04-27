@@ -2,9 +2,10 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getAuthedTester } from "@/lib/tester-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { projectAllowsTesterWork } from "@/lib/project-lifecycle";
+import { logStaffAction } from "@/lib/audit";
 
 export async function POST(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -18,7 +19,7 @@ export async function POST(
 
     const { data: pt } = await admin
       .from("project_testers")
-      .select("id, status, started_at")
+      .select("id, status, started_at, tester:testers(email)")
       .eq("project_id", projectId)
       .eq("tester_id", authed.testerId)
       .maybeSingle();
@@ -85,6 +86,23 @@ export async function POST(
         { status: 409 }
       );
     }
+
+    const testerEmail = (pt.tester as { email?: string } | null)?.email ?? null;
+    await logStaffAction(
+      {
+        staff_id: null,
+        staff_email: testerEmail,
+        action: "mission.started",
+        entity_type: "project_tester",
+        entity_id: pt.id as string,
+        metadata: {
+          project_id: projectId,
+          tester_id: authed.testerId,
+          started_at_iso: now.toISOString(),
+        },
+      },
+      request,
+    );
 
     return NextResponse.json({ success: true, started_at: now.toISOString() });
   } catch (err) {

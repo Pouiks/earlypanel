@@ -1,0 +1,9 @@
+- generic [ref=e3]:
+  - generic [ref=e5]: earlypanel
+  - heading "Accéder à mon espace" [level=1] [ref=e6]
+  - paragraph [ref=e7]: Entrez votre email pour recevoir un lien de connexion
+  - generic [ref=e8]:
+    - textbox "votre@email.com" [ref=e9]
+    - button "Recevoir mon lien →" [ref=e10] [cursor=pointer]
+  - link "← Retour sur earlypanel.fr" [ref=e12] [cursor=pointer]:
+    - /url: /

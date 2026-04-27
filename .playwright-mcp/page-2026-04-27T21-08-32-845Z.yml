@@ -1,0 +1,70 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - link "earlypanel" [ref=e4] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e5]: earlypanel
+      - navigation [ref=e6]:
+        - link "🏠 Tableau de bord" [ref=e7] [cursor=pointer]:
+          - /url: /app/dashboard
+          - generic [ref=e8]: 🏠
+          - generic [ref=e9]: Tableau de bord
+        - link "📋 Mes missions 1" [ref=e41] [cursor=pointer]:
+          - /url: /app/dashboard/missions
+          - generic [ref=e11]: 📋
+          - generic [ref=e12]: Mes missions
+          - generic [ref=e42]: "1"
+        - link "💰 Mes gains" [ref=e13] [cursor=pointer]:
+          - /url: /app/dashboard/gains
+          - generic [ref=e14]: 💰
+          - generic [ref=e15]: Mes gains
+        - link "👤 Mon profil" [ref=e16] [cursor=pointer]:
+          - /url: /app/dashboard/profil
+          - generic [ref=e17]: 👤
+          - generic [ref=e18]: Mon profil
+        - link "📄 Mes documents" [ref=e19] [cursor=pointer]:
+          - /url: /app/dashboard/documents
+          - generic [ref=e20]: 📄
+          - generic [ref=e21]: Mes documents
+      - button "🚪 Déconnexion" [ref=e23] [cursor=pointer]:
+        - generic [ref=e24]: 🚪
+        - text: Déconnexion
+    - generic [ref=e25]:
+      - banner [ref=e26]:
+        - button "E2E Test-mohoq2hp ET" [ref=e43] [cursor=pointer]:
+          - generic [ref=e44]: E2E Test-mohoq2hp
+          - generic [ref=e29]: ET
+      - generic [ref=e30]:
+        - button "← Retour aux missions" [ref=e45] [cursor=pointer]
+        - generic [ref=e46]:
+          - generic [ref=e47]:
+            - heading "[E2E TEST] Demo Project mohoq2hp" [level=1] [ref=e48]
+            - paragraph [ref=e49]: Demo Company SAS · PROJ-00004 · Tech / SaaS
+            - paragraph [ref=e50]: Du 27 avril 2026 à 02:00 au 11 mai 2026 à 02:00
+          - generic [ref=e51]:
+            - generic [ref=e52]: Active
+            - generic [ref=e53]:
+              - generic [ref=e54]: Clôture dans
+              - text: 13j 2h
+        - generic [ref=e55]:
+          - heading "Description de la mission" [level=2] [ref=e56]
+          - generic [ref=e57]: Projet de démonstration créé par /api/admin/seed-demo. À supprimer via /api/admin/cleanup-demo.
+        - generic [ref=e58]:
+          - heading "Démarrer le test" [level=2] [ref=e59]
+          - paragraph [ref=e60]: Une fois démarré, vous devrez compléter toutes les réponses avant la clôture. L'action est irréversible.
+          - button "Démarrer le test" [ref=e61] [cursor=pointer]
+        - generic [ref=e63]:
+          - heading "Démarrer le test ?" [level=3] [ref=e65]
+          - list [ref=e67]:
+            - listitem [ref=e68]: Le test démarre maintenant et ne peut plus être annulé.
+            - listitem [ref=e69]: Vous devez compléter toutes les réponses avant la clôture.
+            - listitem [ref=e70]:
+              - strong [ref=e71]: Travail bâclé non payé
+              - text: ": des points de qualité seront retirés et, en cas de récidive, vous pourrez être suspendu·e des missions."
+            - listitem [ref=e72]: Assurez-vous d'avoir lu la description et ouvert les URLs de test.
+          - generic [ref=e73]:
+            - button "Annuler" [ref=e74] [cursor=pointer]
+            - button "Je démarre maintenant" [ref=e75] [cursor=pointer]
+  - button "Open Next.js Dev Tools" [ref=e36] [cursor=pointer]:
+    - img [ref=e37]
+  - alert [ref=e40]
