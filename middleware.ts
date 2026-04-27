@@ -8,12 +8,16 @@ const PUBLIC_PATHS = [
   "/app/login",
   "/app/auth",
   "/staff/login",
+  "/staff/forgot",
 ];
 
 function isPublic(pathname: string) {
   if (pathname.startsWith("/api/")) return true;
   if (pathname.startsWith("/_next/")) return true;
   if (pathname.startsWith("/app/auth/")) return true;
+  // Le callback staff (verifyOtp/PKCE) et la page d'erreur doivent etre joignables
+  // sans session, sinon le flow magic link / recovery est cassé.
+  if (pathname.startsWith("/staff/auth/")) return true;
   return PUBLIC_PATHS.includes(pathname);
 }
 

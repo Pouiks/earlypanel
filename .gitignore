@@ -38,3 +38,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Claude Code (perso)
+.claude/settings.local.json
+# Playwright (cache local des browsers)
+/test-results/
+/playwright-report/
+/playwright/.cache/

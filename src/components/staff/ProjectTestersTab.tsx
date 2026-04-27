@@ -496,18 +496,46 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
                           Aucun testeur actif trouvé
                         </td>
                       </tr>
-                    ) : sortedTesters.map((t) => (
+                    ) : sortedTesters.map((t) => {
+                      // Defense en profondeur cote UI : meme si l'API /api/staff/testers
+                      // filtre deja sur profile_completed=true, on bloque la checkbox
+                      // si la donnee chargee indique un profil incomplet (regression
+                      // potentielle de l'API ou cache periment).
+                      const eligible = t.status === "active" && t.profile_completed === true;
+                      return (
                       <tr key={t.id}
-                        style={{ borderBottom: "0.5px solid rgba(0,0,0,0.04)", cursor: "pointer", transition: "background 100ms" }}
+                        style={{
+                          borderBottom: "0.5px solid rgba(0,0,0,0.04)",
+                          cursor: "pointer",
+                          transition: "background 100ms",
+                          opacity: eligible ? 1 : 0.55,
+                        }}
                         onClick={() => setDrawerId(t.id)}
                         onMouseEnter={(e) => e.currentTarget.style.background = "#fafafa"}
                         onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
                       >
                         <td style={cellStyle} onClick={(e) => e.stopPropagation()}>
-                          <input type="checkbox" checked={selected.has(t.id)}
-                            onChange={() => toggleSelect(t.id)} style={{ accentColor: "#0A7A5A" }} />
+                          <input
+                            type="checkbox"
+                            checked={selected.has(t.id)}
+                            onChange={() => toggleSelect(t.id)}
+                            disabled={!eligible}
+                            title={eligible ? undefined : "Profil incomplet : ce testeur n'est pas eligible aux invitations"}
+                            style={{ accentColor: "#0A7A5A", cursor: eligible ? "pointer" : "not-allowed" }}
+                          />
                         </td>
-                        <td style={{ ...cellStyle, fontWeight: 600 }}>{t.first_name} {t.last_name}</td>
+                        <td style={{ ...cellStyle, fontWeight: 600 }}>
+                          {t.first_name} {t.last_name}
+                          {!eligible && (
+                            <span title="Profil incomplet" style={{
+                              marginLeft: 6, fontSize: 11, fontWeight: 600,
+                              padding: "1px 8px", borderRadius: 980,
+                              background: "#fef3c7", color: "#92400e",
+                            }}>
+                              incomplet
+                            </span>
+                          )}
+                        </td>
                         <td style={{ ...cellStyle, color: "#6e6e73" }}>{t.email}</td>
                         <td style={cellStyle}>{t.devices?.slice(0, 2).join(", ") || "–"}</td>
                         <td style={cellStyle}>
@@ -518,7 +546,8 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
                         </td>
                         <td style={{ ...cellStyle, color: "#6e6e73" }}>{t.sector || "–"}</td>
                       </tr>
-                    ))}
+                    );
+                    })}
                   </tbody>
                 </table>
               </div>

@@ -4,7 +4,7 @@
 > Toute modification du projet DOIT être cohérente avec les règles documentées ici.
 > En cas de doute, lire le code source référencé — ne jamais supposer.
 >
-> Dernière mise à jour : 2026-04-26
+> Dernière mise à jour : 2026-04-27 (ajout Phase 1 auth + automation NDA + crons relance + section 13 Playbook Sécurité + migration 026 profil strict + lib profile-completeness)
 
 ---
 
@@ -35,7 +35,11 @@
 | `/app/login` | Connexion testeur (magic link) | Public |
 | `/app/onboarding` | Onboarding testeur 5 étapes | Session + profil incomplet |
 | `/app/dashboard/*` | Dashboard testeur | Session + profil complet |
-| `/staff/login` | Connexion staff (email + password) | Public |
+| `/staff/login` | Connexion staff (password ou magic link) | Public |
+| `/staff/forgot` | Demande de reset password staff | Public |
+| `/staff/reset` | Définition d'un nouveau password (post-recovery) | Session staff |
+| `/staff/auth/callback` | Route handler PKCE/OTP staff | Public |
+| `/staff/auth/error` | Page d'erreur auth staff | Public |
 | `/staff/dashboard/*` | Dashboard admin/staff | Session + rôle staff/admin |
 | `/api/*` | Route handlers | Varié (voir section dédiée) |
 
@@ -67,7 +71,13 @@ RESEND_FROM_EMAIL                 # Adresse expéditeur (défaut: "earlypanel <n
 
 # App
 NEXT_PUBLIC_APP_URL               # URL base de l'app (défaut: http://localhost:3000)
-STAFF_SETUP_KEY                   # Clé secrète pour créer le premier staff
+STAFF_SETUP_KEY                   # Double rôle :
+                                  #   1. Créer le 1er admin via /api/staff/setup (one-shot,
+                                  #      se désactive automatiquement après le 1er staff).
+                                  #   2. Break-glass recovery via /api/staff/recover-owner
+                                  #      (envoi d'un magic link recovery à un staff role=admin).
+                                  # Générer avec `openssl rand -hex 32`, stocker uniquement
+                                  # côté Vercel, rotater après chaque recover-owner.
 CRON_SECRET                       # Protection du cron (OPTIONNEL mais recommandé)
 
 # Analytics
@@ -92,7 +102,7 @@ NEXT_PUBLIC_CONTACT_EMAIL         # Email contact (défaut: contact@earlypanel.f
 **Matcher** : `/app/:path*` et `/staff/:path*` uniquement.
 
 **Règles exactes** :
-1. Routes publiques exemptées : `/`, `/entreprises`, `/testeurs`, `/app/login`, `/app/auth`, `/staff/login`, `/api/*`, `/_next/*`, `/app/auth/*`.
+1. Routes publiques exemptées : `/`, `/entreprises`, `/testeurs`, `/app/login`, `/app/auth`, `/staff/login`, `/staff/forgot`, `/api/*`, `/_next/*`, `/app/auth/*`, `/staff/auth/*`.
 2. Pas de session → redirect `/app/login` (testeur) ou `/staff/login` (staff).
 3. Rôle `staff`/`admin` qui accède `/app/*` → redirect `/staff/dashboard`.
 4. Rôle testeur qui accède `/staff/*` → redirect `/app/dashboard`.
@@ -277,6 +287,51 @@ GET /app/auth/callback?code=...&token_hash=...&type=magiclink
   └─ Redirect: profileCompleted ? /app/dashboard : /app/onboarding
 ```
 
+### Flux 2bis : Auth callback staff (magic link / recovery)
+
+```
+GET /staff/auth/callback?code=...&token_hash=...&type=magiclink|recovery
+  ├─ exchangeCodeForSession(code) OU verifyOtp({ token_hash, type })
+  │   └─ Échec → redirect /staff/auth/error
+  ├─ Vérif app_metadata.role ∈ {staff, admin}
+  │   └─ Sinon : signOut + redirect /staff/auth/error?reason=not_staff
+  ├─ Vérif staff_members existe pour auth_user_id
+  │   └─ Sinon : signOut + redirect /staff/auth/error?reason=not_member
+  ├─ Audit : staff.magic_link_login OU staff.password_recovery_started
+  └─ Redirect: type === "recovery" ? /staff/reset : /staff/dashboard
+```
+
+### Flux 2ter : Reset password staff
+
+```
+POST /api/staff/forgot { email }
+  ├─ Rate limit IP (3/min) + email (3/h)
+  ├─ Vérif email existe dans staff_members (sinon 200 silencieux)
+  ├─ admin.auth.admin.generateLink({ type: "recovery", redirectTo: /staff/auth/callback })
+  └─ sendEmail(buildRecoveryEmail) — anti-énumération, retourne 200 systématique
+
+GET /staff/auth/callback?token_hash=...&type=recovery
+  └─ verifyOtp + redirect /staff/reset (session établie)
+
+POST côté client : supabase.auth.updateUser({ password })
+  └─ Redirect /staff/dashboard
+```
+
+### Flux 2quater : Break-glass owner recovery
+
+```
+POST /api/staff/recover-owner { email, recovery_key }
+  ├─ Rate limit dur : 3 tentatives/heure par IP
+  ├─ Vérif recovery_key === STAFF_SETUP_KEY (sinon 403 + audit "rejected")
+  ├─ Vérif email correspond à un staff_members AVEC role='admin'
+  │   └─ Sinon : 200 silencieux + audit "rejected"
+  ├─ Génère magic link recovery (même chemin que /staff/forgot)
+  ├─ Email avec avertissement "si ce n'est pas vous, changez la clé"
+  └─ Audit : staff.recover_owner_used
+```
+
+> **NOTE** : `STAFF_SETUP_KEY` sert pour les deux endpoints (setup + recover-owner). Le setup se désactive automatiquement après le 1er admin, donc seule l'utilisation recover-owner reste possible ensuite.
+
 ### Flux 3 : Onboarding (5 étapes)
 
 ```
@@ -403,6 +458,69 @@ GET /api/cron/close-expired (Vercel cron, toutes les heures)
 
 > Le cron NE déclenche PAS les malus. Ceux-ci sont appliqués lazily quand un testeur consulte sa mission (GET detail).
 
+### Flux 9 : Invitation testeur (automatisée)
+
+```
+POST /api/staff/projects/:id/testers/invite { tester_ids: [] }
+  ├─ Garde: !projectIsClosedForCampaign && projectAllowsStaffAssignTesters
+  │         && projectAllowsNdaSend && questions ≥ 1
+  ├─ Filtre: testeurs status="active" AND profile_completed=true
+  ├─ Auto-création NDA via defaultNdaHtml() si absent
+  ├─ Si projet="draft" → UPDATE status="active"
+  ├─ Pour chaque testeur eligible :
+  │   ├─ sendEmail (NDA invitation) — AVANT toute transition DB
+  │   ├─ Si exist en "selected" → UPDATE status="nda_sent" (filtre status)
+  │   └─ Sinon INSERT direct status="nda_sent"
+  └─ Audit: project.testers_invited (avec metadata results[])
+```
+
+> Cet endpoint remplace le couple `POST .../testers` + `POST .../nda/send` pour le cas "inviter directement". L'ancien `POST .../testers` reste pour les shortlists sans envoi (status="selected").
+
+### Flux 10 : Crons de relance
+
+```
+GET /api/cron/nda-reminders (cron quotidien, 09h00 UTC)
+  ├─ Auth Bearer CRON_SECRET
+  ├─ SELECT project_testers
+  │     WHERE status="nda_sent"
+  │       AND nda_sent_at < now() - 3j
+  │       AND (nda_reminder_sent_at IS NULL OR nda_reminder_sent_at < now() - 3j)
+  ├─ Skip si projet not active OR end_date < now()
+  ├─ sendEmail relance + UPDATE nda_reminder_sent_at = now()
+  └─ Audit: nda.reminder_batch
+
+GET /api/cron/project-reminders (cron quotidien, 09h00 UTC)
+  ├─ Auth Bearer CRON_SECRET
+  ├─ SELECT projects status="active" AND end_date IS NOT NULL
+  ├─ Filtre côté app : now >= start + (end - start)/2 (mi-parcours)
+  ├─ Pour chaque projet à mi-parcours :
+  │   ├─ SELECT project_testers WHERE status IN (nda_signed, invited, in_progress)
+  │   │       AND project_midway_reminder_sent_at IS NULL
+  │   ├─ sendEmail rappel mission + UPDATE project_midway_reminder_sent_at = now()
+  └─ Audit: project.midway_reminder_batch
+```
+
+> Idempotence garantie par les colonnes `nda_reminder_sent_at` (cooldown 3j) et `project_midway_reminder_sent_at` (one-shot par projet/testeur).
+
+### Flux 11 : Audit de signature NDA (preuve juridique)
+
+```
+POST /api/testers/documents/:projectId/sign (existant)
+  ├─ Génère PDF + hash SHA-256 + upload bucket privé
+  ├─ Transition atomique nda_sent → nda_signed
+  ├─ Email post-signature → /app/dashboard/missions
+  └─ logStaffAction: nda.signed_by_tester
+       metadata: {
+         tester_id, project_id, nda_ref,
+         document_hash, document_path,
+         signed_at_iso, tester_email,
+         tester_first_name, tester_last_name, tester_birth_date
+       }
+       request: { ip, user_agent } (capturés automatiquement par logStaffAction)
+```
+
+> Le `staff_audit_log` étant append-only (pas d'UPDATE/DELETE possible côté service_role autre que les opérations explicites), la trace de signature constitue une preuve immuable séparée de `project_testers` qui peut elle être modifiée. En cas de litige, on dispose à la fois du PDF stocké, du hash, du timestamp serveur et d'une entrée d'audit indépendante.
+
 ---
 
 ## 5. CONVENTIONS & PATTERNS
@@ -502,17 +620,25 @@ selected → nda_sent → nda_signed → invited → in_progress → completed
 
 ## 7. RÈGLES MÉTIER EXACTES (depuis le code)
 
-### 7.1 Profil testeur complet — Trigger `auto_activate_tester()`
+### 7.1 Profil testeur complet — Trigger `auto_activate_tester()` (migration 026)
 
 **Champs texte requis** (non null ET non vide) :
-- `first_name`, `last_name`, `phone`, `job_title`, `sector`, `company_size`, `digital_level`, `connection`, `availability`, `ux_experience`
+- Identité : `first_name`, `last_name`, `phone`, `birth_date`
+- **Adresse** (requis depuis migration 026 pour le NDA) : `address`, `city`, `postal_code`
+- Pro : `job_title`, `sector`, `company_size`
+- Tech : `digital_level`, `connection`
+- Préférences : `availability`, `ux_experience`
 
 **Champs tableau requis** (non null ET au moins 1 élément) :
 - `tools`, `browsers`, `devices`, `interests`
 
-> **RÈGLE** : `timeslots` n'est PAS requis par le trigger (contrairement à ce qu'on pourrait penser). `gender`, `address`, `city`, `postal_code`, `birth_date` ne sont PAS requis non plus pour l'activation.
+**Total** : 18 champs obligatoires (14 texte + 4 tableaux).
 
-> **ATTENTION** : Ajouter un champ à cette liste dans le trigger SANS le rendre collectible dans l'onboarding = les testeurs ne pourront JAMAIS devenir actifs.
+> **RÈGLE** : `timeslots` et `gender` ne sont PAS requis par le trigger.
+
+> **ATTENTION** : Ajouter un champ à cette liste dans le trigger SANS le rendre collectible dans l'onboarding = les testeurs ne pourront JAMAIS devenir actifs. Toute modification doit aussi être reflétée dans [`src/lib/profile-completeness.ts`](src/lib/profile-completeness.ts) (source de vérité côté app).
+
+> **MIGRATION 026** : ajout de `address`, `city`, `postal_code`, `birth_date` aux champs requis. Backfill rétroactif : tous les testeurs `active` sans ces champs ont été repassés en `pending`.
 
 ### 7.2 Calcul du tier — Trigger `recalculate_tester_tier()` (version migration 010)
 
@@ -712,6 +838,8 @@ profil = 1 si (address OR city OR postal_code OR birth_date) manquant, sinon 0
 | status | TEXT | DEFAULT 'selected', CHECK ∈ (selected, nda_sent, nda_signed, invited, in_progress, completed) |
 | nda_document_url, nda_signer_ip, nda_signer_user_agent, nda_document_hash | TEXT | |
 | nda_sent_at, nda_signed_at, invited_at, started_at, submitted_at, completed_at | TIMESTAMPTZ | |
+| nda_reminder_sent_at | TIMESTAMPTZ | Cooldown des relances NDA (cron, 3j) |
+| project_midway_reminder_sent_at | TIMESTAMPTZ | One-shot rappel mi-parcours (cron) |
 | staff_rating | INTEGER | CHECK 1-5 |
 | staff_note | TEXT | |
 | malus_applied | BOOLEAN | DEFAULT FALSE |
@@ -768,7 +896,7 @@ profil = 1 si (address OR city OR postal_code OR birth_date) manquant, sinon 0
 | Bucket | Contenu | Accès |
 |--------|---------|-------|
 | `mission-images` | Images uploadées par testeurs | Signed URLs (1h) |
-| `documents` | PDF NDA signés | Public (si créé par le code) |
+| `documents` | PDF NDA signés | **Privé** (forced via `ensureDocumentsBucketPrivate`). URLs signées 1h générées à la volée. Path stocké en DB sous `storage:<path>` |
 
 ---
 
@@ -786,6 +914,11 @@ profil = 1 si (address OR city OR postal_code OR birth_date) manquant, sinon 0
 | `payouts/pay/route.ts` | Paiements réels | Double paiement, argent perdu |
 | `apply-mission-closure-malus.ts` | Side effect sur GET | Malus non appliqués ou appliqués en double |
 | `nda/send/route.ts` | Change le status du projet | Projet activé prématurément |
+| `testers/invite/route.ts` | Email + transition `nda_sent` atomique | Invitation sans email ou doublon |
+| `documents/[projectId]/sign/route.ts` | Génère le PDF, hash, audit log immuable | Trace de signature corrompue = preuve juridique perdue |
+| `staff/auth/callback/route.ts` | Verify + double-check rôle/membership | Accès staff non autorisé en cas de régression |
+| `staff/recover-owner/route.ts` | Break-glass admin | Si la garde `role='admin'` saute, recovery sur n'importe quel staff |
+| `cron/*/route.ts` | Side effects en lot (close, relances, malus) | Spam mass mail ou malus appliqués 2× |
 | `ProjectForm.tsx` (~800 lignes) | Monolithique, beaucoup d'état | Régression UI silencieuse |
 
 ### Triggers DB à ne PAS modifier sans comprendre l'impact
@@ -853,13 +986,54 @@ Le statut `invited` est dans le CHECK constraint mais **aucune route ne le pose 
 `testers.total_earned` est incrémenté de `cents / 100` (conversion en euros) dans `payouts/pay` et le webhook.
 > **RÈGLE** : C'est un `NUMERIC` en euros, pas en centimes. Incohérent avec le reste du modèle (qui est en centimes). Ne pas convertir deux fois.
 
-### C14 — PATCH projet testers sans whitelist
-`PATCH /api/staff/projects/:id/testers/[testerId]` fait `update(body)` sans filtrage de colonnes.
-> **DANGER** : Un appel avec `{ status: "completed" }` bypasse tout le workflow. Aucune validation côté serveur.
+### C14 — PATCH projet testers avec whitelist (résolu)
+`PATCH /api/staff/projects/:id/testers/[testerId]` whiteliste explicitement les colonnes modifiables : `staff_rating` (1-5, validation Number.isInteger) et `staff_note` (string, max 4000 car.). `PATCH /api/staff/testers/:id` whiteliste `persona_id`, `persona_locked`, `gender`. Le statut, les timestamps et les flags malus ne sont jamais modifiables via PATCH générique.
+> **RÈGLE** : Conserver ce pattern de whitelist. Les transitions de statut passent exclusivement par les routes dédiées (nda/send, missions/start, submit, answers).
 
 ### C15 — Rate limiter in-memory
 Le rate limiter d'images utilise un `Map` en mémoire. En serverless, chaque instance a son propre compteur.
 > **RÈGLE** : Inefficace en production Vercel. Pour une vraie protection, migrer vers Redis ou un KV store.
+
+### C16 — Anti-énumération sur les endpoints d'auth staff
+`/api/staff/login/magic`, `/api/staff/forgot`, `/api/staff/recover-owner` retournent **toujours `200`** que l'email existe ou non (sauf erreur de format). C'est volontaire.
+> **RÈGLE** : Ne jamais ajouter une réponse `404 "Email inconnu"` à ces routes. Cela permettrait à un attaquant d'énumérer les comptes staff.
+
+### C17 — STAFF_SETUP_KEY = double rôle
+La même clé sert pour `/api/staff/setup` (bootstrap) **et** `/api/staff/recover-owner` (break-glass). Le setup se désactive automatiquement après le 1er admin créé en prod, mais la clé reste valide pour recover-owner.
+> **RÈGLE** : Rotater cette clé après chaque utilisation réelle de recover-owner. Ne **jamais** la commit.
+
+### C18 — Audit signature NDA = preuve juridique
+La table `staff_audit_log` est append-only (RLS `USING(false)`, pas d'UPDATE/DELETE côté code). L'entrée `nda.signed_by_tester` posée par `documents/[projectId]/sign/route.ts` constitue une preuve **séparée** de `project_testers.nda_*` qui peut elle être modifiée.
+> **RÈGLE** : Ne jamais ajouter de chemin code qui modifie ou supprime `staff_audit_log`. Ne jamais retirer le `logStaffAction({ action: "nda.signed_by_tester", ... })` de la route de signature. Ne jamais réduire le payload `metadata` (hash, IP, UA, timestamps, identité tester) — il sert en cas de litige.
+
+### C19 — Idempotence des crons par colonne DB
+- `cron/nda-reminders` : guard via `nda_reminder_sent_at < now() - 3j` (cooldown)
+- `cron/project-reminders` : guard via `project_midway_reminder_sent_at IS NULL` (one-shot)
+- `cron/close-expired` : guard via `status = 'active' AND end_date < now()` (transition mono-directionnelle)
+> **RÈGLE** : Si on touche au critère de sélection d'un cron, mettre à jour la colonne d'idempotence dans la même requête. Ne jamais retirer le `UPDATE ... reminder_sent_at = now()` après l'envoi : sans ça, le testeur reçoit le même email N fois par jour.
+
+### C20 — Email-AVANT-DB sur les routes critiques
+`nda/send`, `testers/invite` envoient l'email **avant** la transition de statut. Si l'email échoue, le statut ne change pas → retry possible. Si la transition DB échoue après envoi, l'email est déjà parti (pas de rollback) → on log une erreur explicite.
+> **RÈGLE** : Préserver cet ordre. Inverser (DB d'abord) crée des testeurs en `nda_sent` qui n'ont jamais reçu d'email — silencieux et difficile à détecter.
+
+### C22 — Source unique de vérité pour la complétude profil
+[`src/lib/profile-completeness.ts`](src/lib/profile-completeness.ts) définit `REQUIRED_FIELDS` (18 entrées) qui doit rester en phase parfaite avec le trigger `auto_activate_tester()` (migrations 004 + 026).
+> **RÈGLE** : Toute modification des champs requis doit toucher **simultanément** la migration trigger ET le fichier `profile-completeness.ts`. Sinon désynchronisation : soit l'app dit "incomplet" et le trigger active quand même, soit l'app dit "complet" mais le trigger refuse l'activation.
+
+Utilisé par :
+- `/api/testers/notifications` (badge "Mon profil" avec count exact)
+- `/app/dashboard/profil` (panel "X champs à compléter" groupé par catégorie)
+- `/api/staff/projects/:id/testers/invite` (défense en profondeur via `isTesterEligibleForInvitation`)
+- `/api/staff/projects/:id/testers` POST (idem)
+- `ProjectTestersTab.tsx` (checkbox désactivée + badge "incomplet" si `profile_completed=false`)
+
+### C23 — Filtrage staff sur `profile_completed=true`
+`/api/staff/testers?status=active` filtre **automatiquement** `profile_completed=true` côté serveur. Sans ça, un edge case (admin DB direct, bug futur) pourrait laisser un tester `active` mais incomplet apparaître dans la liste de sélection projet.
+> **RÈGLE** : Ne jamais retirer ce filtre. La liste "actifs" exposée au staff doit être strictement = "invitable maintenant".
+
+### C21 — Bucket `documents` privé obligatoire
+`ensureDocumentsBucketPrivate()` force le bucket à `public: false` à chaque signature, et bascule un bucket historique public vers privé. Les NDA signés contiennent des données personnelles (adresse, date de naissance, IP).
+> **RÈGLE** : Ne jamais créer le bucket `documents` en `public: true`. Ne jamais retirer cette garde. Les valeurs `nda_document_url` préfixées `storage:<path>` sont résolues en URL signées 1h à la volée — ne pas stocker d'URL publique.
 
 ---
 
@@ -907,6 +1081,7 @@ Le rate limiter d'images utilise un `Map` en mémoire. En serverless, chaque ins
 
 Avant toute modification, vérifier :
 
+**Cohérence métier**
 - [ ] Le fichier modifié est-il dans la liste des zones fragiles (section 9) ?
 - [ ] La modification touche-t-elle à un contrat implicite (section 10) ?
 - [ ] Les types dans `types/staff.ts` ou `types/tester.ts` sont-ils impactés ?
@@ -917,3 +1092,234 @@ Avant toute modification, vérifier :
 - [ ] La route modifiée est-elle côté testeur (potentiellement appelée en GET avec side effects) ?
 - [ ] Les FK CASCADE peuvent-elles supprimer des données en cascade ?
 - [ ] Le format `idempotencyKey` Stripe est-il préservé ?
+
+**Sécurité (cf. section 13)**
+- [ ] Toute nouvelle route `/api/*` a-t-elle son check d'auth (`getStaffMember()` / `getAuthedTester()`) ?
+- [ ] Toute nouvelle route prenant un email a-t-elle du rate-limiting (IP + email) ?
+- [ ] Si la route révèle l'existence d'un compte (auth/recovery), retourne-t-elle `200` systématiquement (anti-énumération) ?
+- [ ] Tout nouveau cron a-t-il son check `Bearer CRON_SECRET` + son guard d'idempotence (colonne DB ou state) ?
+- [ ] Toute action sensible (NDA signé, paiement, suppression, changement de rôle, recovery) a-t-elle un `logStaffAction(...)` ?
+- [ ] Toute nouvelle table sensible a-t-elle `ENABLE ROW LEVEL SECURITY` + politiques explicites ?
+- [ ] Toute nouvelle RPC `SECURITY DEFINER` a-t-elle un `search_path` explicite + `REVOKE FROM PUBLIC` (cf. migration 023) ?
+
+---
+
+## 13. PLAYBOOK SÉCURITÉ
+
+Cette section liste les patterns à suivre pour ne pas introduire de faille. Lire avant d'ajouter une route, un cron, une RPC ou une table.
+
+### 13.1 Auth des routes API
+
+**Staff** :
+```typescript
+const staff = await getStaffMember();
+if (!staff) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+const admin = createAdminClient();
+if (!admin) return NextResponse.json({ error: "Config serveur manquante" }, { status: 500 });
+```
+
+**Tester** :
+```typescript
+const authed = await getAuthedTester();
+if (!authed) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+```
+
+**Cron** :
+```typescript
+const authHeader = request.headers.get("authorization");
+const cronSecret = process.env.CRON_SECRET;
+if (process.env.NODE_ENV === "production" && !cronSecret) {
+  return NextResponse.json({ error: "Configuration serveur invalide" }, { status: 500 });
+}
+if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+  return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+}
+```
+
+> **RÈGLE** : Aucune nouvelle route `/api/*` sans le bon pattern. Pas d'exception "temporaire".
+
+### 13.2 Rate-limiting
+
+Toute route qui prend un email ou un identifiant utilisateur doit rate-limiter par **IP** ET par **email** :
+
+```typescript
+const ip = getClientIp(request);
+const rlIp = rateLimit(`scope:ip:${ip}`, { windowMs: 60_000, max: 5 });
+if (!rlIp.ok) return NextResponse.json({ error: "Trop de requêtes" }, { status: 429 });
+
+const rlEmail = rateLimit(`scope:email:${emailNormalized}`, { windowMs: 60 * 60 * 1000, max: 3 });
+if (!rlEmail.ok) return NextResponse.json({ success: true }); // anti-énumération
+```
+
+> **LIMITE CONNUE** : `lib/rate-limit.ts` est in-memory (cf. C15). En prod Vercel, chaque instance a son propre compteur. Acceptable pour anti-bot basique, insuffisant contre un attaquant motivé.
+
+### 13.3 Anti-énumération (auth/recovery)
+
+Routes concernées : `/api/staff/login/magic`, `/api/staff/forgot`, `/api/staff/recover-owner`, `/api/testers/login`, `/api/testers/register`.
+
+```typescript
+const { data: member } = await admin.from("staff_members").select("id").eq("email", email).maybeSingle();
+if (!member) return NextResponse.json({ success: true }); // PAS 404
+// ... génération + envoi email seulement si membre existe ...
+return NextResponse.json({ success: true });
+```
+
+> **RÈGLE** : Réponse identique (statut + body + timing approximatif) que l'email existe ou non. Ne jamais ajouter `{ exists: true }` ou un statut différent.
+
+### 13.4 Audit log immuable
+
+Pour toute action sensible côté staff ou pouvant servir de preuve juridique :
+
+```typescript
+await logStaffAction(
+  {
+    staff_id: staff?.id ?? null,
+    staff_email: staff?.email ?? "cron.<name>",
+    action: "domain.action_verb",       // ex: "nda.signed_by_tester", "payout.pay"
+    entity_type: "table_name",
+    entity_id: row.id,
+    metadata: { /* snapshot complet */ },
+  },
+  request, // capture ip + user_agent
+);
+```
+
+Actions actuellement loguées (liste non exhaustive) :
+- `nda.signed_by_tester` (signature, preuve juridique)
+- `nda.reminder_batch` (cron)
+- `project.testers_invited` (invitation auto)
+- `project.midway_reminder_batch` (cron)
+- `project.auto_close` (cron)
+- `staff.setup_initial_admin` / `staff.setup_existing_user_promoted`
+- `staff.password_recovery_requested` / `staff.password_recovery_started`
+- `staff.magic_link_requested` / `staff.magic_link_login`
+- `staff.recover_owner_used` / `staff.recover_owner_rejected`
+
+> **RÈGLE** : `staff_audit_log` est append-only (cf. C18). Ne jamais ajouter d'UPDATE ou de DELETE sur cette table.
+
+### 13.5 RLS — défense en profondeur
+
+Toutes les tables sensibles ont `ENABLE ROW LEVEL SECURITY` + politiques `USING(false)` sur insert/update/delete (cf. C8). L'accès se fait via `service_role` (qui bypasse RLS) depuis les API.
+
+**Quand on ajoute une table** :
+```sql
+ALTER TABLE public.<nouvelle_table> ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "<table>_select_service_role" ON public.<nouvelle_table>
+  FOR SELECT USING (false);
+CREATE POLICY "<table>_insert_service_role" ON public.<nouvelle_table>
+  FOR INSERT WITH CHECK (false);
+-- idem UPDATE / DELETE
+```
+
+> **RÈGLE** : Aucune nouvelle table sans RLS activée. Les policies `false` sont volontaires : elles bloquent tous les clients anon, seul `service_role` passe.
+
+### 13.6 RPC SECURITY DEFINER — search_path obligatoire
+
+Toute fonction PL/pgSQL `SECURITY DEFINER` (qui s'exécute avec les droits du propriétaire, ie. bypass RLS) DOIT :
+
+```sql
+ALTER FUNCTION public.<fn>(<args>) SET search_path = public, pg_temp;
+REVOKE EXECUTE ON FUNCTION public.<fn>(<args>) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.<fn>(<args>) TO service_role;
+```
+
+Cf. migration `023_lockdown_rpcs.sql` pour le pattern complet et la liste des RPCs verrouillées.
+
+> **RÈGLE** : Sans `search_path` explicite, un attaquant qui contrôle un schéma modifiable peut faire exécuter du code arbitraire au contexte du propriétaire. C'est une faille critique.
+
+### 13.7 Email-avant-DB sur routes critiques
+
+Pour toute route qui envoie un email **et** modifie un statut (`nda/send`, `testers/invite`, etc.) :
+
+1. Envoyer l'email
+2. Si succès → faire la transition DB avec un filtre atomique (`.eq("status", "<previous>")`)
+3. Si l'email échoue → retourner l'erreur sans toucher à la DB
+
+```typescript
+try { await sendEmail(...); }
+catch (mailErr) {
+  results.push({ id, success: false, error: "..." });
+  continue;
+}
+const { data: updated } = await admin
+  .from("project_testers")
+  .update({ status: "nda_sent", nda_sent_at: nowIso })
+  .eq("id", row.id)
+  .eq("status", "selected") // garde atomique anti-race
+  .select("id");
+```
+
+> **RÈGLE** : Ne jamais marquer une transition avant que l'email ne soit parti. Ne jamais omettre la garde `.eq("status", ...)` qui rend la transition idempotente.
+
+### 13.8 Idempotence des crons
+
+Tout cron qui produit un side effect (email, paiement, transition) doit avoir une **colonne d'idempotence** sur la table cible :
+- `cron/nda-reminders` → `nda_reminder_sent_at`
+- `cron/project-reminders` → `project_midway_reminder_sent_at`
+- `cron/close-expired` → transition `active → closed` mono-directionnelle (pas de retour)
+
+```typescript
+// SELECT
+.or(`reminder_sent_at.is.null,reminder_sent_at.lt.${cutoff}`)
+// UPDATE après envoi réussi
+.from("...").update({ reminder_sent_at: nowIso }).eq("id", row.id);
+```
+
+> **RÈGLE** : Si on relance un cron 2× le même jour (test, manual trigger, retry Vercel), aucun testeur ne doit recevoir l'email 2×.
+
+### 13.9 Secrets et env vars sensibles
+
+| Variable | Ne jamais... | Toujours... |
+|----------|-------------|-------------|
+| `SUPABASE_SERVICE_ROLE_KEY` | exposer côté client, logger | server-only, via `createAdminClient()` |
+| `STAFF_SETUP_KEY` | committer, partager en clair | rotater après usage de recover-owner |
+| `CRON_SECRET` | omettre en prod | définir avant tout déploiement |
+| `STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET` | exposer, mocker en prod | vérifier signature webhook avec `stripe.webhooks.constructEvent` |
+| `RESEND_API_KEY` | omettre silencieusement (`sendEmail` mock) | monitorer les envois (log côté Resend) |
+| `OWNER_RECOVERY_KEY` | (déprécié, fusionné dans `STAFF_SETUP_KEY`) | — |
+
+### 13.10 Bucket privé `documents`
+
+Le bucket `documents` (NDA signés) doit toujours être en `public: false` :
+
+```typescript
+async function ensureDocumentsBucketPrivate(admin) {
+  const { data: buckets } = await admin.storage.listBuckets();
+  const existing = buckets?.find((b) => b.name === "documents");
+  if (!existing) {
+    await admin.storage.createBucket("documents", { public: false });
+    return;
+  }
+  if (existing.public) {
+    await admin.storage.updateBucket("documents", { public: false });
+  }
+}
+```
+
+Les valeurs stockées en DB sous `nda_document_url` ont **deux formats coexistants** :
+- `storage:ndas/<projectId>/<testerId>_<ts>.pdf` → résolution dynamique en URL signée 1h
+- URL publique historique → retournée telle quelle (legacy, à migrer si possible)
+
+> **RÈGLE** : Tout nouveau write dans `nda_document_url` doit utiliser le préfixe `storage:`. Ne jamais retourner un URL public depuis `/api/testers/documents`.
+
+### 13.11 PKCE / OTP côté staff
+
+Les routes `/staff/auth/callback` (et `/app/auth/callback`) implémentent à la fois :
+- `exchangeCodeForSession(code)` (PKCE — flow magic link "natif" Supabase)
+- `verifyOtp({ token_hash, type })` (lien custom envoyé via Resend avec `generateLink`)
+
+Le callback staff fait en plus un **double check** :
+1. Auth réussie ?
+2. `app_metadata.role` ∈ {staff, admin} ? Sinon `signOut()` + redirect error
+3. Ligne `staff_members` existe ? Sinon `signOut()` + redirect error
+
+> **RÈGLE** : Ne jamais retirer ce double check. Un compte dont le rôle staff a été révoqué côté DB (mais dont le JWT est encore valide) ne doit pas pouvoir entrer.
+
+### 13.12 Webhook signatures
+
+`/api/webhooks/stripe` vérifie la signature avec `STRIPE_WEBHOOK_SECRET`. Tout autre webhook (Yousign si activé, etc.) doit suivre le même pattern :
+1. Lire le body en raw (pas de parsing JSON avant)
+2. Vérifier la signature
+3. Idempotence par event ID (cf. `record_stripe_event` RPC)
+
+> **RÈGLE** : Aucun webhook sans signature vérifiée. Aucun webhook sans idempotence par event ID.

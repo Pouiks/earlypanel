@@ -5,6 +5,11 @@ import { useTester } from "../layout";
 import type { Tester, DigitalLevel, MobileOS, ConnectionType, Availability, UxExperience } from "@/types/tester";
 import PillSelect from "@/components/ui/PillSelect";
 import Toast from "@/components/ui/Toast";
+import {
+  computeProfileCompleteness,
+  CATEGORY_LABELS,
+  type RequiredFieldCategory,
+} from "@/lib/profile-completeness";
 
 function isoToDisplay(iso: string): string {
   if (!iso) return "";
@@ -166,28 +171,47 @@ export default function ProfilPage() {
     ? "Score ≥ 65 et 2+ missions validées"
     : "Profil de base";
 
-  const missingFields: { key: keyof Tester; label: string }[] = [];
-  if (!tester.birth_date) missingFields.push({ key: "birth_date", label: "Date de naissance" });
-  if (!tester.address) missingFields.push({ key: "address", label: "Adresse" });
-  if (!tester.postal_code) missingFields.push({ key: "postal_code", label: "Code postal" });
-  if (!tester.city) missingFields.push({ key: "city", label: "Ville" });
+  // Source unique de verite : aligne sur le trigger DB auto_activate_tester
+  // (cf. migrations 004 + 026). Si la colonne `profile_completed` n'est pas
+  // a true, le testeur ne peut pas etre invite ni signer de NDA.
+  const completeness = computeProfileCompleteness(tester as unknown as Record<string, unknown>);
+  const profileBlocked = !completeness.isComplete;
 
   return (
     <div>
-      {missingFields.length > 0 && (
+      {profileBlocked && (
         <div style={{
-          background: "#fef3c7", borderRadius: 14, padding: "14px 20px",
+          background: "#fef3c7", borderRadius: 14, padding: "16px 20px",
           marginBottom: 20, border: "1px solid #fde68a",
-          display: "flex", alignItems: "flex-start", gap: 12,
         }}>
-          <span style={{ fontSize: 18, flexShrink: 0 }}>&#9888;&#65039;</span>
-          <div>
-            <p style={{ fontSize: 13, fontWeight: 600, color: "#92400e", margin: "0 0 4px" }}>
-              Profil incomplet
-            </p>
-            <p style={{ fontSize: 12, color: "#a16207", margin: 0, lineHeight: 1.5 }}>
-              Pour pouvoir signer vos NDA, veuillez renseigner : {missingFields.map((f) => f.label).join(", ")}.
-            </p>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 12, marginBottom: 10 }}>
+            <span style={{ fontSize: 18, flexShrink: 0 }}>&#9888;&#65039;</span>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontSize: 13, fontWeight: 700, color: "#92400e", margin: "0 0 4px" }}>
+                Profil à compléter — {completeness.count} champ{completeness.count > 1 ? "s" : ""} manquant{completeness.count > 1 ? "s" : ""}
+              </p>
+              <p style={{ fontSize: 12, color: "#a16207", margin: 0, lineHeight: 1.5 }}>
+                Vous ne pourrez pas être invité(e) à des projets ni signer de NDA tant que tous les champs requis ne sont pas renseignés.
+              </p>
+            </div>
+          </div>
+          <div style={{ paddingLeft: 30 }}>
+            {(Object.keys(completeness.missingByCategory) as RequiredFieldCategory[])
+              .filter((cat) => completeness.missingByCategory[cat].length > 0)
+              .map((cat) => (
+                <div key={cat} style={{ marginBottom: 6 }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#92400e", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                    {CATEGORY_LABELS[cat]}
+                  </span>
+                  <ul style={{ margin: "2px 0 0", paddingLeft: 18, listStyle: "disc" }}>
+                    {completeness.missingByCategory[cat].map((f) => (
+                      <li key={f.key} style={{ fontSize: 12, color: "#a16207", lineHeight: 1.6 }}>
+                        {f.label}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
           </div>
         </div>
       )}

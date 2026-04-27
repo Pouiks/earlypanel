@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { computeProfileCompleteness, REQUIRED_FIELDS } from "@/lib/profile-completeness";
 
 async function getSupabaseClient() {
   const cookieStore = await cookies();
@@ -20,27 +21,31 @@ async function getSupabaseClient() {
   );
 }
 
+const SELECT_FIELDS = ["id", "status", "profile_completed", ...REQUIRED_FIELDS.map((f) => f.key)].join(", ");
+
+const EMPTY_PAYLOAD = { missions: 0, documents: 0, profil: 0, profil_missing: [] as string[] };
+
 export async function GET() {
   try {
     const supabase = await getSupabaseClient();
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return NextResponse.json({ missions: 0, documents: 0, profil: 0 });
+    if (!user) return NextResponse.json(EMPTY_PAYLOAD);
 
     const admin = createAdminClient();
-    if (!admin) return NextResponse.json({ missions: 0, documents: 0, profil: 0 });
+    if (!admin) return NextResponse.json(EMPTY_PAYLOAD);
 
     const { data: tester } = await admin
       .from("testers")
-      .select("id, address, city, postal_code, birth_date")
+      .select(SELECT_FIELDS)
       .eq("auth_user_id", user.id)
       .maybeSingle();
 
-    if (!tester) return NextResponse.json({ missions: 0, documents: 0, profil: 0 });
+    if (!tester) return NextResponse.json(EMPTY_PAYLOAD);
 
     const { data: assignments } = await admin
       .from("project_testers")
       .select("status, project_id")
-      .eq("tester_id", tester.id);
+      .eq("tester_id", (tester as unknown as { id: string }).id);
 
     let missionsCount = 0;
     let documentsCount = 0;
@@ -66,15 +71,17 @@ export async function GET() {
       documentsCount = assignments.filter((a) => a.status === "nda_sent").length;
     }
 
-    const profilFields = [tester.address, tester.city, tester.postal_code, tester.birth_date];
-    const profilMissing = profilFields.filter((f) => !f).length;
+    // Calcul du compteur exact de champs manquants via la lib partagee
+    // (source de verite alignee sur le trigger DB auto_activate_tester).
+    const completeness = computeProfileCompleteness(tester as unknown as Record<string, unknown>);
 
     return NextResponse.json({
       missions: missionsCount,
       documents: documentsCount,
-      profil: profilMissing > 0 ? 1 : 0,
+      profil: completeness.count,
+      profil_missing: completeness.missing.map((f) => f.key),
     });
   } catch {
-    return NextResponse.json({ missions: 0, documents: 0, profil: 0 });
+    return NextResponse.json(EMPTY_PAYLOAD);
   }
 }

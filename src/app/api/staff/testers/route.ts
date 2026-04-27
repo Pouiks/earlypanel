@@ -36,8 +36,15 @@ export async function GET(request: NextRequest) {
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 
+  // Filtrage statut. Pour `active`, on AJOUTE un filtre sur `profile_completed=true`.
+  // Sans ca, un testeur dont la colonne serait mal mise a jour (edge case admin
+  // direct DB ou bug futur) pourrait apparaitre dans la liste "Actifs" alors
+  // qu'il n'est pas reellement eligible. Defense en profondeur.
   if (status && status !== "all") {
     query = query.eq("status", status);
+    if (status === "active") {
+      query = query.eq("profile_completed", true);
+    }
   } else {
     query = query.in("status", ["active", "pending"]);
   }

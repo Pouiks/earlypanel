@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getStaffMember } from "@/lib/staff-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { projectAllowsStaffAssignTesters, projectIsClosedForCampaign } from "@/lib/project-lifecycle";
+import { REQUIRED_FIELDS, isTesterEligibleForInvitation } from "@/lib/profile-completeness";
 
 export async function GET(
   _request: NextRequest,
@@ -70,15 +71,25 @@ export async function POST(
     return NextResponse.json({ error: "Statut projet incompatible" }, { status: 400 });
   }
 
-  // Garde-fou : on n'assigne que des testeurs actifs avec un profil complet.
-  // Cela bloque les comptes pending, suspended, rejected, banned, ou les profils incomplets.
+  // Garde-fou : on n'assigne que des testeurs actifs avec un profil COMPLET.
+  // Defense en profondeur : on ne se repose pas uniquement sur `status` et
+  // `profile_completed` mais on recalcule via computeProfileCompleteness sur
+  // tous les champs requis (cf. PROJECT_CONTEXT 13.1, lib/profile-completeness).
+  const SELECT_FIELDS = [
+    "id",
+    "status",
+    "profile_completed",
+    ...REQUIRED_FIELDS.map((f) => f.key),
+  ].join(", ");
+
   const { data: candidates } = await admin
     .from("testers")
-    .select("id, status, profile_completed")
+    .select(SELECT_FIELDS)
     .in("id", tester_ids);
 
-  const eligible = (candidates ?? []).filter(
-    (t) => t.status === "active" && t.profile_completed === true
+  type Candidate = { id: string; [key: string]: unknown };
+  const eligible: Candidate[] = ((candidates as unknown as Candidate[]) ?? []).filter(
+    (t) => isTesterEligibleForInvitation(t)
   );
   const eligibleIds = eligible.map((t) => t.id);
   const rejectedIds = tester_ids.filter((id: string) => !eligibleIds.includes(id));
@@ -87,7 +98,7 @@ export async function POST(
     return NextResponse.json(
       {
         error:
-          "Aucun testeur eligible : seuls les testeurs avec status=active et profil complet peuvent etre assignes.",
+          "Aucun testeur eligible : seuls les testeurs actifs avec un profil complet (incluant adresse, ville, code postal, date de naissance) peuvent etre assignes.",
         rejected_tester_ids: rejectedIds,
       },
       { status: 400 }

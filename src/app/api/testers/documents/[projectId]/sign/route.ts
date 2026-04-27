@@ -3,6 +3,9 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { generateNdaPdf, buildNdaVariables } from "@/lib/nda-pdf";
+import { logStaffAction } from "@/lib/audit";
+import { sendEmail } from "@/lib/email";
+import { tryGetAppUrl } from "@/lib/app-url";
 
 async function getSupabaseClient() {
   const cookieStore = await cookies();
@@ -189,6 +192,61 @@ export async function POST(
     .from("documents")
     .createSignedUrl(filePath, 60 * 60);
 
+  // Audit log immuable separe : la table `staff_audit_log` est append-only
+  // (pas d'UPDATE/DELETE) et son contenu sert de preuve de la chaine de
+  // signature en cas de litige. On y stocke un snapshot complet des elements
+  // de preuve (hash, IP, UA, ref NDA, timestamp serveur, signataire).
+  await logStaffAction(
+    {
+      staff_id: null,
+      staff_email: tester.email as string,
+      action: "nda.signed_by_tester",
+      entity_type: "project_tester",
+      entity_id: pt.id as string,
+      metadata: {
+        tester_id: tester.id,
+        project_id: projectId,
+        nda_ref: variables.nda_ref,
+        document_hash: documentHash,
+        document_path: filePath,
+        signed_at_iso: signedAt,
+        // tester_email duplique le staff_email pour faciliter la recherche
+        // ulterieure dans l'audit log (le champ staff_email est utilise
+        // comme "qui a fait l'action" - ici le tester lui-meme).
+        tester_email: tester.email,
+        tester_first_name: tester.first_name,
+        tester_last_name: tester.last_name,
+        tester_birth_date: tester.birth_date ?? null,
+      },
+    },
+    request
+  );
+
+  // Email post-signature : confirme au testeur que son NDA est valide et
+  // l'oriente vers sa mission. Best-effort : un echec d'envoi ne doit pas
+  // invalider la signature deja faite.
+  try {
+    const appUrl = tryGetAppUrl();
+    if (appUrl) {
+      const missionLink = `${appUrl}/app/dashboard/missions`;
+      await sendEmail({
+        to: tester.email as string,
+        toName: `${tester.first_name ?? ""} ${tester.last_name ?? ""}`.trim() || undefined,
+        subject: `NDA validé - démarrez votre mission ${project?.title ?? ""}`,
+        html: buildPostSignatureEmail({
+          firstName: (tester.first_name as string) ?? "",
+          projectTitle: (project?.title as string) ?? "votre mission",
+          companyName: (project?.company_name as string) ?? "",
+          missionLink,
+          ndaRef: variables.nda_ref,
+        }),
+      });
+    }
+  } catch (mailErr) {
+    // Best-effort : on log mais on ne casse pas la reponse.
+    console.error("[NDA sign] post-signature email failed", mailErr);
+  }
+
   return NextResponse.json({
     success: true,
     signed_at: signedAt,
@@ -196,4 +254,42 @@ export async function POST(
     document_hash: documentHash,
     nda_ref: variables.nda_ref,
   });
+}
+
+function buildPostSignatureEmail(opts: {
+  firstName: string;
+  projectTitle: string;
+  companyName: string;
+  missionLink: string;
+  ndaRef: string;
+}): string {
+  const greeting = opts.firstName ? `Bonjour ${opts.firstName},` : "Bonjour,";
+  return `
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f7;padding:40px 20px;">
+    <tr><td align="center">
+      <table width="100%" style="max-width:520px;background:#fff;border-radius:20px;overflow:hidden;">
+        <tr><td style="background:#0A7A5A;padding:24px 32px;">
+          <span style="font-size:18px;font-weight:700;color:#fff;letter-spacing:-0.5px;">early<span style="color:#2DD4A0;">panel</span></span>
+        </td></tr>
+        <tr><td style="padding:32px;">
+          <p style="font-size:16px;color:#1d1d1f;margin:0 0 16px;font-weight:600;">${greeting}</p>
+          <p style="font-size:14px;color:#6e6e73;line-height:1.6;margin:0 0 8px;">Votre accord de confidentialité a bien été signé pour le projet :</p>
+          <p style="font-size:15px;color:#1d1d1f;font-weight:700;margin:8px 0 4px;">${opts.projectTitle}</p>
+          ${opts.companyName ? `<p style="font-size:13px;color:#86868B;margin:0 0 20px;">${opts.companyName}</p>` : ""}
+          <p style="font-size:14px;color:#6e6e73;line-height:1.6;margin:0 0 28px;">Vous pouvez désormais accéder à la mission et la démarrer dès maintenant.</p>
+          <a href="${opts.missionLink}" style="display:inline-block;background:#0A7A5A;color:#fff;padding:14px 28px;border-radius:980px;font-size:15px;font-weight:700;text-decoration:none;">Démarrer la mission →</a>
+          <p style="font-size:12px;color:#86868B;line-height:1.5;margin:28px 0 0;">Référence du NDA signé : <strong>${opts.ndaRef}</strong></p>
+        </td></tr>
+        <tr><td style="padding:20px 32px;border-top:0.5px solid rgba(0,0,0,0.08);">
+          <p style="font-size:11px;color:#86868B;margin:0;">earlypanel · Made in France</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`.trim();
 }
