@@ -9,6 +9,9 @@ interface AssignedTester {
   id: string;
   tester_id: string;
   status: string;
+  nda_sent_at: string | null;
+  nda_signed_at: string | null;
+  completed_at: string | null;
   tester: Pick<Tester, "id" | "email" | "first_name" | "last_name" | "phone" | "job_title" | "sector" | "devices" | "digital_level" | "browsers" | "connection" | "status" | "profile_completed">;
 }
 
@@ -48,7 +51,7 @@ const FILTER_SECTIONS: {
       { value: "Mac", label: "Mac" },
       { value: "PC Linux", label: "PC Linux" },
       { value: "iPhone", label: "iPhone" },
-      { value: "Android", label: "Android" },
+      { value: "Smartphone Android", label: "Android" },
       { value: "iPad", label: "iPad" },
       { value: "Tablette Android", label: "Tablette Android" },
     ],
@@ -64,26 +67,10 @@ const FILTER_SECTIONS: {
       { value: "Arc", label: "Arc" },
     ],
   },
-  {
-    key: "sector",
-    label: "Secteur",
-    options: [
-      { value: "Tech / IT", label: "Tech / IT" },
-      { value: "Finance / Banque", label: "Finance / Banque" },
-      { value: "Santé", label: "Santé" },
-      { value: "Commerce / Retail", label: "Commerce / Retail" },
-      { value: "Éducation", label: "Éducation" },
-      { value: "Industrie", label: "Industrie" },
-      { value: "Médias / Communication", label: "Médias / Communication" },
-      { value: "Juridique", label: "Juridique" },
-      { value: "Ressources humaines", label: "Ressources humaines" },
-      { value: "Autre", label: "Autre" },
-    ],
-  },
 ];
 
 const NDA_LABELS: Record<string, { label: string; color: string; bg: string }> = {
-  selected: { label: "Sélectionné", color: "#86868B", bg: "#f5f5f7" },
+  selected: { label: "Sélectionné (sans NDA envoyé)", color: "#86868B", bg: "#f5f5f7" },
   nda_sent: { label: "NDA envoyé", color: "#b45309", bg: "#fef3c7" },
   nda_signed: { label: "NDA signé", color: "#0A7A5A", bg: "#f0faf5" },
   invited: { label: "Invité", color: "#1d4ed8", bg: "#eff6ff" },
@@ -91,28 +78,13 @@ const NDA_LABELS: Record<string, { label: string; color: string; bg: string }> =
   completed: { label: "Terminé", color: "#0A7A5A", bg: "#f0faf5" },
 };
 
-const cellStyle: React.CSSProperties = {
-  padding: "10px 12px", fontSize: 13, color: "#1d1d1f", whiteSpace: "nowrap",
-  overflow: "hidden", textOverflow: "ellipsis", textAlign: "left",
-};
-
-const thStyle: React.CSSProperties = {
-  ...cellStyle, fontWeight: 600, color: "#86868B", fontSize: 11,
-  textTransform: "uppercase", letterSpacing: "0.04em",
-  borderBottom: "1px solid rgba(0,0,0,0.08)", position: "sticky", top: 0,
-  background: "#fff", zIndex: 1, textAlign: "left",
-};
-
-const COL_WIDTHS = {
-  checkbox: "36px",
-  name: "22%",
-  email: "28%",
-  devices: "18%",
-  level: "14%",
-  sector: "14%",
-  nda: "14%",
-  action: "40px",
-};
+// Groupes pour la colonne "Mes testeurs assignés".
+const STATUS_GROUPS = [
+  { id: "pending_nda", label: "NDA en attente d'envoi", statuses: ["selected"] },
+  { id: "nda_sent", label: "NDA envoyé, en attente de signature", statuses: ["nda_sent"] },
+  { id: "active", label: "En mission", statuses: ["nda_signed", "invited", "in_progress"] },
+  { id: "done", label: "Terminés", statuses: ["completed"] },
+] as const;
 
 function FilterSidebar({
   filters,
@@ -144,23 +116,20 @@ function FilterSidebar({
 
   return (
     <div style={{
-      width: 220, minWidth: 220, background: "#fff", borderRadius: 16,
-      border: "0.5px solid rgba(0,0,0,0.08)", padding: "16px 0",
-      alignSelf: "flex-start", position: "sticky", top: 0,
-      maxHeight: "calc(100vh - 280px)", overflowY: "auto",
+      width: 200, minWidth: 200, background: "#fff", borderRadius: 14,
+      border: "0.5px solid rgba(0,0,0,0.08)", padding: "14px 0",
+      alignSelf: "flex-start", maxHeight: "calc(100vh - 240px)", overflowY: "auto",
     }}>
       <div style={{
-        padding: "0 16px 12px", display: "flex", alignItems: "center",
+        padding: "0 14px 10px", display: "flex", alignItems: "center",
         justifyContent: "space-between", borderBottom: "0.5px solid rgba(0,0,0,0.06)",
       }}>
-        <span style={{ fontSize: 13, fontWeight: 700, color: "#1d1d1f" }}>
-          Filtres
-        </span>
+        <span style={{ fontSize: 12, fontWeight: 700, color: "#1d1d1f" }}>Filtres</span>
         {activeCount > 0 && (
           <button
             onClick={() => setFilters({})}
             style={{
-              fontSize: 11, color: "#e53e3e", background: "none", border: "none",
+              fontSize: 10, color: "#e53e3e", background: "none", border: "none",
               cursor: "pointer", fontFamily: "inherit", fontWeight: 600,
             }}
           >
@@ -168,58 +137,49 @@ function FilterSidebar({
           </button>
         )}
       </div>
-
       {FILTER_SECTIONS.map((section) => {
         const isCollapsed = collapsed[section.key] ?? false;
         const activeInSection = filters[section.key]?.size || 0;
-
         return (
           <div key={section.key} style={{ borderBottom: "0.5px solid rgba(0,0,0,0.04)" }}>
             <button
               onClick={() => toggleSection(section.key)}
               style={{
                 display: "flex", alignItems: "center", justifyContent: "space-between",
-                width: "100%", padding: "10px 16px", background: "none", border: "none",
+                width: "100%", padding: "9px 14px", background: "none", border: "none",
                 cursor: "pointer", fontFamily: "inherit",
               }}
             >
-              <span style={{ fontSize: 12, fontWeight: 600, color: "#1d1d1f" }}>
+              <span style={{ fontSize: 11, fontWeight: 600, color: "#1d1d1f" }}>
                 {section.label}
                 {activeInSection > 0 && (
                   <span style={{
-                    marginLeft: 6, fontSize: 10, fontWeight: 700, color: "#fff",
-                    background: "#0A7A5A", borderRadius: 980, padding: "1px 6px",
+                    marginLeft: 6, fontSize: 9, fontWeight: 700, color: "#fff",
+                    background: "#0A7A5A", borderRadius: 980, padding: "1px 5px",
                   }}>
                     {activeInSection}
                   </span>
                 )}
               </span>
-              <span style={{
-                fontSize: 10, color: "#86868B",
-                transform: isCollapsed ? "rotate(0deg)" : "rotate(180deg)",
-                transition: "transform 200ms",
-              }}>
-                ▼
-              </span>
+              <span style={{ fontSize: 9, color: "#86868B", transform: isCollapsed ? "rotate(0deg)" : "rotate(180deg)" }}>▼</span>
             </button>
-
             {!isCollapsed && (
-              <div style={{ padding: "0 16px 10px" }}>
+              <div style={{ padding: "0 14px 8px" }}>
                 {section.options.map((opt) => {
                   const checked = filters[section.key]?.has(opt.value) || false;
                   return (
                     <label
                       key={opt.value}
                       style={{
-                        display: "flex", alignItems: "center", gap: 8,
-                        padding: "4px 0", cursor: "pointer", fontSize: 12, color: "#1d1d1f",
+                        display: "flex", alignItems: "center", gap: 7,
+                        padding: "3px 0", cursor: "pointer", fontSize: 11, color: "#1d1d1f",
                       }}
                     >
                       <input
                         type="checkbox"
                         checked={checked}
                         onChange={() => toggleFilter(section.key, opt.value)}
-                        style={{ accentColor: "#0A7A5A", width: 14, height: 14 }}
+                        style={{ accentColor: "#0A7A5A", width: 13, height: 13 }}
                       />
                       {opt.label}
                     </label>
@@ -240,14 +200,12 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [drawerId, setDrawerId] = useState<string | null>(null);
-
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState<Record<string, Set<string>>>({});
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
-  const [showAssigned, setShowAssigned] = useState(false);
-  const [sortKey, setSortKey] = useState<string>("last_name");
-  const [sortAsc, setSortAsc] = useState(true);
-  const { notify, ConfirmModal } = useConfirm();
+  const [actionMenuOpen, setActionMenuOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const { notify, confirm, ConfirmModal } = useConfirm();
 
   const assignedTesterIds = new Set(assigned.map((a) => a.tester_id));
 
@@ -260,7 +218,6 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
     const params = new URLSearchParams();
     params.set("status", "active");
     if (search) params.set("search", search);
-
     const res = await fetch(`/api/staff/testers?${params}`);
     if (res.ok) setAllTesters(await res.json());
   }, [search]);
@@ -273,7 +230,6 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
     return list.filter((t) => {
       for (const [key, values] of Object.entries(filters)) {
         if (values.size === 0) continue;
-
         if (key === "devices" || key === "browsers") {
           const arr = (t as unknown as Record<string, unknown>)[key] as string[] | undefined;
           if (!arr || !arr.some((v) => values.has(v))) return false;
@@ -286,24 +242,6 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
     });
   }
 
-  function sortList<T>(list: T[], key: string, asc: boolean): T[] {
-    return [...list].sort((a, b) => {
-      const va = (a as Record<string, unknown>)[key] as string || "";
-      const vb = (b as Record<string, unknown>)[key] as string || "";
-      return asc ? va.localeCompare(vb) : vb.localeCompare(va);
-    });
-  }
-
-  function handleSort(key: string) {
-    if (sortKey === key) setSortAsc(!sortAsc);
-    else { setSortKey(key); setSortAsc(true); }
-  }
-
-  function sortIndicator(key: string) {
-    if (sortKey !== key) return "";
-    return sortAsc ? " ↑" : " ↓";
-  }
-
   function toggleSelect(id: string) {
     setSelected((prev) => {
       const next = new Set(prev);
@@ -312,76 +250,137 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
     });
   }
 
-  function toggleAll(list: { id: string }[]) {
-    const ids = list.map((t) => t.id);
-    const allSel = ids.every((id) => selected.has(id));
-    if (allSel) {
-      setSelected((prev) => { const n = new Set(prev); ids.forEach((id) => n.delete(id)); return n; });
-    } else {
-      setSelected((prev) => new Set([...prev, ...ids]));
+  // Bouton principal : invitation auto (assign + envoi NDA en 1 clic).
+  // Utilise le nouvel endpoint /api/staff/projects/:id/testers/invite.
+  async function handleInvite() {
+    const ids = [...selected].filter((id) => !assignedTesterIds.has(id));
+    if (ids.length === 0) return;
+    const ok = await confirm({
+      title: `Inviter ${ids.length} testeur${ids.length > 1 ? "s" : ""} ?`,
+      message: `Le NDA va être envoyé immédiatement par email. Le projet sera activé si ce n'est pas déjà fait.`,
+      confirmLabel: "Inviter et envoyer le NDA",
+    });
+    if (!ok) return;
+
+    setSubmitting(true);
+    try {
+      const res = await fetch(`/api/staff/projects/${projectId}/testers/invite`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tester_ids: ids }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        await notify({ title: "Erreur", message: data.error || "Erreur lors de l'invitation" });
+        return;
+      }
+      setSelected(new Set());
+      await Promise.all([fetchAssigned(), fetchTesters()]);
+      await notify({
+        title: "Invitations envoyées",
+        message: `${data.invited}/${data.total} testeur(s) invité(s). Le NDA a été envoyé par email.`,
+      });
+    } finally {
+      setSubmitting(false);
     }
   }
 
-  async function handleAssign() {
+  // Action secondaire (rare) : ajouter sans envoyer le NDA, pour shortlister.
+  async function handleAddAsSelection() {
     const ids = [...selected].filter((id) => !assignedTesterIds.has(id));
     if (ids.length === 0) return;
-    await fetch(`/api/staff/projects/${projectId}/testers`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tester_ids: ids }),
+    setSubmitting(true);
+    try {
+      const res = await fetch(`/api/staff/projects/${projectId}/testers`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tester_ids: ids }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        await notify({ title: "Erreur", message: data.error || "Erreur lors de l'ajout" });
+        return;
+      }
+      setSelected(new Set());
+      setActionMenuOpen(false);
+      await Promise.all([fetchAssigned(), fetchTesters()]);
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  // Envoi NDA pour les testeurs deja en "selected" (cas legacy : on a
+  // shortliste sans envoyer, puis on envoie plus tard).
+  async function handleNdaSendForSelected(testerIds: string[]) {
+    if (testerIds.length === 0) return;
+    const ok = await confirm({
+      title: `Envoyer le NDA à ${testerIds.length} testeur${testerIds.length > 1 ? "s" : ""} ?`,
+      message: "Cette action enverra l'email d'invitation NDA.",
+      confirmLabel: "Envoyer le NDA",
     });
-    setSelected(new Set());
-    await Promise.all([fetchAssigned(), fetchTesters()]);
+    if (!ok) return;
+
+    setSubmitting(true);
+    try {
+      const res = await fetch(`/api/staff/projects/${projectId}/nda/send`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tester_ids: testerIds }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        await notify({ title: "Erreur", message: data.error || "Erreur" });
+        return;
+      }
+      await fetchAssigned();
+      await notify({
+        title: "NDA envoyé",
+        message: `${data.sent}/${data.total} testeur(s) notifié(s).`,
+      });
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   async function handleRemove(testerId: string) {
-    await fetch(`/api/staff/projects/${projectId}/testers/${testerId}`, { method: "DELETE" });
-    await fetchAssigned();
-  }
-
-  async function handleNdaSend() {
-    const ids = [...selected].filter((id) => assignedTesterIds.has(id));
-    if (ids.length === 0) return;
-
-    const eligible = ids.filter((id) => {
-      const a = assigned.find((a) => a.tester_id === id);
-      return a && a.status === "selected";
+    const a = assigned.find((x) => x.tester_id === testerId);
+    if (!a) return;
+    const ok = await confirm({
+      title: "Retirer ce testeur du projet ?",
+      message: a.status === "selected"
+        ? "Ce testeur n'a pas encore reçu de NDA, il peut être retiré sans impact."
+        : "Le NDA est envoyé ou signé : retirer ce testeur peut casser des données. Confirmer ?",
+      confirmLabel: "Retirer",
+      danger: true,
     });
+    if (!ok) return;
 
-    if (eligible.length === 0) {
-      await notify({
-        title: "Aucun testeur éligible",
-        message: "Seuls les testeurs en statut « Sélectionné » peuvent recevoir le NDA.",
-      });
-      return;
-    }
-
-    const res = await fetch(`/api/staff/projects/${projectId}/nda/send`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tester_ids: eligible }),
-    });
-
+    const res = await fetch(`/api/staff/projects/${projectId}/testers/${testerId}`, { method: "DELETE" });
     if (!res.ok) {
       const err = await res.json();
-      await notify({ title: "Erreur", message: err.error || "Erreur lors de l'envoi" });
+      await notify({ title: "Impossible de retirer", message: err.error || "Erreur" });
       return;
     }
-
-    const result = await res.json();
-    await notify({
-      title: "NDA envoyé",
-      message: `NDA envoyé à ${result.sent}/${result.total} testeur(s).`,
-    });
-
-    setSelected(new Set());
     await fetchAssigned();
   }
 
-  const filteredTesters = applyClientFilters(allTesters).filter((t) => !assignedTesterIds.has(t.id));
-  const sortedTesters = sortList(filteredTesters, sortKey, sortAsc);
-  const selectedUnassigned = [...selected].filter((id) => !assignedTesterIds.has(id)).length;
-  const selectedAssigned = [...selected].filter((id) => assignedTesterIds.has(id)).length;
+  const filteredCatalog = applyClientFilters(allTesters)
+    .filter((t) => !assignedTesterIds.has(t.id))
+    .sort((a, b) => (a.last_name ?? "").localeCompare(b.last_name ?? ""));
+
+  const selectedCatalogCount = [...selected].filter((id) => !assignedTesterIds.has(id)).length;
+
+  // Groupement des assignés par état (pour la colonne droite)
+  const grouped: Record<string, AssignedTester[]> = {};
+  for (const grp of STATUS_GROUPS) grouped[grp.id] = [];
+  for (const a of assigned) {
+    for (const grp of STATUS_GROUPS) {
+      if ((grp.statuses as readonly string[]).includes(a.status)) {
+        grouped[grp.id].push(a);
+        break;
+      }
+    }
+  }
 
   if (loading) {
     return <div style={{ textAlign: "center", padding: "40px 0", color: "#86868B", fontSize: 14 }}>Chargement…</div>;
@@ -389,293 +388,266 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
 
   return (
     <div>
-      <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
-        <button onClick={() => setShowAssigned(false)} style={{
-          padding: "8px 18px", fontSize: 13, fontWeight: !showAssigned ? 600 : 400,
-          color: !showAssigned ? "#0A7A5A" : "#6e6e73",
-          background: !showAssigned ? "#f0faf5" : "transparent",
-          border: !showAssigned ? "1.5px solid #0A7A5A" : "1px solid rgba(0,0,0,0.1)",
-          borderRadius: 980, cursor: "pointer", fontFamily: "inherit",
-        }}>Rechercher testeurs</button>
-        <button onClick={() => setShowAssigned(true)} style={{
-          padding: "8px 18px", fontSize: 13, fontWeight: showAssigned ? 600 : 400,
-          color: showAssigned ? "#0A7A5A" : "#6e6e73",
-          background: showAssigned ? "#f0faf5" : "transparent",
-          border: showAssigned ? "1.5px solid #0A7A5A" : "1px solid rgba(0,0,0,0.1)",
-          borderRadius: 980, cursor: "pointer", fontFamily: "inherit",
-        }}>Assignés ({assigned.length})</button>
-      </div>
+      <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
+        <FilterSidebar filters={filters} setFilters={setFilters} collapsed={collapsed} setCollapsed={setCollapsed} />
 
-      {!showAssigned ? (
-        <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
-          <FilterSidebar filters={filters} setFilters={setFilters} collapsed={collapsed} setCollapsed={setCollapsed} />
-
-          <div style={{ flex: 1, minWidth: 0 }}>
-            {/* Search bar */}
-            <div style={{ marginBottom: 12 }}>
-              <input
-                type="text" value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Rechercher par nom ou email…"
-                style={{
-                  width: "100%", padding: "10px 14px", fontSize: 13,
-                  border: "0.5px solid rgba(0,0,0,0.12)", borderRadius: 10,
-                  outline: "none", background: "#fff", fontFamily: "inherit",
-                  boxSizing: "border-box",
-                }}
-                onFocus={(e) => e.currentTarget.style.borderColor = "#0A7A5A"}
-                onBlur={(e) => e.currentTarget.style.borderColor = "rgba(0,0,0,0.12)"}
-              />
-            </div>
-
-            {/* Action bar */}
-            {selectedUnassigned > 0 && (
-              <div style={{
-                background: "#f0faf5", border: "1.5px solid #0A7A5A", borderRadius: 12,
-                padding: "10px 16px", marginBottom: 12,
-                display: "flex", alignItems: "center", justifyContent: "space-between",
-              }}>
-                <span style={{ fontSize: 13, fontWeight: 600, color: "#0A7A5A" }}>
-                  {selectedUnassigned} testeur{selectedUnassigned > 1 ? "s" : ""} sélectionné{selectedUnassigned > 1 ? "s" : ""}
-                </span>
-                <button onClick={handleAssign} style={{
-                  padding: "7px 18px", fontSize: 13, fontWeight: 700, color: "#fff",
-                  background: "#0A7A5A", border: "none", borderRadius: 980,
-                  cursor: "pointer", fontFamily: "inherit",
-                }}>Ajouter au projet</button>
-              </div>
-            )}
-
-            {/* Results count */}
-            <div style={{ fontSize: 12, color: "#86868B", marginBottom: 8 }}>
-              {sortedTesters.length} testeur{sortedTesters.length > 1 ? "s" : ""} trouvé{sortedTesters.length > 1 ? "s" : ""}
-            </div>
-
-            {/* Table */}
-            <div style={{
-              background: "#fff", borderRadius: 12, border: "0.5px solid rgba(0,0,0,0.08)",
-              overflow: "hidden",
-            }}>
-              <div style={{ overflowX: "auto", maxHeight: 520 }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
-                  <colgroup>
-                    <col style={{ width: COL_WIDTHS.checkbox }} />
-                    <col style={{ width: COL_WIDTHS.name }} />
-                    <col style={{ width: COL_WIDTHS.email }} />
-                    <col style={{ width: COL_WIDTHS.devices }} />
-                    <col style={{ width: COL_WIDTHS.level }} />
-                    <col style={{ width: COL_WIDTHS.sector }} />
-                  </colgroup>
-                  <thead>
-                    <tr>
-                      <th style={thStyle}>
-                        <input type="checkbox"
-                          checked={sortedTesters.length > 0 && sortedTesters.every((t) => selected.has(t.id))}
-                          onChange={() => toggleAll(sortedTesters)}
-                          style={{ accentColor: "#0A7A5A" }} />
-                      </th>
-                      <th style={{ ...thStyle, cursor: "pointer" }} onClick={() => handleSort("last_name")}>
-                        Nom{sortIndicator("last_name")}
-                      </th>
-                      <th style={{ ...thStyle, cursor: "pointer" }} onClick={() => handleSort("email")}>
-                        Email{sortIndicator("email")}
-                      </th>
-                      <th style={thStyle}>Appareils</th>
-                      <th style={{ ...thStyle, cursor: "pointer" }} onClick={() => handleSort("digital_level")}>
-                        Niveau{sortIndicator("digital_level")}
-                      </th>
-                      <th style={{ ...thStyle, cursor: "pointer" }} onClick={() => handleSort("sector")}>
-                        Secteur{sortIndicator("sector")}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sortedTesters.length === 0 ? (
-                      <tr>
-                        <td colSpan={6} style={{ ...cellStyle, textAlign: "center", color: "#86868B", padding: "30px" }}>
-                          Aucun testeur actif trouvé
-                        </td>
-                      </tr>
-                    ) : sortedTesters.map((t) => {
-                      // Defense en profondeur cote UI : meme si l'API /api/staff/testers
-                      // filtre deja sur profile_completed=true, on bloque la checkbox
-                      // si la donnee chargee indique un profil incomplet (regression
-                      // potentielle de l'API ou cache periment).
-                      const eligible = t.status === "active" && t.profile_completed === true;
-                      return (
-                      <tr key={t.id}
-                        style={{
-                          borderBottom: "0.5px solid rgba(0,0,0,0.04)",
-                          cursor: "pointer",
-                          transition: "background 100ms",
-                          opacity: eligible ? 1 : 0.55,
-                        }}
-                        onClick={() => setDrawerId(t.id)}
-                        onMouseEnter={(e) => e.currentTarget.style.background = "#fafafa"}
-                        onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
-                      >
-                        <td style={cellStyle} onClick={(e) => e.stopPropagation()}>
-                          <input
-                            type="checkbox"
-                            checked={selected.has(t.id)}
-                            onChange={() => toggleSelect(t.id)}
-                            disabled={!eligible}
-                            title={eligible ? undefined : "Profil incomplet : ce testeur n'est pas eligible aux invitations"}
-                            style={{ accentColor: "#0A7A5A", cursor: eligible ? "pointer" : "not-allowed" }}
-                          />
-                        </td>
-                        <td style={{ ...cellStyle, fontWeight: 600 }}>
-                          {t.first_name} {t.last_name}
-                          {!eligible && (
-                            <span title="Profil incomplet" style={{
-                              marginLeft: 6, fontSize: 11, fontWeight: 600,
-                              padding: "1px 8px", borderRadius: 980,
-                              background: "#fef3c7", color: "#92400e",
-                            }}>
-                              incomplet
-                            </span>
-                          )}
-                        </td>
-                        <td style={{ ...cellStyle, color: "#6e6e73" }}>{t.email}</td>
-                        <td style={cellStyle}>{t.devices?.slice(0, 2).join(", ") || "–"}</td>
-                        <td style={cellStyle}>
-                          <span style={{
-                            padding: "3px 10px", fontSize: 11, fontWeight: 600, borderRadius: 980,
-                            background: "#f5f5f7", color: "#6e6e73",
-                          }}>{t.digital_level || "–"}</span>
-                        </td>
-                        <td style={{ ...cellStyle, color: "#6e6e73" }}>{t.sector || "–"}</td>
-                      </tr>
-                    );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+        {/* COLONNE 1 : catalogue */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ marginBottom: 10 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, color: "#1d1d1f", margin: "0 0 8px" }}>
+              Catalogue testeurs
+              <span style={{ fontSize: 12, fontWeight: 400, color: "#86868B", marginLeft: 8 }}>
+                {filteredCatalog.length} disponible{filteredCatalog.length > 1 ? "s" : ""}
+              </span>
+            </h3>
+            <input
+              type="text" value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Rechercher par nom ou email…"
+              style={{
+                width: "100%", padding: "9px 12px", fontSize: 13,
+                border: "0.5px solid rgba(0,0,0,0.12)", borderRadius: 10,
+                outline: "none", background: "#fff", fontFamily: "inherit", boxSizing: "border-box",
+              }}
+            />
           </div>
-        </div>
-      ) : (
-        <div>
-          {/* NDA status summary */}
-          {assigned.length > 0 && (
-            <div style={{
-              display: "flex", gap: 10, marginBottom: 14, flexWrap: "wrap",
-            }}>
-              {(["selected", "nda_sent", "nda_signed"] as const).map((s) => {
-                const count = assigned.filter((a) => a.status === s).length;
-                if (count === 0) return null;
-                const info = NDA_LABELS[s];
-                return (
-                  <span key={s} style={{
-                    padding: "5px 14px", fontSize: 12, fontWeight: 600,
-                    color: info.color, background: info.bg, borderRadius: 980,
-                  }}>
-                    {info.label} : {count}
-                  </span>
-                );
-              })}
-            </div>
-          )}
 
-          {selectedAssigned > 0 && (
+          {selectedCatalogCount > 0 && (
             <div style={{
               background: "#f0faf5", border: "1.5px solid #0A7A5A", borderRadius: 12,
-              padding: "10px 16px", marginBottom: 12,
-              display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, flexWrap: "wrap",
+              padding: "10px 14px", marginBottom: 10, position: "relative",
+              display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10,
             }}>
               <span style={{ fontSize: 13, fontWeight: 600, color: "#0A7A5A" }}>
-                {selectedAssigned} sélectionné{selectedAssigned > 1 ? "s" : ""}
+                {selectedCatalogCount} testeur{selectedCatalogCount > 1 ? "s" : ""} sélectionné{selectedCatalogCount > 1 ? "s" : ""}
               </span>
-              <button onClick={handleNdaSend} style={{
-                padding: "7px 18px", fontSize: 13, fontWeight: 700, color: "#fff",
-                background: "#0A7A5A", border: "none", borderRadius: 980,
-                cursor: "pointer", fontFamily: "inherit",
-              }}>Envoyer NDA</button>
+              <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                <button
+                  onClick={handleInvite}
+                  disabled={submitting}
+                  style={{
+                    padding: "7px 16px", fontSize: 13, fontWeight: 700, color: "#fff",
+                    background: "#0A7A5A", border: "none", borderRadius: 980,
+                    cursor: submitting ? "wait" : "pointer", fontFamily: "inherit",
+                    opacity: submitting ? 0.7 : 1,
+                  }}
+                >
+                  Inviter au projet →
+                </button>
+                <button
+                  onClick={() => setActionMenuOpen((v) => !v)}
+                  disabled={submitting}
+                  aria-label="Plus d'actions"
+                  style={{
+                    padding: "7px 10px", fontSize: 13, fontWeight: 700, color: "#0A7A5A",
+                    background: "#fff", border: "1px solid #0A7A5A", borderRadius: 980,
+                    cursor: "pointer", fontFamily: "inherit",
+                  }}
+                >
+                  ⋯
+                </button>
+                {actionMenuOpen && (
+                  <div style={{
+                    position: "absolute", top: "calc(100% + 4px)", right: 0,
+                    background: "#fff", borderRadius: 12, padding: 6,
+                    boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+                    border: "0.5px solid rgba(0,0,0,0.08)", zIndex: 10,
+                    minWidth: 240,
+                  }}>
+                    <button
+                      onClick={handleAddAsSelection}
+                      style={{
+                        width: "100%", textAlign: "left", padding: "8px 12px",
+                        background: "none", border: "none", borderRadius: 8,
+                        fontSize: 12, color: "#1d1d1f", cursor: "pointer", fontFamily: "inherit",
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.background = "#f5f5f7"}
+                      onMouseLeave={(e) => e.currentTarget.style.background = "none"}
+                    >
+                      <strong>Ajouter à la sélection</strong>
+                      <br />
+                      <span style={{ color: "#86868B", fontSize: 11 }}>
+                        Sans envoyer le NDA (shortlist)
+                      </span>
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
           <div style={{
             background: "#fff", borderRadius: 12, border: "0.5px solid rgba(0,0,0,0.08)",
-            overflow: "hidden",
+            overflow: "hidden", maxHeight: 560, overflowY: "auto",
           }}>
-            <div style={{ overflowX: "auto", maxHeight: 520 }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed" }}>
-                <colgroup>
-                  <col style={{ width: COL_WIDTHS.checkbox }} />
-                  <col style={{ width: COL_WIDTHS.name }} />
-                  <col style={{ width: COL_WIDTHS.email }} />
-                  <col style={{ width: COL_WIDTHS.devices }} />
-                  <col style={{ width: COL_WIDTHS.level }} />
-                  <col style={{ width: COL_WIDTHS.nda }} />
-                  <col style={{ width: COL_WIDTHS.action }} />
-                </colgroup>
-                <thead>
-                  <tr>
-                    <th style={thStyle}>
-                      <input type="checkbox"
-                        checked={assigned.length > 0 && assigned.every((a) => selected.has(a.tester_id))}
-                        onChange={() => toggleAll(assigned.map((a) => ({ id: a.tester_id })))}
-                        style={{ accentColor: "#0A7A5A" }} />
-                    </th>
-                    <th style={thStyle}>Nom</th>
-                    <th style={thStyle}>Email</th>
-                    <th style={thStyle}>Appareils</th>
-                    <th style={thStyle}>Niveau</th>
-                    <th style={thStyle}>Statut NDA</th>
-                    <th style={thStyle}></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {assigned.length === 0 ? (
-                    <tr>
-                      <td colSpan={7} style={{ ...cellStyle, textAlign: "center", color: "#86868B", padding: "30px" }}>
-                        Aucun testeur assigné à ce projet
-                      </td>
-                    </tr>
-                  ) : assigned.map((a) => {
-                    const t = a.tester;
-                    const ndaInfo = NDA_LABELS[a.status] || NDA_LABELS.selected;
-                    return (
-                      <tr key={a.id}
-                        style={{ borderBottom: "0.5px solid rgba(0,0,0,0.04)", cursor: "pointer", transition: "background 100ms" }}
-                        onClick={() => setDrawerId(a.tester_id)}
-                        onMouseEnter={(e) => e.currentTarget.style.background = "#fafafa"}
-                        onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
-                      >
-                        <td style={cellStyle} onClick={(e) => e.stopPropagation()}>
-                          <input type="checkbox" checked={selected.has(a.tester_id)}
-                            onChange={() => toggleSelect(a.tester_id)} style={{ accentColor: "#0A7A5A" }} />
-                        </td>
-                        <td style={{ ...cellStyle, fontWeight: 600 }}>{t?.first_name} {t?.last_name}</td>
-                        <td style={{ ...cellStyle, color: "#6e6e73" }}>{t?.email}</td>
-                        <td style={cellStyle}>{t?.devices?.slice(0, 2).join(", ") || "–"}</td>
-                        <td style={cellStyle}>
+            {filteredCatalog.length === 0 ? (
+              <div style={{ padding: "30px", textAlign: "center", color: "#86868B", fontSize: 13 }}>
+                Aucun testeur disponible avec ces critères.
+              </div>
+            ) : (
+              filteredCatalog.map((t) => {
+                const eligible = t.status === "active" && t.profile_completed === true;
+                const isSelected = selected.has(t.id);
+                return (
+                  <div
+                    key={t.id}
+                    onClick={() => setDrawerId(t.id)}
+                    style={{
+                      display: "grid",
+                      gridTemplateColumns: "30px 1fr auto",
+                      gap: 10, padding: "10px 14px",
+                      borderBottom: "0.5px solid rgba(0,0,0,0.05)",
+                      cursor: "pointer", alignItems: "center",
+                      background: isSelected ? "#f0faf5" : "transparent",
+                      opacity: eligible ? 1 : 0.55,
+                      transition: "background 100ms",
+                    }}
+                  >
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => toggleSelect(t.id)}
+                        disabled={!eligible}
+                        title={eligible ? undefined : "Profil incomplet : ce testeur n'est pas eligible"}
+                        style={{ accentColor: "#0A7A5A", cursor: eligible ? "pointer" : "not-allowed" }}
+                      />
+                    </div>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: "#1d1d1f", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {t.first_name} {t.last_name}
+                        {!eligible && (
                           <span style={{
-                            padding: "3px 10px", fontSize: 11, fontWeight: 600, borderRadius: 980,
-                            background: "#f5f5f7", color: "#6e6e73",
-                          }}>{t?.digital_level || "–"}</span>
-                        </td>
-                        <td style={cellStyle}>
-                          <span style={{
-                            padding: "4px 12px", fontSize: 11, fontWeight: 600,
-                            color: ndaInfo.color, background: ndaInfo.bg, borderRadius: 980,
-                          }}>{ndaInfo.label}</span>
-                        </td>
-                        <td style={cellStyle} onClick={(e) => e.stopPropagation()}>
-                          <button onClick={() => handleRemove(a.tester_id)} style={{
-                            background: "none", border: "none", color: "#e53e3e",
-                            cursor: "pointer", fontSize: 16, padding: "2px 6px",
-                          }} title="Retirer">&times;</button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                            marginLeft: 6, fontSize: 10, fontWeight: 600,
+                            padding: "1px 6px", borderRadius: 980,
+                            background: "#fef3c7", color: "#92400e",
+                          }}>incomplet</span>
+                        )}
+                      </div>
+                      <div style={{ fontSize: 11, color: "#86868B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {t.job_title || "—"} · {t.sector || "—"}
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", gap: 4 }}>
+                      <span style={{
+                        padding: "2px 8px", fontSize: 10, fontWeight: 600, borderRadius: 980,
+                        background: "#f5f5f7", color: "#6e6e73",
+                      }}>
+                        {t.digital_level || "?"}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
-      )}
+
+        {/* COLONNE 2 : assignés au projet */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ marginBottom: 10 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, color: "#1d1d1f", margin: "0 0 8px" }}>
+              Mes testeurs
+              <span style={{ fontSize: 12, fontWeight: 400, color: "#86868B", marginLeft: 8 }}>
+                {assigned.length} assigné{assigned.length > 1 ? "s" : ""}
+              </span>
+            </h3>
+          </div>
+
+          <div style={{
+            background: "#fff", borderRadius: 12, border: "0.5px solid rgba(0,0,0,0.08)",
+            overflow: "hidden", maxHeight: 620, overflowY: "auto",
+          }}>
+            {assigned.length === 0 ? (
+              <div style={{ padding: "40px 20px", textAlign: "center", color: "#86868B", fontSize: 13 }}>
+                Aucun testeur assigné. Sélectionnez-en dans le catalogue à gauche puis cliquez sur <strong>Inviter au projet</strong>.
+              </div>
+            ) : (
+              STATUS_GROUPS.map((grp) => {
+                const items = grouped[grp.id];
+                if (!items || items.length === 0) return null;
+
+                return (
+                  <div key={grp.id} style={{ borderBottom: "0.5px solid rgba(0,0,0,0.06)" }}>
+                    <div style={{
+                      padding: "10px 14px", background: "#fafafa",
+                      display: "flex", alignItems: "center", justifyContent: "space-between",
+                      fontSize: 11, fontWeight: 700, color: "#86868B",
+                      textTransform: "uppercase", letterSpacing: "0.04em",
+                    }}>
+                      <span>{grp.label} · {items.length}</span>
+                      {grp.id === "pending_nda" && items.length > 0 && (
+                        <button
+                          onClick={() => handleNdaSendForSelected(items.map((i) => i.tester_id))}
+                          disabled={submitting}
+                          style={{
+                            padding: "4px 10px", fontSize: 10, fontWeight: 700,
+                            color: "#fff", background: "#0A7A5A",
+                            border: "none", borderRadius: 980, cursor: submitting ? "wait" : "pointer",
+                            fontFamily: "inherit", textTransform: "none", letterSpacing: 0,
+                          }}
+                        >
+                          Envoyer NDA à tous
+                        </button>
+                      )}
+                    </div>
+                    {items.map((a) => {
+                      const t = a.tester;
+                      const ndaInfo = NDA_LABELS[a.status] || NDA_LABELS.selected;
+                      const dateText = a.completed_at
+                        ? `Terminé le ${new Date(a.completed_at).toLocaleDateString("fr-FR")}`
+                        : a.nda_signed_at
+                        ? `Signé le ${new Date(a.nda_signed_at).toLocaleDateString("fr-FR")}`
+                        : a.nda_sent_at
+                        ? `Envoyé le ${new Date(a.nda_sent_at).toLocaleDateString("fr-FR")}`
+                        : "";
+                      return (
+                        <div
+                          key={a.id}
+                          onClick={() => setDrawerId(a.tester_id)}
+                          style={{
+                            display: "grid", gridTemplateColumns: "1fr auto auto",
+                            gap: 10, padding: "10px 14px",
+                            borderTop: "0.5px solid rgba(0,0,0,0.04)",
+                            cursor: "pointer", alignItems: "center",
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.background = "#fafafa"}
+                          onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}
+                        >
+                          <div style={{ minWidth: 0 }}>
+                            <div style={{ fontSize: 13, fontWeight: 600, color: "#1d1d1f", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                              {t?.first_name} {t?.last_name}
+                            </div>
+                            <div style={{ fontSize: 11, color: "#86868B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                              {t?.email}{dateText && ` · ${dateText}`}
+                            </div>
+                          </div>
+                          <span style={{
+                            padding: "3px 10px", fontSize: 10, fontWeight: 600, borderRadius: 980,
+                            color: ndaInfo.color, background: ndaInfo.bg, whiteSpace: "nowrap",
+                          }}>
+                            {ndaInfo.label}
+                          </span>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleRemove(a.tester_id); }}
+                            style={{
+                              background: "none", border: "none", color: "#e53e3e",
+                              cursor: "pointer", fontSize: 16, padding: "2px 6px",
+                            }}
+                            title="Retirer"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      </div>
 
       <TesterDrawer testerId={drawerId} onClose={() => setDrawerId(null)} />
       <ConfirmModal />

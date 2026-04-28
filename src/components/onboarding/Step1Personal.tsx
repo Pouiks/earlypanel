@@ -72,11 +72,28 @@ export default function Step1Personal({ data, onNext, loading }: Step1Props) {
   const [gender, setGender] = useState(data.gender || "");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Champs requis pour le trigger DB auto_activate_tester (cf. lib/profile-completeness).
+  // Tant qu'un seul est vide, le testeur ne peut pas etre active.
+  const isoBirth = displayToIso(birthDisplay);
+  const allRequiredFilled =
+    firstName.trim() !== "" &&
+    lastName.trim() !== "" &&
+    phone.trim() !== "" &&
+    isoBirth !== "" &&
+    address.trim() !== "" &&
+    postalCode.trim() !== "" &&
+    city.trim() !== "";
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const errs: Record<string, string> = {};
     if (!firstName.trim()) errs.first_name = "Prénom obligatoire";
     if (!lastName.trim()) errs.last_name = "Nom obligatoire";
+    if (!phone.trim()) errs.phone = "Téléphone obligatoire";
+    if (!isoBirth) errs.birth_date = "Date de naissance obligatoire (JJ/MM/AAAA)";
+    if (!address.trim()) errs.address = "Adresse obligatoire";
+    if (!postalCode.trim()) errs.postal_code = "Code postal obligatoire";
+    if (!city.trim()) errs.city = "Ville obligatoire";
     if (Object.keys(errs).length) {
       setErrors(errs);
       return;
@@ -84,11 +101,11 @@ export default function Step1Personal({ data, onNext, loading }: Step1Props) {
     onNext({
       first_name: firstName.trim(),
       last_name: lastName.trim(),
-      phone: phone.trim() || null,
-      birth_date: displayToIso(birthDisplay) || null,
-      address: address.trim() || null,
-      city: city.trim() || null,
-      postal_code: postalCode.trim() || null,
+      phone: phone.trim(),
+      birth_date: isoBirth,
+      address: address.trim(),
+      city: city.trim(),
+      postal_code: postalCode.trim(),
       linkedin_url: linkedin.trim() || null,
       gender: (gender as Tester["gender"]) || null,
     });
@@ -120,12 +137,26 @@ export default function Step1Personal({ data, onNext, loading }: Step1Props) {
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
         <div>
-          <label style={labelStyle}>Téléphone <span style={{ color: "#86868B", fontWeight: 400 }}>(optionnel)</span></label>
-          <input style={inputStyle} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="06 12 34 56 78" />
+          <label style={labelStyle}>Téléphone *</label>
+          <input
+            style={{ ...inputStyle, borderColor: errors.phone ? "#e53e3e" : undefined }}
+            value={phone}
+            onChange={(e) => { setPhone(e.target.value); setErrors((p) => ({ ...p, phone: "" })); }}
+            placeholder="06 12 34 56 78"
+          />
+          {errors.phone && <span style={{ fontSize: 12, color: "#e53e3e" }}>{errors.phone}</span>}
         </div>
         <div>
-          <label style={labelStyle}>Date de naissance <span style={{ color: "#86868B", fontWeight: 400 }}>(optionnel)</span></label>
-          <input style={inputStyle} value={birthDisplay} onChange={handleBirthChange} placeholder="JJ/MM/AAAA" inputMode="numeric" maxLength={10} />
+          <label style={labelStyle}>Date de naissance *</label>
+          <input
+            style={{ ...inputStyle, borderColor: errors.birth_date ? "#e53e3e" : undefined }}
+            value={birthDisplay}
+            onChange={(e) => { handleBirthChange(e); setErrors((p) => ({ ...p, birth_date: "" })); }}
+            placeholder="JJ/MM/AAAA"
+            inputMode="numeric"
+            maxLength={10}
+          />
+          {errors.birth_date && <span style={{ fontSize: 12, color: "#e53e3e" }}>{errors.birth_date}</span>}
         </div>
       </div>
       <div style={{ marginBottom: 16 }}>
@@ -143,33 +174,51 @@ export default function Step1Personal({ data, onNext, loading }: Step1Props) {
         </select>
       </div>
       <div style={{ marginBottom: 16 }}>
-        <label style={labelStyle}>Adresse <span style={{ color: "#86868B", fontWeight: 400 }}>(optionnel)</span></label>
-        <input style={inputStyle} value={address} onChange={(e) => setAddress(e.target.value)} placeholder="12 rue de la Paix" />
+        <label style={labelStyle}>Adresse *</label>
+        <input
+          style={{ ...inputStyle, borderColor: errors.address ? "#e53e3e" : undefined }}
+          value={address}
+          onChange={(e) => { setAddress(e.target.value); setErrors((p) => ({ ...p, address: "" })); }}
+          placeholder="12 rue de la Paix"
+        />
+        {errors.address && <span style={{ fontSize: 12, color: "#e53e3e" }}>{errors.address}</span>}
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
         <div>
-          <label style={labelStyle}>Code postal <span style={{ color: "#86868B", fontWeight: 400 }}>(optionnel)</span></label>
-          <input style={inputStyle} value={postalCode} onChange={(e) => setPostalCode(e.target.value)} placeholder="75001" />
+          <label style={labelStyle}>Code postal *</label>
+          <input
+            style={{ ...inputStyle, borderColor: errors.postal_code ? "#e53e3e" : undefined }}
+            value={postalCode}
+            onChange={(e) => { setPostalCode(e.target.value); setErrors((p) => ({ ...p, postal_code: "" })); }}
+            placeholder="75001"
+          />
+          {errors.postal_code && <span style={{ fontSize: 12, color: "#e53e3e" }}>{errors.postal_code}</span>}
         </div>
         <div>
-          <label style={labelStyle}>Ville <span style={{ color: "#86868B", fontWeight: 400 }}>(optionnel)</span></label>
-          <input style={inputStyle} value={city} onChange={(e) => setCity(e.target.value)} placeholder="Paris" />
+          <label style={labelStyle}>Ville *</label>
+          <input
+            style={{ ...inputStyle, borderColor: errors.city ? "#e53e3e" : undefined }}
+            value={city}
+            onChange={(e) => { setCity(e.target.value); setErrors((p) => ({ ...p, city: "" })); }}
+            placeholder="Paris"
+          />
+          {errors.city && <span style={{ fontSize: 12, color: "#e53e3e" }}>{errors.city}</span>}
         </div>
       </div>
       <div style={{ marginBottom: 28 }}>
         <label style={labelStyle}>LinkedIn <span style={{ color: "#86868B", fontWeight: 400 }}>(optionnel)</span></label>
         <input style={inputStyle} value={linkedin} onChange={(e) => setLinkedin(e.target.value)} placeholder="https://linkedin.com/in/..." />
       </div>
-      <button type="submit" disabled={loading} style={{
+      <button type="submit" disabled={loading || !allRequiredFilled} style={{
         width: "100%",
         padding: "14px",
-        background: "#0A7A5A",
+        background: allRequiredFilled ? "#0A7A5A" : "#ccc",
         color: "#fff",
         border: "none",
         borderRadius: 980,
         fontSize: 15,
         fontWeight: 700,
-        cursor: loading ? "wait" : "pointer",
+        cursor: loading || !allRequiredFilled ? "not-allowed" : "pointer",
         opacity: loading ? 0.7 : 1,
         transition: "all 200ms",
         fontFamily: "inherit",

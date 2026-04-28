@@ -54,11 +54,20 @@ export default function Step2Professional({ data, onNext, loading }: Step2Props)
   const [digitalLevel, setDigitalLevel] = useState<string>(data.digital_level || "");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Champs requis pour activation (cf. lib/profile-completeness).
+  const allRequiredFilled =
+    jobTitle.trim() !== "" &&
+    sector !== "" &&
+    companySize !== "" &&
+    digitalLevel !== "";
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const errs: Record<string, string> = {};
     if (!jobTitle.trim()) errs.job_title = "Intitulé de poste obligatoire";
     if (!sector) errs.sector = "Secteur obligatoire";
+    if (!companySize) errs.company_size = "Taille d'entreprise obligatoire";
+    if (!digitalLevel) errs.digital_level = "Niveau digital obligatoire";
     if (Object.keys(errs).length) {
       setErrors(errs);
       return;
@@ -66,8 +75,8 @@ export default function Step2Professional({ data, onNext, loading }: Step2Props)
     onNext({
       job_title: jobTitle.trim(),
       sector,
-      company_size: companySize || null,
-      digital_level: (digitalLevel as DigitalLevel) || null,
+      company_size: companySize,
+      digital_level: digitalLevel as DigitalLevel,
     });
   }
 
@@ -98,39 +107,46 @@ export default function Step2Professional({ data, onNext, loading }: Step2Props)
       </div>
 
       <div style={{ marginBottom: 16 }}>
-        <label style={labelStyle}>Taille de l&apos;entreprise</label>
+        <label style={labelStyle}>Taille de l&apos;entreprise *</label>
         <select
-          style={{ ...inputStyle, color: companySize ? "#1d1d1f" : "#86868B" }}
+          style={{
+            ...inputStyle,
+            color: companySize ? "#1d1d1f" : "#86868B",
+            borderColor: errors.company_size ? "#e53e3e" : undefined,
+          }}
           value={companySize}
-          onChange={(e) => setCompanySize(e.target.value)}
+          onChange={(e) => { setCompanySize(e.target.value); setErrors((p) => ({ ...p, company_size: "" })); }}
         >
           <option value="">Sélectionnez</option>
           {COMPANY_SIZES.map((s) => <option key={s} value={s}>{s} employés</option>)}
         </select>
+        {errors.company_size && <span style={{ fontSize: 12, color: "#e53e3e" }}>{errors.company_size}</span>}
       </div>
 
       <div style={{ marginBottom: 28 }}>
-        <label style={labelStyle}>Niveau digital</label>
+        <label style={labelStyle}>Niveau digital *</label>
         <PillSelect
           options={DIGITAL_LEVELS.map((d) => d.label)}
           value={DIGITAL_LEVELS.find((d) => d.value === digitalLevel)?.label || ""}
           onChange={(v) => {
             const match = DIGITAL_LEVELS.find((d) => d.label === v);
             setDigitalLevel(match?.value || "");
+            setErrors((p) => ({ ...p, digital_level: "" }));
           }}
         />
+        {errors.digital_level && <span style={{ fontSize: 12, color: "#e53e3e" }}>{errors.digital_level}</span>}
       </div>
 
-      <button type="submit" disabled={loading} style={{
+      <button type="submit" disabled={loading || !allRequiredFilled} style={{
         width: "100%",
         padding: "14px",
-        background: "#0A7A5A",
+        background: allRequiredFilled ? "#0A7A5A" : "#ccc",
         color: "#fff",
         border: "none",
         borderRadius: 980,
         fontSize: 15,
         fontWeight: 700,
-        cursor: loading ? "wait" : "pointer",
+        cursor: loading || !allRequiredFilled ? "not-allowed" : "pointer",
         opacity: loading ? 0.7 : 1,
         transition: "all 200ms",
         fontFamily: "inherit",

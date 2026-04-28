@@ -52,21 +52,29 @@ export default function Step5Availability({ data, onNext, loading }: Step5Props)
   const [uxExperience, setUxExperience] = useState<string>(data.ux_experience || "");
   const [gdprAccepted, setGdprAccepted] = useState(false);
 
+  // Champs requis : availability, ux_experience, interests >= 1, gdpr (cf. trigger DB).
+  // timeslots reste optionnel.
+  const allRequiredFilled =
+    availability !== "" &&
+    uxExperience !== "" &&
+    interests.length > 0 &&
+    gdprAccepted;
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!gdprAccepted) return;
+    if (!allRequiredFilled) return;
     onNext({
-      availability: (availability as Availability) || null,
+      availability: availability as Availability,
       timeslots,
       interests,
-      ux_experience: (uxExperience as UxExperience) || null,
+      ux_experience: uxExperience as UxExperience,
     });
   }
 
   return (
     <form onSubmit={handleSubmit}>
       <div style={{ marginBottom: 22 }}>
-        <label style={labelStyle}>Combien de tests pourriez-vous faire ?</label>
+        <label style={labelStyle}>Combien de tests pourriez-vous faire ? *</label>
         <span style={hintStyle}>Un test dure en moyenne 20 à 30 minutes</span>
         <PillSelect
           options={AVAILABILITIES.map((a) => a.label)}
@@ -79,19 +87,19 @@ export default function Step5Availability({ data, onNext, loading }: Step5Props)
       </div>
 
       <div style={{ marginBottom: 22 }}>
-        <label style={labelStyle}>Quels jours êtes-vous généralement disponible ?</label>
+        <label style={labelStyle}>Quels jours êtes-vous généralement disponible ? <span style={{ color: "#86868B", fontWeight: 400 }}>(optionnel)</span></label>
         <span style={hintStyle}>Vous aurez toujours 3 jours pour compléter un test</span>
         <PillSelect options={DAYS} value={timeslots} onChange={(v) => setTimeslots(v as string[])} multiple />
       </div>
 
       <div style={{ marginBottom: 22 }}>
-        <label style={labelStyle}>Quels types de produits vous intéressent ?</label>
+        <label style={labelStyle}>Quels types de produits vous intéressent ? *</label>
         <span style={hintStyle}>On vous proposera des tests en lien avec vos centres d&apos;intérêt</span>
         <PillSelect options={INTERESTS} value={interests} onChange={(v) => setInterests(v as string[])} multiple />
       </div>
 
       <div style={{ marginBottom: 28 }}>
-        <label style={labelStyle}>Avez-vous déjà testé un site ou une app pour donner votre avis ?</label>
+        <label style={labelStyle}>Avez-vous déjà testé un site ou une app pour donner votre avis ? *</label>
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 8 }}>
           {UX_OPTIONS.map((opt) => {
             const isSelected = uxExperience === opt.value;
@@ -172,16 +180,16 @@ export default function Step5Availability({ data, onNext, loading }: Step5Props)
         </label>
       </div>
 
-      <button type="submit" disabled={loading || !gdprAccepted} style={{
+      <button type="submit" disabled={loading || !allRequiredFilled} style={{
         width: "100%",
         padding: "14px",
-        background: gdprAccepted ? "#0A7A5A" : "#ccc",
+        background: allRequiredFilled ? "#0A7A5A" : "#ccc",
         color: "#fff",
         border: "none",
         borderRadius: 980,
         fontSize: 15,
         fontWeight: 700,
-        cursor: loading || !gdprAccepted ? "not-allowed" : "pointer",
+        cursor: loading || !allRequiredFilled ? "not-allowed" : "pointer",
         opacity: loading ? 0.7 : 1,
         transition: "all 200ms",
         fontFamily: "inherit",

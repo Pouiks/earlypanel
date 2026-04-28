@@ -72,6 +72,47 @@ export const REQUIRED_FIELDS: RequiredFieldInfo[] = [
   { key: "ux_experience", label: "Expérience UX", category: "preferences", isArray: false },
 ];
 
+/**
+ * Mapping step onboarding → champs requis pour valider cette etape.
+ *
+ * Source de verite pour la validation API (`/api/testers/onboarding/step`)
+ * et pour les composants UI (`StepXPersonal/Professional/...`).
+ *
+ * IMPORTANT : la liste totale (concatenation de toutes les valeurs) DOIT
+ * matcher REQUIRED_FIELDS et le trigger DB `auto_activate_tester`. Si un
+ * champ est dans REQUIRED_FIELDS mais absent de STEP_FIELDS, l'utilisateur
+ * pourra terminer l'onboarding sans le renseigner et restera bloque en
+ * status='pending' (le trigger refusera l'activation, comme browncarenza).
+ */
+export const STEP_FIELDS: Record<number, string[]> = {
+  1: ["first_name", "last_name", "phone", "birth_date", "address", "city", "postal_code"],
+  2: ["job_title", "sector", "company_size", "digital_level"],
+  3: ["tools"],
+  4: ["browsers", "devices", "connection"],
+  5: ["availability", "ux_experience", "interests"],
+};
+
+/**
+ * Verifie qu'un objet partial du tester est valide pour une step donnee.
+ * Retourne la liste des champs encore vides (vide = step OK).
+ */
+export function checkStepCompleteness(
+  step: number,
+  data: Record<string, unknown>
+): string[] {
+  const fields = STEP_FIELDS[step] ?? [];
+  const missing: string[] = [];
+  for (const key of fields) {
+    const fieldInfo = REQUIRED_FIELDS.find((f) => f.key === key);
+    const value = data[key];
+    const empty = fieldInfo?.isArray
+      ? !Array.isArray(value) || value.length === 0
+      : value === null || value === undefined || (typeof value === "string" && value.trim() === "");
+    if (empty) missing.push(key);
+  }
+  return missing;
+}
+
 export const CATEGORY_LABELS: Record<RequiredFieldCategory, string> = {
   personal: "Informations personnelles",
   address: "Adresse postale",

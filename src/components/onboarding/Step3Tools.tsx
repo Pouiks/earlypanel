@@ -58,8 +58,12 @@ export default function Step3Tools({ data, onNext, loading }: Step3Props) {
     setOtherInputs((prev) => ({ ...prev, [category]: "" }));
   }
 
+  // Champs requis pour activation : au moins 1 outil selectionne (cf. trigger DB).
+  const allRequiredFilled = selected.length > 0;
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!allRequiredFilled) return;
     onNext({ tools: selected });
   }
 
@@ -169,23 +173,25 @@ export default function Step3Tools({ data, onNext, loading }: Step3Props) {
 
       <p style={{
         fontSize: 12,
-        color: "#86868B",
+        color: allRequiredFilled ? "#86868B" : "#dc2626",
         margin: "16px 0 20px",
         textAlign: "center",
       }}>
-        Aucun choix n&apos;est obligatoire — cochez simplement ce que vous utilisez
+        {allRequiredFilled
+          ? `${selected.length} outil${selected.length > 1 ? "s" : ""} sélectionné${selected.length > 1 ? "s" : ""}`
+          : "Sélectionnez au moins un outil que vous utilisez."}
       </p>
 
-      <button type="submit" disabled={loading} style={{
+      <button type="submit" disabled={loading || !allRequiredFilled} style={{
         width: "100%",
         padding: "14px",
-        background: "#0A7A5A",
+        background: allRequiredFilled ? "#0A7A5A" : "#ccc",
         color: "#fff",
         border: "none",
         borderRadius: 980,
         fontSize: 15,
         fontWeight: 700,
-        cursor: loading ? "wait" : "pointer",
+        cursor: loading || !allRequiredFilled ? "not-allowed" : "pointer",
         opacity: loading ? 0.7 : 1,
         transition: "all 200ms",
         fontFamily: "inherit",

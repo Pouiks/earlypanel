@@ -47,8 +47,21 @@ export default function Step4Technical({ data, onNext, loading }: Step4Props) {
   const [connection, setConnection] = useState<string>(data.connection || "");
   const [connectionError, setConnectionError] = useState("");
 
+  // Champs requis : browsers >= 1, devices >= 1, connection (cf. trigger DB).
+  // phone_model et mobile_os restent optionnels.
+  const allRequiredFilled =
+    browsers.length > 0 && devices.length > 0 && connection !== "";
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (browsers.length === 0) {
+      setConnectionError("Sélectionnez au moins un navigateur.");
+      return;
+    }
+    if (devices.length === 0) {
+      setConnectionError("Sélectionnez au moins un appareil.");
+      return;
+    }
     if (!connection) {
       setConnectionError("Choisissez votre type de connexion internet (requis).");
       return;
@@ -66,27 +79,27 @@ export default function Step4Technical({ data, onNext, loading }: Step4Props) {
   return (
     <form onSubmit={handleSubmit}>
       <div style={{ marginBottom: 20 }}>
-        <label style={labelStyle}>Navigateurs utilisés</label>
+        <label style={labelStyle}>Navigateurs utilisés *</label>
         <PillSelect options={BROWSERS} value={browsers} onChange={(v) => setBrowsers(v as string[])} multiple />
       </div>
 
       <div style={{ marginBottom: 20 }}>
-        <label style={labelStyle}>Appareils</label>
+        <label style={labelStyle}>Appareils *</label>
         <PillSelect options={DEVICES} value={devices} onChange={(v) => setDevices(v as string[])} multiple />
       </div>
 
       <div style={{ marginBottom: 20 }}>
-        <label style={labelStyle}>Modèle de téléphone / tablette</label>
+        <label style={labelStyle}>Modèle de téléphone / tablette <span style={{ color: "#86868B", fontWeight: 400 }}>(optionnel)</span></label>
         <input style={inputStyle} value={phoneModel} onChange={(e) => setPhoneModel(e.target.value)} placeholder="iPhone 15, Samsung Galaxy S24, Pixel 8..." />
       </div>
 
       <div style={{ marginBottom: 20 }}>
-        <label style={labelStyle}>Système mobile</label>
+        <label style={labelStyle}>Système mobile <span style={{ color: "#86868B", fontWeight: 400 }}>(optionnel)</span></label>
         <PillSelect options={MOBILE_OS} value={mobileOs} onChange={(v) => setMobileOs(v as string)} />
       </div>
 
       <div style={{ marginBottom: 12 }}>
-        <label style={labelStyle}>Type de connexion principal</label>
+        <label style={labelStyle}>Type de connexion principal *</label>
         <PillSelect
           options={CONNECTIONS}
           value={connection}
@@ -100,16 +113,16 @@ export default function Step4Technical({ data, onNext, loading }: Step4Props) {
         )}
       </div>
 
-      <button type="submit" disabled={loading || !connection} style={{
+      <button type="submit" disabled={loading || !allRequiredFilled} style={{
         width: "100%",
         padding: "14px",
-        background: "#0A7A5A",
+        background: allRequiredFilled ? "#0A7A5A" : "#ccc",
         color: "#fff",
         border: "none",
         borderRadius: 980,
         fontSize: 15,
         fontWeight: 700,
-        cursor: loading ? "wait" : "pointer",
+        cursor: loading || !allRequiredFilled ? "not-allowed" : "pointer",
         opacity: loading ? 0.7 : 1,
         transition: "all 200ms",
         fontFamily: "inherit",

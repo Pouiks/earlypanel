@@ -2,26 +2,17 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { USE_MOCK_DATA, updateMockTester, isMockUnsafeInProd } from "@/lib/mock";
+import {
+  REQUIRED_FIELDS,
+  checkStepCompleteness,
+  computeProfileCompleteness,
+} from "@/lib/profile-completeness";
 
-const REQUIRED_TEXT_FIELDS = [
-  "first_name", "last_name", "phone",
-  "job_title", "sector", "company_size",
-  "digital_level", "connection", "availability", "ux_experience",
-] as const;
-
-const REQUIRED_ARRAY_FIELDS = [
-  "tools", "browsers", "devices", "interests",
-] as const;
-
-function isProfileComplete(profile: Record<string, unknown>): boolean {
-  for (const field of REQUIRED_TEXT_FIELDS) {
-    if (!profile[field]) return false;
-  }
-  for (const field of REQUIRED_ARRAY_FIELDS) {
-    const arr = profile[field];
-    if (!Array.isArray(arr) || arr.length === 0) return false;
-  }
-  return true;
+// Liste utilisee pour le diagnostic final au step 5 : on relit le profil
+// complet et on signale precisement quels champs sont encore vides. Source
+// de verite alignee avec le trigger DB via REQUIRED_FIELDS.
+function listMissingFieldKeys(profile: Record<string, unknown>): string[] {
+  return computeProfileCompleteness(profile).missing.map((f) => f.key);
 }
 
 export async function PATCH(request: NextRequest) {
@@ -93,10 +84,28 @@ export async function PATCH(request: NextRequest) {
   const forbidden = ["id", "created_at", "email", "auth_user_id", "status", "tier", "quality_score", "missions_completed", "total_earned", "stripe_account_id", "payment_setup", "profile_completed", "persona_id", "persona_locked", "source"];
   forbidden.forEach((key) => delete (data as Record<string, unknown>)[key]);
 
-  // Le trigger BDD `auto_activate_tester` exige `connection` non vide ; sans cela
-  // le testeur reste en pending. Etape 4 = seul endroit du wizard qui le pose.
-  const validConnections = new Set<string>(["Fibre", "ADSL", "4G/5G"]);
+  // Validation stricte des champs requis pour cette step (source : STEP_FIELDS).
+  // Sans ca, un testeur pouvait progresser jusqu'au step 5 sans avoir rempli
+  // par exemple connection ou company_size, et restait bloque en pending
+  // apres l'onboarding (cf. cas browncarenza). On bloque ici, en remontant
+  // la liste des champs manquants pour permettre a l'UI d'afficher un message.
+  const missingForStep = checkStepCompleteness(step, data as Record<string, unknown>);
+  if (missingForStep.length > 0) {
+    const labels = missingForStep
+      .map((key) => REQUIRED_FIELDS.find((f) => f.key === key)?.label ?? key)
+      .join(", ");
+    return NextResponse.json(
+      {
+        error: `Champs obligatoires manquants : ${labels}.`,
+        missing_fields: missingForStep,
+      },
+      { status: 400 }
+    );
+  }
+
+  // Validation specifique de la valeur de connection (CHECK constraint DB).
   if (step === 4) {
+    const validConnections = new Set<string>(["Fibre", "ADSL", "4G/5G"]);
     const c = (data as Record<string, unknown>).connection;
     if (typeof c !== "string" || !validConnections.has(c)) {
       return NextResponse.json(
@@ -154,16 +163,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     // Profil incomplet : remonter clairement les champs manquants pour aider l'UX.
-    const missing: string[] = [];
-    if (fullProfile) {
-      for (const field of REQUIRED_TEXT_FIELDS) {
-        if (!fullProfile[field]) missing.push(field);
-      }
-      for (const field of REQUIRED_ARRAY_FIELDS) {
-        const arr = fullProfile[field];
-        if (!Array.isArray(arr) || arr.length === 0) missing.push(field);
-      }
-    }
+    const missing = fullProfile ? listMissingFieldKeys(fullProfile) : [];
 
     return NextResponse.json(
       {
