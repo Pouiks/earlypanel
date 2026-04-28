@@ -106,13 +106,21 @@ export function buildWelcomeEmail(magicLink: string, firstName?: string): string
         </td></tr>
         <tr><td style="padding:32px;">
           <p style="font-size:16px;color:#1d1d1f;margin:0 0 16px;font-weight:600;">${greeting}</p>
-          <p style="font-size:14px;color:#6e6e73;line-height:1.6;margin:0 0 8px;">Votre inscription a bien été reçue.</p>
-          <p style="font-size:14px;color:#6e6e73;line-height:1.6;margin:0 0 28px;">Cliquez ci-dessous pour accéder à votre espace et compléter votre profil.</p>
+          <p style="font-size:14px;color:#6e6e73;line-height:1.6;margin:0 0 8px;">Merci ! Votre profil est enregistré dans notre panel testeurs.</p>
+          <p style="font-size:14px;color:#6e6e73;line-height:1.6;margin:0 0 22px;">Cliquez ci-dessous pour compléter votre profil et le rendre éligible aux missions.</p>
           <a href="${magicLink}" style="display:inline-block;background:#0A7A5A;color:#fff;padding:14px 28px;border-radius:980px;font-size:15px;font-weight:700;text-decoration:none;">Compléter mon profil →</a>
-          <p style="font-size:12px;color:#86868B;line-height:1.5;margin:28px 0 0;">Ce lien est valable 24h. Si vous n'avez pas demandé cet accès, ignorez cet email.</p>
+
+          <div style="margin:32px 0 0;padding:16px 18px;background:#fef3c7;border-radius:12px;border-left:3px solid #f59e0b;">
+            <p style="font-size:13px;color:#78350f;line-height:1.6;margin:0 0 6px;font-weight:600;">À savoir avant de continuer</p>
+            <p style="font-size:12px;color:#92400e;line-height:1.6;margin:0;">
+              earlypanel est en <strong>phase de pré-lancement</strong>. La fréquence des missions dépend de votre profil et de la demande client : <strong>aucune mission n'est garantie</strong>. Vous serez contacté(e) par email dès qu'une opportunité correspond à votre profil.
+            </p>
+          </div>
+
+          <p style="font-size:12px;color:#86868B;line-height:1.5;margin:24px 0 0;">Ce lien de connexion est valable 24h. Si vous n'avez pas demandé cet accès, ignorez cet email.</p>
         </td></tr>
         <tr><td style="padding:20px 32px;border-top:0.5px solid rgba(0,0,0,0.08);">
-          <p style="font-size:11px;color:#86868B;margin:0;">earlypanel · Made in France · <a href="https://earlypanel.fr" style="color:#86868B;">Confidentialité</a> · <a href="https://earlypanel.fr" style="color:#86868B;">CGU</a></p>
+          <p style="font-size:11px;color:#86868B;margin:0;">earlypanel · Made in France · <a href="https://earlypanel.fr/confidentialite" style="color:#86868B;">Confidentialité</a> · <a href="https://earlypanel.fr/cgu" style="color:#86868B;">CGU</a></p>
         </td></tr>
       </table>
     </td></tr>

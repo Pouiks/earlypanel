@@ -1,0 +1,311 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "earlypanel" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - text: early
+      - emphasis [ref=e4]: panel
+    - generic [ref=e5]:
+      - link "Accueil" [ref=e6] [cursor=pointer]:
+        - /url: /
+      - link "Entreprises" [ref=e7] [cursor=pointer]:
+        - /url: /entreprises
+      - link "Devenir testeur" [ref=e8] [cursor=pointer]:
+        - /url: /testeurs
+    - generic [ref=e9]:
+      - link "Vous êtes une entreprise ?" [ref=e10] [cursor=pointer]:
+        - /url: /entreprises
+      - button "Rejoindre le panel" [ref=e11] [cursor=pointer]
+  - generic [ref=e13]:
+    - generic [ref=e14]:
+      - generic [ref=e15]: Jusqu'à 100€
+      - text: par mission · Payé sous 72h
+    - heading "Donnez votre avis. Soyez rémunéré." [level=1] [ref=e16]:
+      - text: Donnez votre avis.
+      - emphasis [ref=e17]: Soyez rémunéré.
+    - paragraph [ref=e18]: Rejoignez notre panel de testeurs. On vous envoie des missions sur des apps et sites web — vous répondez à des questions précises depuis chez vous.
+    - button "Rejoindre le panel gratuitement →" [ref=e19] [cursor=pointer]
+    - paragraph [ref=e20]: Inscription gratuite · Sans engagement · Votre profil détermine vos missions
+    - generic [ref=e21]:
+      - generic [ref=e22]:
+        - generic [ref=e23]: 25 min
+        - generic [ref=e24]: durée moyenne par mission
+      - generic [ref=e25]:
+        - generic [ref=e26]: 72h
+        - generic [ref=e27]: délai de paiement
+      - generic [ref=e28]:
+        - generic [ref=e29]: 100€
+        - generic [ref=e30]: max par mission
+      - generic [ref=e31]:
+        - generic [ref=e32]: 500+
+        - generic [ref=e33]: testeurs dans le panel
+  - generic [ref=e36]:
+    - generic [ref=e37]: Comment ça marche
+    - generic [ref=e38]: Simple. Flexible. Rémunéré.
+    - generic [ref=e39]:
+      - generic [ref=e40]:
+        - generic [ref=e41]: "01"
+        - generic [ref=e42]:
+          - heading "Vous créez votre profil" [level=3] [ref=e43]
+          - paragraph [ref=e44]: Décrivez votre métier, vos habitudes digitales, vos outils. Plus votre profil est précis, plus les missions correspondent à votre quotidien.
+          - generic [ref=e45]: 5 minutes · Gratuit
+      - generic [ref=e46]:
+        - generic [ref=e47]: "02"
+        - generic [ref=e48]:
+          - heading "On vous contacte pour les bonnes missions" [level=3] [ref=e49]
+          - paragraph [ref=e50]: Quand une mission correspond à votre profil, vous recevez un email avec le brief, la durée estimée et la rémunération. Vous acceptez ou refusez librement.
+          - generic [ref=e51]: Sur invitation · Libre
+      - generic [ref=e52]:
+        - generic [ref=e53]: "03"
+        - generic [ref=e54]:
+          - heading "Vous testez et répondez au questionnaire" [level=3] [ref=e55]
+          - paragraph [ref=e56]: Vous accédez au produit (site, app, maquette) et répondez à des questions précises sur votre expérience. Pas de jargon, juste vos réactions honnêtes.
+          - generic [ref=e57]: 25 min en moyenne
+      - generic [ref=e58]:
+        - generic [ref=e59]: "04"
+        - generic [ref=e60]:
+          - heading "Votre test est validé et vous êtes payé" [level=3] [ref=e61]
+          - paragraph [ref=e62]: "Une fois votre test validé par notre équipe, le paiement est déclenché automatiquement sur votre compte bancaire. Délai : 72h maximum."
+          - generic [ref=e63]: Virement · 72h max
+  - generic [ref=e66]:
+    - generic [ref=e67]:
+      - generic [ref=e68]: Rémunération
+      - heading "Jusqu'à 100€ par test, selon votre profil." [level=2] [ref=e69]:
+        - text: Jusqu'à 100€ par test,
+        - text: selon votre profil.
+      - paragraph [ref=e70]: Chaque test est rémunéré. Le montant dépend de la rareté de votre profil, de la durée de la mission et du secteur demandé par le client.
+      - paragraph [ref=e71]: Après votre inscription, vous découvrez votre fourchette personnalisée dans votre espace. Le paiement est effectué par virement bancaire sécurisé ; vous êtes responsable de la déclaration fiscale de vos revenus complémentaires.
+    - generic [ref=e72]:
+      - generic [ref=e73]: Les tests les mieux payés
+      - list [ref=e74]:
+        - listitem [ref=e75]:
+          - generic [ref=e76]: ✓
+          - generic [ref=e77]:
+            - generic [ref=e78]: Profils niche (direction, médical, juridique…)
+            - generic [ref=e79]: Les plus recherchés, les plus rémunérateurs.
+        - listitem [ref=e80]:
+          - generic [ref=e81]: ✓
+          - generic [ref=e82]:
+            - generic [ref=e83]: Experts métiers (RH, IT, finance, produit…)
+            - generic [ref=e84]: Votre expérience terrain vaut de l’or.
+        - listitem [ref=e85]:
+          - generic [ref=e86]: ✓
+          - generic [ref=e87]:
+            - generic [ref=e88]: Utilisateurs digitaux confirmés
+            - generic [ref=e89]: Vous manipulez des outils pro au quotidien.
+        - listitem [ref=e90]:
+          - generic [ref=e91]: ✓
+          - generic [ref=e92]:
+            - generic [ref=e93]: Grand public
+            - generic [ref=e94]: Accessible à tous, essentiel pour valider un produit.
+      - generic [ref=e95]: Votre fourchette exacte vous est communiquée dans votre espace après votre inscription et peut évoluer en fonction de la qualité de vos retours.
+  - generic [ref=e98]:
+    - generic [ref=e99]: Qui peut rejoindre le panel ?
+    - generic [ref=e100]: Tous les profils sont les bienvenus.
+    - paragraph [ref=e101]: Vous n'avez pas besoin d'être un expert en tech. On cherche des utilisateurs authentiques — pas des professionnels du test. La rémunération exacte vous est communiquée après votre inscription selon votre profil.
+    - generic [ref=e102]:
+      - generic [ref=e103]:
+        - img [ref=e105]
+        - heading "Salarié en poste" [level=4] [ref=e108]
+        - paragraph [ref=e109]: Tout secteur, tout niveau
+        - generic [ref=e110]: Standard
+      - generic [ref=e111]:
+        - img [ref=e113]
+        - heading "Freelance" [level=4] [ref=e116]
+        - paragraph [ref=e117]: Indépendant, consultant
+        - generic [ref=e118]: Recherché
+      - generic [ref=e119]:
+        - img [ref=e121]
+        - heading "Étudiant" [level=4] [ref=e124]
+        - paragraph [ref=e125]: Grande école, université
+        - generic [ref=e126]: Standard
+      - generic [ref=e127]:
+        - img [ref=e129]
+        - heading "Parent à domicile" [level=4] [ref=e132]
+        - paragraph [ref=e133]: Congé parental, temps partiel
+        - generic [ref=e134]: Standard
+      - generic [ref=e135]:
+        - img [ref=e137]
+        - heading "Gérant de PME" [level=4] [ref=e140]
+        - paragraph [ref=e141]: TPE, PME, artisan
+        - generic [ref=e142]: Recherché
+      - generic [ref=e143]:
+        - img [ref=e145]
+        - heading "Professionnel de santé" [level=4] [ref=e147]
+        - paragraph [ref=e148]: Médecin, infirmier, kiné…
+        - generic [ref=e149]: Profil rare
+      - generic [ref=e150]:
+        - img [ref=e152]
+        - heading "Profil finance" [level=4] [ref=e154]
+        - paragraph [ref=e155]: DAF, comptable, contrôleur
+        - generic [ref=e156]: Profil rare
+      - generic [ref=e157]:
+        - img [ref=e159]
+        - heading "Profil IT" [level=4] [ref=e162]
+        - paragraph [ref=e163]: Dev, chef de projet, DSI
+        - generic [ref=e164]: Recherché
+  - generic [ref=e167]:
+    - generic [ref=e168]:
+      - heading "Rejoignez le panel. C'est gratuit." [level=2] [ref=e169]:
+        - text: Rejoignez le panel.
+        - emphasis [ref=e170]: C'est gratuit.
+      - paragraph [ref=e171]: Remplissez le formulaire — on revient vers vous dès qu'une mission correspond à votre profil.
+      - generic [ref=e172]:
+        - generic [ref=e175]:
+          - heading "Zéro engagement" [level=4] [ref=e176]
+          - paragraph [ref=e177]: Vous acceptez ou refusez chaque mission librement. Aucune obligation de fréquence.
+        - generic [ref=e180]:
+          - heading "Paiement sécurisé" [level=4] [ref=e181]
+          - paragraph [ref=e182]: Virement bancaire via Stripe. Vous configurez votre IBAN une fois, le reste est automatique.
+        - generic [ref=e185]:
+          - heading "Confidentialité garantie" [level=4] [ref=e186]
+          - paragraph [ref=e187]: Vos données ne sont jamais revendues. Vous signez un NDA avant chaque mission.
+        - generic [ref=e190]:
+          - heading "Missions sur mesure" [level=4] [ref=e191]
+          - paragraph [ref=e192]: On ne vous envoie que des missions qui correspondent à votre profil et vos disponibilités.
+    - generic [ref=e193]:
+      - heading "Créer mon profil testeur" [level=3] [ref=e194]
+      - paragraph [ref=e195]: Inscription gratuite · 5 minutes
+      - generic [ref=e196]:
+        - generic [ref=e197]:
+          - generic [ref=e198]: Prénom
+          - textbox "Marie" [ref=e199]
+        - generic [ref=e200]:
+          - generic [ref=e201]: Nom
+          - textbox "Dupont" [ref=e202]
+      - generic [ref=e203]:
+        - generic [ref=e204]: Email *
+        - textbox "marie@exemple.fr" [ref=e205]
+      - generic [ref=e206]:
+        - generic [ref=e207]: Secteur d'activité
+        - combobox [ref=e208]:
+          - option "— Sélectionner" [disabled] [selected]
+          - option "Finance / Comptabilité"
+          - option "Ressources humaines"
+          - option "IT / Tech / Dev"
+          - option "Marketing / Communication"
+          - option "Commerce / Vente"
+          - option "Santé / Médical"
+          - option "Juridique / Compliance"
+          - option "Direction / Management"
+          - option "Étudiant"
+          - option "Autre"
+      - generic [ref=e209]:
+        - generic [ref=e210]: Aisance digitale
+        - generic [ref=e211]:
+          - button "Débutant" [ref=e212] [cursor=pointer]
+          - button "Intermédiaire" [ref=e213] [cursor=pointer]
+          - button "Avancé" [ref=e214] [cursor=pointer]
+          - button "Expert" [ref=e215] [cursor=pointer]
+      - generic [ref=e216]:
+        - generic [ref=e217]: Appareils disponibles
+        - generic [ref=e218]:
+          - button "Ordinateur" [ref=e219] [cursor=pointer]
+          - button "Smartphone" [ref=e220] [cursor=pointer]
+          - button "Tablette" [ref=e221] [cursor=pointer]
+      - generic [ref=e222]:
+        - generic [ref=e223]: Disponibilités
+        - combobox [ref=e224]:
+          - option "1 à 2 missions par mois" [selected]
+          - option "3 à 5 missions par mois"
+          - option "+ de 5 missions par mois"
+      - button "Créer mon profil →" [ref=e225] [cursor=pointer]
+      - paragraph [ref=e226]: En créant votre profil, vous acceptez nos CGU testeurs. Vos données sont protégées conformément au RGPD.
+  - generic [ref=e229]:
+    - generic [ref=e230]: Questions fréquentes
+    - generic [ref=e231]: Vos questions, nos réponses.
+    - generic [ref=e232]:
+      - generic [ref=e233]:
+        - generic [ref=e234] [cursor=pointer]:
+          - heading "Est-ce que je dois déclarer ces revenus ?" [level=4] [ref=e235]
+          - img [ref=e237]
+        - paragraph [ref=e239]: Oui. Les revenus issus des tests sont des revenus complémentaires à déclarer aux impôts. Stripe vous fournit un récapitulatif annuel de vos gains pour simplifier votre déclaration.
+      - generic [ref=e240]:
+        - generic [ref=e241] [cursor=pointer]:
+          - heading "Combien de temps faut-il par mission ?" [level=4] [ref=e242]
+          - img [ref=e244]
+        - paragraph [ref=e246]: En moyenne 25 minutes. Chaque invitation précise la durée estimée avant que vous acceptiez. Vous ne pouvez jamais être surpris par une mission plus longue que prévue.
+      - generic [ref=e247]:
+        - generic [ref=e248] [cursor=pointer]:
+          - heading "Quand et comment suis-je payé ?" [level=4] [ref=e249]
+          - img [ref=e251]
+        - paragraph [ref=e253]: Par virement bancaire sous 72h après validation de votre test. Vous configurez votre IBAN une seule fois via notre interface sécurisée Stripe. Aucun intermédiaire.
+      - generic [ref=e254]:
+        - generic [ref=e255] [cursor=pointer]:
+          - heading "Que se passe-t-il si mon test est refusé ?" [level=4] [ref=e256]
+          - img [ref=e258]
+        - paragraph [ref=e260]: On vous explique pourquoi par email. Un test est refusé uniquement si les réponses sont trop courtes ou incohérentes. Vous ne serez pas payé pour ce test, mais votre profil reste actif.
+      - generic [ref=e261]:
+        - generic [ref=e262] [cursor=pointer]:
+          - heading "Mes données personnelles sont-elles protégées ?" [level=4] [ref=e263]
+          - img [ref=e265]
+        - paragraph [ref=e267]: Absolument. Vos données ne sont jamais revendues à des tiers. Elles servent uniquement au matching avec les missions. Tout est conforme RGPD, vous pouvez demander leur suppression à tout moment.
+      - generic [ref=e268]:
+        - generic [ref=e269] [cursor=pointer]:
+          - heading "Combien de missions vais-je recevoir par mois ?" [level=4] [ref=e270]
+          - img [ref=e272]
+        - paragraph [ref=e274]: Cela dépend de votre profil et de la demande côté clients. En moyenne, nos testeurs reçoivent 1 à 3 missions par mois. Les profils rares et experts reçoivent davantage d'invitations.
+  - contentinfo [ref=e275]:
+    - generic [ref=e276]:
+      - generic [ref=e277]:
+        - generic [ref=e278]:
+          - link "earlypanel" [ref=e279] [cursor=pointer]:
+            - /url: /
+            - text: early
+            - emphasis [ref=e280]: panel
+          - paragraph [ref=e281]: Tests utilisateurs clés en main pour équipes produit, startups et agences digitales.
+          - generic [ref=e282]:
+            - generic [ref=e283]: RGPD
+            - generic [ref=e284]: NDA inclus
+            - generic [ref=e285]: Made in France
+        - generic [ref=e286]:
+          - heading "Testeurs" [level=4] [ref=e287]
+          - list [ref=e288]:
+            - listitem [ref=e289]:
+              - link "Rejoindre le panel" [ref=e290] [cursor=pointer]:
+                - /url: "#register"
+            - listitem [ref=e291]:
+              - link "Comment ça marche" [ref=e292] [cursor=pointer]:
+                - /url: "#how"
+            - listitem [ref=e293]:
+              - link "FAQ testeurs" [ref=e294] [cursor=pointer]:
+                - /url: "#faq"
+            - listitem [ref=e295]:
+              - link "CGU testeurs" [ref=e296] [cursor=pointer]:
+                - /url: "#"
+        - generic [ref=e297]:
+          - heading "Entreprises" [level=4] [ref=e298]
+          - list [ref=e299]:
+            - listitem [ref=e300]:
+              - link "Démarrer un test" [ref=e301] [cursor=pointer]:
+                - /url: /entreprises
+            - listitem [ref=e302]:
+              - link "Tarifs" [ref=e303] [cursor=pointer]:
+                - /url: /#tarifs
+            - listitem [ref=e304]:
+              - link "FAQ clients" [ref=e305] [cursor=pointer]:
+                - /url: /entreprises#faq
+        - generic [ref=e306]:
+          - heading "Légal" [level=4] [ref=e307]
+          - list [ref=e308]:
+            - listitem [ref=e309]:
+              - link "Mentions légales" [ref=e310] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e311]:
+              - link "Confidentialité" [ref=e312] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e313]:
+              - link "CGU" [ref=e314] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e315]:
+              - link "contact@earlypanel.fr" [ref=e316] [cursor=pointer]:
+                - /url: "#"
+      - generic [ref=e317]:
+        - paragraph [ref=e318]: © 2025 earlypanel · Tous droits réservés
+        - generic [ref=e319]:
+          - link "Mentions légales" [ref=e320] [cursor=pointer]:
+            - /url: "#"
+          - link "Confidentialité" [ref=e321] [cursor=pointer]:
+            - /url: "#"
+          - link "CGU" [ref=e322] [cursor=pointer]:
+            - /url: "#"
+  - alert [ref=e323]

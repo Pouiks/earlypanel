@@ -1,19 +1,41 @@
 import type { Metadata } from "next";
 import Nav from "@/components/layout/Nav";
+import PreLaunchBanner from "@/components/layout/PreLaunchBanner";
 import HeroB2C from "@/components/b2c/HeroB2C";
 import Separator from "@/components/ui/Separator";
 import HowItWorks from "@/components/b2c/HowItWorks";
 import EarnSection from "@/components/b2c/EarnSection";
+import TestimonialsB2C from "@/components/b2c/TestimonialsB2C";
 import ProfileGrid from "@/components/b2c/ProfileGrid";
 import RegisterSection from "@/components/b2c/RegisterSection";
 import FaqAccordion from "@/components/ui/FaqAccordion";
+import FaqJsonLd from "@/components/ui/FaqJsonLd";
 import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "earlypanel — Devenir testeur rémunéré",
+  // Title B2C : exact match du mot-cle principal "devenir testeur remunere"
+  // + chiffre attractif. Description : freins addresses (gratuit, paiement).
+  title: "Devenir testeur rémunéré · Jusqu'à 100€ par mission",
   description:
-    "Rejoignez notre panel de testeurs. Donnez votre avis sur des apps et sites web, jusqu'à 100€ par mission selon votre profil.",
+    "Devenez testeur rémunéré pour applications et sites web. Inscription gratuite, paiement sous 72h par virement. Missions sur mesure adaptées à votre profil (salarié, freelance, étudiant, parent au foyer). 25 min en moyenne par mission.",
+  keywords: [
+    "devenir testeur rémunéré",
+    "testeur d'applications rémunéré",
+    "test produit payé",
+    "complément de revenu",
+    "panel testeur France",
+    "user testing rémunéré",
+    "tests utilisateurs payés",
+    "missions rémunérées en ligne",
+  ],
   alternates: { canonical: "https://earlypanel.fr/testeurs" },
+  openGraph: {
+    title: "Devenir testeur rémunéré · earlypanel",
+    description:
+      "Inscription gratuite. Jusqu'à 100€ par mission. Paiement sous 72h. 500+ testeurs déjà inscrits.",
+    url: "https://earlypanel.fr/testeurs",
+    type: "website",
+  },
 };
 
 const faqB2C = [
@@ -28,12 +50,17 @@ const faqB2C = [
 export default function TesteursPage() {
   return (
     <>
+      <FaqJsonLd items={faqB2C} />
+
+      <PreLaunchBanner />
       <Nav />
       <HeroB2C />
       <Separator />
       <HowItWorks />
       <Separator />
       <EarnSection />
+      <Separator />
+      <TestimonialsB2C />
       <Separator />
       <ProfileGrid />
       <Separator />

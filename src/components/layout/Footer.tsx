@@ -33,8 +33,7 @@ export default function Footer({ variant = "index" }: FooterProps) {
                   <li><a href="#process">Comment ça marche</a></li>
                   <li><a href="#tarifs">Nos offres</a></li>
                   <li><Link href="/entreprises">Page entreprises</Link></li>
-                  <li><a href="#">Exemple de rapport</a></li>
-                  <li><a href="#">FAQ clients</a></li>
+                  <li><Link href="/entreprises#faq">FAQ clients</Link></li>
                 </ul>
               </div>
               <div className="footer-col">
@@ -43,17 +42,17 @@ export default function Footer({ variant = "index" }: FooterProps) {
                   <li><Link href="/testeurs">Rejoindre le panel</Link></li>
                   <li><Link href="/testeurs#how">Comment ça marche</Link></li>
                   <li><Link href="/testeurs#faq">FAQ testeurs</Link></li>
-                  <li><a href="#">CGU testeurs</a></li>
+                  <li><Link href="/cgu">CGU testeurs</Link></li>
                 </ul>
               </div>
               <div className="footer-col">
                 <h4>Légal</h4>
                 <ul>
-                  <li><a href="#">Mentions légales</a></li>
-                  <li><a href="#">Politique de confidentialité</a></li>
-                  <li><a href="#">CGV</a></li>
-                  <li><a href="#">RGPD</a></li>
-                  <li><a href="#">contact@earlypanel.fr</a></li>
+                  <li><Link href="/mentions-legales">Mentions légales</Link></li>
+                  <li><Link href="/confidentialite">Politique de confidentialité</Link></li>
+                  <li><Link href="/cgv">CGV</Link></li>
+                  <li><Link href="/cgu">CGU</Link></li>
+                  <li><a href="mailto:contact@earlypanel.fr">contact@earlypanel.fr</a></li>
                 </ul>
               </div>
             </>
@@ -65,9 +64,8 @@ export default function Footer({ variant = "index" }: FooterProps) {
                 <h4>Service</h4>
                 <ul>
                   <li><Link href="/#process">Comment ça marche</Link></li>
-                  <li><Link href="/#tarifs">Tarifs</Link></li>
-                  <li><a href="#">Exemple de rapport</a></li>
-                  <li><a href="#faq">FAQ</a></li>
+                  <li><Link href="/entreprises#tarifs">Tarifs</Link></li>
+                  <li><Link href="/entreprises#faq">FAQ</Link></li>
                 </ul>
               </div>
               <div className="footer-col">
@@ -75,16 +73,16 @@ export default function Footer({ variant = "index" }: FooterProps) {
                 <ul>
                   <li><Link href="/testeurs">Rejoindre le panel</Link></li>
                   <li><Link href="/testeurs#how">Comment ça marche</Link></li>
-                  <li><a href="#">CGU testeurs</a></li>
+                  <li><Link href="/cgu">CGU testeurs</Link></li>
                 </ul>
               </div>
               <div className="footer-col">
                 <h4>Légal</h4>
                 <ul>
-                  <li><a href="#">Mentions légales</a></li>
-                  <li><a href="#">Confidentialité</a></li>
-                  <li><a href="#">CGV</a></li>
-                  <li><a href="#">contact@earlypanel.fr</a></li>
+                  <li><Link href="/mentions-legales">Mentions légales</Link></li>
+                  <li><Link href="/confidentialite">Confidentialité</Link></li>
+                  <li><Link href="/cgv">CGV</Link></li>
+                  <li><a href="mailto:contact@earlypanel.fr">contact@earlypanel.fr</a></li>
                 </ul>
               </div>
             </>
@@ -98,35 +96,35 @@ export default function Footer({ variant = "index" }: FooterProps) {
                   <li><a href="#register">Rejoindre le panel</a></li>
                   <li><a href="#how">Comment ça marche</a></li>
                   <li><a href="#faq">FAQ testeurs</a></li>
-                  <li><a href="#">CGU testeurs</a></li>
+                  <li><Link href="/cgu">CGU testeurs</Link></li>
                 </ul>
               </div>
               <div className="footer-col">
                 <h4>Entreprises</h4>
                 <ul>
                   <li><Link href="/entreprises">Démarrer un test</Link></li>
-                  <li><Link href="/#tarifs">Tarifs</Link></li>
+                  <li><Link href="/entreprises#tarifs">Tarifs</Link></li>
                   <li><Link href="/entreprises#faq">FAQ clients</Link></li>
                 </ul>
               </div>
               <div className="footer-col">
                 <h4>Légal</h4>
                 <ul>
-                  <li><a href="#">Mentions légales</a></li>
-                  <li><a href="#">Confidentialité</a></li>
-                  <li><a href="#">CGU</a></li>
-                  <li><a href="#">contact@earlypanel.fr</a></li>
+                  <li><Link href="/mentions-legales">Mentions légales</Link></li>
+                  <li><Link href="/confidentialite">Confidentialité</Link></li>
+                  <li><Link href="/cgu">CGU</Link></li>
+                  <li><a href="mailto:contact@earlypanel.fr">contact@earlypanel.fr</a></li>
                 </ul>
               </div>
             </>
           )}
         </div>
         <div className="footer-bottom">
-          <p>© 2025 earlypanel · Tous droits réservés</p>
+          <p>© 2026 earlypanel · Tous droits réservés</p>
           <div className="footer-legal">
-            <a href="#">Mentions légales</a>
-            <a href="#">Confidentialité</a>
-            <a href="#">{variant === "b2c" ? "CGU" : "CGV"}</a>
+            <Link href="/mentions-legales">Mentions légales</Link>
+            <Link href="/confidentialite">Confidentialité</Link>
+            <Link href={variant === "b2c" ? "/cgu" : "/cgv"}>{variant === "b2c" ? "CGU" : "CGV"}</Link>
           </div>
         </div>
       </div>

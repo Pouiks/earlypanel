@@ -4,17 +4,43 @@ import Nav from "@/components/layout/Nav";
 import HeroB2B from "@/components/b2b/HeroB2B";
 import Separator from "@/components/ui/Separator";
 import UseCaseGrid from "@/components/b2b/UseCaseGrid";
+import TestimonialsB2B from "@/components/b2b/TestimonialsB2B";
+import PricingTable from "@/components/b2b/PricingTable";
+import Comparison from "@/components/b2b/Comparison";
 import BriefSection from "@/components/b2b/BriefSection";
 import SectorPills from "@/components/b2b/SectorPills";
 import FaqAccordion from "@/components/ui/FaqAccordion";
+import FaqJsonLd from "@/components/ui/FaqJsonLd";
+import ServiceJsonLd from "@/components/ui/ServiceJsonLd";
 import CtaFinal from "@/components/b2b/CtaFinal";
 import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "earlypanel — Pour les entreprises",
+  // Title B2B optimise : intention "tests utilisateurs" + qualifier "B2B"
+  // + benefice "clés en main". Description riche en mots-cles longue traine.
+  title: "Tests utilisateurs B2B clés en main · 5 jours · NDA inclus",
   description:
-    "Startups, scale-ups, agences, éditeurs SaaS — on teste vos POC, maquettes, URLs de recette et produits live avec les bons profils.",
+    "Service de tests utilisateurs pour startups, scale-ups et agences. Panel de 500+ testeurs sélectionnés manuellement (SaaS, fintech, healthtech, e-commerce). NDA contractualisé, atelier de cadrage offert, rapport actionnable livré en 5 jours. À partir de 700€ HT.",
+  keywords: [
+    "tests utilisateurs B2B",
+    "user testing France",
+    "test SaaS",
+    "test MVP",
+    "audit UX",
+    "panel testeurs qualifiés",
+    "tests produit clés en main",
+    "test maquette Figma",
+    "test prototype",
+    "test recette staging",
+  ],
   alternates: { canonical: "https://earlypanel.fr/entreprises" },
+  openGraph: {
+    title: "Tests utilisateurs B2B clés en main · earlypanel",
+    description:
+      "500+ testeurs qualifiés. NDA contractualisé. Rapport en 5 jours. À partir de 700€ HT.",
+    url: "https://earlypanel.fr/entreprises",
+    type: "website",
+  },
 };
 
 const faqB2B = [
@@ -29,11 +55,23 @@ const faqB2B = [
 export default function EntreprisesPage() {
   return (
     <>
+      {/* JSON-LD : balisage FAQPage pour rich snippets Google. Doit etre place
+          dans le rendu HTML, ce composant ne renvoie qu'une balise <script>. */}
+      <FaqJsonLd items={faqB2B} />
+      {/* JSON-LD : 3 packs Service pour rich results commerciaux + citations LLM. */}
+      <ServiceJsonLd />
+
       <AnnounceBar />
       <Nav />
       <HeroB2B />
       <Separator />
+      <TestimonialsB2B />
+      <Separator />
       <UseCaseGrid />
+      <Separator />
+      <PricingTable />
+      <Separator />
+      <Comparison />
       <Separator />
       <BriefSection />
       <Separator />

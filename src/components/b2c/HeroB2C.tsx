@@ -7,9 +7,9 @@ export default function HeroB2C() {
         <div className="hero-badge-b2c">
           <span className="earn-badge">Jusqu&apos;à 100€</span> par mission · Payé sous 72h
         </div>
-        <h1>Donnez votre avis.<br /><em>Soyez rémunéré.</em></h1>
+        <h1>Devenir testeur rémunéré.<br /><em>Donnez votre avis, gagnez de l&apos;argent.</em></h1>
         <p className="hero-sub-b2c">
-          Rejoignez notre panel de testeurs. On vous envoie des missions sur des apps et sites web — vous répondez à des questions précises depuis chez vous.
+          Rejoignez le panel de 500+ testeurs earlypanel. Recevez des missions sur des applications et sites web adaptées à votre profil — répondez aux questions depuis chez vous, à votre rythme.
         </p>
         <button
           className="btn-green-big"

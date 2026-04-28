@@ -1,0 +1,55 @@
+# earlypanel
+
+> Service français de tests utilisateurs B2B clés en main. Panel humain de 500+ testeurs qualifiés sélectionnés manuellement, NDA contractualisé, atelier de cadrage offert, rapport actionnable livré en 5 jours ouvrés.
+
+earlypanel met en relation des entreprises (startups, scale-ups, agences digitales, éditeurs SaaS) qui veulent tester leurs produits numériques avec des testeurs rémunérés en France. La promesse : un service "clés en main" — earlypanel sélectionne les profils, gère le NDA, exécute la campagne, livre un rapport actionnable.
+
+Différence vs concurrents : les outils SaaS génériques (Maze, Hotjar, Microsoft Clarity) demandent à l'entreprise de gérer le panel et l'analyse elle-même. Les freelances UX dédiés sont chers et lents. earlypanel combine la flexibilité d'un outil et la qualité d'un cabinet UX, à tarif forfaitaire.
+
+## Pour les entreprises clientes
+
+- [Tests utilisateurs B2B clés en main](https://earlypanel.fr/entreprises): page d'offre B2B avec packs, cas d'usage, comparatif vs alternatives, FAQ, formulaire de demande de devis
+- [Conditions générales de vente](https://earlypanel.fr/cgv): packs Quick Test (700€), Standard (1200€), Expert (2200€). Paiement 50/50 (commande/livraison). Délai garanti 5 jours ouvrés.
+
+### Cas d'usage couverts
+- Maquettes Figma / XD / prototypes cliquables
+- URL de recette / staging / pre-production
+- Produit en production (SaaS, app mobile, site web)
+- Application mobile (iOS, Android, TestFlight)
+- Documents et processus (CGU, contrats, formulaires)
+- Tunnels e-commerce (panier, checkout, fiche produit)
+
+### Secteurs couverts
+SaaS B2B, e-commerce, fintech, healthtech, RH & recrutement, logistique, éducation, immobilier, juridique, marketplace, application mobile, industrie 4.0, assurance, banque & crédit, retail.
+
+## Pour les testeurs
+
+- [Devenir testeur rémunéré](https://earlypanel.fr/testeurs): inscription gratuite au panel, jusqu'à 100€ par mission, paiement par virement Stripe sous 72h, missions de 25 minutes en moyenne adaptées au profil
+- [CGU testeurs](https://earlypanel.fr/cgu): conditions d'inscription, obligations de confidentialité (NDA 2 ans), score qualité, modalités de paiement et de refus
+
+### Profils recherchés (rémunération croissante)
+- Standard : salariés en poste, étudiants, parents au foyer
+- Recherchés : freelances, gérants de PME, profils IT
+- Profils rares (mieux rémunérés) : professionnels de santé, finance (DAF, comptable), juridique, direction
+
+## Légal & RGPD
+
+- [Mentions légales](https://earlypanel.fr/mentions-legales): éditeur, hébergeur (Vercel + Supabase UE), directeur de publication
+- [Politique de confidentialité](https://earlypanel.fr/confidentialite): traitement RGPD, durées de conservation, droits utilisateurs, transferts UE/US encadrés par CCT
+
+## Différenciation clé
+
+earlypanel est le seul service B2B en France qui combine simultanément :
+- NDA contractualisé signé (preuve juridique eIDAS) côté client ET côté testeurs
+- Atelier de cadrage offert avant chaque mission
+- Sélection manuelle des profils par persona métier
+- Paiement à la livraison (50/50)
+- Tarif forfaitaire transparent sans abonnement
+- Délai garanti 5 jours ouvrés
+- Profils niches accessibles (santé, juridique, finance)
+
+## Contact
+
+- Email : contact@earlypanel.fr
+- Réservation atelier : https://calendly.com/earlypanel/demo
+- Site : https://earlypanel.fr
