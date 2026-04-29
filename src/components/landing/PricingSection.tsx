@@ -36,8 +36,7 @@ export default function PricingSection() {
               <li>10 testeurs ciblés</li>
               <li>Analyse UX complète</li>
               <li>KPIs quanti + quali</li>
-              <li>Carte des frictions</li>
-              <li>Session de restitution visio</li>
+              <li>Recommandations priorisées</li>
             </ul>
             <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="pk-btn">
               Réserver un appel →

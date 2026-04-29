@@ -176,7 +176,7 @@ body { font-family: var(--font); background: #fff; color: var(--black); overflow
 .pricing-note { font-size: 14px; color: var(--gray); max-width: 220px; text-align: right; line-height: 1.5; }
 .pack-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
 .pk { background: #fff; border-radius: 20px; padding: 2rem; display: flex; flex-direction: column; }
-.pk.featured { background: var(--black); }
+.pk.featured { background: var(--green); }
 .pk-cat { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--gray-light); margin-bottom: .75rem; }
 .pk.featured .pk-cat { color: rgba(255,255,255,.35); }
 .pk-name { font-size: 20px; font-weight: 700; letter-spacing: -.02em; }
@@ -198,7 +198,8 @@ body { font-family: var(--font); background: #fff; color: var(--black); overflow
 .pk.featured .pk-features li::before { background-color: rgba(255,255,255,.1); background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M3 7l2.5 2.5L11 4.5' stroke='%232DD4A0' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
 .pk-btn { padding: 12px; border-radius: var(--radius-pill); font-size: 14px; font-weight: 700; cursor: pointer; font-family: var(--font); border: 0.5px solid rgba(0,0,0,.12); background: transparent; color: var(--black); transition: all .15s; width: 100%; }
 .pk-btn:hover { background: rgba(0,0,0,.04); }
-.pk.featured .pk-btn { background: #2DD4A0; border-color: transparent; color: #0a0a0a; }
+.pk.featured .pk-btn { background: #fff; border-color: transparent; color: var(--green); font-weight: 700; }
+.pk.featured .pk-btn:hover { background: rgba(255,255,255,.92); }
 
 /* ── LEAD MAGNET ── */
 .leadmag { padding: 6rem clamp(1.5rem,5vw,4rem); background: #0a0a0a; text-align: center; position: relative; overflow: hidden; }
