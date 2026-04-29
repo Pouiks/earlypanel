@@ -5,6 +5,7 @@ import { useTester } from "../layout";
 import type { Tester, DigitalLevel, MobileOS, ConnectionType, Availability, UxExperience } from "@/types/tester";
 import PillSelect from "@/components/ui/PillSelect";
 import Toast from "@/components/ui/Toast";
+import PaymentInfoSection from "@/components/tester/PaymentInfoSection";
 import {
   computeProfileCompleteness,
   CATEGORY_LABELS,
@@ -441,6 +442,9 @@ export default function ProfilPage() {
           {saving === "avail" ? "Sauvegarde…" : "Sauvegarder"}
         </button>
       </div>
+
+      {/* Finance — IBAN + signature CGU */}
+      <PaymentInfoSection />
 
       <Toast message={toast.message} visible={toast.visible} onHide={hideToast} />
     </div>
