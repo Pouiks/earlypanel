@@ -40,6 +40,19 @@ export const metadata: Metadata = {
       "500+ testeurs qualifiés. NDA contractualisé. Rapport en 5 jours. À partir de 700€ HT.",
     url: "https://earlypanel.fr/entreprises",
     type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "earlypanel — Tests utilisateurs livrés en 5 jours",
+        type: "image/png",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: ["/og-image.png"],
   },
 };
 
