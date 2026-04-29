@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { sendEmail, buildWelcomeEmail } from "@/lib/email";
+import { sendEmail, buildWelcomeEmail, buildNewTesterAdminEmail } from "@/lib/email";
 import { tryGetAppUrl } from "@/lib/app-url";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
@@ -16,7 +16,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, first_name, last_name } = await request.json();
+    const {
+      email,
+      first_name,
+      last_name,
+      sector,
+      digital_level,
+      availability,
+    } = await request.json();
 
     if (!email || typeof email !== "string") {
       return NextResponse.json(
@@ -93,6 +100,27 @@ export async function POST(request: NextRequest) {
     // G3 : insertion testers transactionnelle. Si elle echoue, on doit
     // rollback la creation auth pour eviter un user auth orphelin qui
     // bloquerait toute reinscription future avec le meme email.
+    // Validation defensive des champs pre-remplis depuis la landing :
+    // listes blanches strictes pour respecter les CHECK constraints DB.
+    const ALLOWED_DIGITAL = new Set(["debutant", "intermediaire", "avance", "expert"]);
+    const ALLOWED_AVAILABILITY = new Set(["1-2", "3-5", "5+"]);
+    const ALLOWED_SECTORS = new Set([
+      "Tech / SaaS", "E-commerce", "Finance / Banque", "Assurance",
+      "Santé", "RH / Recrutement", "Juridique", "Éducation",
+      "Immobilier", "Transport / Logistique", "Industrie", "Autre",
+    ]);
+
+    const safeSector =
+      typeof sector === "string" && ALLOWED_SECTORS.has(sector) ? sector : null;
+    const safeDigital =
+      typeof digital_level === "string" && ALLOWED_DIGITAL.has(digital_level)
+        ? digital_level
+        : null;
+    const safeAvailability =
+      typeof availability === "string" && ALLOWED_AVAILABILITY.has(availability)
+        ? availability
+        : null;
+
     const { error: insertError } = await adminClient
       .from("testers")
       .insert({
@@ -100,6 +128,12 @@ export async function POST(request: NextRequest) {
         auth_user_id: userId,
         first_name: first_name || null,
         last_name: last_name || null,
+        // Pre-remplissage depuis la landing : reduit la friction onboarding.
+        // Le testeur arrivera sur step 1 mais step 2 aura deja sector +
+        // digital_level remplis, et step 5 aura availability rempli.
+        sector: safeSector,
+        digital_level: safeDigital,
+        availability: safeAvailability,
         status: "pending",
         profile_completed: false,
         profile_step: 1,
@@ -152,6 +186,37 @@ export async function POST(request: NextRequest) {
         : "Complétez votre profil earlypanel →",
       html: buildWelcomeEmail(magicLink, first_name || undefined),
     });
+
+    // Notification interne staff : envoi best-effort, ne casse jamais
+    // l'inscription si l'envoi echoue. La cle ADMIN_NOTIFICATION_EMAIL est
+    // prioritaire ; fallback sur ADMIN_EMAIL si non definie.
+    const adminEmail =
+      process.env.ADMIN_NOTIFICATION_EMAIL?.trim() ||
+      process.env.ADMIN_EMAIL?.trim();
+    if (adminEmail) {
+      try {
+        await sendEmail({
+          to: adminEmail,
+          subject: `[earlypanel] Nouvelle inscription : ${emailNormalized}`,
+          html: buildNewTesterAdminEmail({
+            email: emailNormalized,
+            firstName: first_name || null,
+            lastName: last_name || null,
+            ip,
+            source: "landing",
+            // Champs pre-remplis depuis la landing : aide a evaluer la
+            // qualite/profil de l'inscription en un coup d'oeil cote staff.
+            prefilledFields: {
+              sector: safeSector,
+              digital_level: safeDigital,
+              availability: safeAvailability,
+            },
+          }),
+        });
+      } catch (notifyErr) {
+        console.error("[Register] admin notification failed", notifyErr);
+      }
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -3,19 +3,60 @@ import { useState } from "react";
 
 type FormState = "idle" | "loading" | "success" | "error";
 
+// Listes alignees sur les composants d'onboarding (Step2Professional + Step5Availability)
+// pour que les valeurs pre-remplies soient retrouvees dans les selects de l'onboarding.
+const SECTORS = [
+  "Tech / SaaS",
+  "E-commerce",
+  "Finance / Banque",
+  "Assurance",
+  "Santé",
+  "RH / Recrutement",
+  "Juridique",
+  "Éducation",
+  "Immobilier",
+  "Transport / Logistique",
+  "Industrie",
+  "Autre",
+] as const;
+
+const DIGITAL_LEVELS_UI = ["Débutant", "Intermédiaire", "Avancé", "Expert"] as const;
+type DigitalLevelUI = typeof DIGITAL_LEVELS_UI[number];
+
+// Mapping label UI (avec accents) vers la valeur stockee en DB (CHECK constraint)
+const DIGITAL_LEVEL_MAP: Record<DigitalLevelUI, "debutant" | "intermediaire" | "avance" | "expert"> = {
+  "Débutant": "debutant",
+  "Intermédiaire": "intermediaire",
+  "Avancé": "avance",
+  "Expert": "expert",
+};
+
+const AVAILABILITY_OPTIONS_UI = [
+  "1 à 2 missions par mois",
+  "3 à 5 missions par mois",
+  "+ de 5 missions par mois",
+] as const;
+type AvailabilityUI = typeof AVAILABILITY_OPTIONS_UI[number];
+
+const AVAILABILITY_MAP: Record<AvailabilityUI, "1-2" | "3-5" | "5+"> = {
+  "1 à 2 missions par mois": "1-2",
+  "3 à 5 missions par mois": "3-5",
+  "+ de 5 missions par mois": "5+",
+};
+
 export default function RegisterForm() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [digitalLevel, setDigitalLevel] = useState("Intermédiaire");
+  const [sector, setSector] = useState<string>("");
+  const [digitalLevel, setDigitalLevel] = useState<DigitalLevelUI>("Intermédiaire");
   const [devices, setDevices] = useState<string[]>(["Ordinateur", "Smartphone"]);
+  const [availability, setAvailability] = useState<AvailabilityUI>("1 à 2 missions par mois");
   const [email, setEmail] = useState("");
   const [formState, setFormState] = useState<FormState>("idle");
   const [errorMsg, setErrorMsg] = useState("");
-  // G3 : si le backend repond mock:true (env dev sans Supabase), on n'affiche
-  // pas le message trompeur "verifiez votre boite mail".
   const [mockMode, setMockMode] = useState(false);
 
-  function selectDigital(level: string) {
+  function selectDigital(level: DigitalLevelUI) {
     setDigitalLevel(level);
   }
 
@@ -33,6 +74,11 @@ export default function RegisterForm() {
     setErrorMsg("");
 
     try {
+      // Pre-remplissage : on envoie au backend les champs collectes sur la
+      // landing pour que l'onboarding demarre avec ces valeurs deja connues.
+      // Devices "Ordinateur/Smartphone/Tablette" ne sont PAS envoyes : la
+      // granularite landing est trop large pour le CHECK DB. L'utilisateur
+      // les saisira en step 4 onboarding (PC Windows, Mac, iPhone, ...).
       const res = await fetch("/api/testers/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -40,6 +86,12 @@ export default function RegisterForm() {
           email,
           first_name: firstName.trim() || undefined,
           last_name: lastName.trim() || undefined,
+          sector: sector || undefined,
+          digital_level: DIGITAL_LEVEL_MAP[digitalLevel],
+          availability: AVAILABILITY_MAP[availability],
+          // Devices generiques landing → on les passe en metadata informelle,
+          // pas en DB (le user precisera en step 4).
+          landing_devices_hint: devices,
         }),
       });
 
@@ -198,24 +250,17 @@ export default function RegisterForm() {
       </div>
       <div className="form-row">
         <label>Secteur d&apos;activité</label>
-        <select defaultValue="">
-          <option value="" disabled>— Sélectionner</option>
-          <option>Finance / Comptabilité</option>
-          <option>Ressources humaines</option>
-          <option>IT / Tech / Dev</option>
-          <option>Marketing / Communication</option>
-          <option>Commerce / Vente</option>
-          <option>Santé / Médical</option>
-          <option>Juridique / Compliance</option>
-          <option>Direction / Management</option>
-          <option>Étudiant</option>
-          <option>Autre</option>
+        <select value={sector} onChange={(e) => setSector(e.target.value)}>
+          <option value="">— Sélectionner</option>
+          {SECTORS.map((s) => (
+            <option key={s} value={s}>{s}</option>
+          ))}
         </select>
       </div>
       <div className="form-row">
         <label>Aisance digitale</label>
         <div className="form-pills">
-          {["Débutant", "Intermédiaire", "Avancé", "Expert"].map((level) => (
+          {DIGITAL_LEVELS_UI.map((level) => (
             <button
               key={level}
               type="button"
@@ -244,10 +289,10 @@ export default function RegisterForm() {
       </div>
       <div className="form-row">
         <label>Disponibilités</label>
-        <select defaultValue="1 à 2 missions par mois">
-          <option>1 à 2 missions par mois</option>
-          <option>3 à 5 missions par mois</option>
-          <option>+ de 5 missions par mois</option>
+        <select value={availability} onChange={(e) => setAvailability(e.target.value as AvailabilityUI)}>
+          {AVAILABILITY_OPTIONS_UI.map((a) => (
+            <option key={a} value={a}>{a}</option>
+          ))}
         </select>
       </div>
 
