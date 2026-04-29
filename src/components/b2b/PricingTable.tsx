@@ -30,7 +30,7 @@ const PACKS: Pack[] = [
       "Rapport synthétique PDF",
       "NDA signé inclus",
     ],
-    cta: { label: "Démarrer Quick Test", href: "https://calendly.com/earlypanel/demo" },
+    cta: { label: "Démarrer Quick Test", href: "https://calendly.com/virgilejoinville/30min" },
   },
   {
     name: "Standard",
@@ -45,7 +45,7 @@ const PACKS: Pack[] = [
       "Atelier de cadrage offert",
       "NDA signé inclus",
     ],
-    cta: { label: "Démarrer Standard", href: "https://calendly.com/earlypanel/demo" },
+    cta: { label: "Démarrer Standard", href: "https://calendly.com/virgilejoinville/30min" },
     highlighted: true,
   },
   {
@@ -62,7 +62,7 @@ const PACKS: Pack[] = [
       "Atelier de cadrage offert",
       "NDA signé inclus",
     ],
-    cta: { label: "Démarrer Expert", href: "https://calendly.com/earlypanel/demo" },
+    cta: { label: "Démarrer Expert", href: "https://calendly.com/virgilejoinville/30min" },
   },
 ];
 
@@ -110,7 +110,7 @@ export default function PricingTable() {
         </div>
 
         <p className="pricing-footnote">
-          Besoin spécifique ou volumes plus importants ? <Link href="https://calendly.com/earlypanel/demo">Réservez un appel</Link> pour un devis sur mesure.
+          Besoin spécifique ou volumes plus importants ? <Link href="https://calendly.com/virgilejoinville/30min">Réservez un appel</Link> pour un devis sur mesure.
         </p>
       </div>
 

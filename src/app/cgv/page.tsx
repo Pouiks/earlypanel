@@ -72,7 +72,7 @@ export default function CgvPage() {
 
       <h2>9. Contact</h2>
       <p>
-        Pour toute question, demande de devis ou prise de rendez-vous : <a href="mailto:contact@earlypanel.fr">contact@earlypanel.fr</a> ou <a href="https://calendly.com/earlypanel/demo" target="_blank" rel="noopener noreferrer">réservation directe</a>.
+        Pour toute question, demande de devis ou prise de rendez-vous : <a href="mailto:contact@earlypanel.fr">contact@earlypanel.fr</a> ou <a href="https://calendly.com/virgilejoinville/30min" target="_blank" rel="noopener noreferrer">réservation directe</a>.
       </p>
     </LegalLayout>
   );
