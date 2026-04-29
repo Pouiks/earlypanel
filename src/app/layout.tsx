@@ -28,6 +28,8 @@ export const metadata: Metadata = {
   authors: [{ name: "earlypanel" }],
   metadataBase: new URL("https://earlypanel.fr"),
   openGraph: {
+    // L'image og est generee dynamiquement par src/app/opengraph-image.tsx
+    // (PNG via next/og) — pas besoin de la declarer ici, Next l'injecte.
     title: "earlypanel — Tests utilisateurs B2B clés en main",
     description:
       "Panel humain de 500+ testeurs. NDA contractualisé. Rapport actionnable en 5 jours. Pour startups, scale-ups, agences digitales.",
@@ -35,21 +37,12 @@ export const metadata: Metadata = {
     locale: "fr_FR",
     url: "https://earlypanel.fr",
     siteName: "earlypanel",
-    images: [
-      {
-        url: "/og_image_variant_a_5jours.svg",
-        width: 1200,
-        height: 630,
-        alt: "earlypanel — Tests utilisateurs livrés en 5 jours",
-        type: "image/svg+xml",
-      },
-    ],
   },
   twitter: {
+    // Image fournie par src/app/twitter-image.tsx (re-export de opengraph-image).
     card: "summary_large_image",
     title: "earlypanel — Tests utilisateurs B2B clés en main",
     description: "500+ testeurs qualifiés. NDA inclus. Rapport en 5 jours.",
-    images: ["/og_image_variant_a_5jours.svg"],
   },
   robots: {
     index: true,

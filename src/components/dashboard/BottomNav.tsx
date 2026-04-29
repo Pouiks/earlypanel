@@ -9,7 +9,9 @@ interface BottomNavProps {
   notifications?: NotificationCounts;
 }
 
-const NAV_ITEMS: { href: string; label: string; icon: string; badgeKey: keyof NotificationCounts | null; badgeType: "alert" | "info" }[] = [
+type NumericNotifKey = "missions" | "documents" | "profil";
+
+const NAV_ITEMS: { href: string; label: string; icon: string; badgeKey: NumericNotifKey | null; badgeType: "alert" | "info" }[] = [
   { href: "/app/dashboard", label: "Accueil", icon: "🏠", badgeKey: null, badgeType: "info" },
   { href: "/app/dashboard/missions", label: "Missions", icon: "📋", badgeKey: "missions", badgeType: "info" },
   { href: "/app/dashboard/gains", label: "Gains", icon: "💰", badgeKey: null, badgeType: "info" },
@@ -36,7 +38,7 @@ export default function BottomNav({ notifications }: BottomNavProps) {
     }}>
       {NAV_ITEMS.map((item) => {
         const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-        const badgeCount = item.badgeKey && notifications ? notifications[item.badgeKey] : 0;
+        const badgeCount: number = item.badgeKey && notifications ? notifications[item.badgeKey] : 0;
         return (
           <Link
             key={item.href}

@@ -296,7 +296,7 @@ export default function PaymentInfoSection() {
         Informations bancaires
       </h2>
       <p style={{ fontSize: 13, color: "#6e6e73", margin: "0 0 16px", lineHeight: 1.5 }}>
-        Renseignez votre IBAN pour recevoir vos indemnites de test par virement SEPA.
+        Renseignez votre IBAN pour être payé par virement SEPA après chaque mission validée.
       </p>
 
       <div style={{
@@ -323,7 +323,7 @@ export default function PaymentInfoSection() {
           fontWeight: 700,
         }}>i</div>
         <p style={{ fontSize: 12, color: "#0A7A5A", margin: 0, lineHeight: 1.5 }}>
-          Cet IBAN nous sert uniquement a recevoir vos indemnites. Il ne permet aucun prelevement de votre compte. Vous pouvez le modifier ou le supprimer a tout moment dans votre profil.
+          Cet IBAN nous sert uniquement à vous verser vos paiements après mission. Il ne permet aucun prélèvement de votre compte. Vous pouvez le modifier ou le supprimer à tout moment.
         </p>
       </div>
 
@@ -413,7 +413,7 @@ export default function PaymentInfoSection() {
               >
                 conditions generales testeur
               </button>
-              {" "}et j&apos;autorise earlypanel a effectuer des virements SEPA vers cet IBAN au titre de mes indemnites de test.
+              {" "}et j&apos;autorise earlypanel à effectuer des virements SEPA vers cet IBAN pour le paiement de mes missions de test.
             </span>
           </label>
         </div>

@@ -45,6 +45,10 @@ body { font-family: var(--font); background: #fff; color: var(--black); overflow
 .nav-cta { display: inline-flex; align-items: center; justify-content: center; background: var(--green); color: #fff; border: none; padding: 8px 20px; border-radius: var(--radius-pill); font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font); transition: opacity .15s; text-decoration: none; }
 .nav-cta:hover { opacity: .85; }
 
+/* CTA "Mon espace" : etat connecte avec petite icone maison. */
+.nav-cta-authed { gap: 8px; padding-left: 14px; }
+.nav-cta-icon { display: inline-block; }
+
 /* ── BURGER (hidden on desktop) ── */
 .nav-burger { display: none; background: none; border: none; cursor: pointer; width: 36px; height: 36px; padding: 6px; flex-direction: column; justify-content: center; gap: 5px; order: 10; }
 .nav-burger span { display: block; height: 2px; width: 100%; background: var(--black); border-radius: 2px; transition: transform .25s ease, opacity .2s ease; }

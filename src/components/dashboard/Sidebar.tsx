@@ -9,7 +9,9 @@ interface SidebarProps {
   notifications?: NotificationCounts;
 }
 
-const NAV_ITEMS: { href: string; label: string; icon: string; badgeKey: keyof NotificationCounts | null; badgeType: "alert" | "info" }[] = [
+type NumericNotifKey = "missions" | "documents" | "profil";
+
+const NAV_ITEMS: { href: string; label: string; icon: string; badgeKey: NumericNotifKey | null; badgeType: "alert" | "info" }[] = [
   { href: "/app/dashboard", label: "Tableau de bord", icon: "🏠", badgeKey: null, badgeType: "info" },
   { href: "/app/dashboard/missions", label: "Mes missions", icon: "📋", badgeKey: "missions", badgeType: "info" },
   { href: "/app/dashboard/gains", label: "Mes gains", icon: "💰", badgeKey: null, badgeType: "info" },
@@ -55,7 +57,7 @@ export default function Sidebar({ notifications }: SidebarProps) {
       <nav style={{ flex: 1, padding: "8px 12px" }}>
         {NAV_ITEMS.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-          const badgeCount = item.badgeKey && notifications ? notifications[item.badgeKey] : 0;
+          const badgeCount: number = item.badgeKey && notifications ? notifications[item.badgeKey] : 0;
           return (
             <Link
               key={item.href}

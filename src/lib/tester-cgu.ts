@@ -6,45 +6,45 @@ import { createHash } from "node:crypto";
  * nouvelle version au moment de la signature, et on demandera resignature
  * a chaque testeur a sa prochaine action sensible (paiement / modif IBAN).
  *
- * Version active : v1.0-2026-04
+ * Version active : v1.1-2026-04
  *
  * IMPORTANT : ce texte n'est PAS un document juridique definitif. A faire
  * relire par un avocat avant production reelle. Voir bandeau "Document
  * temporaire" sur les pages legales.
  */
 
-export const CGU_VERSION = "v1.0-2026-04";
+export const CGU_VERSION = "v1.1-2026-04";
 
 export const CGU_TEXT = `CONDITIONS GENERALES TESTEUR — earlypanel
 Version ${CGU_VERSION}
 
 1. OBJET
 Les presentes conditions encadrent la relation entre earlypanel (l'editeur) et
-le testeur (vous), dans le cadre de missions de test utilisateur remunerees
-sous forme d'indemnites.
+le testeur (vous), dans le cadre de missions de test utilisateur remunerees.
 
 2. NATURE DE LA RELATION
 Le testeur agit en tant que participant independant. Les presentes ne creent
 ni contrat de travail, ni lien de subordination, ni relation commerciale.
-Les indemnites versees ne constituent pas un salaire mais une compensation
-forfaitaire pour la participation aux tests.
+Les sommes versees constituent une compensation forfaitaire pour la
+participation aux tests, et non un salaire.
 
-3. INDEMNITES ET PAIEMENT
-A chaque mission validee, le testeur recoit une indemnite definie a l'avance.
-Le paiement est effectue par virement SEPA vers le compte bancaire dont l'IBAN
-a ete renseigne par le testeur. Les versements sont regroupes en lots
+3. REMUNERATION ET PAIEMENT
+A chaque mission validee, le testeur recoit un paiement defini a l'avance.
+Le versement est effectue par virement SEPA vers le compte bancaire dont
+l'IBAN a ete renseigne par le testeur. Les paiements sont regroupes en lots
 periodiques (mensuels ou hebdomadaires).
 
 4. AUTORISATION DE VIREMENT
 En signant ces CGU, le testeur autorise earlypanel a effectuer des virements
 SEPA vers l'IBAN qu'il a fourni. Cet IBAN sert exclusivement a la reception
-des indemnites : aucun prelevement ne pourra etre effectue depuis ce compte.
+des paiements de missions : aucun prelevement ne pourra etre effectue depuis
+ce compte.
 
 5. OBLIGATIONS FISCALES
 Au-dela d'un seuil annuel cumule (DAS-2 en France), earlypanel devra declarer
 les sommes versees a l'administration fiscale. Le testeur est seul responsable
-de la declaration de ses indemnites au titre de l'impot sur le revenu, selon
-les regles applicables a sa residence fiscale.
+de la declaration de ses revenus au titre de l'impot, selon les regles
+applicables a sa residence fiscale.
 
 6. CONFIDENTIALITE ET SECURITE DES DONNEES
 L'IBAN est stocke chiffre au repos. Il n'est jamais affiche en clair dans
@@ -59,8 +59,7 @@ de cette version du texte. Ces elements constituent la preuve de signature.
 
 8. RESILIATION
 Le testeur peut a tout moment supprimer son IBAN et fermer son compte. Les
-indemnites deja gagnees et non versees seront reglees lors du prochain lot
-de paiement.
+paiements deja gagnes et non verses seront regles lors du prochain lot.
 
 9. PROTECTION DES DONNEES (RGPD)
 earlypanel est responsable du traitement des donnees personnelles. Les bases

@@ -23,7 +23,7 @@ async function getSupabaseClient() {
 
 const SELECT_FIELDS = ["id", "status", "profile_completed", ...REQUIRED_FIELDS.map((f) => f.key)].join(", ");
 
-const EMPTY_PAYLOAD = { missions: 0, documents: 0, profil: 0, profil_missing: [] as string[] };
+const EMPTY_PAYLOAD = { missions: 0, documents: 0, profil: 0, profil_missing: [] as string[], payment_info_missing: false };
 
 export async function GET() {
   try {
@@ -75,11 +75,19 @@ export async function GET() {
     // (source de verite alignee sur le trigger DB auto_activate_tester).
     const completeness = computeProfileCompleteness(tester as unknown as Record<string, unknown>);
 
+    // Verifie si l'IBAN/CGU paiement est renseigne. On ne ramene pas la
+    // ligne (donnees sensibles) : un simple count(*) suffit.
+    const { count: paymentInfoCount } = await admin
+      .from("tester_payment_info")
+      .select("*", { count: "exact", head: true })
+      .eq("tester_id", (tester as unknown as { id: string }).id);
+
     return NextResponse.json({
       missions: missionsCount,
       documents: documentsCount,
       profil: completeness.count,
       profil_missing: completeness.missing.map((f) => f.key),
+      payment_info_missing: (paymentInfoCount ?? 0) === 0,
     });
   } catch {
     return NextResponse.json(EMPTY_PAYLOAD);

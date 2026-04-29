@@ -4,9 +4,16 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { BOOKING_URL } from "@/lib/cta-links";
 
+interface SessionState {
+  authenticated: boolean;
+  first_name?: string | null;
+  profile_completed?: boolean;
+}
+
 export default function Nav() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [session, setSession] = useState<SessionState | null>(null);
 
   const isIndex = pathname === "/";
   const isB2B = pathname === "/entreprises";
@@ -20,6 +27,26 @@ export default function Nav() {
       return () => { document.body.style.overflow = ""; };
     }
   }, [menuOpen]);
+
+  // Detection session testeur : si authentifie on remplace le CTA
+  // "Devenir testeur" / "Rejoindre le panel" par "Mon espace".
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/testers/session", { cache: "no-store" });
+        if (!res.ok) return;
+        const data = (await res.json()) as SessionState;
+        if (!cancelled) setSession(data);
+      } catch {
+        /* silent */
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [pathname]);
+
+  const isAuthed = !!session?.authenticated;
+  const dashboardHref = session?.profile_completed ? "/app/dashboard" : "/app/onboarding";
 
   return (
     <nav className="nav">
@@ -52,19 +79,31 @@ export default function Nav() {
       )}
 
       <div className="nav-actions">
-        {isB2C ? (
-          <Link href="/entreprises" className="nav-secondary">Vous êtes une entreprise ?</Link>
+        {isAuthed ? (
+          <Link href={dashboardHref} className="nav-cta nav-cta-authed">
+            <svg className="nav-cta-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M3 12l9-9 9 9" />
+              <path d="M5 10v10h14V10" />
+            </svg>
+            Mon espace
+          </Link>
         ) : (
-          <Link href="/testeurs" className="nav-secondary">Devenir testeur</Link>
-        )}
-        {isB2C ? (
-          <button className="nav-cta" onClick={() => document.getElementById("register")?.scrollIntoView({ behavior: "smooth" })}>
-            Rejoindre le panel
-          </button>
-        ) : (
-          <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="nav-cta">
-            {isB2B ? "Démarrer un projet" : "Lancer un test"}
-          </a>
+          <>
+            {isB2C ? (
+              <Link href="/entreprises" className="nav-secondary">Vous êtes une entreprise ?</Link>
+            ) : (
+              <Link href="/testeurs" className="nav-secondary">Devenir testeur</Link>
+            )}
+            {isB2C ? (
+              <button className="nav-cta" onClick={() => document.getElementById("register")?.scrollIntoView({ behavior: "smooth" })}>
+                Rejoindre le panel
+              </button>
+            ) : (
+              <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="nav-cta">
+                {isB2B ? "Démarrer un projet" : "Lancer un test"}
+              </a>
+            )}
+          </>
         )}
       </div>
 
@@ -88,7 +127,15 @@ export default function Nav() {
               <a href="#tarifs" onClick={() => setMenuOpen(false)}>Tarifs</a>
             </>}
             <div className="mobile-menu-cta">
-              {isB2C ? (
+              {isAuthed ? (
+                <Link href={dashboardHref} className="nav-cta nav-cta-authed" onClick={() => setMenuOpen(false)}>
+                  <svg className="nav-cta-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <path d="M3 12l9-9 9 9" />
+                    <path d="M5 10v10h14V10" />
+                  </svg>
+                  Mon espace
+                </Link>
+              ) : isB2C ? (
                 <button className="nav-cta" onClick={() => { setMenuOpen(false); document.getElementById("register")?.scrollIntoView({ behavior: "smooth" }); }}>
                   Rejoindre le panel
                 </button>

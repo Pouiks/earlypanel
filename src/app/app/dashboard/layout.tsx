@@ -11,6 +11,7 @@ export interface NotificationCounts {
   missions: number;
   documents: number;
   profil: number;
+  payment_info_missing?: boolean;
 }
 
 interface DashboardContextValue {
@@ -56,7 +57,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [notifications, setNotifications] = useState<NotificationCounts>({
-    missions: 0, documents: 0, profil: 0,
+    missions: 0, documents: 0, profil: 0, payment_info_missing: false,
   });
   const previousNotifsRef = useRef<NotificationCounts | null>(null);
   const initialNotifShownRef = useRef(false);
@@ -136,6 +137,16 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
           action: { label: "Compléter mon profil", href: "/app/dashboard/profil" },
           persistent: true,
           dedupKey: "login-profil",
+        });
+      }
+      if (data.payment_info_missing) {
+        notify({
+          type: "warning",
+          title: "Coordonnées bancaires manquantes",
+          message: "Renseignez votre IBAN pour recevoir vos rémunérations après chaque mission validée.",
+          action: { label: "Renseigner mon IBAN", href: "/app/dashboard/profil" },
+          persistent: true,
+          dedupKey: "login-payment-info",
         });
       }
     });
