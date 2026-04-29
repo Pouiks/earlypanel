@@ -49,7 +49,6 @@ export default function RegisterForm() {
   const [lastName, setLastName] = useState("");
   const [sector, setSector] = useState<string>("");
   const [digitalLevel, setDigitalLevel] = useState<DigitalLevelUI>("Intermédiaire");
-  const [devices, setDevices] = useState<string[]>(["Ordinateur", "Smartphone"]);
   const [availability, setAvailability] = useState<AvailabilityUI>("1 à 2 missions par mois");
   const [email, setEmail] = useState("");
   const [formState, setFormState] = useState<FormState>("idle");
@@ -58,12 +57,6 @@ export default function RegisterForm() {
 
   function selectDigital(level: DigitalLevelUI) {
     setDigitalLevel(level);
-  }
-
-  function toggleDevice(device: string) {
-    setDevices((prev) =>
-      prev.includes(device) ? prev.filter((d) => d !== device) : [...prev, device]
-    );
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -76,9 +69,8 @@ export default function RegisterForm() {
     try {
       // Pre-remplissage : on envoie au backend les champs collectes sur la
       // landing pour que l'onboarding demarre avec ces valeurs deja connues.
-      // Devices "Ordinateur/Smartphone/Tablette" ne sont PAS envoyes : la
-      // granularite landing est trop large pour le CHECK DB. L'utilisateur
-      // les saisira en step 4 onboarding (PC Windows, Mac, iPhone, ...).
+      // Les appareils precis (PC Windows, Mac, iPhone, ...) sont saisis en
+      // step 4 onboarding ou la granularite est appropriee.
       const res = await fetch("/api/testers/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -89,9 +81,6 @@ export default function RegisterForm() {
           sector: sector || undefined,
           digital_level: DIGITAL_LEVEL_MAP[digitalLevel],
           availability: AVAILABILITY_MAP[availability],
-          // Devices generiques landing → on les passe en metadata informelle,
-          // pas en DB (le user precisera en step 4).
-          landing_devices_hint: devices,
         }),
       });
 
@@ -268,21 +257,6 @@ export default function RegisterForm() {
               onClick={() => selectDigital(level)}
             >
               {level}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="form-row">
-        <label>Appareils disponibles</label>
-        <div className="form-pills">
-          {["Ordinateur", "Smartphone", "Tablette"].map((device) => (
-            <button
-              key={device}
-              type="button"
-              className={`form-pill${devices.includes(device) ? " active" : ""}`}
-              onClick={() => toggleDevice(device)}
-            >
-              {device}
             </button>
           ))}
         </div>
