@@ -17,7 +17,7 @@ export default function HeroB2B() {
       </div>
       <div className="hero-stats">
         <div><div className="hero-stat-n">5 j</div><div className="hero-stat-l">Délai de livraison garanti</div></div>
-        <div><div className="hero-stat-n">500+</div><div className="hero-stat-l">Testeurs qualifiés dans le panel</div></div>
+        <div><div className="hero-stat-n">75+</div><div className="hero-stat-l">Testeurs qualifiés dans le panel</div></div>
         <div><div className="hero-stat-n">100%</div><div className="hero-stat-l">Tests validés manuellement</div></div>
         <div><div className="hero-stat-n">NDA</div><div className="hero-stat-l">Confidentialité contractualisée</div></div>
       </div>

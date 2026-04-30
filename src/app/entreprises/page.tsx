@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   // + benefice "clés en main". Description riche en mots-cles longue traine.
   title: "Tests utilisateurs B2B clés en main · 5 jours · NDA inclus",
   description:
-    "Service de tests utilisateurs pour startups, scale-ups et agences. Panel de 500+ testeurs sélectionnés manuellement (SaaS, fintech, healthtech, e-commerce). NDA contractualisé, atelier de cadrage offert, rapport actionnable livré en 5 jours. Devis sur mesure.",
+    "Service de tests utilisateurs pour startups, scale-ups et agences. Panel de 75+ testeurs sélectionnés manuellement (SaaS, fintech, healthtech, e-commerce). NDA contractualisé, atelier de cadrage offert, rapport actionnable livré en 5 jours. Devis sur mesure.",
   keywords: [
     "tests utilisateurs B2B",
     "user testing France",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Tests utilisateurs B2B clés en main · earlypanel",
     description:
-      "500+ testeurs qualifiés. NDA contractualisé. Rapport en 5 jours. Devis sur mesure.",
+      "75+ testeurs qualifiés. NDA contractualisé. Rapport en 5 jours. Devis sur mesure.",
     url: "https://earlypanel.fr/entreprises",
     type: "website",
     images: [

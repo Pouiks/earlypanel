@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Devenir testeur rémunéré · earlypanel",
     description:
-      "Inscription gratuite. Jusqu'à 100€ par mission. Paiement sous 72h. 500+ testeurs déjà inscrits.",
+      "Inscription gratuite. Jusqu'à 100€ par mission. Paiement sous 72h. 75+ testeurs déjà inscrits.",
     url: "https://earlypanel.fr/testeurs",
     type: "website",
     images: [

@@ -13,7 +13,7 @@ const SERVICE_JSON = {
   "@id": "https://earlypanel.fr/entreprises#service",
   name: "Tests utilisateurs B2B sur mesure",
   description:
-    "Tests utilisateurs cles en main pour startups, scale-ups et agences. Panel humain de 500+ testeurs selectionnes manuellement (SaaS, fintech, healthtech, e-commerce). NDA contractualise, atelier de cadrage offert, rapport actionnable livre en 5 jours ouvres. Forfait defini sur devis a chaque mission.",
+    "Tests utilisateurs cles en main pour startups, scale-ups et agences. Panel humain de 75+ testeurs selectionnes manuellement (SaaS, fintech, healthtech, e-commerce). NDA contractualise, atelier de cadrage offert, rapport actionnable livre en 5 jours ouvres. Forfait defini sur devis a chaque mission.",
   provider: { "@type": "Organization", name: "earlypanel", url: "https://earlypanel.fr" },
   areaServed: { "@type": "Country", name: "France" },
   serviceType: "User Testing",

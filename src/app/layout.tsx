@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     template: "%s · earlypanel",
   },
   description:
-    "Service de tests utilisateurs B2B en France. Panel humain de 500+ testeurs qualifiés (SaaS, fintech, healthtech, e-commerce). NDA contractualisé, atelier de cadrage offert, rapport livré en 5 jours.",
+    "Service de tests utilisateurs B2B en France. Panel humain de 75+ testeurs qualifiés (SaaS, fintech, healthtech, e-commerce). NDA contractualisé, atelier de cadrage offert, rapport livré en 5 jours.",
   keywords: [
     "tests utilisateurs",
     "user testing France",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "earlypanel — Tests utilisateurs B2B clés en main",
     description:
-      "Panel humain de 500+ testeurs. NDA contractualisé. Rapport actionnable en 5 jours. Pour startups, scale-ups, agences digitales.",
+      "Panel humain de 75+ testeurs. NDA contractualisé. Rapport actionnable en 5 jours. Pour startups, scale-ups, agences digitales.",
     type: "website",
     locale: "fr_FR",
     url: "https://earlypanel.fr",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "earlypanel — Tests utilisateurs B2B clés en main",
-    description: "500+ testeurs qualifiés. NDA inclus. Rapport en 5 jours.",
+    description: "75+ testeurs qualifiés. NDA inclus. Rapport en 5 jours.",
     images: ["/og-image.png"],
   },
   robots: {

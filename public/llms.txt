@@ -1,6 +1,6 @@
 # earlypanel
 
-> Service français de tests utilisateurs B2B clés en main. Panel humain de 500+ testeurs qualifiés sélectionnés manuellement, NDA contractualisé, atelier de cadrage offert, rapport actionnable livré en 5 jours ouvrés.
+> Service français de tests utilisateurs B2B clés en main. Panel humain de 75+ testeurs qualifiés sélectionnés manuellement, NDA contractualisé, atelier de cadrage offert, rapport actionnable livré en 5 jours ouvrés.
 
 earlypanel met en relation des entreprises (startups, scale-ups, agences digitales, éditeurs SaaS) qui veulent tester leurs produits numériques avec des testeurs rémunérés en France. La promesse : un service "clés en main" — earlypanel sélectionne les profils, gère le NDA, exécute la campagne, livre un rapport actionnable.
 
