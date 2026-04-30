@@ -1,53 +1,44 @@
 "use client";
 import { useState, useEffect, useCallback, useRef } from "react";
 
+// Scenarios anonymes : on illustre le format des reponses attendues sans
+// inventer d'identite. Pas de nom / pas d'initiales fake pour eviter toute
+// confusion avec un vrai temoignage client (art. L121-1 du Code de la conso).
 const scenarios = [
   {
     tag: "Parcours d'onboarding",
-    session: "Session · Logiciel de facturation",
+    session: "Exemple · Logiciel de facturation",
     question: "À quelle étape vous êtes-vous arrêté, et pourquoi ?",
     hint: "Décrivez précisément ce qui s'est passé, même si c'est technique.",
     answer: "Lorsque j'ai cliqué sur \"Se connecter\", une erreur est apparue et m'a redirigé vers une page blanche.\n\nJ'ai ouvert la console et j'ai vu : \"TypeError: Cannot read properties of undefined (reading 'token')\"\n\nJ'ai essayé de recommencer 2 fois, même résultat.",
     progress: "Question 3 sur 6",
     pct: "50%",
     fill: "50%",
-    name: "Marie L.",
-    job: "Chargée RH",
-    avatar: "ML",
-    avatarBg: "#1a3326",
-    avatarColor: "#2DD4A0",
+    profile: "Profil · Outils de gestion",
     device: "Ordinateur · Chrome",
   },
   {
     tag: "Tunnel de paiement",
-    session: "Session · Application e-commerce",
+    session: "Exemple · Application e-commerce",
     question: "Qu'est-ce qui vous a empêché de finaliser votre commande ?",
     hint: "Pensez aux informations demandées, aux étapes, aux messages affichés.",
     answer: "Tout allait bien jusqu'à la saisie de ma carte. Le formulaire a vidé tous mes champs après que j'ai corrigé le numéro.\n\nJ'ai dû tout ressaisir 3 fois. À la 3ème tentative j'ai abandonné.\n\nAussi : les frais de livraison n'apparaissent qu'à la dernière étape — c'est frustrant.",
     progress: "Question 4 sur 7",
     pct: "57%",
     fill: "57%",
-    name: "Simon R.",
-    job: "Freelance dev",
-    avatar: "SR",
-    avatarBg: "#1a2535",
-    avatarColor: "#85B7EB",
+    profile: "Profil · E-commerce",
     device: "Mobile · Safari",
   },
   {
     tag: "Dashboard analytique",
-    session: "Session · SaaS RH",
+    session: "Exemple · SaaS RH",
     question: "Avez-vous trouvé facilement l'information que vous cherchiez ?",
     hint: "Dites-nous où vous avez cherché et ce que vous avez trouvé ou non.",
     answer: "Je cherchais le rapport des congés sur les 6 derniers mois.\n\nJ'ai d'abord cliqué sur \"Rapports\" puis \"Congés\" mais les filtres de date ne fonctionnent pas comme prévu — impossible de choisir une plage personnalisée.\n\nJ'ai finalement trouvé en passant par \"Export\", ce qui n'est vraiment pas logique.",
     progress: "Question 2 sur 5",
     pct: "40%",
     fill: "40%",
-    name: "Amira K.",
-    job: "Responsable RH",
-    avatar: "AK",
-    avatarBg: "#2a1f0e",
-    avatarColor: "#EF9F27",
+    profile: "Profil · RH / SaaS B2B",
     device: "Tablette · Firefox",
   },
 ];
@@ -152,13 +143,8 @@ export default function QuestionnaireWidget() {
           </div>
         </div>
         <div className="q-footer">
-          <div className="q-avatar-row">
-            <div className="q-avatar" style={{ background: s.avatarBg, color: s.avatarColor }}>
-              {s.avatar}
-            </div>
-            <div className="q-tester-info">
-              <strong>{s.name}</strong> · <span>{s.job}</span>
-            </div>
+          <div className="q-tester-info" style={{ fontSize: 12, color: "#86868B" }}>
+            {s.profile}
           </div>
           <div className="q-device">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#86868B" strokeWidth="2">

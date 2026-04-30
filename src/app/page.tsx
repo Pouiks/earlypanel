@@ -6,8 +6,6 @@ import Separator from "@/components/ui/Separator";
 import StatementSection from "@/components/landing/StatementSection";
 import ProcessSection from "@/components/landing/ProcessSection";
 import DifferentiatorsSection from "@/components/landing/DifferentiatorsSection";
-import TestimonialsSection from "@/components/landing/TestimonialsSection";
-import PricingSection from "@/components/landing/PricingSection";
 import LeadMagnetSection from "@/components/landing/LeadMagnetSection";
 import Footer from "@/components/layout/Footer";
 
@@ -49,9 +47,6 @@ export default function HomePage() {
       <Separator />
       <DifferentiatorsSection />
       <Separator />
-      <TestimonialsSection />
-      <Separator />
-      <PricingSection />
       <LeadMagnetSection />
       <Footer variant="index" />
     </>

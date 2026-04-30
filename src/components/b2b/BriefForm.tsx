@@ -29,10 +29,11 @@ export default function BriefForm() {
         <label>Budget indicatif</label>
         <select defaultValue="">
           <option value="" disabled>— Sélectionner</option>
-          <option>Quick Test · 700€ HT</option>
-          <option>Standard · 1 200€ HT</option>
-          <option>Expert · 2 200€ HT</option>
-          <option>Sur mesure / à définir</option>
+          <option>{`< 1 000 €`}</option>
+          <option>1 000 € — 3 000 €</option>
+          <option>3 000 € — 10 000 €</option>
+          <option>{`> 10 000 €`}</option>
+          <option>À définir ensemble</option>
         </select>
       </div>
       <button className="form-submit">Envoyer ma demande →</button>

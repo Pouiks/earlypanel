@@ -129,13 +129,24 @@ export async function recomputePersonaForTester(
 }
 
 /**
- * Recalcule tous les testeurs non-locked. Utilise par le bouton "Recalculer" staff.
+ * Recalcule les testeurs non-locked. Par defaut on cible UNIQUEMENT ceux
+ * sans persona (`persona_id IS NULL`) — comportement attendu du bouton
+ * "Recalculer" staff : ne pas recasser un persona deja attribue.
+ *
+ * Pour forcer un recompute global (ex: matrice de matching modifiee),
+ * passer `{ onlyEmpty: false }`.
  */
-export async function recomputeAllPersonas(admin: SupabaseClient): Promise<{ updated: number; total: number }> {
-  const { data: testers } = await admin
-    .from("testers")
-    .select("id")
-    .eq("persona_locked", false);
+export async function recomputeAllPersonas(
+  admin: SupabaseClient,
+  options: { onlyEmpty?: boolean } = {}
+): Promise<{ updated: number; total: number }> {
+  const onlyEmpty = options.onlyEmpty !== false; // defaut true
+
+  let q = admin.from("testers").select("id").eq("persona_locked", false);
+  if (onlyEmpty) {
+    q = q.is("persona_id", null);
+  }
+  const { data: testers } = await q;
 
   if (!testers) return { updated: 0, total: 0 };
 

@@ -5,7 +5,6 @@ import HeroB2C from "@/components/b2c/HeroB2C";
 import Separator from "@/components/ui/Separator";
 import HowItWorks from "@/components/b2c/HowItWorks";
 import EarnSection from "@/components/b2c/EarnSection";
-import TestimonialsB2C from "@/components/b2c/TestimonialsB2C";
 import ProfileGrid from "@/components/b2c/ProfileGrid";
 import RegisterSection from "@/components/b2c/RegisterSection";
 import FaqAccordion from "@/components/ui/FaqAccordion";
@@ -72,8 +71,6 @@ export default function TesteursPage() {
       <HowItWorks />
       <Separator />
       <EarnSection />
-      <Separator />
-      <TestimonialsB2C />
       <Separator />
       <ProfileGrid />
       <Separator />

@@ -155,12 +155,13 @@ export default function StaffTestersPage() {
         </div>
       ) : (
         <div style={{ background: "#fff", borderRadius: 16, border: "0.5px solid rgba(0,0,0,0.08)", overflow: "hidden" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1.2fr 0.8fr 0.8fr 0.8fr 0.8fr", gap: 12, padding: "12px 20px", background: "#fafafa", borderBottom: "0.5px solid rgba(0,0,0,0.06)", fontSize: 11, fontWeight: 700, color: "#86868B", letterSpacing: 0.4, textTransform: "uppercase" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1.2fr 0.8fr 0.7fr 0.6fr 0.8fr 0.7fr", gap: 12, padding: "12px 20px", background: "#fafafa", borderBottom: "0.5px solid rgba(0,0,0,0.06)", fontSize: 11, fontWeight: 700, color: "#86868B", letterSpacing: 0.4, textTransform: "uppercase" }}>
             <div>Testeur</div>
             <div>Métier / Secteur</div>
             <div>Persona</div>
             <div>Tier</div>
             <div>Missions</div>
+            <div>Inscription</div>
             <div>Statut</div>
           </div>
           {filtered.map((t) => {
@@ -171,7 +172,7 @@ export default function StaffTestersPage() {
                 key={t.id}
                 onClick={() => setDrawerId(t.id)}
                 style={{
-                  display: "grid", gridTemplateColumns: "1.5fr 1.2fr 0.8fr 0.8fr 0.8fr 0.8fr",
+                  display: "grid", gridTemplateColumns: "1.5fr 1.2fr 0.8fr 0.7fr 0.6fr 0.8fr 0.7fr",
                   gap: 12, padding: "14px 20px",
                   borderBottom: "0.5px solid rgba(0,0,0,0.04)",
                   alignItems: "center", fontSize: 13, color: "#1d1d1f",
@@ -232,6 +233,14 @@ export default function StaffTestersPage() {
                 <div style={{ fontSize: 13, fontVariantNumeric: "tabular-nums" }}>
                   {t.missions_completed}
                 </div>
+                <div
+                  style={{ fontSize: 12, color: "#86868B", fontVariantNumeric: "tabular-nums" }}
+                  title={new Date(t.created_at).toLocaleString("fr-FR")}
+                >
+                  {new Date(t.created_at).toLocaleDateString("fr-FR", {
+                    day: "2-digit", month: "2-digit", year: "2-digit",
+                  })}
+                </div>
                 <div>
                   <span style={{ padding: "3px 10px", fontSize: 11, fontWeight: 600, borderRadius: 980, background: sc.bg, color: sc.fg }}>
                     {STATUS_LABELS[t.status] || t.status}
@@ -243,7 +252,13 @@ export default function StaffTestersPage() {
         </div>
       )}
 
-      <TesterDrawer testerId={drawerId} onClose={() => { setDrawerId(null); load(); }} />
+      <TesterDrawer
+        testerId={drawerId}
+        onClose={(mutated) => {
+          setDrawerId(null);
+          if (mutated) load();
+        }}
+      />
     </div>
   );
 }

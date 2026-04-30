@@ -29,15 +29,6 @@ export interface Testimonial {
   avatarColor: string;
 }
 
-export interface PricingPack {
-  category: string;
-  name: string;
-  price: string;
-  features: string[];
-  featured?: boolean;
-  trackingId: string;
-}
-
 export interface UseCase {
   title: string;
   description: string;

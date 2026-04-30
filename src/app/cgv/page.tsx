@@ -39,9 +39,9 @@ export default function CgvPage() {
         <li>Ne constituent pas une offre commerciale standardisée et ne créent aucun précédent contractuel pour les futures prestations.</li>
       </ul>
 
-      <h2>4. Tarifs indicatifs</h2>
+      <h2>4. Tarifs</h2>
       <p>
-        Les fourchettes tarifaires affichées sur le site (Quick Test, Standard, Expert) sont communiquées <strong>à titre indicatif</strong> et reflètent l&apos;intention commerciale d&apos;earlypanel pour le futur lancement officiel. Elles ne constituent pas une offre ferme tant que la structure commerciale n&apos;est pas opérationnelle.
+        Aucun tarif public n&apos;est affiché : chaque mission donne lieu à un devis sur mesure établi à l&apos;issue de l&apos;atelier de cadrage, en fonction du périmètre, du nombre de testeurs, des profils recherchés et des délais. Le devis fait foi pour la facturation ; il est validé par écrit avant le démarrage de toute prestation.
       </p>
 
       <h2>5. Confidentialité (NDA)</h2>
