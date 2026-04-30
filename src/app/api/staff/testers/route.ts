@@ -81,5 +81,26 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json(data ?? []);
+  const rows = data ?? [];
+
+  // Annotation legere "payment_info_configured" pour signaler dans l'UI
+  // staff les testeurs qui n'ont pas encore renseigne leur IBAN + signe les
+  // CGU paiement. Sans cette info ils ne peuvent pas etre payes => warning
+  // a cote du nom dans la liste. On ne ramene PAS la ligne payment_info
+  // (donnees sensibles) — juste l'existence.
+  if (rows.length > 0) {
+    const ids = rows.map((r) => (r as { id: string }).id);
+    const { data: paymentRows } = await admin
+      .from("tester_payment_info")
+      .select("tester_id")
+      .in("tester_id", ids);
+    const configuredSet = new Set((paymentRows ?? []).map((p) => p.tester_id));
+    const annotated = rows.map((r) => ({
+      ...r,
+      payment_info_configured: configuredSet.has((r as { id: string }).id),
+    }));
+    return NextResponse.json(annotated);
+  }
+
+  return NextResponse.json(rows);
 }

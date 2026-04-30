@@ -22,6 +22,7 @@ interface TesterRow {
   total_earned: number;
   persona_id: string | null;
   persona: { id: string; slug: string; name: string } | null;
+  payment_info_configured?: boolean;
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -180,8 +181,29 @@ export default function StaffTestersPage() {
                 onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
               >
                 <div style={{ minWidth: 0 }}>
-                  <div style={{ fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {fullName}
+                  <div style={{ fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{fullName}</span>
+                    {t.status === "active" && t.payment_info_configured === false && (
+                      <span
+                        title="Coordonnees bancaires non renseignees — ne peut pas etre paye, donc pas eligible aux invitations projet."
+                        style={{
+                          display: "inline-flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          width: 18,
+                          height: 18,
+                          borderRadius: "50%",
+                          background: "#fef3c7",
+                          color: "#b45309",
+                          fontSize: 11,
+                          fontWeight: 700,
+                          flexShrink: 0,
+                          cursor: "help",
+                        }}
+                      >
+                        !
+                      </span>
+                    )}
                   </div>
                   <div style={{ fontSize: 12, color: "#86868B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {t.email}
