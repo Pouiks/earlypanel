@@ -6,6 +6,7 @@ import type { Tester, DigitalLevel, MobileOS, ConnectionType, Availability, UxEx
 import PillSelect from "@/components/ui/PillSelect";
 import Toast from "@/components/ui/Toast";
 import PaymentInfoSection from "@/components/tester/PaymentInfoSection";
+import DeleteAccountSection from "@/components/tester/DeleteAccountSection";
 import {
   computeProfileCompleteness,
   CATEGORY_LABELS,
@@ -445,6 +446,12 @@ export default function ProfilPage() {
 
       {/* Finance — IBAN + signature CGU */}
       <PaymentInfoSection />
+
+      {/* Suppression compte (RGPD art. 17 — droit a l'effacement) */}
+      <DeleteAccountSection
+        email={tester.email}
+        hasMissions={(tester.missions_completed ?? 0) > 0 || (tester.total_earned ?? 0) > 0}
+      />
 
       <Toast message={toast.message} visible={toast.visible} onHide={hideToast} />
     </div>

@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail, buildWelcomeEmail, buildNewTesterAdminEmail } from "@/lib/email";
 import { tryGetAppUrl } from "@/lib/app-url";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
+import { checkJunkFields } from "@/lib/junk-detection";
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,6 +38,16 @@ export async function POST(request: NextRequest) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(emailNormalized)) {
       return NextResponse.json({ error: "Email invalide" }, { status: 400 });
+    }
+
+    // Detection des inscriptions bidons (azerty / Test Test / aaaa...).
+    // On valide les 2 noms s'ils sont fournis ; le reste est optionnel.
+    const junkCheck = checkJunkFields([
+      { label: "Le prenom", value: typeof first_name === "string" ? first_name : null },
+      { label: "Le nom", value: typeof last_name === "string" ? last_name : null },
+    ]);
+    if (!junkCheck.ok) {
+      return NextResponse.json({ error: junkCheck.reason }, { status: 400 });
     }
 
     const adminClient = createAdminClient();

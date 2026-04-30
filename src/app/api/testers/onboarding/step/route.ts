@@ -7,6 +7,9 @@ import {
   checkStepCompleteness,
   computeProfileCompleteness,
 } from "@/lib/profile-completeness";
+import { checkJunkFields } from "@/lib/junk-detection";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { recomputePersonaForTester } from "@/lib/persona-matcher";
 
 // Liste utilisee pour le diagnostic final au step 5 : on relit le profil
 // complet et on signale precisement quels champs sont encore vides. Source
@@ -84,6 +87,22 @@ export async function PATCH(request: NextRequest) {
   const forbidden = ["id", "created_at", "email", "auth_user_id", "status", "tier", "quality_score", "missions_completed", "total_earned", "stripe_account_id", "payment_setup", "profile_completed", "persona_id", "persona_locked", "source"];
   forbidden.forEach((key) => delete (data as Record<string, unknown>)[key]);
 
+  // Detection des saisies bidons (azerty / Test / aaaa) sur les champs
+  // texte sensibles aux faux comptes. Bloque tot dans le pipeline pour
+  // que le testeur reformule sans avoir consomme un step.
+  {
+    const d = data as Record<string, unknown>;
+    const junkCheck = checkJunkFields([
+      { label: "Le prenom", value: typeof d.first_name === "string" ? d.first_name : null },
+      { label: "Le nom", value: typeof d.last_name === "string" ? d.last_name : null },
+      { label: "La ville", value: typeof d.city === "string" ? d.city : null },
+      { label: "L'intitule de poste", value: typeof d.job_title === "string" ? d.job_title : null },
+    ]);
+    if (!junkCheck.ok) {
+      return NextResponse.json({ error: junkCheck.reason }, { status: 400 });
+    }
+  }
+
   // Validation stricte des champs requis pour cette step (source : STEP_FIELDS).
   // Sans ca, un testeur pouvait progresser jusqu'au step 5 sans avoir rempli
   // par exemple connection ou company_size, et restait bloque en pending
@@ -141,6 +160,21 @@ export async function PATCH(request: NextRequest) {
       .eq("auth_user_id", user.id)
       .single();
 
+    // Recalcul automatique du persona a la fin de l'onboarding : tous les
+    // champs de matching (job_title / sector / digital_level / company_size)
+    // sont desormais saisis. Sans ca, le testeur reste sans persona jusqu'a
+    // ce qu'il edite son profil depuis le dashboard.
+    if (fullProfile?.id) {
+      const adminClient = createAdminClient();
+      if (adminClient) {
+        try {
+          await recomputePersonaForTester(adminClient, fullProfile.id);
+        } catch (e) {
+          console.error("[onboarding/step] persona recompute failed", e);
+        }
+      }
+    }
+
     const reallyComplete = !!fullProfile && fullProfile.profile_completed === true;
 
     // Le cookie reflete l'etat reel : si le profil n'est pas complet, le middleware
@@ -182,6 +216,28 @@ export async function PATCH(request: NextRequest) {
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  // Recompute persona des que les champs de matching sont susceptibles
+  // d'avoir change (step 2 = job_title/sector/digital_level/company_size).
+  // Au pire, recomputer quand rien n'a change est idempotent (cf. la guard
+  // `if (newPersonaId !== tester.persona_id)` dans recomputePersonaForTester).
+  if (step >= 2) {
+    const adminClient = createAdminClient();
+    if (adminClient) {
+      const { data: row } = await adminClient
+        .from("testers")
+        .select("id")
+        .eq("auth_user_id", user.id)
+        .maybeSingle();
+      if (row?.id) {
+        try {
+          await recomputePersonaForTester(adminClient, row.id);
+        } catch (e) {
+          console.error("[onboarding/step] persona recompute failed", e);
+        }
+      }
+    }
   }
 
   return NextResponse.json({ success: true });

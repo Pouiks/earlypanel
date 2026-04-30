@@ -6,6 +6,9 @@ import { USE_MOCK_DATA, getMockTester, updateMockTester, isMockUnsafeInProd } fr
 import { checkOrigin, forbiddenOriginResponse } from "@/lib/csrf";
 import { recomputePersonaForTester } from "@/lib/persona-matcher";
 import { backfillConnectionIfStuck } from "@/lib/tester-activation-repair";
+import { checkJunkFields } from "@/lib/junk-detection";
+import { logStaffAction } from "@/lib/audit";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 async function getSupabaseClient() {
   const cookieStore = await cookies();
@@ -152,6 +155,18 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "Aucun champ modifiable fourni" }, { status: 400 });
   }
 
+  // Detection des saisies bidons (azerty / Test / aaaa) sur les champs
+  // texte sensibles aux faux comptes. On laisse passer le vide / null.
+  const junkCheck = checkJunkFields([
+    { label: "Le prenom", value: typeof sanitized.first_name === "string" ? sanitized.first_name : null },
+    { label: "Le nom", value: typeof sanitized.last_name === "string" ? sanitized.last_name : null },
+    { label: "La ville", value: typeof sanitized.city === "string" ? sanitized.city : null },
+    { label: "L'intitule de poste", value: typeof sanitized.job_title === "string" ? sanitized.job_title : null },
+  ]);
+  if (!junkCheck.ok) {
+    return NextResponse.json({ error: junkCheck.reason }, { status: 400 });
+  }
+
   const admin = createAdminClient();
   const client = admin || supabase;
 
@@ -182,4 +197,122 @@ export async function PATCH(request: NextRequest) {
   }
 
   return NextResponse.json({ success: true });
+}
+
+/**
+ * DELETE /api/testers/me
+ *
+ * Droit a l'effacement RGPD (art. 17 RGPD) — le testeur supprime son
+ * compte lui-meme. Comportement :
+ *
+ *   - Cascade DB sur project_testers, mission_answers, payouts, nda,
+ *     tester_payment_info (toutes les FKs ON DELETE CASCADE).
+ *   - Suppression de l'auth.users associe pour liberer l'email.
+ *   - Deconnexion immediate (signOut) + cookies effaces.
+ *   - Log immuable dans staff_audit_log avec action "tester.self_delete"
+ *     et l'identite/email du compte (preuve de la demande RGPD).
+ *
+ * Garde-fou : si le testeur a des missions completees ou des paiements,
+ * on refuse la suppression (HTTP 409). Il doit contacter le support a
+ * contact@earlypanel.fr pour une anonymisation cas par cas (les rapports
+ * clients exigent la conservation des donnees agregees).
+ *
+ * Securite : double confirmation cote client (saisie de l'email) +
+ * verification origin + rate limit IP (anti-bot).
+ */
+export async function DELETE(request: NextRequest) {
+  if (!checkOrigin(request)) return forbiddenOriginResponse();
+
+  if (isMockUnsafeInProd()) {
+    return NextResponse.json({ error: "Service indisponible" }, { status: 503 });
+  }
+
+  const ip = getClientIp(request);
+  const ipLimit = rateLimit(`self-delete:ip:${ip}`, { windowMs: 60_000, max: 5 });
+  if (!ipLimit.ok) {
+    return NextResponse.json({ error: "Trop de tentatives." }, { status: 429 });
+  }
+
+  const supabase = await getSupabaseClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Non autorise" }, { status: 401 });
+
+  const admin = createAdminClient();
+  if (!admin) return NextResponse.json({ error: "Service indisponible" }, { status: 500 });
+
+  // Lecture prealable pour audit + verification du garde-fou.
+  const { data: tester, error: fetchError } = await admin
+    .from("testers")
+    .select("id, email, first_name, last_name, missions_completed, total_earned")
+    .eq("auth_user_id", user.id)
+    .maybeSingle();
+
+  if (fetchError) {
+    return NextResponse.json({ error: fetchError.message }, { status: 500 });
+  }
+  if (!tester) {
+    // Pas de profil testeur : on supprime au moins le user auth pour ne pas
+    // laisser un orphelin (cas tres rare : compte cree mais row testers
+    // jamais inseree).
+    await admin.auth.admin.deleteUser(user.id).catch(() => {});
+    return NextResponse.json({ success: true, no_profile: true });
+  }
+
+  if (tester.missions_completed > 0 || (tester.total_earned ?? 0) > 0) {
+    return NextResponse.json(
+      {
+        error:
+          "Vous avez des missions completees ou des paiements en cours. La suppression complete necessite une anonymisation. Contactez contact@earlypanel.fr pour exercer votre droit a l'effacement RGPD.",
+      },
+      { status: 409 }
+    );
+  }
+
+  // 1) Suppression DB (cascade sur toutes les tables liees).
+  const { error: deleteError } = await admin
+    .from("testers")
+    .delete()
+    .eq("id", tester.id);
+
+  if (deleteError) {
+    return NextResponse.json({ error: deleteError.message }, { status: 500 });
+  }
+
+  // 2) Suppression de l'auth user (libere l'email pour reinscription future).
+  let authDeleted = false;
+  const { error: authError } = await admin.auth.admin.deleteUser(user.id);
+  if (authError) {
+    console.error("[testers/me DELETE] auth user delete failed:", authError.message);
+  } else {
+    authDeleted = true;
+  }
+
+  // 3) Audit immuable (RGPD : preuve qu'on a bien execute la demande).
+  await logStaffAction(
+    {
+      staff_id: null,
+      staff_email: null,
+      action: "tester.self_delete",
+      entity_type: "tester",
+      entity_id: tester.id,
+      metadata: {
+        deleted_email: tester.email,
+        deleted_first_name: tester.first_name,
+        deleted_last_name: tester.last_name,
+        auth_user_deleted: authDeleted,
+      },
+    },
+    request
+  );
+
+  // 4) Deconnexion + cookies effaces. Le client redirigera vers /.
+  try {
+    await supabase.auth.signOut();
+  } catch {
+    /* deja ko si user supprime au-dessus, mais on continue */
+  }
+
+  const res = NextResponse.json({ success: true, auth_user_deleted: authDeleted });
+  res.cookies.set("tp-profile", "", { path: "/", maxAge: 0 });
+  return res;
 }

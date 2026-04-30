@@ -54,6 +54,10 @@ export default function TesterDrawer({ testerId, onClose }: TesterDrawerProps) {
   const [personas, setPersonas] = useState<PersonaOption[]>([]);
   const [loading, setLoading] = useState(false);
   const [savingPersona, setSavingPersona] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteConfirmEmail, setDeleteConfirmEmail] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const fetchDrawerData = useCallback(async () => {
     if (!testerId) {
@@ -284,6 +288,23 @@ export default function TesterDrawer({ testerId, onClose }: TesterDrawerProps) {
                   </div>
                 </div>
               </Section>
+
+              <Section title="Zone dangereuse">
+                <p style={{ fontSize: 12, color: "#86868B", lineHeight: 1.5, margin: "0 0 12px" }}>
+                  Suppression definitive : compte testeur + auth + donnees liees (NDA, missions en cours, IBAN). Action loggee dans l&apos;audit. A reserver aux faux comptes / spam — sinon utiliser le statut &laquo;&nbsp;rejete&nbsp;&raquo;.
+                </p>
+                <button
+                  onClick={() => { setDeleteOpen(true); setDeleteConfirmEmail(""); setDeleteError(null); }}
+                  style={{
+                    padding: "9px 18px", fontSize: 13, fontWeight: 600,
+                    background: "#fff", color: "#b91c1c",
+                    border: "1.5px solid #b91c1c", borderRadius: 980,
+                    cursor: "pointer", fontFamily: "inherit",
+                  }}
+                >
+                  Supprimer ce testeur…
+                </button>
+              </Section>
             </>
           ) : (
             <div style={{ textAlign: "center", padding: "40px 0", color: "#86868B", fontSize: 14 }}>
@@ -292,6 +313,109 @@ export default function TesterDrawer({ testerId, onClose }: TesterDrawerProps) {
           )}
         </div>
       </div>
+
+      {deleteOpen && tester && (
+        <div
+          onClick={() => !deleting && setDeleteOpen(false)}
+          style={{
+            position: "fixed", inset: 0, background: "rgba(0,0,0,0.55)",
+            zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center",
+            padding: 20,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "#fff", borderRadius: 18, padding: "24px 26px",
+              width: "100%", maxWidth: 460,
+              boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
+              fontFamily: "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif",
+            }}
+          >
+            <h3 style={{ fontSize: 17, fontWeight: 700, color: "#1d1d1f", margin: "0 0 8px" }}>
+              Supprimer ce testeur ?
+            </h3>
+            <p style={{ fontSize: 13, color: "#3a3a3c", lineHeight: 1.6, margin: "0 0 16px" }}>
+              Cette action supprime <strong>definitivement</strong> le compte de
+              {" "}<strong>{tester.first_name} {tester.last_name}</strong> ({tester.email}),
+              ainsi que ses donnees liees (NDA en cours, missions non completees, IBAN, etc.).
+              Elle est <strong>irreversible</strong>.
+            </p>
+            <p style={{ fontSize: 12, color: "#86868B", margin: "0 0 8px" }}>
+              Pour confirmer, tape l&apos;email du testeur :
+            </p>
+            <input
+              type="text"
+              value={deleteConfirmEmail}
+              onChange={(e) => setDeleteConfirmEmail(e.target.value)}
+              placeholder={tester.email}
+              autoFocus
+              disabled={deleting}
+              style={{
+                width: "100%", padding: "10px 14px", fontSize: 13,
+                border: "1.5px solid rgba(0,0,0,0.12)", borderRadius: 10,
+                fontFamily: "inherit", background: "#f5f5f7",
+                marginBottom: 16, boxSizing: "border-box",
+              }}
+            />
+
+            {deleteError && (
+              <div style={{
+                background: "#fef2f2", border: "1px solid #fecaca",
+                borderRadius: 10, padding: "10px 12px", marginBottom: 12,
+                color: "#b91c1c", fontSize: 12, lineHeight: 1.5,
+              }}>
+                {deleteError}
+              </div>
+            )}
+
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+              <button
+                onClick={() => setDeleteOpen(false)}
+                disabled={deleting}
+                style={{
+                  padding: "9px 18px", fontSize: 13, fontWeight: 600,
+                  background: "#fff", color: "#1d1d1f",
+                  border: "1px solid rgba(0,0,0,0.15)", borderRadius: 980,
+                  cursor: deleting ? "wait" : "pointer", fontFamily: "inherit",
+                }}
+              >
+                Annuler
+              </button>
+              <button
+                disabled={deleting || deleteConfirmEmail.trim().toLowerCase() !== tester.email.toLowerCase()}
+                onClick={async () => {
+                  setDeleting(true);
+                  setDeleteError(null);
+                  try {
+                    const res = await fetch(`/api/staff/testers/${tester.id}`, { method: "DELETE" });
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok) {
+                      throw new Error(data.error || `Erreur ${res.status}`);
+                    }
+                    setDeleteOpen(false);
+                    onClose();
+                  } catch (e) {
+                    setDeleteError(e instanceof Error ? e.message : "Erreur lors de la suppression");
+                  } finally {
+                    setDeleting(false);
+                  }
+                }}
+                style={{
+                  padding: "9px 18px", fontSize: 13, fontWeight: 700,
+                  background: "#b91c1c", color: "#fff", border: "none",
+                  borderRadius: 980,
+                  cursor: deleting ? "wait" : (deleteConfirmEmail.trim().toLowerCase() !== tester.email.toLowerCase() ? "not-allowed" : "pointer"),
+                  fontFamily: "inherit",
+                  opacity: deleting || deleteConfirmEmail.trim().toLowerCase() !== tester.email.toLowerCase() ? 0.5 : 1,
+                }}
+              >
+                {deleting ? "Suppression…" : "Supprimer definitivement"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style jsx global>{`
         @keyframes drawerSlideIn {
