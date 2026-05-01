@@ -7,7 +7,7 @@ export default function HeroLanding() {
       <div className="hero-index">
         <div>
           <div className="h-eyebrow">Tests utilisateurs B2B · Phase de lancement</div>
-          <h1>On teste votre produit.<br /><em>Avec les bons profils.</em></h1>
+          <h1>Sachez ce que vos utilisateurs <em>pensent vraiment</em>, avant de déployer.</h1>
           <p className="hero-sub-index">
             On commence par comprendre ce que vous voulez vraiment savoir. Ensuite on sélectionne les profils qui correspondent à votre cible. Le questionnaire, on l&apos;écrit avec vous. Et les testeurs répondent vraiment, sans cocher des cases au hasard.
           </p>

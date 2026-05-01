@@ -2,7 +2,7 @@ export default function StatementSection() {
   return (
     <section className="statement">
       <p>
-        Ni outil self-service où vous gérez tout vous-même, ni panel générique qui envoie n&apos;importe qui répondre. Une prestation menée par des <em>humains</em> du début à la fin, y compris quand il s&apos;agit de relire les réponses une par une.
+        earlypanel n&apos;est pas un outil que vous configurez seul. C&apos;est un service où <em>des humains</em> écrivent le questionnaire avec vous, choisissent les testeurs un par un, lisent leurs réponses et vous remettent un rapport.
       </p>
     </section>
   );

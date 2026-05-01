@@ -139,6 +139,23 @@ body { font-family: var(--font); background: #fff; color: var(--black); overflow
 .about-contact a { color: var(--green); font-weight: 600; text-decoration: none; }
 .about-contact a:hover { text-decoration: underline; }
 
+/* ── 3 MOMENTS METIER (B2B) ── */
+.moments { padding: clamp(3rem, 6vh, 5rem) clamp(1.5rem, 5vw, 3rem); background: #fff; }
+.moments-inner { max-width: var(--content-wide); margin: 0 auto; }
+.moments .sec-title { margin-bottom: .75rem; }
+.moments-grid { margin-top: clamp(2rem, 4vh, 3rem); display: grid; grid-template-columns: 1fr; gap: clamp(1rem, 2vh, 1.5rem); }
+@media (min-width: 900px) { .moments-grid { grid-template-columns: repeat(3, 1fr); } }
+.moment-card { background: #fff; border: 0.5px solid rgba(0,0,0,0.08); border-radius: 20px; padding: clamp(1.5rem, 2.5vw, 2rem); display: flex; flex-direction: column; }
+.moment-num { font-size: 13px; font-weight: 700; color: var(--green); letter-spacing: .12em; margin-bottom: 1rem; font-variant-numeric: tabular-nums; }
+.moment-eye { font-size: 11px; font-weight: 700; color: var(--gray-light); letter-spacing: .12em; text-transform: uppercase; margin-bottom: .75rem; }
+.moment-title { font-size: clamp(20px, 1.6vw, 24px); font-weight: 700; color: var(--black); line-height: 1.25; letter-spacing: -.02em; margin: 0 0 1rem; }
+.moment-body { font-size: 14px; color: var(--gray); line-height: 1.65; margin: 0 0 1.25rem; }
+.moment-actions { list-style: none; padding: 0; margin: 0 0 1.25rem; display: flex; flex-direction: column; gap: .55rem; }
+.moment-actions li { font-size: 14px; color: var(--black); line-height: 1.55; padding-left: 1.25rem; position: relative; }
+.moment-actions li::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--green); position: absolute; left: 0; top: 0.55rem; }
+.moment-when { margin-top: auto; padding-top: 1rem; border-top: 0.5px solid rgba(0,0,0,0.08); font-size: 13px; color: var(--gray); line-height: 1.55; }
+.moment-when strong { color: var(--black); font-weight: 600; }
+
 /* ── PROCESS ── */
 .process { padding: 6rem clamp(1.5rem,5vw,4rem); }
 .process-inner { max-width: var(--content-width); margin: 0 auto; }

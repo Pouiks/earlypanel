@@ -3,6 +3,7 @@ import AnnounceBar from "@/components/layout/AnnounceBar";
 import Nav from "@/components/layout/Nav";
 import HeroB2B from "@/components/b2b/HeroB2B";
 import Separator from "@/components/ui/Separator";
+import ThreeMoments from "@/components/b2b/ThreeMoments";
 import UseCaseGrid from "@/components/b2b/UseCaseGrid";
 import Comparison from "@/components/b2b/Comparison";
 import BriefSection from "@/components/b2b/BriefSection";
@@ -75,6 +76,8 @@ export default function EntreprisesPage() {
       <AnnounceBar />
       <Nav />
       <HeroB2B />
+      <Separator />
+      <ThreeMoments />
       <Separator />
       <UseCaseGrid />
       <Separator />

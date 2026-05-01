@@ -2,9 +2,9 @@ export default function UseCaseGrid() {
   return (
     <section className="usecases">
       <div className="uc-inner">
-        <div className="sec-eye">Cas d&apos;usage</div>
-        <div className="sec-title">Sur quoi peut-on tester ?</div>
-        <p className="sec-sub">On peut tester à n&apos;importe quel stade du produit. Plus vous testez tôt, moins ça coûte cher de corriger.</p>
+        <div className="sec-eye">Sur quoi on travaille</div>
+        <div className="sec-title">Concrètement, on peut tester quoi ?</div>
+        <p className="sec-sub">Quel que soit le moment où vous nous appelez, voici les formats qu&apos;on prend en charge. Si votre support n&apos;est pas dans cette liste, écrivez-nous, on regardera ensemble.</p>
         <div className="uc-grid">
           <div className="uc-card">
             <div className="uc-icon">
