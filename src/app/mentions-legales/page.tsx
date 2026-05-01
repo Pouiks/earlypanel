@@ -39,7 +39,7 @@ export default function MentionsLegalesPage() {
       </ul>
       <p>Les données utilisateurs (inscriptions au panel) sont stockées via :</p>
       <ul>
-        <li><strong>Supabase Inc.</strong> (base de données + authentification) — région Europe (UE).</li>
+        <li><strong>Supabase Inc.</strong> (base de données + authentification), région Europe (UE).</li>
         <li><strong>Resend Inc.</strong> (emails transactionnels).</li>
       </ul>
       <p>

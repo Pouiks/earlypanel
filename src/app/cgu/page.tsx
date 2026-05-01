@@ -32,7 +32,7 @@ export default function CguPage() {
         <li>L&apos;éditeur se réserve le droit de refuser ou révoquer un compte (compte multiple, fausse identité, comportement abusif).</li>
       </ul>
 
-      <h2>4. Phase de pré-lancement — Aucune mission garantie</h2>
+      <h2>4. Phase de pré-lancement · Aucune mission garantie</h2>
       <p>
         L&apos;inscription au panel <strong>ne crée aucune obligation</strong> dans le chef d&apos;earlypanel. Plus précisément :
       </p>

@@ -27,7 +27,7 @@ export default function UseCaseGrid() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A7A5A" strokeWidth="2" strokeLinecap="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" /></svg>
             </div>
             <h3>Produit en production</h3>
-            <p>Votre SaaS est live mais vous voulez comprendre pourquoi un parcours convertit mal. On cible la zone précise — checkout, onboarding, dashboard — sans toucher à vos données réelles.</p>
+            <p>Votre SaaS est live mais vous voulez comprendre pourquoi un parcours convertit mal. On cible la zone précise (checkout, onboarding, dashboard) sans toucher à vos données réelles.</p>
             <span className="uc-example">SaaS · App mobile · Site web</span>
           </div>
           <div className="uc-card">
@@ -35,7 +35,7 @@ export default function UseCaseGrid() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A7A5A" strokeWidth="2" strokeLinecap="round"><rect x="5" y="2" width="14" height="20" rx="2" /><circle cx="12" cy="17" r="1" /></svg>
             </div>
             <h3>Application mobile</h3>
-            <p>iOS, Android, TestFlight, APK — on choisit les testeurs en fonction de leur appareil réel. Pas de simulation desktop quand vous testez une app mobile.</p>
+            <p>iOS, Android, TestFlight, APK : on choisit les testeurs en fonction de leur appareil réel. Pas de simulation desktop quand vous testez une app mobile.</p>
             <span className="uc-example">iOS · Android · PWA</span>
           </div>
           <div className="uc-card">

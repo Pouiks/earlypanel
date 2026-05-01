@@ -25,7 +25,7 @@ export default function LegalLayout({
         <div className="legal-inner">
           {temporary && (
             <div className="legal-temp-banner" role="status">
-              <strong>📄 Document temporaire — Phase de pré-lancement.</strong> earlypanel est actuellement en phase d&apos;ouverture du panel testeurs, exploité à titre personnel par son fondateur. Ce document sera mis à jour lors de la constitution de la structure commerciale officielle.
+              <strong>📄 Document temporaire · Phase de pré-lancement.</strong> earlypanel est actuellement en phase d&apos;ouverture du panel testeurs, exploité à titre personnel par son fondateur. Ce document sera mis à jour lors de la constitution de la structure commerciale officielle.
             </div>
           )}
           <div className="legal-eyebrow">Document légal</div>

@@ -24,7 +24,7 @@ export default function ProfileGrid() {
         <div className="sec-eye">Qui peut rejoindre le panel ?</div>
         <div className="sec-title">Tous les profils sont les bienvenus.</div>
         <p style={{ fontSize: "15px", color: "var(--gray)", lineHeight: 1.6, marginTop: ".75rem", maxWidth: "540px" }}>
-          Vous n&apos;avez pas besoin d&apos;être un expert en tech. On cherche des utilisateurs authentiques — pas des professionnels du test.
+          Vous n&apos;avez pas besoin d&apos;être un expert en tech. On cherche des utilisateurs authentiques, pas des professionnels du test.
           La rémunération exacte vous est communiquée après votre inscription selon votre profil.
         </p>
         <div className="profile-grid">

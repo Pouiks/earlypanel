@@ -27,7 +27,7 @@ export default function PreLaunchBanner() {
       }}
     >
       <strong>Phase de pré-lancement.</strong>{" "}
-      earlypanel ouvre son panel — les premières missions démarrent dans les prochaines semaines. Inscrivez-vous dès maintenant pour être contacté(e) quand une mission correspond à votre profil.
+      earlypanel ouvre son panel. Les premières missions démarrent dans les prochaines semaines. Inscrivez-vous dès maintenant pour être contacté(e) quand une mission correspond à votre profil.
     </div>
   );
 }

@@ -9,10 +9,10 @@ export default function EarnSection() {
             <br />selon votre profil.
           </h2>
           <p>
-            Combien vous gagnez dépend de trois choses : à quel point votre profil est recherché, combien de temps prend la mission, et le secteur du client. Un cadre médical avec 15 ans d&apos;expérience qui teste un logiciel hospitalier sera mieux payé qu&apos;un test de site e-commerce grand public — et c&apos;est normal.
+            Combien vous gagnez dépend de trois choses : à quel point votre profil est recherché, combien de temps prend la mission, et le secteur du client. Un cadre médical avec 15 ans d&apos;expérience qui teste un logiciel hospitalier sera mieux payé qu&apos;un test de site e-commerce grand public, et c&apos;est normal.
           </p>
           <p style={{ fontSize: "13px", color: "var(--gray-light)", lineHeight: 1.6 }}>
-            Après votre inscription, votre fourchette s&apos;affiche dans votre espace. Le paiement passe par virement SEPA classique. Côté impôts, ces revenus sont à déclarer comme revenus complémentaires — c&apos;est à vous de le faire, on vous fournira un récapitulatif annuel pour faciliter.
+            Après votre inscription, votre fourchette s&apos;affiche dans votre espace. Le paiement passe par virement SEPA classique. Côté impôts, ces revenus sont à déclarer comme revenus complémentaires : c&apos;est à vous de le faire, on vous fournira un récapitulatif annuel pour faciliter.
           </p>
         </div>
 

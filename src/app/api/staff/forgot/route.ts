@@ -136,7 +136,7 @@ function buildRecoveryEmail(link: string): string {
         </a>
       </div>
       <p style="font-size: 12px; color: #86868b; text-align: center; line-height: 1.5;">
-        Si vous n&apos;avez pas demandé cette réinitialisation, ignorez cet email — votre mot de passe restera inchangé.
+        Si vous n&apos;avez pas demandé cette réinitialisation, ignorez cet email. Votre mot de passe restera inchangé.
       </p>
     </div>
   `;

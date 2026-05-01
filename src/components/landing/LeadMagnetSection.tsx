@@ -30,10 +30,10 @@ export default function LeadMagnetSection() {
     <section className="leadmag">
       <div className="leadmag-inner">
         <h2>Voyez à quoi ressemble<br /><em>un vrai rapport earlypanel.</em></h2>
-        <p>Téléchargez un exemple complet — KPIs, verbatims, carte des frictions et recommandations.</p>
+        <p>Téléchargez un exemple complet : KPIs, verbatims, carte des frictions et recommandations.</p>
 
         {status === "sent" ? (
-          <p className="lead-success">Le rapport a été envoyé à <strong>{email}</strong> — vérifiez vos emails.</p>
+          <p className="lead-success">Le rapport a été envoyé à <strong>{email}</strong>. Pensez à vérifier vos spams.</p>
         ) : (
           <form className="lead-form" onSubmit={handleSubmit}>
             <input
