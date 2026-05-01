@@ -4,7 +4,7 @@ export default function DifferentiatorsSection() {
       <div className="diff-inner">
         <div className="diff-left">
           <div className="sec-eye">Pourquoi earlypanel</div>
-          <div className="sec-title">Ce qu&apos;aucun outil self-service ne peut vous offrir.</div>
+          <div className="sec-title">Ce qu&apos;un outil self-service ne fera jamais à votre place.</div>
           <div className="diff-list">
             <div className="diff-item">
               <div className="diff-icon">
@@ -13,8 +13,8 @@ export default function DifferentiatorsSection() {
                 </svg>
               </div>
               <div>
-                <h4>Des vrais profils recrutés</h4>
-                <p>On ne vous envoie pas n&apos;importe qui. Chaque testeur est sélectionné selon un profil précis défini avec vous — pas un panel ouvert à tous.</p>
+                <h4>Des vrais profils, pas un panel ouvert à tous</h4>
+                <p>Quand vous nous dites que vous testez un outil de gestion de planning pour kinés, on ne vous envoie pas 15 freelances digitaux qui n&apos;ont jamais mis les pieds dans un cabinet médical. On va chercher dans notre panel ceux qui correspondent — vraiment.</p>
               </div>
             </div>
             <div className="diff-item">
@@ -24,8 +24,8 @@ export default function DifferentiatorsSection() {
                 </svg>
               </div>
               <div>
-                <h4>Questions construites avec vous</h4>
-                <p>Le questionnaire n&apos;est pas un template. Il est co-rédigé avec votre équipe pour cibler exactement ce que vous avez besoin de comprendre.</p>
+                <h4>Le questionnaire est écrit avec vous</h4>
+                <p>On part de votre brief, on propose une première version, et on itère ensemble jusqu&apos;à ce que chaque question serve un objectif clair. Pas de copier-coller depuis un projet précédent.</p>
               </div>
             </div>
             <div className="diff-item">
@@ -35,8 +35,8 @@ export default function DifferentiatorsSection() {
                 </svg>
               </div>
               <div>
-                <h4>Validation manuelle de chaque test</h4>
-                <p>Pas d&apos;algorithme, pas d&apos;auto-validation. On lit chaque réponse. Un test incohérent est refusé et remplacé sans frais supplémentaire.</p>
+                <h4>Chaque test est lu par un humain</h4>
+                <p>Pas d&apos;auto-validation, pas de score algorithmique. On lit les réponses une par une. Si quelque chose cloche — incohérence, réponse trop courte, sujet mal compris — on refuse le test et on en lance un autre, sans vous le facturer.</p>
               </div>
             </div>
             <div className="diff-item">
@@ -46,8 +46,8 @@ export default function DifferentiatorsSection() {
                 </svg>
               </div>
               <div>
-                <h4>Analyse et restitution incluses</h4>
-                <p>On ne vous livre pas un tableur de réponses brutes. On fait l&apos;analyse, on priorise, et on vous présente les résultats avec votre équipe produit.</p>
+                <h4>L&apos;analyse fait partie du livrable</h4>
+                <p>Vous n&apos;avez pas à éplucher 200 verbatims pour en tirer un sens. On le fait pour vous, on priorise, et on vient présenter les résultats à votre équipe en visio. Vous repartez avec ce qu&apos;il faut décider, pas avec un tableur.</p>
               </div>
             </div>
           </div>
@@ -66,7 +66,7 @@ export default function DifferentiatorsSection() {
             <div className="compare-row"><div className="compare-label" style={{ flex: 1.5 }}>Questionnaire</div><div className="compare-them">Template générique</div><div className="compare-us">Co-construit</div></div>
             <div className="compare-row"><div className="compare-label" style={{ flex: 1.5 }}>Validation</div><div className="compare-them">Automatique</div><div className="compare-us">Manuelle</div></div>
             <div className="compare-row"><div className="compare-label" style={{ flex: 1.5 }}>Analyse</div><div className="compare-them">Données brutes</div><div className="compare-us">Rapport + restitution</div></div>
-            <div className="compare-row"><div className="compare-label" style={{ flex: 1.5 }}>Délai</div><div className="compare-them">Variable</div><div className="compare-us">5 jours garantis</div></div>
+            <div className="compare-row"><div className="compare-label" style={{ flex: 1.5 }}>Délai</div><div className="compare-them">Variable</div><div className="compare-us">5 jours ouvrés</div></div>
             <div className="compare-row"><div className="compare-label" style={{ flex: 1.5 }}>NDA / confidentialité</div><div className="compare-them">Standard</div><div className="compare-us">Contractualisé</div></div>
           </div>
         </div>

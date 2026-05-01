@@ -51,12 +51,12 @@ export const metadata: Metadata = {
 };
 
 const faqB2C = [
-  { q: "Est-ce que je dois déclarer ces revenus ?", a: "Oui. Les revenus issus des tests sont des revenus complémentaires à déclarer aux impôts. Stripe vous fournit un récapitulatif annuel de vos gains pour simplifier votre déclaration." },
-  { q: "Combien de temps faut-il par mission ?", a: "En moyenne 25 minutes. Chaque invitation précise la durée estimée avant que vous acceptiez. Vous ne pouvez jamais être surpris par une mission plus longue que prévue." },
-  { q: "Quand et comment suis-je payé ?", a: "Par virement bancaire sous 72h après validation de votre test. Vous configurez votre IBAN une seule fois via notre interface sécurisée Stripe. Aucun intermédiaire." },
-  { q: "Que se passe-t-il si mon test est refusé ?", a: "On vous explique pourquoi par email. Un test est refusé uniquement si les réponses sont trop courtes ou incohérentes. Vous ne serez pas payé pour ce test, mais votre profil reste actif." },
-  { q: "Mes données personnelles sont-elles protégées ?", a: "Absolument. Vos données ne sont jamais revendues à des tiers. Elles servent uniquement au matching avec les missions. Tout est conforme RGPD, vous pouvez demander leur suppression à tout moment." },
-  { q: "Combien de missions vais-je recevoir par mois ?", a: "Cela dépend de votre profil et de la demande côté clients. En moyenne, nos testeurs reçoivent 1 à 3 missions par mois. Les profils rares et experts reçoivent davantage d'invitations." },
+  { q: "Est-ce que je dois déclarer ces revenus ?", a: "Oui. Ce sont des revenus complémentaires, à déclarer dans votre déclaration annuelle. On vous fournit un récapitulatif chaque année pour vous simplifier la tâche au moment des impôts." },
+  { q: "Combien de temps faut-il par mission ?", a: "En général entre 15 et 40 minutes selon ce qui est testé. La durée estimée est toujours précisée dans l'email d'invitation, avant que vous décidiez d'accepter. Pas de mauvaise surprise." },
+  { q: "Quand et comment suis-je payé ?", a: "Par virement SEPA classique vers l'IBAN renseigné dans votre profil. En général le virement part dans les 72h après validation de votre test, parfois un peu plus si on doit relire en détail." },
+  { q: "Que se passe-t-il si mon test est refusé ?", a: "On vous écrit pour vous dire pourquoi : réponses trop courtes, hors-sujet, ou copier-coller détecté. Le test n'est pas payé, mais votre compte reste actif. Si vous n'êtes pas d'accord avec la décision, vous pouvez demander une revue." },
+  { q: "Mes données personnelles sont-elles protégées ?", a: "Oui. On ne revend rien à personne. Vos infos servent uniquement à vous matcher avec des missions qui correspondent à votre profil. Vous pouvez à tout moment supprimer votre compte depuis votre espace, ou nous écrire pour exercer vos droits RGPD." },
+  { q: "Combien de missions vais-je recevoir par mois ?", a: "Honnêtement, ça dépend. En moyenne 1 à 3 missions par mois pour la plupart des profils. Les profils rares (médical, juridique, dirigeant) ou très spécialisés reçoivent plus de propositions, mais ce n'est pas une garantie." },
 ];
 
 export default function TesteursPage() {

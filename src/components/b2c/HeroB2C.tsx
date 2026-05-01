@@ -7,10 +7,9 @@ export default function HeroB2C() {
         <div className="hero-badge-b2c">
           <span className="earn-badge">Jusqu&apos;à 100€</span> par mission · Payé sous 72h
         </div>
-        <h1>Devenir testeur rémunéré.<br /><em>Donnez votre avis, gagnez de l&apos;argent.</em></h1>
+        <h1>Testez des produits, <em>gagnez un complément de revenu.</em></h1>
         <p className="hero-sub-b2c">
-          Rejoignez le panel de 75+ testeurs earlypanel. Recevez des missions sur des applications et sites web adaptées à votre profil — répondez aux questions depuis chez vous, à votre rythme.
-        </p>
+          earlypanel met en relation des entreprises qui veulent valider leur produit avec des testeurs comme vous. Chaque mission consiste à essayer un site, une app ou une maquette, puis à répondre à quelques questions précises sur ce que vous avez vécu. C&apos;est tout. Vous le faites depuis chez vous, quand ça vous arrange.</p>
         <button
           className="btn-green-big"
           onClick={() => document.getElementById("register")?.scrollIntoView({ behavior: "smooth" })}

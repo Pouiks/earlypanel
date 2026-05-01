@@ -3,37 +3,37 @@ export default function HowItWorks() {
     <section className="how" id="how">
       <div className="how-inner">
         <div className="sec-eye">Comment ça marche</div>
-        <div className="sec-title">Simple. Flexible. Rémunéré.</div>
+        <div className="sec-title">De votre inscription au paiement, en quatre étapes.</div>
         <div className="how-steps">
           <div className="how-step">
             <div className="how-num">01</div>
             <div>
               <h3>Vous créez votre profil</h3>
-              <p>Décrivez votre métier, vos habitudes digitales, vos outils. Plus votre profil est précis, plus les missions correspondent à votre quotidien.</p>
+              <p>Quelques infos sur ce que vous faites au quotidien — métier, secteur, outils utilisés, équipement. Plus c&apos;est précis, plus on peut vous proposer des missions où votre avis a vraiment de la valeur. Si vous êtes infirmière libérale, on ne va pas vous envoyer tester un logiciel de comptabilité.</p>
               <span className="how-pill">5 minutes · Gratuit</span>
             </div>
           </div>
           <div className="how-step">
             <div className="how-num">02</div>
             <div>
-              <h3>On vous contacte pour les bonnes missions</h3>
-              <p>Quand une mission correspond à votre profil, vous recevez un email avec le brief, la durée estimée et la rémunération. Vous acceptez ou refusez librement.</p>
+              <h3>On vous propose des missions adaptées</h3>
+              <p>Quand un client a besoin d&apos;un profil comme le vôtre, vous recevez un email court avec ce qu&apos;il faut tester, le temps estimé et combien c&apos;est payé. Vous dites oui, non, ou rien — pas de pression, pas de pénalité si la mission ne vous intéresse pas.</p>
               <span className="how-pill">Sur invitation · Libre</span>
             </div>
           </div>
           <div className="how-step">
             <div className="how-num">03</div>
             <div>
-              <h3>Vous testez et répondez au questionnaire</h3>
-              <p>Vous accédez au produit (site, app, maquette) et répondez à des questions précises sur votre expérience. Pas de jargon, juste vos réactions honnêtes.</p>
+              <h3>Vous testez et vous répondez aux questions</h3>
+              <p>Vous accédez au produit (un site, une app, une maquette Figma) et vous l&apos;utilisez comme si c&apos;était le vôtre. Ensuite quelques questions ouvertes : ce qui vous a plu, ce qui vous a gêné, ce qui vous a perdu. Pas de jargon, pas de bonne ou mauvaise réponse — juste votre vécu.</p>
               <span className="how-pill">25 min en moyenne</span>
             </div>
           </div>
           <div className="how-step">
             <div className="how-num">04</div>
             <div>
-              <h3>Votre test est validé et vous êtes payé</h3>
-              <p>Une fois votre test validé par notre équipe, le paiement est déclenché automatiquement sur votre compte bancaire. Délai : 72h maximum.</p>
+              <h3>Votre test est validé, vous êtes payé</h3>
+              <p>On lit votre test sous quelques jours. Si tout va bien, le virement part vers votre IBAN, en général sous 72h. Si on a un doute (réponse trop courte, sujet mal compris), on revient vers vous avant de décider — on ne refuse jamais sans explication.</p>
               <span className="how-pill">Virement · 72h max</span>
             </div>
           </div>

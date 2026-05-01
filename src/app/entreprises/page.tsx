@@ -55,12 +55,12 @@ export const metadata: Metadata = {
 };
 
 const faqB2B = [
-  { q: "Mon produit n'est pas terminé, peut-on quand même tester ?", a: "Oui, c'est même recommandé. On teste des maquettes Figma, des prototypes cliquables, des URLs de staging — plus tôt vous testez, moins les corrections coûtent cher." },
-  { q: "Comment garantissez-vous la confidentialité de mon produit ?", a: "Un NDA est signé avant tout échange, côté client et côté testeurs. Vos liens et accès ne sont jamais partagés en dehors de la session de test. Tout est contractualisé." },
-  { q: "Comment sélectionnez-vous les testeurs ?", a: "On définit ensemble le profil exact lors de l'atelier de cadrage (secteur, métier, niveau digital, équipement, comportements d'achat…) et on sélectionne manuellement dans notre panel les profils qui correspondent." },
-  { q: "Quel est le délai réel de livraison ?", a: "5 jours ouvrés à partir de la validation du questionnaire. Le délai peut être raccourci selon le scope défini lors de l'atelier de cadrage. Si vous êtes en urgence, contactez-nous directement." },
-  { q: "Peut-on faire un test en plusieurs langues ?", a: "Oui. On dispose de testeurs francophones, anglophones et dans d'autres langues sur devis. Le questionnaire peut être adapté dans la langue de votre choix." },
-  { q: "Que se passe-t-il si les résultats ne sont pas exploitables ?", a: "Chaque test est validé manuellement avant d'être comptabilisé. Si un test est jugé insuffisant, il est refusé et remplacé sans frais. Votre rapport contient uniquement des réponses validées." },
+  { q: "Mon produit n'est pas terminé, peut-on quand même tester ?", a: "Oui, et c'est souvent là que tester apporte le plus. Une maquette Figma, un prototype cliquable, une URL de staging : tout ça se teste. Corriger un problème de parcours sur Figma coûte 10x moins cher que le corriger une fois en production." },
+  { q: "Comment garantissez-vous la confidentialité de mon produit ?", a: "Tout passe par un NDA signé avant qu'on échange quoi que ce soit. Côté client comme côté testeurs. Les accès que vous nous fournissez ne sortent pas du périmètre du test, et les credentials créés pour l'occasion sont supprimés une fois la mission terminée." },
+  { q: "Comment sélectionnez-vous les testeurs ?", a: "On en discute lors de l'atelier de cadrage. Vous nous décrivez votre utilisateur cible — métier, secteur, ancienneté, équipement, voire comportements d'achat — et on va piocher manuellement dans notre panel les profils qui collent. Pas de matching automatique : c'est de la sélection humaine, mission par mission." },
+  { q: "Quel est le délai réel de livraison ?", a: "Comptez 5 jours ouvrés à partir du moment où on lance les tests (donc une fois le questionnaire validé). Sur des scopes serrés, ça peut être plus rapide. Si vous êtes en urgence, dites-le-nous dès l'appel : on regarde si c'est faisable." },
+  { q: "Peut-on faire un test en plusieurs langues ?", a: "Oui. On a des testeurs francophones, anglophones, et d'autres langues disponibles sur demande. Le questionnaire est traduit dans la langue de l'utilisateur cible — ce n'est pas un détail, ça change la qualité des réponses." },
+  { q: "Que se passe-t-il si les résultats ne sont pas exploitables ?", a: "Tous les tests passent par une validation manuelle avant d'être comptés. Si un test n'est pas jugé suffisamment sérieux (réponses trop courtes, hors-sujet, copier-coller), il est refusé : pas comptabilisé pour vous, pas payé au testeur, et on en lance un nouveau pour combler. Votre rapport ne contient que ce qui a passé ce filtre." },
 ];
 
 export default function EntreprisesPage() {

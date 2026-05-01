@@ -21,7 +21,6 @@ export default function Footer({ variant = "index" }: FooterProps) {
             <div className="footer-badges">
               <span className="footer-badge">RGPD</span>
               <span className="footer-badge">NDA inclus</span>
-              <span className="footer-badge">Made in France</span>
             </div>
           </div>
 
@@ -122,6 +121,9 @@ export default function Footer({ variant = "index" }: FooterProps) {
         <div className="footer-bottom">
           <p>© 2026 earlypanel · Tous droits réservés</p>
           <div className="footer-legal">
+            <a href="https://www.linkedin.com/company/earlypanel/" target="_blank" rel="noopener noreferrer" aria-label="earlypanel sur LinkedIn">
+              LinkedIn
+            </a>
             <Link href="/mentions-legales">Mentions légales</Link>
             <Link href="/confidentialite">Confidentialité</Link>
             <Link href={variant === "b2c" ? "/cgu" : "/cgv"}>{variant === "b2c" ? "CGU" : "CGV"}</Link>

@@ -7,6 +7,7 @@ import StatementSection from "@/components/landing/StatementSection";
 import ProcessSection from "@/components/landing/ProcessSection";
 import DifferentiatorsSection from "@/components/landing/DifferentiatorsSection";
 import LeadMagnetSection from "@/components/landing/LeadMagnetSection";
+import AboutSection from "@/components/landing/AboutSection";
 import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
@@ -48,6 +49,8 @@ export default function HomePage() {
       <DifferentiatorsSection />
       <Separator />
       <LeadMagnetSection />
+      <Separator />
+      <AboutSection />
       <Footer variant="index" />
     </>
   );

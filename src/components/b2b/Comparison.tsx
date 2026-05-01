@@ -44,7 +44,7 @@ const FEATURES: Feature[] = [
     freelance: true,
   },
   {
-    label: "Rapport actionnable livré clé en main",
+    label: "Rapport rédigé et restitution incluse",
     earlypanel: true,
     saasTools: false,
     freelance: true,
@@ -56,7 +56,7 @@ const FEATURES: Feature[] = [
     freelance: false,
   },
   {
-    label: "Délai garanti 5 jours ouvrés",
+    label: "Délai engagé sur 5 jours ouvrés",
     earlypanel: true,
     saasTools: false,
     freelance: false,
@@ -66,12 +66,6 @@ const FEATURES: Feature[] = [
     earlypanel: true,
     saasTools: false,
     freelance: true,
-  },
-  {
-    label: "Tarif forfaitaire transparent",
-    earlypanel: true,
-    saasTools: true,
-    freelance: false,
   },
   {
     label: "Profils niches (santé, juridique, finance, IT)",
@@ -93,10 +87,10 @@ export default function Comparison() {
       <div className="comparison-inner">
         <div className="comparison-eyebrow">Pourquoi earlypanel</div>
         <h2 className="comparison-title">
-          Le seul service en France qui combine <em>panel humain + cadrage + livrable</em>.
+          Ni un <em>SaaS où vous vous débrouillez</em>, ni un <em>freelance facturé à la journée</em>.
         </h2>
         <p className="comparison-sub">
-          Plutôt qu&apos;un SaaS où vous gérez tout vous-même ou un freelance qui factorise par jour-homme, on combine la flexibilité d&apos;un outil et la qualité d&apos;un cabinet UX.
+          Les outils SaaS sont rapides mais vous laissent gérer le recrutement, la rédaction et l&apos;analyse. Les freelances UX sont précis mais coûtent plusieurs k€ par mission. earlypanel se positionne entre les deux : la flexibilité d&apos;un service rapide, et un humain qui prend en charge les bouts qui demandent du jugement.
         </p>
 
         <div className="comparison-table-wrapper">

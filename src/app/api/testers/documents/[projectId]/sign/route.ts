@@ -285,7 +285,7 @@ function buildPostSignatureEmail(opts: {
           <p style="font-size:12px;color:#86868B;line-height:1.5;margin:28px 0 0;">Référence du NDA signé : <strong>${opts.ndaRef}</strong></p>
         </td></tr>
         <tr><td style="padding:20px 32px;border-top:0.5px solid rgba(0,0,0,0.08);">
-          <p style="font-size:11px;color:#86868B;margin:0;">earlypanel · Made in France</p>
+          <p style="font-size:11px;color:#86868B;margin:0;">earlypanel</p>
         </td></tr>
       </table>
     </td></tr>

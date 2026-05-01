@@ -82,7 +82,7 @@ export function buildLeadMagnetEmail(): string {
           <a href="https://earlypanel.fr/entreprises" style="display:inline-block;background:#0A7A5A;color:#fff;padding:14px 28px;border-radius:980px;font-size:15px;font-weight:700;text-decoration:none;">Découvrir nos formules →</a>
         </td></tr>
         <tr><td style="padding:20px 32px;border-top:0.5px solid rgba(0,0,0,0.08);">
-          <p style="font-size:11px;color:#86868B;margin:0;">earlypanel · Made in France · <a href="https://earlypanel.fr" style="color:#86868B;">Confidentialité</a></p>
+          <p style="font-size:11px;color:#86868B;margin:0;">earlypanel · <a href="https://earlypanel.fr" style="color:#86868B;">Confidentialité</a></p>
         </td></tr>
       </table>
     </td></tr>
@@ -243,7 +243,7 @@ export function buildWelcomeEmail(magicLink: string, firstName?: string): string
           <p style="font-size:12px;color:#86868B;line-height:1.5;margin:24px 0 0;">Ce lien de connexion est valable 24h. Si vous n'avez pas demandé cet accès, ignorez cet email.</p>
         </td></tr>
         <tr><td style="padding:20px 32px;border-top:0.5px solid rgba(0,0,0,0.08);">
-          <p style="font-size:11px;color:#86868B;margin:0;">earlypanel · Made in France · <a href="https://earlypanel.fr/confidentialite" style="color:#86868B;">Confidentialité</a> · <a href="https://earlypanel.fr/cgu" style="color:#86868B;">CGU</a></p>
+          <p style="font-size:11px;color:#86868B;margin:0;">earlypanel · <a href="https://earlypanel.fr/confidentialite" style="color:#86868B;">Confidentialité</a> · <a href="https://earlypanel.fr/cgu" style="color:#86868B;">CGU</a></p>
         </td></tr>
       </table>
     </td></tr>

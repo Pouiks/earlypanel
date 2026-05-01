@@ -7,7 +7,7 @@ export default function BriefSection() {
         <div className="brief-left">
           <div className="sec-eye">Démarrer un projet</div>
           <div className="sec-title">Parlez-nous de votre besoin.</div>
-          <p>En 2 minutes, décrivez votre produit et ce que vous voulez tester. On revient vers vous sous 24h avec une proposition sur mesure.</p>
+          <p>Quelques infos suffisent. On revient vers vous sous 24h pour caler un appel et préciser ce qui peut être testé, comment, et avec quels profils.</p>
           <div className="brief-guarantees">
             <div className="brief-guarantee">
               <div className="bg-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#0A7A5A" strokeWidth="2.5" strokeLinecap="round"><path d="M9 11l3 3L22 4" /></svg></div>
