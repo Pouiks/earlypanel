@@ -7,9 +7,9 @@ export default function HeroB2B() {
         <div className="hero-badge-dot" />
         Pour les équipes produit &amp; agences
       </div>
-      <h1>Faites tester votre produit <em>avant</em> de le déployer.</h1>
+      <h1>On va chercher vos vrais utilisateurs, on les fait tester, on vous remet ce qu&apos;ils ont <em>vraiment</em> pensé.</h1>
       <p className="hero-sub">
-        On teste vos maquettes Figma, vos prototypes, vos URLs de recette ou votre produit en prod. On va chercher les bons profils dans notre panel, on construit le questionnaire avec vous, et on vous rend un rapport qui dit quoi corriger en priorité.
+        Que vous soyez en pré-lancement ou déjà en production, on vous aide à valider vos parcours auprès des profils qui ressemblent à vos vrais utilisateurs.
       </p>
       <div className="hero-ctas">
         <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn-dark-b2b">Réserver un appel gratuit →</a>
