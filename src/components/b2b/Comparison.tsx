@@ -15,7 +15,7 @@ export default function Comparison() {
           Pourquoi un <em>service</em> plutôt qu&apos;un outil
         </h2>
         <p className="comparison-sub">
-          Les outils SaaS sont rapides mais vous laissent gérer le recrutement, la rédaction et l&apos;analyse. Les freelances UX sont précis mais coûtent plusieurs k€ par mission. earlypanel se positionne entre les deux : la flexibilité d&apos;un service rapide, et un humain qui prend en charge les bouts qui demandent du jugement.
+          Vos équipes savent ce qu&apos;elles veulent valider. Elles n&apos;ont juste pas le temps de recruter les testeurs, écrire les questions, lire les retours et en tirer un rapport exploitable. earlypanel prend en charge ces étapes, en 5 jours ouvrés, à un tarif forfaitaire, pour que vos équipes gardent leur temps pour ce qu&apos;elles font de mieux.
         </p>
       </div>
 
