@@ -12,7 +12,7 @@ export default function Comparison() {
       <div className="comparison-inner">
         <div className="comparison-eyebrow">Pourquoi earlypanel</div>
         <h2 className="comparison-title">
-          Pourquoi un <em>service</em> plutôt qu&apos;un outil
+          Pourquoi un <em>service</em>&nbsp;plutôt qu&apos;un outil
         </h2>
         <p className="comparison-sub">
           Vos équipes savent ce qu&apos;elles veulent valider. Elles n&apos;ont juste pas le temps de recruter les testeurs, écrire les questions, lire les retours et en tirer un rapport exploitable. earlypanel prend en charge ces étapes, en 5 jours ouvrés, à un tarif forfaitaire, pour que vos équipes gardent leur temps pour ce qu&apos;elles font de mieux.
