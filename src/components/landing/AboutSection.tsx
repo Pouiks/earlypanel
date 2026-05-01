@@ -14,7 +14,7 @@ export default function AboutSection() {
           Pourquoi <em>earlypanel</em>.
         </h2>
         <p className="about-lede">
-          Earlypanel est lancé en 2026 par Virgile Joinville, après plusieurs années à voir des produits déployés sans validation utilisateur. Le constat : les équipes produit savent faire, mais elles n&apos;ont jamais le temps de tester. earlypanel s&apos;occupe de cette partie, pour qu&apos;elles gardent leur temps pour ce qu&apos;elles font de mieux.
+          Earlypanel est lancé en 2026 par <a href="https://www.linkedin.com/in/virgilejoinville/" target="_blank" rel="noopener noreferrer">Virgile Joinville</a>, après plusieurs années à voir des produits déployés sans validation utilisateur. Le constat : les équipes produit savent faire, mais elles n&apos;ont jamais le temps de tester. earlypanel s&apos;occupe de cette partie, pour qu&apos;elles gardent leur temps pour ce qu&apos;elles font de mieux.
         </p>
         <p className="about-contact">
           Vous pouvez me joindre directement à{" "}
