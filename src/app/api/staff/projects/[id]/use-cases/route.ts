@@ -2,6 +2,32 @@ import { NextRequest, NextResponse } from "next/server";
 import { getStaffMember } from "@/lib/staff-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+type QuestionType = "text" | "binary" | "scale_1_5";
+const VALID_TYPES: QuestionType[] = ["text", "binary", "scale_1_5"];
+const VALID_BINARY_VALUES = ["yes", "no", "partial"];
+
+interface IncomingQuestion {
+  id?: string;
+  question_text: string;
+  question_hint?: string | null;
+  position: number;
+  question_type?: QuestionType;
+  /** Position (dans le meme UC) de la question parent. null = pas de parent. */
+  parent_position?: number | null;
+  parent_show_when_values?: string[] | null;
+  min_chars_hint?: number | null;
+}
+
+interface IncomingUseCase {
+  id?: string;
+  title: string;
+  task_wording?: string;
+  order: number;
+  expected_testers_count?: number;
+  criteria?: Array<{ id?: string; label: string; is_primary?: boolean; order: number }>;
+  questions?: IncomingQuestion[];
+}
+
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -99,12 +125,14 @@ export async function POST(
 
   if (questions && Array.isArray(questions) && questions.length > 0) {
     const rows = questions.map(
-      (q: { question_text: string; question_hint?: string }, i: number) => ({
+      (q: IncomingQuestion, i: number) => ({
         project_id: id,
         use_case_id: uc.id,
         position: i,
         question_text: q.question_text,
         question_hint: q.question_hint || null,
+        question_type: VALID_TYPES.includes(q.question_type ?? "text") ? q.question_type ?? "text" : "text",
+        min_chars_hint: q.min_chars_hint ?? null,
       })
     );
     await admin.from("project_questions").insert(rows);
@@ -135,18 +163,55 @@ export async function PUT(
 
   const { id: projectId } = await params;
   const body = await request.json();
-  const useCases: Array<{
-    id?: string;
-    title: string;
-    task_wording?: string;
-    order: number;
-    expected_testers_count?: number;
-    criteria?: Array<{ id?: string; label: string; is_primary?: boolean; order: number }>;
-    questions?: Array<{ id?: string; question_text: string; question_hint?: string; position: number }>;
-  }> = body.use_cases;
+  const useCases: IncomingUseCase[] = body.use_cases;
 
   if (!Array.isArray(useCases)) {
     return NextResponse.json({ error: "use_cases requis" }, { status: 400 });
+  }
+
+  // Validation prealable des questions conditionnelles. On le fait avant
+  // toute mutation pour eviter de partir en transaction et echouer au milieu.
+  for (const uc of useCases) {
+    const qs = uc.questions ?? [];
+    for (let i = 0; i < qs.length; i++) {
+      const q = qs[i];
+      if (q.question_type && !VALID_TYPES.includes(q.question_type)) {
+        return NextResponse.json(
+          { error: `Type de question invalide : ${q.question_type}` },
+          { status: 400 }
+        );
+      }
+      if (q.parent_position !== null && q.parent_position !== undefined) {
+        if (q.parent_position < 0 || q.parent_position >= i) {
+          return NextResponse.json(
+            { error: "Une question conditionnelle doit referencer un parent situe avant elle dans le meme cas d'usage." },
+            { status: 400 }
+          );
+        }
+        const parent = qs[q.parent_position];
+        if (parent.question_type !== "binary") {
+          return NextResponse.json(
+            { error: "Seule une question de type 'binary' peut etre parent d'une question conditionnelle." },
+            { status: 400 }
+          );
+        }
+        if (q.parent_show_when_values && q.parent_show_when_values.length > 0) {
+          const invalid = q.parent_show_when_values.filter((v) => !VALID_BINARY_VALUES.includes(v));
+          if (invalid.length > 0) {
+            return NextResponse.json(
+              { error: `Valeur(s) parent_show_when_values invalides : ${invalid.join(", ")}` },
+              { status: 400 }
+            );
+          }
+        }
+      }
+      if (q.min_chars_hint !== null && q.min_chars_hint !== undefined && q.min_chars_hint <= 0) {
+        return NextResponse.json(
+          { error: "min_chars_hint doit etre > 0 ou null" },
+          { status: 400 }
+        );
+      }
+    }
   }
 
   const existingUcIds = useCases.filter((uc) => uc.id).map((uc) => uc.id!);
@@ -160,9 +225,6 @@ export async function PUT(
     .map((u: { id: string }) => u.id)
     .filter((uid: string) => !existingUcIds.includes(uid));
 
-  // Garde-fou : refuser la suppression d'un UC dont les questions ont deja recu des reponses.
-  // La FK project_questions.use_case_id ON DELETE SET NULL preserve les questions,
-  // mais l'utilisateur perdrait sa structure d'UC tout en laissant des questions orphelines.
   if (toDelete.length > 0) {
     const { data: ucQuestions } = await admin
       .from("project_questions")
@@ -186,7 +248,6 @@ export async function PUT(
         );
       }
 
-      // Aucune reponse : supprimer aussi explicitement les questions de ces UC pour eviter les orphelins.
       await admin.from("project_questions").delete().in("use_case_id", toDelete);
     }
 
@@ -236,7 +297,6 @@ export async function PUT(
     }
 
     if (uc.questions !== undefined) {
-      // Diff base sur les ids pour preserver les reponses existantes.
       const { data: existingQs } = await admin
         .from("project_questions")
         .select("id")
@@ -249,7 +309,6 @@ export async function PUT(
       const questionsToDelete = [...existingIds].filter((qid) => !incomingIds.has(qid));
 
       if (questionsToDelete.length > 0) {
-        // Garde-fou : refuser de supprimer une question deja repondue.
         const { count: answersOnDeleted } = await admin
           .from("project_tester_answers")
           .select("id", { count: "exact", head: true })
@@ -265,12 +324,24 @@ export async function PUT(
           );
         }
 
+        // SET NULL en cascade avant DELETE pour que les enfants ne pointent
+        // pas dans le vide (ON DELETE SET NULL le ferait deja, mais on rend
+        // l'intention explicite).
+        await admin
+          .from("project_questions")
+          .update({ parent_question_id: null, parent_show_when_values: null })
+          .in("parent_question_id", questionsToDelete);
+
         await admin.from("project_questions").delete().in("id", questionsToDelete);
       }
 
-      // UPDATE des questions existantes, INSERT des nouvelles, en preservant l'ordre fourni.
+      // Pass 1 : UPDATE/INSERT et collecte des ids par position pour resoudre les parents.
+      const positionToId: string[] = [];
       for (let i = 0; i < uc.questions.length; i++) {
         const q = uc.questions[i];
+        const qType = VALID_TYPES.includes(q.question_type ?? "text") ? q.question_type ?? "text" : "text";
+        const minHint = q.min_chars_hint ?? null;
+
         if (q.id && existingIds.has(q.id)) {
           await admin
             .from("project_questions")
@@ -278,17 +349,53 @@ export async function PUT(
               question_text: q.question_text,
               question_hint: q.question_hint || null,
               position: i,
+              question_type: qType,
+              min_chars_hint: minHint,
+              // Reset des champs conditionnels : seront re-positionnes en pass 2.
+              parent_question_id: null,
+              parent_show_when_values: null,
             })
             .eq("id", q.id);
+          positionToId[i] = q.id;
         } else {
-          await admin.from("project_questions").insert({
-            project_id: projectId,
-            use_case_id: ucId,
-            position: i,
-            question_text: q.question_text,
-            question_hint: q.question_hint || null,
-          });
+          const { data: newQ, error: qErr } = await admin
+            .from("project_questions")
+            .insert({
+              project_id: projectId,
+              use_case_id: ucId,
+              position: i,
+              question_text: q.question_text,
+              question_hint: q.question_hint || null,
+              question_type: qType,
+              min_chars_hint: minHint,
+            })
+            .select()
+            .single();
+          if (qErr || !newQ) {
+            return NextResponse.json(
+              { error: qErr?.message || "Erreur insertion question" },
+              { status: 500 }
+            );
+          }
+          positionToId[i] = newQ.id;
         }
+      }
+
+      // Pass 2 : pour chaque question conditionnelle, on resoud parent_position -> id
+      // et on met a jour parent_question_id + parent_show_when_values.
+      for (let i = 0; i < uc.questions.length; i++) {
+        const q = uc.questions[i];
+        if (q.parent_position === null || q.parent_position === undefined) continue;
+        const parentId = positionToId[q.parent_position];
+        if (!parentId) continue;
+        const showWhen = (q.parent_show_when_values ?? []).filter((v) => VALID_BINARY_VALUES.includes(v));
+        await admin
+          .from("project_questions")
+          .update({
+            parent_question_id: parentId,
+            parent_show_when_values: showWhen.length > 0 ? showWhen : null,
+          })
+          .eq("id", positionToId[i]);
       }
     }
   }

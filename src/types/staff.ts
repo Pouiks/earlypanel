@@ -59,6 +59,11 @@ export interface Project {
   questions?: ProjectQuestion[];
 }
 
+export type QuestionType = "text" | "binary" | "scale_1_5";
+
+/** Valeurs possibles d'une reponse pour une question binary. */
+export type BinaryAnswerValue = "yes" | "no" | "partial";
+
 export interface ProjectQuestion {
   id: string;
   project_id: string;
@@ -66,6 +71,14 @@ export interface ProjectQuestion {
   question_text: string;
   use_case_id?: string | null;
   question_hint?: string | null;
+  question_type?: QuestionType;
+  /** Si non null, cette question n'apparait au testeur que si la reponse du parent
+   *  est dans `parent_show_when_values`. Le parent doit etre une question binary
+   *  du meme cas d'usage (verifie cote API). */
+  parent_question_id?: string | null;
+  parent_show_when_values?: string[] | null;
+  /** Suggestion soft (non bloquante) pour les questions text. */
+  min_chars_hint?: number | null;
 }
 
 export interface ProjectUseCase {

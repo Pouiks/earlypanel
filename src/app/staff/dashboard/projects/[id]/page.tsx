@@ -59,8 +59,11 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
     fetchProject();
   }, [id]);
 
-  async function fetchProject() {
-    setLoading(true);
+  async function fetchProject(opts: { silent?: boolean } = {}) {
+    // silent=true : refresh sans flag loading global, pour eviter de
+    // demonter les onglets enfants (canvas Scenarios) pendant qu'ils
+    // travaillent. Utilise apres un autosave reussi.
+    if (!opts.silent) setLoading(true);
     try {
       const res = await fetch(`/api/staff/projects/${id}`);
       if (res.ok) {
@@ -73,7 +76,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
     } catch {
       // retry
     } finally {
-      setLoading(false);
+      if (!opts.silent) setLoading(false);
     }
   }
 
@@ -307,7 +310,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         <ProjectQuestionsTab
           projectId={id}
           questions={project.questions ?? []}
-          onUpdate={fetchProject}
+          onUpdate={() => fetchProject({ silent: true })}
         />
       )}
       {activeTab === "answers" && <ProjectAnswersTab projectId={id} />}

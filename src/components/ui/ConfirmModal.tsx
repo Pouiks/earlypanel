@@ -92,7 +92,9 @@ export function useConfirm() {
           position: "fixed",
           inset: 0,
           background: "rgba(0,0,0,0.45)",
-          zIndex: 1000,
+          // Doit etre au-dessus de tous les autres modals (NDA preview a 10000,
+          // staff drawer a 200, etc.) — c'est par nature un dialogue par-dessus.
+          zIndex: 100000,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",

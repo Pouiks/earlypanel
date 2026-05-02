@@ -11,6 +11,24 @@ interface MissionAnswer {
   answer_text: string | null;
   images: UploadedImage[];
 }
+interface MissionUseCase {
+  id: string;
+  title: string;
+  task_wording: string | null;
+  order: number;
+  criteria: { id: string; label: string; is_primary: boolean; order: number }[];
+}
+interface MissionQuestion {
+  id: string;
+  position: number;
+  question_text: string;
+  question_hint?: string | null;
+  question_type?: "text" | "binary" | "scale_1_5";
+  parent_question_id?: string | null;
+  parent_show_when_values?: string[] | null;
+  min_chars_hint?: number | null;
+  use_case_id?: string | null;
+}
 interface MissionDetail {
   tester_id: string;
   tester: {
@@ -38,7 +56,8 @@ interface MissionDetail {
     ref_number: string | null;
     status: string;
   };
-  questions: { id: string; position: number; question_text: string }[];
+  questions: MissionQuestion[];
+  use_cases?: MissionUseCase[];
   answers: MissionAnswer[];
 }
 
@@ -228,8 +247,8 @@ export default function MissionDetailPage() {
   const inProgress = !readOnlyMission && status === "in_progress" && !expired;
   const completed = status === "completed";
 
-  const totalAnswered = questions.filter((q) => (drafts[q.id] || "").trim().length > 0).length;
-  const allAnswered = totalAnswered === questions.length;
+  // allAnswered est calcule par le wizard lui-meme (les questions
+  // conditionnelles non visibles ne doivent pas bloquer la soumission).
 
   return (
     <div>
@@ -457,6 +476,7 @@ export default function MissionDetailPage() {
             projectTitle={project.title}
             categoryLabel={project.sector?.trim() || "Votre mission"}
             questions={questions}
+            useCases={mission.use_cases ?? []}
             tester={mission.tester}
             drafts={drafts}
             onDraftChange={handleDraftChange}
@@ -468,7 +488,6 @@ export default function MissionDetailPage() {
             }
             inProgress={inProgress}
             completed={completed}
-            allAnswered={allAnswered}
             onOpenSubmit={() => setShowSubmitModal(true)}
           />
         </div>

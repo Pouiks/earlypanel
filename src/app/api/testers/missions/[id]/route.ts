@@ -74,9 +74,37 @@ export async function GET(
 
     const { data: questions } = await admin
       .from("project_questions")
-      .select("id, position, question_text")
+      .select(
+        "id, position, question_text, question_hint, question_type, " +
+        "parent_question_id, parent_show_when_values, min_chars_hint, use_case_id"
+      )
       .eq("project_id", projectId)
       .order("position");
+
+    // Cas d'usage avec leurs criteres : permet a la vue testeur d'afficher
+    // briefs et checklist par scenario, plutot qu'une liste plate de questions.
+    const { data: useCasesRaw } = await admin
+      .from("project_use_cases")
+      .select("id, title, task_wording, \"order\", use_case_success_criteria(id, label, is_primary, \"order\")")
+      .eq("project_id", projectId)
+      .order("order", { ascending: true });
+
+    const useCases = (useCasesRaw ?? []).map((uc: Record<string, unknown>) => ({
+      id: uc.id as string,
+      title: uc.title as string,
+      task_wording: (uc.task_wording as string | null) ?? null,
+      order: uc.order as number,
+      criteria: Array.isArray(uc.use_case_success_criteria)
+        ? (uc.use_case_success_criteria as Record<string, unknown>[])
+            .sort((a, b) => (a.order as number) - (b.order as number))
+            .map((c) => ({
+              id: c.id as string,
+              label: c.label as string,
+              is_primary: c.is_primary as boolean,
+              order: c.order as number,
+            }))
+        : [],
+    }));
 
     const { data: rawAnswers } = await admin
       .from("project_tester_answers")
@@ -142,6 +170,7 @@ export async function GET(
         status: project.status,
       },
       questions: questions || [],
+      use_cases: useCases,
       answers: answers || [],
     });
   } catch (err) {

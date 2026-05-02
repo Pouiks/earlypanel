@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import RichTextEditor from "@/components/ui/RichTextEditor";
 import PillSelect from "@/components/ui/PillSelect";
-import type { Project, ProjectQuestion } from "@/types/staff";
+import type { Project } from "@/types/staff";
 
 interface ProjectFormProps {
   initialData?: Project & { client_id?: string | null };
@@ -24,7 +24,6 @@ export interface ProjectFormData {
   contact_email: string;
   contact_phone: string;
   urls: string[];
-  questions: { question_text: string }[];
   target_gender: string[];
   target_age_min: number | null;
   target_age_max: number | null;
@@ -220,11 +219,6 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
     initialData?.end_date ? toDatetimeLocal(initialData.end_date) : defaultEndDatetimeLocal()
   );
   const [dateError, setDateError] = useState<string | null>(null);
-  const [baseRewardEuros, setBaseRewardEuros] = useState(
-    initialData?.base_reward_cents != null && initialData.base_reward_cents > 0
-      ? String(initialData.base_reward_cents / 100)
-      : ""
-  );
 
   const [businessObjective, setBusinessObjective] = useState(initialData?.business_objective ?? "");
   const [scopeIncluded, setScopeIncluded] = useState<string[]>(initialData?.scope_included?.length ? initialData.scope_included : [""]);
@@ -241,10 +235,8 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
 
   const [urls, setUrls] = useState<string[]>(initialData?.urls?.length ? initialData.urls : [""]);
 
-  const initQuestions = initialData?.questions?.length
-    ? initialData.questions.map((q: ProjectQuestion) => q.question_text)
-    : [""];
-  const [questions, setQuestions] = useState<string[]>(initQuestions);
+  // Les questions sont composees dans l'onglet "Scenarios" du projet
+  // (canvas outline). Plus de questions a la creation.
 
   const [targetGender, setTargetGender] = useState<string[]>(initialData?.target_gender ?? []);
   const [targetAgeMin, setTargetAgeMin] = useState(initialData?.target_age_min?.toString() ?? "");
@@ -274,14 +266,6 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
   function addFinding() { setAuditFindings([...auditFindings, ""]); }
   function removeFinding(i: number) { setAuditFindings(auditFindings.filter((_, idx) => idx !== i)); }
   function updateFinding(i: number, val: string) { const n = [...auditFindings]; n[i] = val; setAuditFindings(n); }
-
-  function addQuestion() { setQuestions([...questions, ""]); }
-  function removeQuestion(i: number) { setQuestions(questions.filter((_, idx) => idx !== i)); }
-  function updateQuestion(i: number, val: string) {
-    const next = [...questions];
-    next[i] = val;
-    setQuestions(next);
-  }
 
   function addLocation() {
     const trimmed = locationInput.trim();
@@ -320,15 +304,16 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
         sector,
         start_date: startIso,
         end_date: endIso,
-        base_reward_cents: baseRewardEuros.trim()
-          ? Math.round(parseFloat(baseRewardEuros.replace(",", ".")) * 100)
-          : null,
+        // base_reward_cents : la rémunération est calculée par profil testeur,
+        // pas au niveau projet. On envoie null pour ne pas alimenter de
+        // fallback obsolète côté DB.
+        base_reward_cents: null,
         contact_first_name: contactFirstName.trim(),
         contact_last_name: contactLastName.trim(),
         contact_email: contactEmail.trim(),
         contact_phone: contactPhone.trim(),
         urls: urls.filter((u) => u.trim()),
-        questions: questions.filter((q) => q.trim()).map((q) => ({ question_text: q.trim() })),
+        // Les questions sont gerees dans l'onglet Scenarios du projet, pas ici.
         target_gender: targetGender,
         target_age_min: targetAgeMin ? parseInt(targetAgeMin) : null,
         target_age_max: targetAgeMax ? parseInt(targetAgeMax) : null,
@@ -421,22 +406,6 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
           </div>
         </div>
 
-        <div style={{ marginTop: 14 }}>
-          <label style={labelStyle}>Rémunération de base (€ HT par testeur)</label>
-          <input
-            type="text"
-            inputMode="decimal"
-            value={baseRewardEuros}
-            onChange={(e) => setBaseRewardEuros(e.target.value)}
-            placeholder="Ex : 20"
-            style={{ ...inputStyle, maxWidth: 200 }}
-            onFocus={(e) => e.currentTarget.style.borderColor = "#0A7A5A"}
-            onBlur={(e) => e.currentTarget.style.borderColor = "rgba(0,0,0,0.12)"}
-          />
-          <p style={{ fontSize: 12, color: "#86868b", margin: "8px 0 0" }}>
-            Sert au calcul automatique du versement après notation (ajustable dans l&apos;onglet Versements).
-          </p>
-        </div>
       </div>
 
       {/* SECTION: Client */}
@@ -605,74 +574,12 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
         </button>
       </div>
 
-      {/* SECTION: Questions */}
-      <div style={sectionStyle}>
-        <h2 style={sectionTitleStyle}>Questions du test</h2>
-        {questions.map((q, i) => (
-          <div key={i} style={{ display: "flex", gap: 8, marginBottom: 10, alignItems: "flex-start" }}>
-            <span style={{
-              minWidth: 28,
-              height: 38,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 13,
-              fontWeight: 700,
-              color: "#0A7A5A",
-              background: "#f0faf5",
-              borderRadius: 8,
-            }}>
-              {i + 1}
-            </span>
-            <input
-              type="text"
-              value={q}
-              onChange={(e) => updateQuestion(i, e.target.value)}
-              placeholder={`Question ${i + 1}`}
-              style={{ ...inputStyle, flex: 1 }}
-              onFocus={(e) => e.currentTarget.style.borderColor = "#0A7A5A"}
-              onBlur={(e) => e.currentTarget.style.borderColor = "rgba(0,0,0,0.12)"}
-            />
-            {questions.length > 1 && (
-              <button
-                type="button"
-                onClick={() => removeQuestion(i)}
-                style={{
-                  padding: "0 14px",
-                  fontSize: 18,
-                  color: "#e53e3e",
-                  background: "#fef2f2",
-                  border: "none",
-                  borderRadius: 10,
-                  cursor: "pointer",
-                  transition: "all 150ms",
-                  height: 38,
-                }}
-              >
-                &times;
-              </button>
-            )}
-          </div>
-        ))}
-        <button
-          type="button"
-          onClick={addQuestion}
-          style={{
-            padding: "8px 18px",
-            fontSize: 13,
-            fontWeight: 600,
-            color: "#0A7A5A",
-            background: "#f0faf5",
-            border: "1.5px solid #0A7A5A",
-            borderRadius: 980,
-            cursor: "pointer",
-            fontFamily: "inherit",
-            transition: "all 200ms",
-          }}
-        >
-          + Ajouter une question
-        </button>
-      </div>
+      {/*
+        Note : les questions et scenarios sont desormais composes dans l'onglet
+        "Scenarios" de la fiche projet (canvas outline avec drag-and-drop, types
+        de question, conditionnelles, prevue testeur). Apres creation, accedez
+        a cet onglet pour rediger le contenu du test.
+      */}
 
       {/* SECTION: Contexte du rapport (repliable) */}
       <div style={sectionStyle}>
