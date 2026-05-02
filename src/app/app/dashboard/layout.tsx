@@ -144,7 +144,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
           type: "warning",
           title: "Coordonnées bancaires manquantes",
           message: "Renseignez votre IBAN pour recevoir vos rémunérations après chaque mission validée.",
-          action: { label: "Renseigner mon IBAN", href: "/app/dashboard/profil" },
+          action: { label: "Renseigner mon IBAN", href: "/app/dashboard/profil#informations-bancaires" },
           persistent: true,
           dedupKey: "login-payment-info",
         });

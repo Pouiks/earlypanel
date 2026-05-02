@@ -180,7 +180,7 @@ export default function PaymentInfoSection() {
 
   if (loading) {
     return (
-      <div style={sectionStyle}>
+      <div id="informations-bancaires" style={sectionStyle}>
         <div style={{ color: "#86868B", fontSize: 14 }}>Chargement…</div>
       </div>
     );
@@ -189,7 +189,7 @@ export default function PaymentInfoSection() {
   // Vue "configured" : on n'affiche jamais l'IBAN clair, seulement le last4.
   if (info?.configured && !editing) {
     return (
-      <div style={sectionStyle}>
+      <div id="informations-bancaires" style={sectionStyle}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16, marginBottom: 12 }}>
           <h2 style={{ fontSize: 16, fontWeight: 700, color: "#1d1d1f", margin: 0 }}>
             Informations bancaires
@@ -291,7 +291,7 @@ export default function PaymentInfoSection() {
 
   // Vue "edit" : formulaire de saisie (initial ou modification).
   return (
-    <div style={sectionStyle}>
+    <div id="informations-bancaires" style={sectionStyle}>
       <h2 style={{ fontSize: 16, fontWeight: 700, color: "#1d1d1f", margin: "0 0 6px" }}>
         Informations bancaires
       </h2>

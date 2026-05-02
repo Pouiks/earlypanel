@@ -10,9 +10,14 @@ const GENDER_LABELS: Record<string, string> = {
   prefer_not_to_say: "Préfère ne pas répondre",
 };
 
+type DrawerCloseAction =
+  | { type: "unchanged" }
+  | { type: "deleted"; id: string }
+  | { type: "updated"; id: string; patch: Record<string, unknown> };
+
 interface TesterDrawerProps {
   testerId: string | null;
-  onClose: (mutated: boolean) => void;
+  onClose: (action: DrawerCloseAction) => void;
 }
 
 interface PersonaOption extends TesterPersona {
@@ -58,10 +63,9 @@ export default function TesterDrawer({ testerId, onClose }: TesterDrawerProps) {
   const [deleteConfirmEmail, setDeleteConfirmEmail] = useState("");
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
-  // Vrai des qu'une mutation reussit (PATCH ou DELETE) : la liste parente
-  // n'est rechargee qu'a la fermeture si un changement a effectivement eu
-  // lieu — pas de re-render gratuit a chaque clic dehors.
-  const [mutated, setMutated] = useState(false);
+  // Patch accumule des champs visibles dans la liste parente, mergee a la
+  // fermeture sans refetch. Vide = aucune mutation = parent ne re-render pas.
+  const [rowPatch, setRowPatch] = useState<Record<string, unknown>>({});
 
   const fetchDrawerData = useCallback(async () => {
     if (!testerId) {
@@ -69,8 +73,7 @@ export default function TesterDrawer({ testerId, onClose }: TesterDrawerProps) {
       setPersonas([]);
       return;
     }
-    // Reset du flag mutation a chaque ouverture d'un nouveau testeur.
-    setMutated(false);
+    setRowPatch({});
 
     setLoading(true);
     try {
@@ -92,10 +95,18 @@ export default function TesterDrawer({ testerId, onClose }: TesterDrawerProps) {
 
   if (!testerId) return null;
 
+  const handleClose = () => {
+    if (Object.keys(rowPatch).length === 0) {
+      onClose({ type: "unchanged" });
+    } else {
+      onClose({ type: "updated", id: testerId, patch: rowPatch });
+    }
+  };
+
   return (
     <>
       <div
-        onClick={() => onClose(mutated)}
+        onClick={handleClose}
         style={{
           position: "fixed", inset: 0, background: "rgba(0,0,0,0.3)",
           zIndex: 200, animation: "drawerOverlayIn 200ms ease",
@@ -114,7 +125,7 @@ export default function TesterDrawer({ testerId, onClose }: TesterDrawerProps) {
           <h2 style={{ fontSize: 17, fontWeight: 700, color: "#1d1d1f", letterSpacing: "-0.03em", margin: 0 }}>
             Profil testeur
           </h2>
-          <button onClick={() => onClose(mutated)} style={{
+          <button onClick={handleClose} style={{
             background: "none", border: "none", fontSize: 20, color: "#86868B",
             cursor: "pointer", padding: "4px 8px", borderRadius: 8, transition: "background 150ms",
           }}>&times;</button>
@@ -165,7 +176,6 @@ export default function TesterDrawer({ testerId, onClose }: TesterDrawerProps) {
                       });
                       if (res.ok) {
                         setTester({ ...tester, gender: val || null } as Tester);
-                        setMutated(true);
                       }
                     }}
                     style={{
@@ -201,7 +211,14 @@ export default function TesterDrawer({ testerId, onClose }: TesterDrawerProps) {
                       });
                       if (res.ok) {
                         setTester({ ...tester, persona_id: personaId } as Tester);
-                        setMutated(true);
+                        const matched = personaId ? personas.find((p) => p.id === personaId) : null;
+                        setRowPatch((prev) => ({
+                          ...prev,
+                          persona_id: personaId,
+                          persona: matched
+                            ? { id: matched.id, slug: matched.slug, name: matched.name }
+                            : null,
+                        }));
                       }
                       setSavingPersona(false);
                     }}
@@ -252,7 +269,6 @@ export default function TesterDrawer({ testerId, onClose }: TesterDrawerProps) {
                       });
                       if (res.ok) {
                         setTester({ ...tester, persona_locked: locked } as Tester);
-                        setMutated(true);
                       }
                       setSavingPersona(false);
                     }}
@@ -403,7 +419,7 @@ export default function TesterDrawer({ testerId, onClose }: TesterDrawerProps) {
                       throw new Error(data.error || `Erreur ${res.status}`);
                     }
                     setDeleteOpen(false);
-                    onClose(true);
+                    onClose({ type: "deleted", id: testerId });
                   } catch (e) {
                     setDeleteError(e instanceof Error ? e.message : "Erreur lors de la suppression");
                   } finally {

@@ -254,9 +254,17 @@ export default function StaffTestersPage() {
 
       <TesterDrawer
         testerId={drawerId}
-        onClose={(mutated) => {
+        onClose={(action) => {
+          if (action.type === "deleted") {
+            setTesters((prev) => prev.filter((t) => t.id !== action.id));
+          } else if (action.type === "updated") {
+            setTesters((prev) =>
+              prev.map((t) =>
+                t.id === action.id ? ({ ...t, ...action.patch } as TesterRow) : t,
+              ),
+            );
+          }
           setDrawerId(null);
-          if (mutated) load();
         }}
       />
     </div>
