@@ -48,17 +48,26 @@ export interface NotificationOptions {
   action?: NotificationAction;
   /** Si true, ne disparait jamais automatiquement. Defaut : false. */
   persistent?: boolean;
-  /** Duree avant autodismiss (ms). Defaut 30000 (30s). Ignore si persistent=true. */
+  /** Duree avant autodismiss (ms). Defaut 7000 (7s). Ignore si persistent=true. */
   durationMs?: number;
   /** Cle de dedup : remplace au lieu d'empiler. */
   dedupKey?: string;
+  /**
+   * Si defini avec une dedupKey : la notification ne sera pas re-affichee
+   * pendant cette duree, meme apres un refresh de la page (persiste en
+   * localStorage). Utile pour les notifs "rappel" qu'on ne veut pas voir
+   * resurgir a chaque navigation. La notif reste accessible dans
+   * l'historique de la cloche du header.
+   */
+  cooldownMs?: number;
 }
 
-interface InternalNotification extends Required<Omit<NotificationOptions, "action" | "title" | "dedupKey">> {
+interface InternalNotification extends Required<Omit<NotificationOptions, "action" | "title" | "dedupKey" | "cooldownMs">> {
   id: string;
   action?: NotificationAction;
   title?: string;
   dedupKey?: string;
+  cooldownMs?: number;
   /** Timestamp de creation (pour l'historique). */
   createdAt: number;
 }
@@ -79,6 +88,28 @@ const NotificationContext = createContext<NotificationContextValue | null>(null)
 // notifs ratees / a relire.
 const DEFAULT_DURATION_MS = 7_000;
 const HISTORY_MAX = 50;
+
+const COOLDOWN_STORAGE_PREFIX = "notif-cooldown:";
+
+function wasShownWithinCooldown(dedupKey: string, cooldownMs: number): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const raw = window.localStorage.getItem(COOLDOWN_STORAGE_PREFIX + dedupKey);
+    if (!raw) return false;
+    const ts = parseInt(raw, 10);
+    if (!Number.isFinite(ts)) return false;
+    return Date.now() - ts < cooldownMs;
+  } catch {
+    return false;
+  }
+}
+
+function markShownNow(dedupKey: string) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(COOLDOWN_STORAGE_PREFIX + dedupKey, String(Date.now()));
+  } catch { /* localStorage indisponible (mode prive) */ }
+}
 
 let idCounter = 0;
 function nextId(): string {
@@ -135,6 +166,16 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
   const notify = useCallback(
     (opts: NotificationOptions): string => {
+      // Cooldown localStorage : si la notif a deja ete declenchee dans la
+      // fenetre, on la skip silencieusement. L'historique cloche garde
+      // la trace de la derniere occurrence.
+      if (opts.dedupKey && opts.cooldownMs && opts.cooldownMs > 0) {
+        if (wasShownWithinCooldown(opts.dedupKey, opts.cooldownMs)) {
+          return "";
+        }
+        markShownNow(opts.dedupKey);
+      }
+
       const id = nextId();
       const internal: InternalNotification = {
         id,

@@ -101,8 +101,11 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
       previousNotifsRef.current = data;
 
       // Toast au login : signaler les choses qui demandent une action.
-      // Persistant tant que le user ne clique pas (volontaire : on ne veut
-      // pas qu'il rate son NDA en attente).
+      // Cooldown 4h pour eviter de re-spammer a chaque refresh / retour
+      // sur le dashboard. Le testeur retrouve les notifs dans la cloche
+      // du header s'il veut les relire.
+      const COOLDOWN = 4 * 60 * 60 * 1000;
+
       if (data.documents > 0) {
         notify({
           type: "warning",
@@ -111,8 +114,8 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
             : "1 document à signer",
           message: "Un accord de confidentialité vous attend dans votre espace documents.",
           action: { label: "Voir mes documents", href: "/app/dashboard/documents" },
-          // Auto-dismiss apres 30s (defaut). Reste accessible via la cloche du header.
           dedupKey: "login-documents",
+          cooldownMs: COOLDOWN,
         });
       }
       if (data.missions > 0) {
@@ -123,8 +126,8 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
             : "1 mission disponible",
           message: "Vous pouvez démarrer ou poursuivre vos missions de test.",
           action: { label: "Voir mes missions", href: "/app/dashboard/missions" },
-          // Auto-dismiss apres 30s (defaut). Reste accessible via la cloche du header.
           dedupKey: "login-missions",
+          cooldownMs: COOLDOWN,
         });
       }
       if (data.profil > 0) {
@@ -135,8 +138,8 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
             : "1 champ à compléter",
           message: "Complétez votre profil pour pouvoir être invité aux projets.",
           action: { label: "Compléter mon profil", href: "/app/dashboard/profil" },
-          // Auto-dismiss apres 30s (defaut). Reste accessible via la cloche du header.
           dedupKey: "login-profil",
+          cooldownMs: COOLDOWN,
         });
       }
       if (data.payment_info_missing) {
@@ -145,8 +148,8 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
           title: "Coordonnées bancaires manquantes",
           message: "Renseignez votre IBAN pour recevoir vos rémunérations après chaque mission validée.",
           action: { label: "Renseigner mon IBAN", href: "/app/dashboard/profil#informations-bancaires" },
-          // Auto-dismiss apres 30s (defaut). Reste accessible via la cloche du header.
           dedupKey: "login-payment-info",
+          cooldownMs: COOLDOWN,
         });
       }
     });
