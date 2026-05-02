@@ -111,7 +111,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
             : "1 document à signer",
           message: "Un accord de confidentialité vous attend dans votre espace documents.",
           action: { label: "Voir mes documents", href: "/app/dashboard/documents" },
-          persistent: true,
+          // Auto-dismiss apres 30s (defaut). Reste accessible via la cloche du header.
           dedupKey: "login-documents",
         });
       }
@@ -123,7 +123,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
             : "1 mission disponible",
           message: "Vous pouvez démarrer ou poursuivre vos missions de test.",
           action: { label: "Voir mes missions", href: "/app/dashboard/missions" },
-          persistent: true,
+          // Auto-dismiss apres 30s (defaut). Reste accessible via la cloche du header.
           dedupKey: "login-missions",
         });
       }
@@ -135,7 +135,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
             : "1 champ à compléter",
           message: "Complétez votre profil pour pouvoir être invité aux projets.",
           action: { label: "Compléter mon profil", href: "/app/dashboard/profil" },
-          persistent: true,
+          // Auto-dismiss apres 30s (defaut). Reste accessible via la cloche du header.
           dedupKey: "login-profil",
         });
       }
@@ -145,7 +145,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
           title: "Coordonnées bancaires manquantes",
           message: "Renseignez votre IBAN pour recevoir vos rémunérations après chaque mission validée.",
           action: { label: "Renseigner mon IBAN", href: "/app/dashboard/profil#informations-bancaires" },
-          persistent: true,
+          // Auto-dismiss apres 30s (defaut). Reste accessible via la cloche du header.
           dedupKey: "login-payment-info",
         });
       }
@@ -166,7 +166,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
             title: delta > 1 ? `${delta} nouveaux documents à signer` : "Nouveau document à signer",
             message: "Un accord de confidentialité vient d'arriver dans votre espace.",
             action: { label: "Voir", href: "/app/dashboard/documents" },
-            persistent: true,
+            // Auto-dismiss apres 30s (defaut). Reste accessible via la cloche du header.
             dedupKey: "new-documents",
           });
         }
@@ -177,7 +177,7 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
             title: delta > 1 ? `${delta} nouvelles missions` : "Nouvelle mission disponible",
             message: "Une mission de test vient d'être ouverte pour vous.",
             action: { label: "Voir", href: "/app/dashboard/missions" },
-            persistent: true,
+            // Auto-dismiss apres 30s (defaut). Reste accessible via la cloche du header.
             dedupKey: "new-missions",
           });
         }

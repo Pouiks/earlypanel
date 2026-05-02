@@ -15,8 +15,7 @@ import {
 // Notifications riches : queue, types, actions, dismiss persistant
 // =====================================================================
 //
-// Remplace le composant Toast simple (un seul message a la fois,
-// autodismiss force). Utilise via le hook `useNotify()` :
+// Remplace le composant Toast simple. Utilise via le hook `useNotify()` :
 //
 //   const { notify } = useNotify();
 //   notify({
@@ -24,12 +23,16 @@ import {
 //     title: "Nouvelle mission",
 //     message: "Le projet ABC vient d'etre ouvert.",
 //     action: { label: "Voir", href: "/app/dashboard/missions" },
-//     persistent: true, // si true : pas d'autodismiss
-//     dedupKey: "mission-abc", // si meme key existe deja, on remplace
+//     // Auto-dismiss apres 30s par defaut (avec barre de progression visible).
+//     // Pour une notif critique non auto-dismissable : persistent: true
+//     dedupKey: "mission-abc",
 //   });
 //
-// Plusieurs toasts s'empilent en bas a droite. Cliquer sur l'action
-// ferme le toast et navigue. Cliquer sur le X le ferme sans naviguer.
+// Toutes les notifs (sauf persistent:true) sont retirees du stack apres
+// leur duree, mais conservees dans `history` (max 50) accessible via
+// useNotificationHistory() — pour permettre une cloche "Notifications recentes"
+// dans le header.
+// =====================================================================
 
 export type NotificationType = "info" | "success" | "warning" | "error";
 
@@ -43,15 +46,11 @@ export interface NotificationOptions {
   title?: string;
   message: string;
   action?: NotificationAction;
-  /** Si true, ne disparait pas automatiquement (l'utilisateur doit cliquer X ou l'action) */
+  /** Si true, ne disparait jamais automatiquement. Defaut : false. */
   persistent?: boolean;
-  /** Duree avant autodismiss (ms). Defaut 4000. Ignore si persistent=true. */
+  /** Duree avant autodismiss (ms). Defaut 30000 (30s). Ignore si persistent=true. */
   durationMs?: number;
-  /**
-   * Cle de deduplication. Si une notification avec la meme key existe deja,
-   * elle est remplacee au lieu d'empiler. Utile pour le polling : on ne veut
-   * pas accumuler 10 toasts "1 nouveau document" si le user ne ferme pas.
-   */
+  /** Cle de dedup : remplace au lieu d'empiler. */
   dedupKey?: string;
 }
 
@@ -60,15 +59,23 @@ interface InternalNotification extends Required<Omit<NotificationOptions, "actio
   action?: NotificationAction;
   title?: string;
   dedupKey?: string;
+  /** Timestamp de creation (pour l'historique). */
+  createdAt: number;
 }
 
 interface NotificationContextValue {
   notify: (opts: NotificationOptions) => string;
   dismiss: (id: string) => void;
   clearAll: () => void;
+  /** Historique : toutes les notifications affichees recemment (max 50). */
+  history: InternalNotification[];
+  clearHistory: () => void;
 }
 
 const NotificationContext = createContext<NotificationContextValue | null>(null);
+
+const DEFAULT_DURATION_MS = 30_000;
+const HISTORY_MAX = 50;
 
 let idCounter = 0;
 function nextId(): string {
@@ -108,7 +115,10 @@ const TYPE_STYLES: Record<NotificationType, { bg: string; border: string; iconBg
 };
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
+  // items = ce qui est actuellement affiche en bas a droite
   const [items, setItems] = useState<InternalNotification[]>([]);
+  // history = toutes les notifs recentes (cumulees), pour la cloche header
+  const [history, setHistory] = useState<InternalNotification[]>([]);
   const timeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
 
   const dismiss = useCallback((id: string) => {
@@ -130,12 +140,12 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         message: opts.message,
         action: opts.action,
         persistent: opts.persistent ?? false,
-        durationMs: opts.durationMs ?? 4000,
+        durationMs: opts.durationMs ?? DEFAULT_DURATION_MS,
         dedupKey: opts.dedupKey,
+        createdAt: Date.now(),
       };
 
       setItems((prev) => {
-        // Dedup : si une notif existante a la meme dedupKey, on la remplace.
         if (opts.dedupKey) {
           const existing = prev.find((n) => n.dedupKey === opts.dedupKey);
           if (existing) {
@@ -150,6 +160,14 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
         return [...prev, internal];
       });
 
+      // Historique : ajout en tete + dedup par key + cap a HISTORY_MAX.
+      setHistory((prev) => {
+        const filtered = opts.dedupKey
+          ? prev.filter((n) => n.dedupKey !== opts.dedupKey)
+          : prev;
+        return [internal, ...filtered].slice(0, HISTORY_MAX);
+      });
+
       if (!internal.persistent) {
         const handle = setTimeout(() => dismiss(id), internal.durationMs);
         timeoutsRef.current.set(id, handle);
@@ -157,7 +175,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
       return id;
     },
-    [dismiss]
+    [dismiss],
   );
 
   const clearAll = useCallback(() => {
@@ -166,7 +184,10 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     setItems([]);
   }, []);
 
-  // Cleanup timeouts on unmount
+  const clearHistory = useCallback(() => {
+    setHistory([]);
+  }, []);
+
   useEffect(() => {
     const map = timeoutsRef.current;
     return () => {
@@ -175,7 +196,10 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const value = useMemo(() => ({ notify, dismiss, clearAll }), [notify, dismiss, clearAll]);
+  const value = useMemo(
+    () => ({ notify, dismiss, clearAll, history, clearHistory }),
+    [notify, dismiss, clearAll, history, clearHistory],
+  );
 
   return (
     <NotificationContext.Provider value={value}>
@@ -193,8 +217,20 @@ export function useNotify(): NotificationContextValue {
   return ctx;
 }
 
+/** Hook dedie pour la cloche/historique du header. */
+export function useNotificationHistory(): {
+  history: InternalNotification[];
+  clearHistory: () => void;
+} {
+  const ctx = useContext(NotificationContext);
+  if (!ctx) {
+    throw new Error("useNotificationHistory doit etre appele a l'interieur d'un <NotificationProvider>");
+  }
+  return { history: ctx.history, clearHistory: ctx.clearHistory };
+}
+
 // =====================================================================
-// Composant visuel — stack en bas a droite
+// Composants visuels
 // =====================================================================
 
 function NotificationStack({
@@ -239,7 +275,6 @@ function NotificationCard({
   const styles = TYPE_STYLES[item.type];
 
   useEffect(() => {
-    // Slide in animation
     const t = setTimeout(() => setVisible(true), 10);
     return () => clearTimeout(t);
   }, []);
@@ -268,6 +303,8 @@ function NotificationCard({
         transform: visible ? "translateX(0)" : "translateX(20px)",
         transition: "all 250ms cubic-bezier(0.4, 0.0, 0.2, 1)",
         pointerEvents: "auto",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
       <div
@@ -358,6 +395,31 @@ function NotificationCard({
       >
         ×
       </button>
+
+      {/* Barre de progression du timer auto-dismiss. Cachee si persistent. */}
+      {!item.persistent && (
+        <div
+          aria-hidden
+          style={{
+            position: "absolute",
+            left: 0,
+            bottom: 0,
+            height: 2,
+            background: styles.iconColor,
+            opacity: 0.7,
+            width: "100%",
+            transformOrigin: "left",
+            animation: `notif-progress ${item.durationMs}ms linear forwards`,
+          }}
+        />
+      )}
+
+      <style jsx>{`
+        @keyframes notif-progress {
+          from { transform: scaleX(1); }
+          to { transform: scaleX(0); }
+        }
+      `}</style>
     </div>
   );
 }

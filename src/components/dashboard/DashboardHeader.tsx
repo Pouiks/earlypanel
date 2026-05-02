@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import NotificationBell from "@/components/dashboard/NotificationBell";
 
 interface DashboardHeaderProps {
   firstName: string | null;
@@ -46,7 +47,9 @@ export default function DashboardHeader({ firstName, lastName }: DashboardHeader
       marginBottom: 8,
     }}>
       <div />
-      <div ref={menuRef} style={{ position: "relative" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <NotificationBell />
+        <div ref={menuRef} style={{ position: "relative" }}>
         <button
           onClick={() => setOpen((prev) => !prev)}
           style={{
@@ -165,6 +168,7 @@ export default function DashboardHeader({ firstName, lastName }: DashboardHeader
             }
           }
         `}</style>
+        </div>
       </div>
     </header>
   );

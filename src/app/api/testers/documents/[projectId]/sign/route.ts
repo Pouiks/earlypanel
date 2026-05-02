@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -223,11 +223,14 @@ export async function POST(
   );
 
   // Email post-signature : confirme au testeur que son NDA est valide et
-  // l'oriente vers sa mission. Best-effort : un echec d'envoi ne doit pas
-  // invalider la signature deja faite.
-  try {
-    const appUrl = tryGetAppUrl();
-    if (appUrl) {
+  // l'oriente vers sa mission. Best-effort, NON-bloquant : on l'envoie via
+  // `after()` pour que la reponse HTTP soit retournee avant. Gain : ~0.5-1.5s
+  // de latence percue cote testeur (l'email arrive ~1s plus tard, c'est
+  // acceptable pour un email de confirmation).
+  after(async () => {
+    try {
+      const appUrl = tryGetAppUrl();
+      if (!appUrl) return;
       const missionLink = `${appUrl}/app/dashboard/missions`;
       await sendEmail({
         to: tester.email as string,
@@ -241,11 +244,10 @@ export async function POST(
           ndaRef: variables.nda_ref,
         }),
       });
+    } catch (mailErr) {
+      console.error("[NDA sign] post-signature email failed", mailErr);
     }
-  } catch (mailErr) {
-    // Best-effort : on log mais on ne casse pas la reponse.
-    console.error("[NDA sign] post-signature email failed", mailErr);
-  }
+  });
 
   return NextResponse.json({
     success: true,
