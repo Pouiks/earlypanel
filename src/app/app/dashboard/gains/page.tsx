@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useTester } from "../layout";
+import Link from "next/link";
+import { useTester, useNotifications } from "../layout";
 import EmptyState from "@/components/dashboard/EmptyState";
 
 interface PayoutRow {
@@ -29,7 +30,8 @@ function centsToEuros(c: number): string {
 
 export default function GainsPage() {
   const { tester } = useTester();
-  const [stripeLoading, setStripeLoading] = useState(false);
+  const { notifications } = useNotifications();
+  const ibanConfigured = !notifications.payment_info_missing;
   const [payouts, setPayouts] = useState<PayoutRow[]>([]);
   const [totalPaidCents, setTotalPaidCents] = useState(0);
   const [totalPendingCents, setTotalPendingCents] = useState(0);
@@ -53,21 +55,6 @@ export default function GainsPage() {
   useEffect(() => {
     fetchPayouts();
   }, [fetchPayouts]);
-
-  async function handleStripeOnboarding() {
-    setStripeLoading(true);
-    try {
-      const res = await fetch("/api/testers/stripe-onboarding", { method: "POST" });
-      const data = await res.json();
-      if (data.url) {
-        window.open(data.url, "_blank");
-      }
-    } catch {
-      // silent
-    } finally {
-      setStripeLoading(false);
-    }
-  }
 
   if (!tester) {
     return <div style={{ padding: "60px 0", textAlign: "center", color: "#86868B" }}>Chargement…</div>;
@@ -110,13 +97,13 @@ export default function GainsPage() {
         />
       </div>
 
-      {/* --- Stripe Connect --- */}
+      {/* --- Coordonnees bancaires (IBAN) --- */}
       <div style={{
         background: "#fff", borderRadius: 20,
-        border: `0.5px solid ${tester.payment_setup ? "#0A7A5A" : "#F5C542"}`,
+        border: `0.5px solid ${ibanConfigured ? "#0A7A5A" : "#F5C542"}`,
         padding: "24px", marginBottom: 24,
       }}>
-        {tester.payment_setup ? (
+        {ibanConfigured ? (
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <span style={{
@@ -125,41 +112,40 @@ export default function GainsPage() {
                 alignItems: "center", justifyContent: "center", fontSize: 16,
               }}>✓</span>
               <span style={{ fontSize: 14, fontWeight: 600, color: "#0A7A5A" }}>
-                Compte bancaire configuré
+                Coordonnées bancaires configurées
               </span>
             </div>
-            <button
-              onClick={handleStripeOnboarding}
+            <Link
+              href="/app/dashboard/profil#informations-bancaires"
               style={{
                 padding: "8px 20px", fontSize: 13, fontWeight: 600,
                 border: "1px solid rgba(0,0,0,0.1)", borderRadius: 980,
-                background: "#fff", color: "#1d1d1f", cursor: "pointer",
-                fontFamily: "inherit",
+                background: "#fff", color: "#1d1d1f",
+                fontFamily: "inherit", textDecoration: "none",
               }}
             >
               Gérer mes coordonnées →
-            </button>
+            </Link>
           </div>
         ) : (
           <div>
             <p style={{ fontSize: 15, fontWeight: 600, color: "#92600A", margin: "0 0 6px" }}>
-              Configurez votre compte bancaire
+              Renseignez votre IBAN
             </p>
             <p style={{ fontSize: 13, color: "#B8860B", margin: "0 0 16px", lineHeight: 1.5 }}>
-              Pour recevoir vos paiements, connectez votre compte bancaire via Stripe.
+              Pour recevoir vos paiements par virement SEPA après chaque mission validée, ajoutez votre IBAN dans votre profil.
             </p>
-            <button
-              onClick={handleStripeOnboarding}
-              disabled={stripeLoading}
+            <Link
+              href="/app/dashboard/profil#informations-bancaires"
               style={{
                 padding: "12px 24px", fontSize: 14, fontWeight: 700,
                 border: "none", borderRadius: 980, background: "#0A7A5A",
-                color: "#fff", cursor: stripeLoading ? "wait" : "pointer",
-                fontFamily: "inherit", opacity: stripeLoading ? 0.7 : 1,
+                color: "#fff", fontFamily: "inherit",
+                display: "inline-block", textDecoration: "none",
               }}
             >
-              {stripeLoading ? "Chargement…" : "Configurer mes coordonnées bancaires →"}
-            </button>
+              Renseigner mon IBAN →
+            </Link>
           </div>
         )}
       </div>
