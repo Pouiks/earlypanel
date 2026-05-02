@@ -61,7 +61,9 @@ export async function GET() {
       calculated_amount_cents,
       status,
       paid_at,
-      project:projects(name)
+      exported_at,
+      sepa_batch_ref,
+      project:projects(title, company_name, ref_number)
     `)
     .eq("tester_id", tester.id)
     .order("created_at", { ascending: false });

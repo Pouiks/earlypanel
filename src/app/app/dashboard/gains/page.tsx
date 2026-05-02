@@ -11,7 +11,9 @@ interface PayoutRow {
   calculated_amount_cents: number;
   status: string;
   paid_at: string | null;
-  project: { name: string } | null;
+  exported_at: string | null;
+  sepa_batch_ref: string | null;
+  project: { title: string; company_name: string | null; ref_number: string | null } | null;
 }
 
 const STATUS_MAP: Record<string, { label: string; bg: string; color: string }> = {
@@ -104,7 +106,7 @@ export default function GainsPage() {
           label="Prochain virement"
           value={nextPending ? centsToEuros(nextPending.final_amount_cents) : "—"}
           color="#1d1d1f"
-          sub={nextPending ? (nextPending.project as { name: string } | null)?.name ?? "" : "Aucun en attente"}
+          sub={nextPending ? nextPending.project?.title ?? "" : "Aucun en attente"}
         />
       </div>
 
@@ -205,8 +207,13 @@ export default function GainsPage() {
                   alignItems: "center", fontSize: 13,
                 }}
               >
-                <span style={{ fontWeight: 600, color: "#1d1d1f" }}>
-                  {(p.project as { name: string } | null)?.name ?? "—"}
+                <span style={{ fontWeight: 600, color: "#1d1d1f", display: "flex", flexDirection: "column" }}>
+                  <span>{p.project?.title ?? "—"}</span>
+                  {p.exported_at && p.status !== "paid" && (
+                    <span style={{ fontSize: 11, color: "#0A7A5A", fontWeight: 500, marginTop: 2 }}>
+                      Virement programmé · sous 1-2 jours ouvrés
+                    </span>
+                  )}
                 </span>
                 <span style={{ textAlign: "right", fontWeight: 700, color: "#1d1d1f" }}>
                   {centsToEuros(p.final_amount_cents)}

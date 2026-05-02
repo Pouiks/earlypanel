@@ -9,6 +9,8 @@ interface Persona {
   description: string | null;
   min_reward_cents: number;
   max_reward_cents: number;
+  /** Indemnité ferme versée au testeur par mission. Source de vérité pour le paiement. */
+  payout_per_mission_cents: number;
   matching_rules: {
     job_title_keywords?: string[];
     sectors?: string[];
@@ -230,6 +232,7 @@ function PersonaEditor({
   const [description, setDescription] = useState(persona.description ?? "");
   const [minEur, setMinEur] = useState(String(Math.round(persona.min_reward_cents / 100)));
   const [maxEur, setMaxEur] = useState(String(Math.round(persona.max_reward_cents / 100)));
+  const [payoutEur, setPayoutEur] = useState(String(Math.round((persona.payout_per_mission_cents ?? 0) / 100)));
   const [priority, setPriority] = useState(String(persona.priority));
   const [isActive, setIsActive] = useState(persona.is_active);
   const [isFallback, setIsFallback] = useState(persona.is_fallback);
@@ -248,6 +251,7 @@ function PersonaEditor({
       description: description.trim() || null,
       min_reward_cents: Math.max(0, Math.round(Number(minEur) * 100)),
       max_reward_cents: Math.max(0, Math.round(Number(maxEur) * 100)),
+      payout_per_mission_cents: Math.max(0, Math.round(Number(payoutEur) * 100)),
       priority: Number(priority) || 0,
       is_active: isActive,
       is_fallback: isFallback,
@@ -284,16 +288,29 @@ function PersonaEditor({
         <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} style={{ ...inputStyle, resize: "vertical" }} />
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
         <div>
           <label style={labelStyle}>Retribution min (€)</label>
-          <input value={minEur} onChange={(e) => setMinEur(e.target.value)} type="number" style={inputStyle} />
+          <input value={minEur} onChange={(e) => setMinEur(e.target.value)} type="number" style={inputStyle} title="Affiche au testeur a l'inscription (range marketing)" />
         </div>
         <div>
           <label style={labelStyle}>Retribution max (€)</label>
-          <input value={maxEur} onChange={(e) => setMaxEur(e.target.value)} type="number" style={inputStyle} />
+          <input value={maxEur} onChange={(e) => setMaxEur(e.target.value)} type="number" style={inputStyle} title="Affiche au testeur a l'inscription (range marketing)" />
+        </div>
+        <div>
+          <label style={labelStyle}>Indemnite ferme (€)</label>
+          <input
+            value={payoutEur}
+            onChange={(e) => setPayoutEur(e.target.value)}
+            type="number"
+            style={{ ...inputStyle, borderColor: "#0A7A5A", borderWidth: 2 }}
+            title="Montant reellement verse au testeur par mission completee. Source de verite des paiements."
+          />
         </div>
       </div>
+      <p style={{ fontSize: 11, color: "#86868B", margin: "-6px 0 0", fontStyle: "italic" }}>
+        L&apos;indemnite ferme est ce que vous payez au testeur (et facturez au client + marge). Min/Max sont les ranges affiches a l&apos;inscription.
+      </p>
 
       <div>
         <label style={labelStyle}>Mots-cles fonction (separes par virgule)</label>
@@ -312,7 +329,7 @@ function PersonaEditor({
       </div>
 
       <div>
-        <label style={labelStyle}>Tailles d'entreprise</label>
+        <label style={labelStyle}>Tailles d&apos;entreprise</label>
         <input value={sizes} onChange={(e) => setSizes(e.target.value)} style={inputStyle} placeholder="51-200, 201-1000, 1000+" />
       </div>
 

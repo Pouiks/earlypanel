@@ -18,6 +18,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     "description",
     "min_reward_cents",
     "max_reward_cents",
+    "payout_per_mission_cents",
     "matching_rules",
     "priority",
     "is_active",
