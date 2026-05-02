@@ -415,43 +415,115 @@ export default function MissionDetailPage() {
       )}
 
       {/* Bouton demarrer si applicable */}
-      {!inProgress && !completed && (
-        <div style={sectionStyle}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, color: "#1d1d1f", margin: "0 0 8px" }}>
-            Démarrer le test
-          </h2>
-          <p style={{ fontSize: 13, color: "#6e6e73", margin: "0 0 16px" }}>
-            Une fois démarré, vous devrez compléter toutes les réponses avant la clôture. L&apos;action est irréversible.
-          </p>
-          {expired ? (
-            <button
-              disabled
-              style={{
-                padding: "14px 28px", background: "#dc2626", color: "#fff",
-                borderRadius: 980, fontSize: 14, fontWeight: 700,
-                border: "none", cursor: "not-allowed", fontFamily: "inherit",
-                opacity: 0.95,
-              }}
-            >
-              Délai dépassé
-            </button>
-          ) : (
-            <button
-              disabled={!canStart}
-              onClick={() => setShowStartModal(true)}
-              style={{
-                padding: "14px 28px",
-                background: canStart ? "#0A7A5A" : "#d1d5db",
-                color: "#fff", borderRadius: 980, fontSize: 14, fontWeight: 700,
-                border: "none", cursor: canStart ? "pointer" : "not-allowed",
-                fontFamily: "inherit",
-              }}
-            >
-              {notStarted ? "Non disponible" : "Démarrer le test"}
-            </button>
-          )}
-        </div>
-      )}
+      {!inProgress && !completed && (() => {
+        // Calcule la raison de blocage la plus pertinente. Priorite :
+        // expire > non actif > pas encore demarre > NDA non signe > NDA en
+        // attente d'envoi > etat inattendu.
+        let disabledReason: { short: string; help: string; cta?: { label: string; href: string } } | null = null;
+        if (expired) {
+          disabledReason = { short: "Délai dépassé", help: "La date de fin de la mission est passée. Vous ne pouvez plus la démarrer." };
+        } else if (readOnlyMission) {
+          disabledReason = { short: "Projet inactif", help: "Ce projet n'est plus actif chez le client. Vous ne pouvez plus démarrer le test." };
+        } else if (notStarted) {
+          disabledReason = {
+            short: "Pas encore disponible",
+            help: project.start_date
+              ? `La mission démarre le ${new Date(project.start_date).toLocaleString("fr-FR", { dateStyle: "long", timeStyle: "short" })}. Le bouton sera actif à cette heure.`
+              : "Le bouton sera actif quand la mission s'ouvrira.",
+          };
+        } else if (status === "nda_sent") {
+          disabledReason = {
+            short: "Signez le NDA pour commencer",
+            help: "Un accord de confidentialité (NDA) vous a été envoyé. Vous devez le signer avant de pouvoir démarrer le test.",
+            cta: { label: "Signer le NDA →", href: "/app/dashboard/documents" },
+          };
+        } else if (status === "selected") {
+          disabledReason = {
+            short: "En attente d'envoi du NDA",
+            help: "L'équipe earlypanel doit encore vous envoyer l'accord de confidentialité. Vous pourrez démarrer dès qu'il sera signé.",
+          };
+        } else if (!canStart) {
+          disabledReason = {
+            short: "Non disponible",
+            help: "Cette mission n'est pas démarrable dans son état actuel. Contactez l'équipe earlypanel si vous pensez que c'est une erreur.",
+          };
+        }
+
+        return (
+          <div style={sectionStyle}>
+            <h2 style={{ fontSize: 16, fontWeight: 700, color: "#1d1d1f", margin: "0 0 8px" }}>
+              Démarrer le test
+            </h2>
+            <p style={{ fontSize: 13, color: "#6e6e73", margin: "0 0 16px" }}>
+              Une fois démarré, vous devrez compléter toutes les réponses avant la clôture. L&apos;action est irréversible.
+            </p>
+            {expired ? (
+              <button
+                disabled
+                style={{
+                  padding: "14px 28px", background: "#dc2626", color: "#fff",
+                  borderRadius: 980, fontSize: 14, fontWeight: 700,
+                  border: "none", cursor: "not-allowed", fontFamily: "inherit",
+                  opacity: 0.95,
+                }}
+              >
+                Délai dépassé
+              </button>
+            ) : (
+              <button
+                disabled={!canStart}
+                onClick={() => setShowStartModal(true)}
+                title={disabledReason?.help}
+                style={{
+                  padding: "14px 28px",
+                  background: canStart ? "#0A7A5A" : "#d1d5db",
+                  color: "#fff", borderRadius: 980, fontSize: 14, fontWeight: 700,
+                  border: "none", cursor: canStart ? "pointer" : "not-allowed",
+                  fontFamily: "inherit",
+                }}
+              >
+                {disabledReason ? disabledReason.short : "Démarrer le test"}
+              </button>
+            )}
+            {!canStart && !expired && disabledReason && (
+              <div
+                style={{
+                  marginTop: 14,
+                  padding: "12px 14px",
+                  background: "#fffbeb",
+                  border: "1px solid #fde68a",
+                  borderRadius: 12,
+                  fontSize: 13,
+                  color: "#92400e",
+                  lineHeight: 1.5,
+                }}
+              >
+                <strong style={{ display: "block", marginBottom: 4 }}>Pourquoi ce bouton est-il grisé ?</strong>
+                <span>{disabledReason.help}</span>
+                {disabledReason.cta && (
+                  <div style={{ marginTop: 10 }}>
+                    <a
+                      href={disabledReason.cta.href}
+                      style={{
+                        display: "inline-block",
+                        padding: "8px 18px",
+                        background: "#0A7A5A",
+                        color: "#fff",
+                        borderRadius: 980,
+                        fontSize: 13,
+                        fontWeight: 700,
+                        textDecoration: "none",
+                      }}
+                    >
+                      {disabledReason.cta.label}
+                    </a>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Formulaire reponses */}
       {(inProgress || completed) && questions.length > 0 && (

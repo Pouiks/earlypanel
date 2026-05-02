@@ -74,7 +74,10 @@ interface NotificationContextValue {
 
 const NotificationContext = createContext<NotificationContextValue | null>(null);
 
-const DEFAULT_DURATION_MS = 30_000;
+// Duree d'affichage par defaut. Court car la barre de progression rend
+// la duree lisible, et l'historique de la cloche header conserve les
+// notifs ratees / a relire.
+const DEFAULT_DURATION_MS = 7_000;
 const HISTORY_MAX = 50;
 
 let idCounter = 0;
