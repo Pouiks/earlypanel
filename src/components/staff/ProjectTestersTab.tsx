@@ -90,7 +90,7 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
     } catch { /* fallback: pas de pre-filtre */ }
   }, [projectId]);
 
-  const fetchTesters = useCallback(async () => {
+  const fetchTesters = useCallback(async (signal?: AbortSignal) => {
     const params = new URLSearchParams();
     params.set("status", "active");
     if (search) params.set("search", search);
@@ -110,14 +110,38 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
     }
     // 2. Filtres avances ajoutes par le staff dans le panneau partage.
     appendTesterFiltersToParams(params, filters);
-    const res = await fetch(`/api/staff/testers?${params}`);
-    if (res.ok) setAllTesters(await res.json());
+    try {
+      const res = await fetch(`/api/staff/testers?${params}`, signal ? { signal } : undefined);
+      if (signal?.aborted) return;
+      if (res.ok) {
+        const data = await res.json();
+        if (signal?.aborted) return;
+        setAllTesters(data);
+      }
+    } catch (e) {
+      // AbortError = filtre/search a change pendant le fetch, ignore.
+      if ((e as Error).name === "AbortError") return;
+      throw e;
+    }
   }, [search, projectTargeting, showOutOfTarget, filters]);
 
+  // Initial mount + projectId change : fetch les choses qui ne dependent QUE du projet.
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    Promise.all([fetchTesters(), fetchAssigned(), fetchProjectTargeting()]).finally(() => setLoading(false));
-  }, [fetchTesters, fetchAssigned, fetchProjectTargeting]);
+    Promise.all([fetchAssigned(), fetchProjectTargeting()]).finally(() => setLoading(false));
+  }, [fetchAssigned, fetchProjectTargeting]);
+
+  // Catalogue testeurs : refetch a chaque changement de filtre/search/targeting.
+  // Debounce 200ms + AbortController : evite les race conditions ou les comptes
+  // oscillent quand l'utilisateur clique plusieurs filtres rapidement.
+  useEffect(() => {
+    const ac = new AbortController();
+    const t = setTimeout(() => fetchTesters(ac.signal), 200);
+    return () => {
+      ac.abort();
+      clearTimeout(t);
+    };
+  }, [fetchTesters]);
 
   function toggleSelect(id: string) {
     setSelected((prev) => {

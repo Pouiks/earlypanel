@@ -66,28 +66,45 @@ export default function StaffTestersPage() {
   const [filters, setFilters] = useState<TesterAdvancedFilterState>(() => emptyTesterFilters());
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (signal?: AbortSignal) => {
     setLoading(true);
     setError(null);
     try {
       const params = new URLSearchParams();
       params.set("status", filter);
       appendTesterFiltersToParams(params, filters);
-      const res = await fetch(`/api/staff/testers?${params.toString()}`);
+      const res = await fetch(
+        `/api/staff/testers?${params.toString()}`,
+        signal ? { signal } : undefined,
+      );
+      if (signal?.aborted) return;
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error((err as { error?: string }).error || `Erreur ${res.status}`);
       }
-      setTesters(await res.json());
+      const data = await res.json();
+      if (signal?.aborted) return;
+      setTesters(data);
     } catch (e: unknown) {
+      // AbortError = volontaire (filtre change), pas une vraie erreur a afficher.
+      if ((e as Error).name === "AbortError") return;
       setError(e instanceof Error ? e.message : "Erreur");
     } finally {
-      setLoading(false);
+      if (!signal?.aborted) setLoading(false);
     }
   }, [filter, filters]);
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => { load(); }, [load]);
+  // Debounce 200ms + AbortController : un changement de filtre cleanup la requete
+  // en cours et le timer pendant. Seule la derniere intention utilisateur fait
+  // un fetch reel, les reponses obsoletes sont ignorees -> plus d'oscillation.
+  useEffect(() => {
+    const ac = new AbortController();
+    const t = setTimeout(() => load(ac.signal), 200);
+    return () => {
+      ac.abort();
+      clearTimeout(t);
+    };
+  }, [load]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
