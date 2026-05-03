@@ -210,6 +210,8 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
   const [projectTargeting, setProjectTargeting] = useState<{
     sector: string | null;
     csp: string[];
+    gender: string[];
+    locations: string[];
     ageMin: number | null;
     ageMax: number | null;
   } | null>(null);
@@ -231,6 +233,8 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
       setProjectTargeting({
         sector: (data.target_sector_restricted && data.target_sector ? String(data.target_sector) : null),
         csp: Array.isArray(data.target_csp) ? data.target_csp.filter((s: unknown): s is string => typeof s === "string") : [],
+        gender: Array.isArray(data.target_gender) ? data.target_gender.filter((s: unknown): s is string => typeof s === "string") : [],
+        locations: Array.isArray(data.target_locations) ? data.target_locations.filter((s: unknown): s is string => typeof s === "string") : [],
         ageMin: typeof data.target_age_min === "number" ? data.target_age_min : null,
         ageMax: typeof data.target_age_max === "number" ? data.target_age_max : null,
       });
@@ -245,6 +249,13 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
     if (projectTargeting && !showOutOfTarget) {
       if (projectTargeting.sector) params.append("sector", projectTargeting.sector);
       projectTargeting.csp.forEach((c) => params.append("csp", c));
+      projectTargeting.gender.forEach((g) => params.append("gender", g));
+      // Localisation : l'API accepte UNE valeur (ville/CP). On filtre sur la
+      // premiere ville cible. Pour multi-locations, le staff peut basculer
+      // "Voir hors cible" et filtrer manuellement plus large.
+      if (projectTargeting.locations.length > 0) {
+        params.set("location", projectTargeting.locations[0]);
+      }
       if (projectTargeting.ageMin !== null) params.set("age_min", String(projectTargeting.ageMin));
       if (projectTargeting.ageMax !== null) params.set("age_max", String(projectTargeting.ageMax));
     }
@@ -443,7 +454,11 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
             />
           </div>
 
-          {projectTargeting && (projectTargeting.sector || projectTargeting.csp.length > 0 || projectTargeting.ageMin !== null || projectTargeting.ageMax !== null) && (
+          {projectTargeting && (
+            projectTargeting.sector || projectTargeting.csp.length > 0 ||
+            projectTargeting.gender.length > 0 || projectTargeting.locations.length > 0 ||
+            projectTargeting.ageMin !== null || projectTargeting.ageMax !== null
+          ) && (
             <div style={{
               background: showOutOfTarget ? "#f5f5f7" : "#f0faf5",
               border: "1px solid " + (showOutOfTarget ? "rgba(0,0,0,0.08)" : "rgba(10,122,90,0.2)"),
@@ -455,6 +470,13 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
                 <strong style={{ marginRight: 6 }}>{showOutOfTarget ? "Pre-filtre desactive" : "Cible projet"} :</strong>
                 {projectTargeting.sector && <span style={{ marginRight: 8 }}>secteur {projectTargeting.sector}</span>}
                 {projectTargeting.csp.length > 0 && <span style={{ marginRight: 8 }}>CSP {projectTargeting.csp.join(", ")}</span>}
+                {projectTargeting.gender.length > 0 && <span style={{ marginRight: 8 }}>genre {projectTargeting.gender.join(", ")}</span>}
+                {projectTargeting.locations.length > 0 && (
+                  <span style={{ marginRight: 8 }}>
+                    loc. {projectTargeting.locations[0]}
+                    {projectTargeting.locations.length > 1 && ` (+${projectTargeting.locations.length - 1})`}
+                  </span>
+                )}
                 {(projectTargeting.ageMin !== null || projectTargeting.ageMax !== null) && (
                   <span>
                     {projectTargeting.ageMin ?? "?"}-{projectTargeting.ageMax ?? "?"} ans

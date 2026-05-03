@@ -17,13 +17,21 @@ export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
   const search = searchParams.get("search");
   const status = searchParams.get("status");
-  const digital_level = searchParams.get("digital_level");
-  const connection = searchParams.get("connection");
-  const devices = searchParams.get("devices");
-  const browsers = searchParams.get("browsers");
-  // Multi-secteur, multi-CSP : repete-toi (?sector=Tech&sector=Finance) ou virgule.
-  const sectorList = searchParams.getAll("sector").flatMap((s) => s.split(",")).map((s) => s.trim()).filter(Boolean);
-  const cspList = searchParams.getAll("csp").flatMap((s) => s.split(",")).map((s) => s.trim()).filter(Boolean);
+  const location = searchParams.get("location")?.trim(); // ville OU code postal (prefixe)
+  // Tous les filtres multi : on accepte ?key=v1&key=v2 ou ?key=v1,v2
+  const multi = (k: string) =>
+    searchParams.getAll(k).flatMap((s) => s.split(",")).map((s) => s.trim()).filter(Boolean);
+  const sectorList = multi("sector");
+  const cspList = multi("csp");
+  const genderList = multi("gender"); // female | male | non_binary | prefer_not_to_say
+  const digitalLevelList = multi("digital_level"); // debutant | intermediaire | avance | expert
+  const connectionList = multi("connection"); // Fibre | ADSL | 4G/5G
+  const devicesList = multi("devices"); // PC Windows, Mac, iPhone…
+  const browsersList = multi("browsers"); // Chrome, Firefox…
+  const mobileOsList = multi("mobile_os"); // iOS | Android
+  const companySizeList = multi("company_size");
+  const tierList = multi("tier"); // standard | expert | premium
+  const personaList = multi("persona_id"); // UUID[]
   // Recherche fuzzy sur job_title (utilise l'index pg_trgm de la migration 030).
   const jobTitle = searchParams.get("job_title")?.trim();
   // Tranche d'age : on filtre sur birth_date en derivant les bornes.
@@ -42,7 +50,7 @@ export async function GET(request: NextRequest) {
 
   let query = admin
     .from("testers")
-    .select("id, email, first_name, last_name, phone, job_title, sector, company_size, digital_level, csp, birth_date, tools, browsers, devices, phone_model, mobile_os, connection, availability, interests, ux_experience, status, profile_completed, created_at, tier, quality_score, missions_completed, total_earned, persona_id, persona_locked, persona:tester_personas(id, slug, name)")
+    .select("id, email, first_name, last_name, phone, gender, city, postal_code, job_title, sector, company_size, digital_level, csp, birth_date, tools, browsers, devices, phone_model, mobile_os, connection, availability, interests, ux_experience, status, profile_completed, created_at, tier, quality_score, missions_completed, total_earned, persona_id, persona_locked, persona:tester_personas(id, slug, name)")
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 
@@ -59,8 +67,12 @@ export async function GET(request: NextRequest) {
     query = query.in("status", ["active", "pending"]);
   }
 
-  if (digital_level) {
-    query = query.eq("digital_level", digital_level);
+  // Helper : quote pour PostgREST or() (double quotes doublees a l'interieur).
+  const quoteList = (arr: string[]) =>
+    arr.map((v) => `"${v.replace(/"/g, '""')}"`).join(",");
+
+  if (digitalLevelList.length > 0) {
+    query = query.in("digital_level", digitalLevelList);
   }
 
   if (sectorList.length > 0) {
@@ -68,19 +80,52 @@ export async function GET(request: NextRequest) {
   }
 
   if (cspList.length > 0) {
-    query = query.in("csp", cspList);
+    // Tolerance NULL pour CSP : optionnelle dans l'onboarding, beaucoup de
+    // testeurs inscrits avant son introduction n'en ont pas. On les inclut.
+    query = query.or(`csp.in.(${quoteList(cspList)}),csp.is.null`);
   }
 
-  if (connection) {
-    query = query.eq("connection", connection);
+  if (genderList.length > 0) {
+    // Tolerance NULL pour gender : champ optionnel.
+    query = query.or(`gender.in.(${quoteList(genderList)}),gender.is.null`);
   }
 
-  if (devices) {
-    query = query.contains("devices", [devices]);
+  if (connectionList.length > 0) {
+    query = query.in("connection", connectionList);
   }
 
-  if (browsers) {
-    query = query.contains("browsers", [browsers]);
+  if (mobileOsList.length > 0) {
+    // Tolerance NULL : un testeur sans phone n'a pas de mobile_os.
+    query = query.or(`mobile_os.in.(${quoteList(mobileOsList)}),mobile_os.is.null`);
+  }
+
+  if (companySizeList.length > 0) {
+    query = query.in("company_size", companySizeList);
+  }
+
+  if (tierList.length > 0) {
+    query = query.in("tier", tierList);
+  }
+
+  if (personaList.length > 0) {
+    query = query.in("persona_id", personaList);
+  }
+
+  // Devices et browsers sont des arrays cote DB. .overlaps fait l'intersection :
+  // un testeur match s'il a AU MOINS UN device/browser de la liste demandee.
+  if (devicesList.length > 0) {
+    query = query.overlaps("devices", devicesList);
+  }
+
+  if (browsersList.length > 0) {
+    query = query.overlaps("browsers", browsersList);
+  }
+
+  // Localisation : recherche permissive sur ville OU debut de code postal.
+  // "75" matche tous les arrondissements de Paris ; "Lyon" matche "Lyon", "Lyon 1er".
+  if (location) {
+    const safe = location.replace(/[%_]/g, "\\$&");
+    query = query.or(`city.ilike.%${safe}%,postal_code.ilike.${safe}%`);
   }
 
   // Filtre age : on traduit en bornes birth_date. Age max => date min (plus

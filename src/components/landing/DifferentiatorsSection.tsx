@@ -57,17 +57,17 @@ export default function DifferentiatorsSection() {
             earlypanel vs. outils self-service
           </p>
           <div className="compare-header">
-            <span style={{ flex: 1.5 }}>Critère</span>
+            <span>Critère</span>
             <span>Outils classiques</span>
             <span>earlypanel</span>
           </div>
           <div className="diff-compare">
-            <div className="compare-row"><div className="compare-label" style={{ flex: 1.5 }}>Profil testeur</div><div className="compare-them">Panel ouvert</div><div className="compare-us">Sélection manuelle</div></div>
-            <div className="compare-row"><div className="compare-label" style={{ flex: 1.5 }}>Questionnaire</div><div className="compare-them">Template générique</div><div className="compare-us">Co-construit</div></div>
-            <div className="compare-row"><div className="compare-label" style={{ flex: 1.5 }}>Validation</div><div className="compare-them">Automatique</div><div className="compare-us">Manuelle</div></div>
-            <div className="compare-row"><div className="compare-label" style={{ flex: 1.5 }}>Analyse</div><div className="compare-them">Données brutes</div><div className="compare-us">Rapport + restitution</div></div>
-            <div className="compare-row"><div className="compare-label" style={{ flex: 1.5 }}>Délai</div><div className="compare-them">Variable</div><div className="compare-us">5 jours ouvrés</div></div>
-            <div className="compare-row"><div className="compare-label" style={{ flex: 1.5 }}>NDA / confidentialité</div><div className="compare-them">Standard</div><div className="compare-us">Contractualisé</div></div>
+            <div className="compare-row"><div className="compare-label">Profil testeur</div><div className="compare-them">Panel ouvert</div><div className="compare-us">Sélection manuelle</div></div>
+            <div className="compare-row"><div className="compare-label">Questionnaire</div><div className="compare-them">Template générique</div><div className="compare-us">Co-construit</div></div>
+            <div className="compare-row"><div className="compare-label">Validation</div><div className="compare-them">Automatique</div><div className="compare-us">Manuelle</div></div>
+            <div className="compare-row"><div className="compare-label">Analyse</div><div className="compare-them">Données brutes</div><div className="compare-us">Rapport + restitution</div></div>
+            <div className="compare-row"><div className="compare-label">Profils niches</div><div className="compare-them">Indisponibles</div><div className="compare-us">Santé, juridique, finance, IT</div></div>
+            <div className="compare-row"><div className="compare-label">Restitution équipe</div><div className="compare-them">Aucune</div><div className="compare-us">Réunion incluse</div></div>
           </div>
         </div>
       </div>

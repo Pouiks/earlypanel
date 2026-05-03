@@ -182,12 +182,13 @@ body { font-family: var(--font); background: #fff; color: var(--black); overflow
 .diff-item p { font-size: 13px; color: var(--gray); line-height: 1.6; }
 .diff-right { background: var(--bg-secondary); border-radius: 20px; padding: 2rem; }
 .diff-compare { display: flex; flex-direction: column; gap: 10px; }
-.compare-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.compare-label { font-size: 13px; color: var(--gray); flex: 1; }
-.compare-them { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: var(--radius-pill); background: rgba(0,0,0,0.05); color: var(--gray-light); }
-.compare-us { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: var(--radius-pill); background: var(--green-bg); color: var(--green); }
-.compare-header { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 10px; border-bottom: 0.5px solid var(--border); margin-bottom: 4px; }
-.compare-header span { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--gray-light); }
+.compare-row { display: grid; grid-template-columns: 1.5fr 1fr 1fr; align-items: center; gap: 12px; }
+.compare-label { font-size: 13px; color: var(--gray); }
+.compare-them { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: var(--radius-pill); background: rgba(0,0,0,0.05); color: var(--gray-light); justify-self: center; text-align: center; }
+.compare-us { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: var(--radius-pill); background: var(--green-bg); color: var(--green); justify-self: center; text-align: center; }
+.compare-header { display: grid; grid-template-columns: 1.5fr 1fr 1fr; gap: 12px; padding-bottom: 10px; border-bottom: 0.5px solid var(--border); margin-bottom: 4px; }
+.compare-header span { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--gray-light); text-align: center; }
+.compare-header span:first-child { text-align: left; }
 .compare-header span:last-child { color: var(--green); }
 
 /* ── TESTIMONIALS ── */
