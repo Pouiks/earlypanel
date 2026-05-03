@@ -1,9 +1,15 @@
 export default function StatementSection() {
   return (
     <section className="statement">
-      <p>
-        earlypanel n&apos;est pas un outil que vous configurez seul. C&apos;est un service où <em>des humains</em> écrivent le questionnaire avec vous, choisissent les testeurs un par un, lisent leurs réponses et vous remettent un rapport.
-      </p>
+      <div className="statement-inner">
+        <div className="statement-eye">Notre approche</div>
+        <p className="statement-lead">
+          Avec <em>earlypanel</em>, vous n&apos;avez rien à configurer, rien à analyser, rien à rédiger.
+        </p>
+        <p className="statement-sub">
+          Vous nous expliquez ce que vous voulez valider, on s&apos;occupe du reste&nbsp;: panel, scénarios, collecte, analyse, rapport.
+        </p>
+      </div>
     </section>
   );
 }
