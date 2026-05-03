@@ -3,6 +3,13 @@
 import { useState, useEffect, useCallback } from "react";
 import type { Tester } from "@/types/tester";
 import TesterDrawer from "./TesterDrawer";
+import TesterAdvancedFilters from "./TesterAdvancedFilters";
+import {
+  emptyTesterFilters,
+  countActiveTesterFilters,
+  appendTesterFiltersToParams,
+  type TesterAdvancedFilterState,
+} from "@/lib/tester-filters";
 import { useConfirm } from "@/components/ui/ConfirmModal";
 
 interface AssignedTester {
@@ -18,56 +25,6 @@ interface AssignedTester {
 interface ProjectTestersTabProps {
   projectId: string;
 }
-
-const FILTER_SECTIONS: {
-  key: string;
-  label: string;
-  options: { value: string; label: string }[];
-}[] = [
-  {
-    key: "digital_level",
-    label: "Niveau digital",
-    options: [
-      { value: "debutant", label: "Débutant" },
-      { value: "intermediaire", label: "Intermédiaire" },
-      { value: "avance", label: "Avancé" },
-      { value: "expert", label: "Expert" },
-    ],
-  },
-  {
-    key: "connection",
-    label: "Connexion",
-    options: [
-      { value: "Fibre", label: "Fibre" },
-      { value: "ADSL", label: "ADSL" },
-      { value: "4G/5G", label: "4G/5G" },
-    ],
-  },
-  {
-    key: "devices",
-    label: "Appareils",
-    options: [
-      { value: "PC Windows", label: "PC Windows" },
-      { value: "Mac", label: "Mac" },
-      { value: "PC Linux", label: "PC Linux" },
-      { value: "iPhone", label: "iPhone" },
-      { value: "Smartphone Android", label: "Android" },
-      { value: "iPad", label: "iPad" },
-      { value: "Tablette Android", label: "Tablette Android" },
-    ],
-  },
-  {
-    key: "browsers",
-    label: "Navigateurs",
-    options: [
-      { value: "Chrome", label: "Chrome" },
-      { value: "Firefox", label: "Firefox" },
-      { value: "Safari", label: "Safari" },
-      { value: "Edge", label: "Edge" },
-      { value: "Arc", label: "Arc" },
-    ],
-  },
-];
 
 const NDA_LABELS: Record<string, { label: string; color: string; bg: string }> = {
   selected: { label: "Sélectionné (sans NDA envoyé)", color: "#86868B", bg: "#f5f5f7" },
@@ -86,114 +43,6 @@ const STATUS_GROUPS = [
   { id: "done", label: "Terminés", statuses: ["completed"] },
 ] as const;
 
-function FilterSidebar({
-  filters,
-  setFilters,
-  collapsed,
-  setCollapsed,
-}: {
-  filters: Record<string, Set<string>>;
-  setFilters: React.Dispatch<React.SetStateAction<Record<string, Set<string>>>>;
-  collapsed: Record<string, boolean>;
-  setCollapsed: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
-}) {
-  function toggleFilter(key: string, value: string) {
-    setFilters((prev) => {
-      const next = { ...prev };
-      const set = new Set(prev[key] || []);
-      if (set.has(value)) set.delete(value);
-      else set.add(value);
-      next[key] = set;
-      return next;
-    });
-  }
-
-  function toggleSection(key: string) {
-    setCollapsed((prev) => ({ ...prev, [key]: !prev[key] }));
-  }
-
-  const activeCount = Object.values(filters).reduce((sum, s) => sum + s.size, 0);
-
-  return (
-    <div style={{
-      width: 200, minWidth: 200, background: "#fff", borderRadius: 14,
-      border: "0.5px solid rgba(0,0,0,0.08)", padding: "14px 0",
-      alignSelf: "flex-start", maxHeight: "calc(100vh - 240px)", overflowY: "auto",
-    }}>
-      <div style={{
-        padding: "0 14px 10px", display: "flex", alignItems: "center",
-        justifyContent: "space-between", borderBottom: "0.5px solid rgba(0,0,0,0.06)",
-      }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: "#1d1d1f" }}>Filtres</span>
-        {activeCount > 0 && (
-          <button
-            onClick={() => setFilters({})}
-            style={{
-              fontSize: 10, color: "#e53e3e", background: "none", border: "none",
-              cursor: "pointer", fontFamily: "inherit", fontWeight: 600,
-            }}
-          >
-            Effacer ({activeCount})
-          </button>
-        )}
-      </div>
-      {FILTER_SECTIONS.map((section) => {
-        const isCollapsed = collapsed[section.key] ?? false;
-        const activeInSection = filters[section.key]?.size || 0;
-        return (
-          <div key={section.key} style={{ borderBottom: "0.5px solid rgba(0,0,0,0.04)" }}>
-            <button
-              onClick={() => toggleSection(section.key)}
-              style={{
-                display: "flex", alignItems: "center", justifyContent: "space-between",
-                width: "100%", padding: "9px 14px", background: "none", border: "none",
-                cursor: "pointer", fontFamily: "inherit",
-              }}
-            >
-              <span style={{ fontSize: 11, fontWeight: 600, color: "#1d1d1f" }}>
-                {section.label}
-                {activeInSection > 0 && (
-                  <span style={{
-                    marginLeft: 6, fontSize: 9, fontWeight: 700, color: "#fff",
-                    background: "#0A7A5A", borderRadius: 980, padding: "1px 5px",
-                  }}>
-                    {activeInSection}
-                  </span>
-                )}
-              </span>
-              <span style={{ fontSize: 9, color: "#86868B", transform: isCollapsed ? "rotate(0deg)" : "rotate(180deg)" }}>▼</span>
-            </button>
-            {!isCollapsed && (
-              <div style={{ padding: "0 14px 8px" }}>
-                {section.options.map((opt) => {
-                  const checked = filters[section.key]?.has(opt.value) || false;
-                  return (
-                    <label
-                      key={opt.value}
-                      style={{
-                        display: "flex", alignItems: "center", gap: 7,
-                        padding: "3px 0", cursor: "pointer", fontSize: 11, color: "#1d1d1f",
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        onChange={() => toggleFilter(section.key, opt.value)}
-                        style={{ accentColor: "#0A7A5A", width: 13, height: 13 }}
-                      />
-                      {opt.label}
-                    </label>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
 export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps) {
   const [allTesters, setAllTesters] = useState<Tester[]>([]);
   const [assigned, setAssigned] = useState<AssignedTester[]>([]);
@@ -201,8 +50,8 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [filters, setFilters] = useState<Record<string, Set<string>>>({});
-  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [filters, setFilters] = useState<TesterAdvancedFilterState>(() => emptyTesterFilters());
+  const [showAdvanced, setShowAdvanced] = useState(false);
   const [actionMenuOpen, setActionMenuOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   // Pre-filtre auto sur le ciblage projet (target_sector, target_csp, target_age_min/max).
@@ -245,44 +94,30 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
     const params = new URLSearchParams();
     params.set("status", "active");
     if (search) params.set("search", search);
-    // Pre-filtre serveur sur le ciblage projet, sauf si on demande "hors cible".
+    // 1. Pre-filtre serveur sur le ciblage projet, sauf si "Voir hors cible".
+    //    Note : ces params sont APPENDED, donc ils s'AJOUTENT aux filtres
+    //    avances du staff. C'est volontaire : si le projet cible Paris ET
+    //    le staff ajoute "secteur Tech", on cumule pour affiner.
     if (projectTargeting && !showOutOfTarget) {
       if (projectTargeting.sector) params.append("sector", projectTargeting.sector);
       projectTargeting.csp.forEach((c) => params.append("csp", c));
       projectTargeting.gender.forEach((g) => params.append("gender", g));
-      // Localisation : l'API accepte UNE valeur (ville/CP). On filtre sur la
-      // premiere ville cible. Pour multi-locations, le staff peut basculer
-      // "Voir hors cible" et filtrer manuellement plus large.
       if (projectTargeting.locations.length > 0) {
         params.set("location", projectTargeting.locations[0]);
       }
       if (projectTargeting.ageMin !== null) params.set("age_min", String(projectTargeting.ageMin));
       if (projectTargeting.ageMax !== null) params.set("age_max", String(projectTargeting.ageMax));
     }
+    // 2. Filtres avances ajoutes par le staff dans le panneau partage.
+    appendTesterFiltersToParams(params, filters);
     const res = await fetch(`/api/staff/testers?${params}`);
     if (res.ok) setAllTesters(await res.json());
-  }, [search, projectTargeting, showOutOfTarget]);
+  }, [search, projectTargeting, showOutOfTarget, filters]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     Promise.all([fetchTesters(), fetchAssigned(), fetchProjectTargeting()]).finally(() => setLoading(false));
   }, [fetchTesters, fetchAssigned, fetchProjectTargeting]);
-
-  function applyClientFilters(list: Tester[]): Tester[] {
-    return list.filter((t) => {
-      for (const [key, values] of Object.entries(filters)) {
-        if (values.size === 0) continue;
-        if (key === "devices" || key === "browsers") {
-          const arr = (t as unknown as Record<string, unknown>)[key] as string[] | undefined;
-          if (!arr || !arr.some((v) => values.has(v))) return false;
-        } else {
-          const val = (t as unknown as Record<string, unknown>)[key] as string | undefined;
-          if (!val || !values.has(val)) return false;
-        }
-      }
-      return true;
-    });
-  }
 
   function toggleSelect(id: string) {
     setSelected((prev) => {
@@ -406,7 +241,7 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
     await fetchAssigned();
   }
 
-  const filteredCatalog = applyClientFilters(allTesters)
+  const filteredCatalog = allTesters
     .filter((t) => !assignedTesterIds.has(t.id))
     .sort((a, b) => (a.last_name ?? "").localeCompare(b.last_name ?? ""));
 
@@ -428,20 +263,41 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
     return <div style={{ textAlign: "center", padding: "40px 0", color: "#86868B", fontSize: 14 }}>Chargement…</div>;
   }
 
+  const advancedCount = countActiveTesterFilters(filters);
+
   return (
     <div>
       <div style={{ display: "flex", gap: 16, alignItems: "flex-start" }}>
-        <FilterSidebar filters={filters} setFilters={setFilters} collapsed={collapsed} setCollapsed={setCollapsed} />
 
         {/* COLONNE 1 : catalogue */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ marginBottom: 10 }}>
-            <h3 style={{ fontSize: 14, fontWeight: 700, color: "#1d1d1f", margin: "0 0 8px" }}>
-              Catalogue testeurs
-              <span style={{ fontSize: 12, fontWeight: 400, color: "#86868B", marginLeft: 8 }}>
-                {filteredCatalog.length} disponible{filteredCatalog.length > 1 ? "s" : ""}
-              </span>
-            </h3>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginBottom: 8, flexWrap: "wrap" }}>
+              <h3 style={{ fontSize: 14, fontWeight: 700, color: "#1d1d1f", margin: 0 }}>
+                Catalogue testeurs
+                <span style={{ fontSize: 12, fontWeight: 400, color: "#86868B", marginLeft: 8 }}>
+                  {filteredCatalog.length} disponible{filteredCatalog.length > 1 ? "s" : ""}
+                </span>
+              </h3>
+              <button
+                onClick={() => setShowAdvanced((v) => !v)}
+                style={{
+                  padding: "6px 14px", fontSize: 12, fontWeight: 600,
+                  color: showAdvanced || advancedCount > 0 ? "#0A7A5A" : "#6e6e73",
+                  background: showAdvanced || advancedCount > 0 ? "#f0faf5" : "transparent",
+                  border: showAdvanced || advancedCount > 0 ? "1.5px solid #0A7A5A" : "1px solid rgba(0,0,0,0.1)",
+                  borderRadius: 980, cursor: "pointer", fontFamily: "inherit",
+                }}
+                title="Filtres avances : age, sexe, secteur, CSP, equipement, localisation…"
+              >
+                Filtres avancés{advancedCount > 0 ? ` · ${advancedCount}` : ""}
+              </button>
+            </div>
+            {showAdvanced && (
+              <div style={{ marginBottom: 12 }}>
+                <TesterAdvancedFilters value={filters} onChange={setFilters} />
+              </div>
+            )}
             <input
               type="text" value={search}
               onChange={(e) => setSearch(e.target.value)}

@@ -2,7 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import TesterDrawer from "@/components/staff/TesterDrawer";
-import { SECTORS, CSPS } from "@/lib/taxonomy";
+import TesterAdvancedFilters from "@/components/staff/TesterAdvancedFilters";
+import {
+  emptyTesterFilters,
+  countActiveTesterFilters,
+  appendTesterFiltersToParams,
+  type TesterAdvancedFilterState,
+} from "@/lib/tester-filters";
 
 interface TesterRow {
   id: string;
@@ -50,31 +56,6 @@ const FILTERS = [
   { value: "rejected", label: "Rejetés" },
 ];
 
-const GENDER_OPTIONS: Array<{ value: string; label: string }> = [
-  { value: "female", label: "Femme" },
-  { value: "male", label: "Homme" },
-  { value: "non_binary", label: "Non-binaire" },
-  { value: "prefer_not_to_say", label: "Ne se prononce pas" },
-];
-
-const DIGITAL_LEVELS: Array<{ value: string; label: string }> = [
-  { value: "debutant", label: "Débutant" },
-  { value: "intermediaire", label: "Intermédiaire" },
-  { value: "avance", label: "Avancé" },
-  { value: "expert", label: "Expert" },
-];
-
-const CONNECTIONS = ["Fibre", "ADSL", "4G/5G"];
-const DEVICES = ["PC Windows", "PC Linux", "Mac", "iPhone", "Smartphone Android", "iPad", "Tablette Android", "Autre smartphone", "Autre tablette"];
-const BROWSERS = ["Chrome", "Firefox", "Safari", "Edge", "Brave", "Opera", "Arc", "Autre"];
-const MOBILE_OS = ["iOS", "Android"];
-const COMPANY_SIZES = ["1-10", "11-50", "51-200", "201-1000", "1000+"];
-const TIERS = [
-  { value: "standard", label: "Standard" },
-  { value: "expert", label: "Expert" },
-  { value: "premium", label: "Premium" },
-];
-
 export default function StaffTestersPage() {
   const [testers, setTesters] = useState<TesterRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,25 +63,7 @@ export default function StaffTestersPage() {
   const [filter, setFilter] = useState("active");
   const [search, setSearch] = useState("");
   const [drawerId, setDrawerId] = useState<string | null>(null);
-  // Filtres avances : Demographie
-  const [genderFilter, setGenderFilter] = useState<Set<string>>(new Set());
-  const [ageMin, setAgeMin] = useState("");
-  const [ageMax, setAgeMax] = useState("");
-  const [cspFilter, setCspFilter] = useState<Set<string>>(new Set());
-  // Profession
-  const [sectorFilter, setSectorFilter] = useState<Set<string>>(new Set());
-  const [jobTitleFilter, setJobTitleFilter] = useState("");
-  const [companySizeFilter, setCompanySizeFilter] = useState<Set<string>>(new Set());
-  // Equipement
-  const [digitalLevelFilter, setDigitalLevelFilter] = useState<Set<string>>(new Set());
-  const [connectionFilter, setConnectionFilter] = useState<Set<string>>(new Set());
-  const [devicesFilter, setDevicesFilter] = useState<Set<string>>(new Set());
-  const [browsersFilter, setBrowsersFilter] = useState<Set<string>>(new Set());
-  const [mobileOsFilter, setMobileOsFilter] = useState<Set<string>>(new Set());
-  // Localisation
-  const [locationFilter, setLocationFilter] = useState("");
-  // Profil interne
-  const [tierFilter, setTierFilter] = useState<Set<string>>(new Set());
+  const [filters, setFilters] = useState<TesterAdvancedFilterState>(() => emptyTesterFilters());
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const load = useCallback(async () => {
@@ -109,20 +72,7 @@ export default function StaffTestersPage() {
     try {
       const params = new URLSearchParams();
       params.set("status", filter);
-      sectorFilter.forEach((s) => params.append("sector", s));
-      cspFilter.forEach((s) => params.append("csp", s));
-      genderFilter.forEach((s) => params.append("gender", s));
-      digitalLevelFilter.forEach((s) => params.append("digital_level", s));
-      connectionFilter.forEach((s) => params.append("connection", s));
-      devicesFilter.forEach((s) => params.append("devices", s));
-      browsersFilter.forEach((s) => params.append("browsers", s));
-      mobileOsFilter.forEach((s) => params.append("mobile_os", s));
-      companySizeFilter.forEach((s) => params.append("company_size", s));
-      tierFilter.forEach((s) => params.append("tier", s));
-      if (jobTitleFilter.trim()) params.set("job_title", jobTitleFilter.trim());
-      if (ageMin.trim()) params.set("age_min", ageMin.trim());
-      if (ageMax.trim()) params.set("age_max", ageMax.trim());
-      if (locationFilter.trim()) params.set("location", locationFilter.trim());
+      appendTesterFiltersToParams(params, filters);
       const res = await fetch(`/api/staff/testers?${params.toString()}`);
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
@@ -134,21 +84,10 @@ export default function StaffTestersPage() {
     } finally {
       setLoading(false);
     }
-  }, [
-    filter, sectorFilter, cspFilter, genderFilter,
-    digitalLevelFilter, connectionFilter, devicesFilter, browsersFilter, mobileOsFilter,
-    companySizeFilter, tierFilter,
-    jobTitleFilter, ageMin, ageMax, locationFilter,
-  ]);
+  }, [filter, filters]);
 
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { load(); }, [load]);
-
-  function toggleSet(set: Set<string>, key: string, setter: (s: Set<string>) => void) {
-    const next = new Set(set);
-    if (next.has(key)) next.delete(key); else next.add(key);
-    setter(next);
-  }
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -164,31 +103,7 @@ export default function StaffTestersPage() {
     });
   }, [testers, search]);
 
-  const advancedCount =
-    sectorFilter.size + cspFilter.size + genderFilter.size +
-    digitalLevelFilter.size + connectionFilter.size + devicesFilter.size +
-    browsersFilter.size + mobileOsFilter.size + companySizeFilter.size +
-    tierFilter.size +
-    (jobTitleFilter.trim() ? 1 : 0) +
-    (ageMin.trim() ? 1 : 0) + (ageMax.trim() ? 1 : 0) +
-    (locationFilter.trim() ? 1 : 0);
-
-  function resetAllFilters() {
-    setSectorFilter(new Set());
-    setCspFilter(new Set());
-    setGenderFilter(new Set());
-    setDigitalLevelFilter(new Set());
-    setConnectionFilter(new Set());
-    setDevicesFilter(new Set());
-    setBrowsersFilter(new Set());
-    setMobileOsFilter(new Set());
-    setCompanySizeFilter(new Set());
-    setTierFilter(new Set());
-    setJobTitleFilter("");
-    setAgeMin("");
-    setAgeMax("");
-    setLocationFilter("");
-  }
+  const advancedCount = countActiveTesterFilters(filters);
 
   return (
     <div>
@@ -250,154 +165,8 @@ export default function StaffTestersPage() {
       </div>
 
       {showAdvanced && (
-        <div style={{
-          background: "#fff",
-          border: "0.5px solid rgba(0,0,0,0.08)",
-          borderRadius: 16,
-          padding: "20px 22px",
-          marginBottom: 16,
-          display: "grid",
-          gap: 22,
-        }}>
-          <FilterSection title="Démographie">
-            <FilterField label="Genre">
-              <PillGroup
-                options={GENDER_OPTIONS}
-                selected={genderFilter}
-                onToggle={(v) => toggleSet(genderFilter, v, setGenderFilter)}
-              />
-            </FilterField>
-            <FilterField label="Tranche d'âge">
-              <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                <input
-                  type="number" min={16} max={120}
-                  placeholder="Min" value={ageMin}
-                  onChange={(e) => setAgeMin(e.target.value)}
-                  style={ageInputStyle}
-                />
-                <span style={{ color: "#86868B", fontSize: 12 }}>–</span>
-                <input
-                  type="number" min={16} max={120}
-                  placeholder="Max" value={ageMax}
-                  onChange={(e) => setAgeMax(e.target.value)}
-                  style={ageInputStyle}
-                />
-                <span style={{ color: "#86868B", fontSize: 11 }}>ans</span>
-              </div>
-            </FilterField>
-            <FilterField label="Catégorie socio-professionnelle (CSP)">
-              <PillGroup
-                options={(CSPS as unknown as string[]).map((c) => ({ value: c, label: c }))}
-                selected={cspFilter}
-                onToggle={(v) => toggleSet(cspFilter, v, setCspFilter)}
-              />
-            </FilterField>
-          </FilterSection>
-
-          <FilterSection title="Profession">
-            <FilterField label="Secteur d'activité">
-              <PillGroup
-                options={SECTORS.map((s) => ({ value: s, label: s }))}
-                selected={sectorFilter}
-                onToggle={(v) => toggleSet(sectorFilter, v, setSectorFilter)}
-              />
-            </FilterField>
-            <FilterField label="Métier (recherche fuzzy)">
-              <input
-                type="search"
-                placeholder="Ex: comptab, ingenieur, etudiant…"
-                value={jobTitleFilter}
-                onChange={(e) => setJobTitleFilter(e.target.value)}
-                style={textInputStyle}
-              />
-            </FilterField>
-            <FilterField label="Taille d'entreprise">
-              <PillGroup
-                options={COMPANY_SIZES.map((s) => ({ value: s, label: `${s} pers.` }))}
-                selected={companySizeFilter}
-                onToggle={(v) => toggleSet(companySizeFilter, v, setCompanySizeFilter)}
-              />
-            </FilterField>
-          </FilterSection>
-
-          <FilterSection title="Équipement & Niveau digital">
-            <FilterField label="Niveau digital">
-              <PillGroup
-                options={DIGITAL_LEVELS}
-                selected={digitalLevelFilter}
-                onToggle={(v) => toggleSet(digitalLevelFilter, v, setDigitalLevelFilter)}
-              />
-            </FilterField>
-            <FilterField label="Connexion Internet">
-              <PillGroup
-                options={CONNECTIONS.map((c) => ({ value: c, label: c }))}
-                selected={connectionFilter}
-                onToggle={(v) => toggleSet(connectionFilter, v, setConnectionFilter)}
-              />
-            </FilterField>
-            <FilterField label="Appareils utilisés">
-              <PillGroup
-                options={DEVICES.map((d) => ({ value: d, label: d }))}
-                selected={devicesFilter}
-                onToggle={(v) => toggleSet(devicesFilter, v, setDevicesFilter)}
-              />
-            </FilterField>
-            <FilterField label="Navigateurs">
-              <PillGroup
-                options={BROWSERS.map((b) => ({ value: b, label: b }))}
-                selected={browsersFilter}
-                onToggle={(v) => toggleSet(browsersFilter, v, setBrowsersFilter)}
-              />
-            </FilterField>
-            <FilterField label="OS mobile">
-              <PillGroup
-                options={MOBILE_OS.map((o) => ({ value: o, label: o }))}
-                selected={mobileOsFilter}
-                onToggle={(v) => toggleSet(mobileOsFilter, v, setMobileOsFilter)}
-              />
-            </FilterField>
-          </FilterSection>
-
-          <FilterSection title="Localisation">
-            <FilterField label="Ville ou code postal">
-              <input
-                type="search"
-                placeholder="Ex: Paris, Lyon, 75, 69001…"
-                value={locationFilter}
-                onChange={(e) => setLocationFilter(e.target.value)}
-                style={textInputStyle}
-              />
-              <p style={{ fontSize: 11, color: "#86868B", margin: "4px 0 0" }}>
-                Recherche partielle : « 75 » matche tous les codes 75XXX (Paris), « Lyon » matche Lyon et arrondissements.
-              </p>
-            </FilterField>
-          </FilterSection>
-
-          <FilterSection title="Profil interne (staff)">
-            <FilterField label="Tier qualité">
-              <PillGroup
-                options={TIERS}
-                selected={tierFilter}
-                onToggle={(v) => toggleSet(tierFilter, v, setTierFilter)}
-              />
-            </FilterField>
-          </FilterSection>
-
-          {advancedCount > 0 && (
-            <div style={{ display: "flex", justifyContent: "flex-end", paddingTop: 6, borderTop: "0.5px solid rgba(0,0,0,0.06)" }}>
-              <button
-                onClick={resetAllFilters}
-                style={{
-                  padding: "8px 16px", fontSize: 12, fontWeight: 600,
-                  background: "#fef2f2", color: "#b91c1c",
-                  border: "1px solid rgba(0,0,0,0.05)", borderRadius: 980,
-                  cursor: "pointer", fontFamily: "inherit",
-                }}
-              >
-                Réinitialiser tous les filtres ({advancedCount})
-              </button>
-            </div>
-          )}
+        <div style={{ marginBottom: 16 }}>
+          <TesterAdvancedFilters value={filters} onChange={setFilters} />
         </div>
       )}
 
@@ -537,81 +306,3 @@ export default function StaffTestersPage() {
   );
 }
 
-// =====================================================================
-// Helpers UI : sections de filtres + groupe de pills
-// =====================================================================
-
-const ageInputStyle: React.CSSProperties = {
-  width: 80, padding: "8px 10px", fontSize: 13,
-  border: "1px solid rgba(0,0,0,0.12)", borderRadius: 8, fontFamily: "inherit",
-};
-
-const textInputStyle: React.CSSProperties = {
-  width: "100%", maxWidth: 420,
-  padding: "8px 14px", fontSize: 13,
-  border: "1px solid rgba(0,0,0,0.12)", borderRadius: 980,
-  fontFamily: "inherit", background: "#fff",
-};
-
-function FilterSection({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <div style={{
-        fontSize: 11, fontWeight: 700, color: "#0A7A5A",
-        textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 12,
-        paddingBottom: 6, borderBottom: "0.5px solid rgba(10,122,90,0.15)",
-      }}>
-        {title}
-      </div>
-      <div style={{ display: "grid", gap: 14 }}>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function FilterField({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <div style={{ fontSize: 12, fontWeight: 600, color: "#1d1d1f", marginBottom: 6 }}>
-        {label}
-      </div>
-      {children}
-    </div>
-  );
-}
-
-function PillGroup({
-  options,
-  selected,
-  onToggle,
-}: {
-  options: Array<{ value: string; label: string }>;
-  selected: Set<string>;
-  onToggle: (value: string) => void;
-}) {
-  return (
-    <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-      {options.map((o) => {
-        const active = selected.has(o.value);
-        return (
-          <button
-            key={o.value}
-            onClick={() => onToggle(o.value)}
-            style={{
-              padding: "5px 12px", fontSize: 12,
-              fontWeight: active ? 700 : 500,
-              color: active ? "#fff" : "#1d1d1f",
-              background: active ? "#0A7A5A" : "#f5f5f7",
-              border: "1px solid " + (active ? "#0A7A5A" : "rgba(0,0,0,0.08)"),
-              borderRadius: 980, cursor: "pointer", fontFamily: "inherit",
-              transition: "all 100ms",
-            }}
-          >
-            {o.label}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
