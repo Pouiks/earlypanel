@@ -12,6 +12,8 @@ import {
   CATEGORY_LABELS,
   type RequiredFieldCategory,
 } from "@/lib/profile-completeness";
+import { SECTORS, CSPS } from "@/lib/taxonomy";
+import JobTitleInput from "@/components/ui/JobTitleInput";
 
 function isoToDisplay(iso: string): string {
   if (!iso) return "";
@@ -40,11 +42,7 @@ function formatBirthInput(raw: string, prev: string): string {
   return out;
 }
 
-const SECTORS = [
-  "Tech / SaaS", "E-commerce", "Finance / Banque", "Assurance",
-  "Santé", "RH / Recrutement", "Juridique", "Éducation",
-  "Immobilier", "Transport / Logistique", "Industrie", "Autre",
-];
+// Secteurs et CSP : taxonomie centralisee dans src/lib/taxonomy.ts (importes en haut du fichier).
 const COMPANY_SIZES = ["1-10", "11-50", "51-200", "201-1000", "1000+"];
 const BROWSERS = ["Chrome", "Firefox", "Safari", "Edge", "Brave", "Opera", "Arc", "Autre"];
 const DEVICES = ["PC Windows", "PC Linux", "Mac", "iPhone", "Smartphone Android", "Autre smartphone", "iPad", "Tablette Android", "Autre tablette"];
@@ -351,7 +349,11 @@ export default function ProfilPage() {
         <h2 style={{ fontSize: 16, fontWeight: 700, color: "#1d1d1f", margin: "0 0 16px" }}>Profil professionnel</h2>
         <div style={{ marginBottom: 12 }}>
           <label style={labelStyle}>Intitulé de poste</label>
-          <input style={inputStyle} value={val("job_title") as string} onChange={(e) => update("job_title", e.target.value)} />
+          <JobTitleInput
+            value={(val("job_title") as string) || ""}
+            onChange={(v) => update("job_title", v)}
+            style={inputStyle}
+          />
         </div>
         <div style={{ marginBottom: 12 }}>
           <label style={labelStyle}>Secteur</label>
@@ -378,7 +380,15 @@ export default function ProfilPage() {
             }}
           />
         </div>
-        <button onClick={() => saveSection("pro", ["job_title", "sector", "company_size", "digital_level"])} disabled={saving === "pro"} style={{
+        <div style={{ marginBottom: 16 }}>
+          <label style={labelStyle}>Catégorie socio-professionnelle <span style={{ fontSize: 11, fontWeight: 400, color: "#86868B" }}>(optionnel)</span></label>
+          <PillSelect
+            options={CSPS as unknown as string[]}
+            value={(val("csp") as string) || ""}
+            onChange={(v) => update("csp", v === val("csp") ? null : v)}
+          />
+        </div>
+        <button onClick={() => saveSection("pro", ["job_title", "sector", "company_size", "digital_level", "csp"])} disabled={saving === "pro"} style={{
           padding: "10px 24px", fontSize: 14, fontWeight: 700, background: "#0A7A5A", color: "#fff", border: "none", borderRadius: 980, cursor: "pointer", fontFamily: "inherit", opacity: saving === "pro" ? 0.7 : 1, transition: "all 200ms",
         }}>
           {saving === "pro" ? "Sauvegarde…" : "Sauvegarder"}

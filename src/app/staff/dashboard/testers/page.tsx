@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import TesterDrawer from "@/components/staff/TesterDrawer";
+import { SECTORS, CSPS } from "@/lib/taxonomy";
 
 interface TesterRow {
   id: string;
@@ -11,11 +12,14 @@ interface TesterRow {
   phone: string | null;
   job_title: string | null;
   sector: string | null;
+  csp: string | null;
   company_size: string | null;
   digital_level: string | null;
   status: string;
   profile_completed: boolean;
   created_at: string;
+  birth_date: string | null;
+  age: number | null;
   tier: string;
   quality_score: number;
   missions_completed: number;
@@ -53,16 +57,26 @@ export default function StaffTestersPage() {
   const [filter, setFilter] = useState("active");
   const [search, setSearch] = useState("");
   const [drawerId, setDrawerId] = useState<string | null>(null);
+  // Filtres avances
+  const [sectorFilter, setSectorFilter] = useState<Set<string>>(new Set());
+  const [cspFilter, setCspFilter] = useState<Set<string>>(new Set());
+  const [jobTitleFilter, setJobTitleFilter] = useState("");
+  const [ageMin, setAgeMin] = useState("");
+  const [ageMax, setAgeMax] = useState("");
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
-  useEffect(() => {
-    load();
-  }, [filter]);
-
-  async function load() {
+  const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/staff/testers?status=${filter}`);
+      const params = new URLSearchParams();
+      params.set("status", filter);
+      sectorFilter.forEach((s) => params.append("sector", s));
+      cspFilter.forEach((s) => params.append("csp", s));
+      if (jobTitleFilter.trim()) params.set("job_title", jobTitleFilter.trim());
+      if (ageMin.trim()) params.set("age_min", ageMin.trim());
+      if (ageMax.trim()) params.set("age_max", ageMax.trim());
+      const res = await fetch(`/api/staff/testers?${params.toString()}`);
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         throw new Error((err as { error?: string }).error || `Erreur ${res.status}`);
@@ -73,6 +87,15 @@ export default function StaffTestersPage() {
     } finally {
       setLoading(false);
     }
+  }, [filter, sectorFilter, cspFilter, jobTitleFilter, ageMin, ageMax]);
+
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { load(); }, [load]);
+
+  function toggleSet(set: Set<string>, key: string, setter: (s: Set<string>) => void) {
+    const next = new Set(set);
+    if (next.has(key)) next.delete(key); else next.add(key);
+    setter(next);
   }
 
   const filtered = useMemo(() => {
@@ -88,6 +111,8 @@ export default function StaffTestersPage() {
       );
     });
   }, [testers, search]);
+
+  const advancedCount = sectorFilter.size + cspFilter.size + (jobTitleFilter.trim() ? 1 : 0) + (ageMin.trim() ? 1 : 0) + (ageMax.trim() ? 1 : 0);
 
   return (
     <div>
@@ -121,6 +146,19 @@ export default function StaffTestersPage() {
             </button>
           ))}
         </div>
+        <button
+          onClick={() => setShowAdvanced((v) => !v)}
+          style={{
+            padding: "7px 16px", fontSize: 13, fontWeight: 600,
+            color: showAdvanced || advancedCount > 0 ? "#0A7A5A" : "#6e6e73",
+            background: showAdvanced || advancedCount > 0 ? "#f0faf5" : "transparent",
+            border: showAdvanced || advancedCount > 0 ? "1.5px solid #0A7A5A" : "1px solid rgba(0,0,0,0.1)",
+            borderRadius: 980, cursor: "pointer", fontFamily: "inherit",
+          }}
+          title="Filtres avances (secteur, CSP, age, metier)"
+        >
+          Filtres avances{advancedCount > 0 ? ` · ${advancedCount}` : ""}
+        </button>
         <input
           type="search"
           placeholder="Rechercher par nom, email, métier…"
@@ -134,6 +172,132 @@ export default function StaffTestersPage() {
           }}
         />
       </div>
+
+      {showAdvanced && (
+        <div style={{
+          background: "#fff",
+          border: "0.5px solid rgba(0,0,0,0.08)",
+          borderRadius: 16,
+          padding: "16px 20px",
+          marginBottom: 16,
+          display: "grid",
+          gap: 14,
+        }}>
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "#1d1d1f", marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.5 }}>
+              Secteur d&apos;activite
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {SECTORS.map((s) => {
+                const active = sectorFilter.has(s);
+                return (
+                  <button
+                    key={s}
+                    onClick={() => toggleSet(sectorFilter, s, setSectorFilter)}
+                    style={{
+                      padding: "5px 12px", fontSize: 12,
+                      fontWeight: active ? 700 : 500,
+                      color: active ? "#fff" : "#1d1d1f",
+                      background: active ? "#0A7A5A" : "#f5f5f7",
+                      border: "1px solid " + (active ? "#0A7A5A" : "rgba(0,0,0,0.08)"),
+                      borderRadius: 980, cursor: "pointer", fontFamily: "inherit",
+                    }}
+                  >
+                    {s}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "#1d1d1f", marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.5 }}>
+              Categorie socio-professionnelle (CSP)
+            </div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {CSPS.map((c) => {
+                const active = cspFilter.has(c);
+                return (
+                  <button
+                    key={c}
+                    onClick={() => toggleSet(cspFilter, c, setCspFilter)}
+                    style={{
+                      padding: "5px 12px", fontSize: 12,
+                      fontWeight: active ? 700 : 500,
+                      color: active ? "#fff" : "#1d1d1f",
+                      background: active ? "#0A7A5A" : "#f5f5f7",
+                      border: "1px solid " + (active ? "#0A7A5A" : "rgba(0,0,0,0.08)"),
+                      borderRadius: 980, cursor: "pointer", fontFamily: "inherit",
+                    }}
+                  >
+                    {c}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: 16, flexWrap: "wrap", alignItems: "flex-end" }}>
+            <div style={{ flex: "1 1 220px", minWidth: 200 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#1d1d1f", marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                Metier (recherche fuzzy)
+              </div>
+              <input
+                type="search"
+                placeholder="Ex: comptab, ingenieur, etudiant…"
+                value={jobTitleFilter}
+                onChange={(e) => setJobTitleFilter(e.target.value)}
+                style={{
+                  width: "100%", padding: "8px 14px", fontSize: 13,
+                  border: "1px solid rgba(0,0,0,0.12)", borderRadius: 980,
+                  fontFamily: "inherit", background: "#fff",
+                }}
+              />
+            </div>
+            <div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#1d1d1f", marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                Tranche d&apos;age
+              </div>
+              <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                <input
+                  type="number" min={16} max={120}
+                  placeholder="Min" value={ageMin}
+                  onChange={(e) => setAgeMin(e.target.value)}
+                  style={{ width: 80, padding: "8px 10px", fontSize: 13, border: "1px solid rgba(0,0,0,0.12)", borderRadius: 8, fontFamily: "inherit" }}
+                />
+                <span style={{ color: "#86868B", fontSize: 12 }}>–</span>
+                <input
+                  type="number" min={16} max={120}
+                  placeholder="Max" value={ageMax}
+                  onChange={(e) => setAgeMax(e.target.value)}
+                  style={{ width: 80, padding: "8px 10px", fontSize: 13, border: "1px solid rgba(0,0,0,0.12)", borderRadius: 8, fontFamily: "inherit" }}
+                />
+                <span style={{ color: "#86868B", fontSize: 11 }}>ans</span>
+              </div>
+            </div>
+            {advancedCount > 0 && (
+              <button
+                onClick={() => {
+                  setSectorFilter(new Set());
+                  setCspFilter(new Set());
+                  setJobTitleFilter("");
+                  setAgeMin("");
+                  setAgeMax("");
+                }}
+                style={{
+                  padding: "8px 14px", fontSize: 12, fontWeight: 600,
+                  background: "#fef2f2", color: "#b91c1c",
+                  border: "1px solid rgba(0,0,0,0.05)", borderRadius: 980,
+                  cursor: "pointer", fontFamily: "inherit",
+                  marginBottom: 1,
+                }}
+              >
+                Reinitialiser
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {error && (
         <div style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 12, padding: "12px 16px", marginBottom: 16, color: "#b91c1c", fontSize: 13 }}>

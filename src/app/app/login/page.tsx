@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 type LoginState = "idle" | "loading" | "sent" | "error";
 
@@ -193,6 +194,29 @@ export default function LoginPage() {
                 {state === "loading" ? "Envoi en cours…" : "Recevoir mon lien →"}
               </button>
             </form>
+
+            <div style={{
+              marginTop: 20,
+              padding: "16px",
+              background: "#f5f5f7",
+              borderRadius: 12,
+              textAlign: "center",
+            }}>
+              <p style={{ fontSize: 13, color: "#6e6e73", margin: "0 0 8px" }}>
+                Pas encore de compte ?
+              </p>
+              <a
+                href="/testeurs#register"
+                style={{
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: "#0A7A5A",
+                  textDecoration: "none",
+                }}
+              >
+                Devenir testeur →
+              </a>
+            </div>
           </>
         )}
 
@@ -202,7 +226,7 @@ export default function LoginPage() {
           paddingTop: 20,
           borderTop: "0.5px solid rgba(0,0,0,0.08)",
         }}>
-          <a
+          <Link
             href="/"
             style={{
               fontSize: 13,
@@ -211,7 +235,7 @@ export default function LoginPage() {
             }}
           >
             ← Retour sur earlypanel.fr
-          </a>
+          </Link>
         </div>
       </div>
     </div>

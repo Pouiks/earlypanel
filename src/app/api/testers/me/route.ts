@@ -139,7 +139,7 @@ export async function PATCH(request: NextRequest) {
   const TESTER_SELF_EDITABLE_FIELDS = [
     "first_name", "last_name", "phone", "linkedin_url",
     "address", "city", "postal_code", "birth_date",
-    "job_title", "sector", "company_size", "digital_level",
+    "job_title", "sector", "company_size", "digital_level", "csp",
     "tools", "browsers", "devices", "phone_model", "mobile_os",
     "connection", "availability", "timeslots", "interests", "ux_experience",
   ] as const;

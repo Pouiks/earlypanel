@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { href: "/staff/dashboard/clients", label: "Clients B2B", icon: "🏢" },
   { href: "/staff/dashboard/testers", label: "Testeurs", icon: "🧑‍🔬" },
   { href: "/staff/dashboard/personas", label: "Personas", icon: "👥" },
+  { href: "/staff/dashboard/diversite", label: "Diversité panel", icon: "📊" },
   { href: "/staff/dashboard/payouts", label: "Versements", icon: "💸" },
 ];
 

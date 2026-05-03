@@ -29,6 +29,7 @@ export interface Tester {
   sector: string | null;
   company_size: string | null;
   digital_level: DigitalLevel | null;
+  csp: string | null;
   tools: string[];
   browsers: string[];
   devices: string[];

@@ -3,18 +3,14 @@
 import { useState } from "react";
 import type { Tester, DigitalLevel } from "@/types/tester";
 import PillSelect from "@/components/ui/PillSelect";
+import JobTitleInput from "@/components/ui/JobTitleInput";
+import { SECTORS, CSPS } from "@/lib/taxonomy";
 
 interface Step2Props {
-  data: Partial<Tester>;
-  onNext: (data: Partial<Tester>) => void;
+  data: Partial<Tester> & { csp?: string | null };
+  onNext: (data: Partial<Tester> & { csp?: string | null }) => void;
   loading: boolean;
 }
-
-const SECTORS = [
-  "Tech / SaaS", "E-commerce", "Finance / Banque", "Assurance",
-  "Santé", "RH / Recrutement", "Juridique", "Éducation",
-  "Immobilier", "Transport / Logistique", "Industrie", "Autre",
-];
 
 const COMPANY_SIZES = ["1-10", "11-50", "51-200", "201-1000", "1000+"];
 
@@ -52,6 +48,7 @@ export default function Step2Professional({ data, onNext, loading }: Step2Props)
   const [sector, setSector] = useState(data.sector || "");
   const [companySize, setCompanySize] = useState(data.company_size || "");
   const [digitalLevel, setDigitalLevel] = useState<string>(data.digital_level || "");
+  const [csp, setCsp] = useState<string>(data.csp || "");
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Champs requis pour activation (cf. lib/profile-completeness).
@@ -77,6 +74,7 @@ export default function Step2Professional({ data, onNext, loading }: Step2Props)
       sector,
       company_size: companySize,
       digital_level: digitalLevel as DigitalLevel,
+      csp: csp || null,
     });
   }
 
@@ -84,11 +82,10 @@ export default function Step2Professional({ data, onNext, loading }: Step2Props)
     <form onSubmit={handleSubmit}>
       <div style={{ marginBottom: 16 }}>
         <label style={labelStyle}>Intitulé de poste *</label>
-        <input
-          style={{ ...inputStyle, borderColor: errors.job_title ? "#e53e3e" : undefined }}
+        <JobTitleInput
           value={jobTitle}
-          onChange={(e) => { setJobTitle(e.target.value); setErrors((p) => ({ ...p, job_title: "" })); }}
-          placeholder="Product Manager, Développeur, Chef de projet..."
+          onChange={(v) => { setJobTitle(v); setErrors((p) => ({ ...p, job_title: "" })); }}
+          style={{ ...inputStyle, borderColor: errors.job_title ? "#e53e3e" : undefined }}
         />
         {errors.job_title && <span style={{ fontSize: 12, color: "#e53e3e" }}>{errors.job_title}</span>}
       </div>
@@ -123,7 +120,7 @@ export default function Step2Professional({ data, onNext, loading }: Step2Props)
         {errors.company_size && <span style={{ fontSize: 12, color: "#e53e3e" }}>{errors.company_size}</span>}
       </div>
 
-      <div style={{ marginBottom: 28 }}>
+      <div style={{ marginBottom: 20 }}>
         <label style={labelStyle}>Niveau digital *</label>
         <PillSelect
           options={DIGITAL_LEVELS.map((d) => d.label)}
@@ -135,6 +132,18 @@ export default function Step2Professional({ data, onNext, loading }: Step2Props)
           }}
         />
         {errors.digital_level && <span style={{ fontSize: 12, color: "#e53e3e" }}>{errors.digital_level}</span>}
+      </div>
+
+      <div style={{ marginBottom: 28 }}>
+        <label style={labelStyle}>Catégorie socio-professionnelle <span style={{ fontSize: 11, fontWeight: 400, color: "#86868B" }}>(optionnel)</span></label>
+        <PillSelect
+          options={CSPS as unknown as string[]}
+          value={csp}
+          onChange={(v) => setCsp(typeof v === "string" ? (v === csp ? "" : v) : "")}
+        />
+        <p style={{ fontSize: 11, color: "#86868B", margin: "6px 0 0", lineHeight: 1.4 }}>
+          Aide les clients à cibler les bons profils (étudiants, cadres, retraités…). Vous pouvez le modifier plus tard.
+        </p>
       </div>
 
       <button type="submit" disabled={loading || !allRequiredFilled} style={{

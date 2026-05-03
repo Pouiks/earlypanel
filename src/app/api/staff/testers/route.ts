@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStaffMember } from "@/lib/staff-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { ageFromBirthDate } from "@/lib/taxonomy";
 
 export async function GET(request: NextRequest) {
   const staff = await getStaffMember();
@@ -17,10 +18,19 @@ export async function GET(request: NextRequest) {
   const search = searchParams.get("search");
   const status = searchParams.get("status");
   const digital_level = searchParams.get("digital_level");
-  const sector = searchParams.get("sector");
   const connection = searchParams.get("connection");
   const devices = searchParams.get("devices");
   const browsers = searchParams.get("browsers");
+  // Multi-secteur, multi-CSP : repete-toi (?sector=Tech&sector=Finance) ou virgule.
+  const sectorList = searchParams.getAll("sector").flatMap((s) => s.split(",")).map((s) => s.trim()).filter(Boolean);
+  const cspList = searchParams.getAll("csp").flatMap((s) => s.split(",")).map((s) => s.trim()).filter(Boolean);
+  // Recherche fuzzy sur job_title (utilise l'index pg_trgm de la migration 030).
+  const jobTitle = searchParams.get("job_title")?.trim();
+  // Tranche d'age : on filtre sur birth_date en derivant les bornes.
+  const ageMinRaw = searchParams.get("age_min");
+  const ageMaxRaw = searchParams.get("age_max");
+  const ageMin = ageMinRaw && Number.isFinite(Number(ageMinRaw)) ? Number(ageMinRaw) : null;
+  const ageMax = ageMaxRaw && Number.isFinite(Number(ageMaxRaw)) ? Number(ageMaxRaw) : null;
 
   // G11 : pagination defensive. Defaults large pour preserver la compat UI
   // (l'UI consomme un array sans pagination), mais bornee a 5000 lignes max
@@ -32,7 +42,7 @@ export async function GET(request: NextRequest) {
 
   let query = admin
     .from("testers")
-    .select("id, email, first_name, last_name, phone, job_title, sector, company_size, digital_level, tools, browsers, devices, phone_model, mobile_os, connection, availability, interests, ux_experience, status, profile_completed, created_at, tier, quality_score, missions_completed, total_earned, persona_id, persona_locked, persona:tester_personas(id, slug, name)")
+    .select("id, email, first_name, last_name, phone, job_title, sector, company_size, digital_level, csp, birth_date, tools, browsers, devices, phone_model, mobile_os, connection, availability, interests, ux_experience, status, profile_completed, created_at, tier, quality_score, missions_completed, total_earned, persona_id, persona_locked, persona:tester_personas(id, slug, name)")
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 
@@ -53,8 +63,12 @@ export async function GET(request: NextRequest) {
     query = query.eq("digital_level", digital_level);
   }
 
-  if (sector) {
-    query = query.eq("sector", sector);
+  if (sectorList.length > 0) {
+    query = query.in("sector", sectorList);
+  }
+
+  if (cspList.length > 0) {
+    query = query.in("csp", cspList);
   }
 
   if (connection) {
@@ -69,9 +83,34 @@ export async function GET(request: NextRequest) {
     query = query.contains("browsers", [browsers]);
   }
 
+  // Filtre age : on traduit en bornes birth_date. Age max => date min (plus
+  // ancien) ; age min => date max (plus recent). Ex: age 25-34 ans aujourd'hui
+  // 2026-05-02 => birth_date entre 1991-05-02 (35-1) et 2001-05-02 (25).
+  if (ageMin !== null || ageMax !== null) {
+    const today = new Date();
+    if (ageMax !== null) {
+      const minBirth = new Date(today);
+      minBirth.setUTCFullYear(today.getUTCFullYear() - ageMax - 1);
+      // L'utilisateur pourrait avoir ageMax aujourd'hui meme : on prend +1 jour pour inclure les anniversaires d'aujourd'hui.
+      minBirth.setUTCDate(minBirth.getUTCDate() + 1);
+      query = query.gte("birth_date", minBirth.toISOString().slice(0, 10));
+    }
+    if (ageMin !== null) {
+      const maxBirth = new Date(today);
+      maxBirth.setUTCFullYear(today.getUTCFullYear() - ageMin);
+      query = query.lte("birth_date", maxBirth.toISOString().slice(0, 10));
+    }
+  }
+
+  // Recherche fuzzy job_title via l'index trigram pg_trgm. ILIKE est suffisamment
+  // efficace avec gin_trgm_ops pour ce volume.
+  if (jobTitle) {
+    query = query.ilike("job_title", `%${jobTitle}%`);
+  }
+
   if (search) {
     query = query.or(
-      `first_name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%`
+      `first_name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%`,
     );
   }
 
@@ -95,10 +134,14 @@ export async function GET(request: NextRequest) {
       .select("tester_id")
       .in("tester_id", ids);
     const configuredSet = new Set((paymentRows ?? []).map((p) => p.tester_id));
-    const annotated = rows.map((r) => ({
-      ...r,
-      payment_info_configured: configuredSet.has((r as { id: string }).id),
-    }));
+    const annotated = rows.map((r) => {
+      const row = r as { id: string; birth_date: string | null };
+      return {
+        ...r,
+        payment_info_configured: configuredSet.has(row.id),
+        age: ageFromBirthDate(row.birth_date),
+      };
+    });
     return NextResponse.json(annotated);
   }
 

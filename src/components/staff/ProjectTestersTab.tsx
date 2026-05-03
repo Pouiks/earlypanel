@@ -205,6 +205,15 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const [actionMenuOpen, setActionMenuOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  // Pre-filtre auto sur le ciblage projet (target_sector, target_csp, target_age_min/max).
+  // Si l'utilisateur clique "Voir hors cible", on bypass ce pre-filtre.
+  const [projectTargeting, setProjectTargeting] = useState<{
+    sector: string | null;
+    csp: string[];
+    ageMin: number | null;
+    ageMax: number | null;
+  } | null>(null);
+  const [showOutOfTarget, setShowOutOfTarget] = useState(false);
   const { notify, confirm, ConfirmModal } = useConfirm();
 
   const assignedTesterIds = new Set(assigned.map((a) => a.tester_id));
@@ -214,17 +223,39 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
     if (res.ok) setAssigned(await res.json());
   }, [projectId]);
 
+  const fetchProjectTargeting = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/staff/projects/${projectId}`);
+      if (!res.ok) return;
+      const data = await res.json();
+      setProjectTargeting({
+        sector: (data.target_sector_restricted && data.target_sector ? String(data.target_sector) : null),
+        csp: Array.isArray(data.target_csp) ? data.target_csp.filter((s: unknown): s is string => typeof s === "string") : [],
+        ageMin: typeof data.target_age_min === "number" ? data.target_age_min : null,
+        ageMax: typeof data.target_age_max === "number" ? data.target_age_max : null,
+      });
+    } catch { /* fallback: pas de pre-filtre */ }
+  }, [projectId]);
+
   const fetchTesters = useCallback(async () => {
     const params = new URLSearchParams();
     params.set("status", "active");
     if (search) params.set("search", search);
+    // Pre-filtre serveur sur le ciblage projet, sauf si on demande "hors cible".
+    if (projectTargeting && !showOutOfTarget) {
+      if (projectTargeting.sector) params.append("sector", projectTargeting.sector);
+      projectTargeting.csp.forEach((c) => params.append("csp", c));
+      if (projectTargeting.ageMin !== null) params.set("age_min", String(projectTargeting.ageMin));
+      if (projectTargeting.ageMax !== null) params.set("age_max", String(projectTargeting.ageMax));
+    }
     const res = await fetch(`/api/staff/testers?${params}`);
     if (res.ok) setAllTesters(await res.json());
-  }, [search]);
+  }, [search, projectTargeting, showOutOfTarget]);
 
   useEffect(() => {
-    Promise.all([fetchTesters(), fetchAssigned()]).finally(() => setLoading(false));
-  }, [fetchTesters, fetchAssigned]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    Promise.all([fetchTesters(), fetchAssigned(), fetchProjectTargeting()]).finally(() => setLoading(false));
+  }, [fetchTesters, fetchAssigned, fetchProjectTargeting]);
 
   function applyClientFilters(list: Tester[]): Tester[] {
     return list.filter((t) => {
@@ -411,6 +442,38 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
               }}
             />
           </div>
+
+          {projectTargeting && (projectTargeting.sector || projectTargeting.csp.length > 0 || projectTargeting.ageMin !== null || projectTargeting.ageMax !== null) && (
+            <div style={{
+              background: showOutOfTarget ? "#f5f5f7" : "#f0faf5",
+              border: "1px solid " + (showOutOfTarget ? "rgba(0,0,0,0.08)" : "rgba(10,122,90,0.2)"),
+              borderRadius: 12, padding: "10px 14px", marginBottom: 10,
+              fontSize: 12, color: showOutOfTarget ? "#6e6e73" : "#0A7A5A",
+              display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center", justifyContent: "space-between",
+            }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <strong style={{ marginRight: 6 }}>{showOutOfTarget ? "Pre-filtre desactive" : "Cible projet"} :</strong>
+                {projectTargeting.sector && <span style={{ marginRight: 8 }}>secteur {projectTargeting.sector}</span>}
+                {projectTargeting.csp.length > 0 && <span style={{ marginRight: 8 }}>CSP {projectTargeting.csp.join(", ")}</span>}
+                {(projectTargeting.ageMin !== null || projectTargeting.ageMax !== null) && (
+                  <span>
+                    {projectTargeting.ageMin ?? "?"}-{projectTargeting.ageMax ?? "?"} ans
+                  </span>
+                )}
+              </div>
+              <button
+                onClick={() => setShowOutOfTarget((v) => !v)}
+                style={{
+                  padding: "5px 12px", fontSize: 11, fontWeight: 600,
+                  background: "#fff", color: "#1d1d1f",
+                  border: "1px solid rgba(0,0,0,0.12)", borderRadius: 980,
+                  cursor: "pointer", fontFamily: "inherit",
+                }}
+              >
+                {showOutOfTarget ? "Re-filtrer sur la cible" : "Voir hors cible"}
+              </button>
+            </div>
+          )}
 
           {selectedCatalogCount > 0 && (
             <div style={{

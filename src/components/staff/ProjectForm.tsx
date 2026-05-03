@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import RichTextEditor from "@/components/ui/RichTextEditor";
 import PillSelect from "@/components/ui/PillSelect";
 import type { Project } from "@/types/staff";
+import { SECTORS as SECTOR_OPTIONS } from "@/lib/taxonomy";
 
 interface ProjectFormProps {
   initialData?: Project & { client_id?: string | null };
@@ -73,22 +74,7 @@ const CSP_OPTIONS = [
   "Sans activité",
 ];
 
-const SECTOR_OPTIONS = [
-  "Tech / IT",
-  "Finance / Banque",
-  "Santé",
-  "Commerce / Retail",
-  "Éducation",
-  "Industrie",
-  "Transport / Logistique",
-  "Immobilier",
-  "Médias / Communication",
-  "Juridique",
-  "Alimentation",
-  "Tourisme / Hôtellerie",
-  "Énergie",
-  "Autre",
-];
+// Secteurs : taxonomie centralisee dans src/lib/taxonomy.ts. Importee plus bas.
 
 const labelStyle: React.CSSProperties = {
   display: "block",

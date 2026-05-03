@@ -89,11 +89,9 @@ export default function Nav() {
           </Link>
         ) : (
           <>
-            {isB2C ? (
-              <Link href="/entreprises" className="nav-secondary">Vous êtes une entreprise ?</Link>
-            ) : (
-              <Link href="/testeurs" className="nav-secondary">Devenir testeur</Link>
-            )}
+            <Link href="/app/login" className="nav-secondary" title="Connexion testeur">
+              Accéder à mon espace
+            </Link>
             {isB2C ? (
               <button className="nav-cta" onClick={() => document.getElementById("register")?.scrollIntoView({ behavior: "smooth" })}>
                 Rejoindre le panel
@@ -135,14 +133,21 @@ export default function Nav() {
                   </svg>
                   Mon espace
                 </Link>
-              ) : isB2C ? (
-                <button className="nav-cta" onClick={() => { setMenuOpen(false); document.getElementById("register")?.scrollIntoView({ behavior: "smooth" }); }}>
-                  Rejoindre le panel
-                </button>
               ) : (
-                <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="nav-cta" onClick={() => setMenuOpen(false)}>
-                  {isB2B ? "Démarrer un projet" : "Lancer un test"}
-                </a>
+                <>
+                  <Link href="/app/login" className="nav-secondary" onClick={() => setMenuOpen(false)} style={{ display: "block", marginBottom: 12, textAlign: "center" }}>
+                    Accéder à mon espace
+                  </Link>
+                  {isB2C ? (
+                    <button className="nav-cta" onClick={() => { setMenuOpen(false); document.getElementById("register")?.scrollIntoView({ behavior: "smooth" }); }}>
+                      Rejoindre le panel
+                    </button>
+                  ) : (
+                    <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="nav-cta" onClick={() => setMenuOpen(false)}>
+                      {isB2B ? "Démarrer un projet" : "Lancer un test"}
+                    </a>
+                  )}
+                </>
               )}
             </div>
           </div>
