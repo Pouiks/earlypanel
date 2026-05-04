@@ -3,6 +3,10 @@ import { getStaffMember } from "@/lib/staff-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { SECTORS, CSPS, AGE_BUCKETS, ageFromBirthDate, ageBucketLabel } from "@/lib/taxonomy";
 
+// Edge Runtime : page diversite consultee occasionnellement, mais l'agregat
+// est petit. Cold start eviting compense largement.
+export const runtime = "edge";
+
 /**
  * GET /api/staff/diversity
  *
@@ -66,14 +70,22 @@ export async function GET() {
     }
   }
 
-  return NextResponse.json({
-    total_active: totalActive,
-    by_sector: bySector,
-    by_csp: byCsp,
-    by_age_bucket: byAgeBucket,
-    matrix,
-    sectors: SECTORS,
-    csps: CSPS,
-    age_buckets: AGE_BUCKETS.map((b) => b.label),
-  });
+  return NextResponse.json(
+    {
+      total_active: totalActive,
+      by_sector: bySector,
+      by_csp: byCsp,
+      by_age_bucket: byAgeBucket,
+      matrix,
+      sectors: SECTORS,
+      csps: CSPS,
+      age_buckets: AGE_BUCKETS.map((b) => b.label),
+    },
+    {
+      // Cache 30s + stale-while-revalidate 5min : agreges qui evoluent
+      // tres lentement (nouveaux inscrits, profils mis a jour). Re-charger
+      // a chaque ouverture de la page est inutile.
+      headers: { "Cache-Control": "private, max-age=30, stale-while-revalidate=300" },
+    },
+  );
 }

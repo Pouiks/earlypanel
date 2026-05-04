@@ -26,7 +26,12 @@ export async function GET() {
   });
 
   const enriched = (data ?? []).map((p) => ({ ...p, tester_count: countByPersona.get(p.id) ?? 0 }));
-  return NextResponse.json(enriched);
+  // Cache navigateur 60s + revalidation en arriere-plan : les personas
+  // changent rarement (configuration semantique). Sur des navigations
+  // multi-onglets staff, evite de re-fetch a chaque ouverture.
+  return NextResponse.json(enriched, {
+    headers: { "Cache-Control": "private, max-age=60, stale-while-revalidate=300" },
+  });
 }
 
 export async function POST(request: NextRequest) {

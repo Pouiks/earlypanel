@@ -3,6 +3,10 @@ import { getStaffMember } from "@/lib/staff-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ageFromBirthDate } from "@/lib/taxonomy";
 
+// Edge Runtime : route appelee a chaque ouverture de l'onglet Testeurs et
+// pour le pre-filtrage du catalogue projet. Cold start Node = ~1-2s, Edge = ~50ms.
+export const runtime = "edge";
+
 export async function GET(request: NextRequest) {
   const staff = await getStaffMember();
   if (!staff) {

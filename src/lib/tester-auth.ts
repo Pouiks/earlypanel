@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -34,8 +35,13 @@ export interface AuthedTester {
 /**
  * Authentifie le testeur et retourne son id (table testers).
  * Retourne null si non authentifie ou profil introuvable.
+ *
+ * Memoise par requete via React cache() : si plusieurs composants ou
+ * routes appellent getAuthedTester() pendant le meme cycle de requete,
+ * un seul appel reseau + DB est effectue. Gain : ~200-500ms par appel
+ * eveite (cf. waterfall auth identifie en optimisation perf).
  */
-export async function getAuthedTester(): Promise<AuthedTester | null> {
+export const getAuthedTester = cache(async (): Promise<AuthedTester | null> => {
   const supabase = await getSupabaseServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return null;
@@ -51,4 +57,4 @@ export async function getAuthedTester(): Promise<AuthedTester | null> {
 
   if (!tester) return null;
   return { authUserId: user.id, testerId: tester.id };
-}
+});

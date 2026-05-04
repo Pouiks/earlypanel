@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import NotificationBadge from "@/components/ui/NotificationBadge";
 import type { NotificationCounts } from "@/app/app/dashboard/layout";
@@ -21,6 +21,7 @@ const NAV_ITEMS: { href: string; label: string; icon: string; badgeKey: NumericN
 
 export default function Sidebar({ notifications }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
 
   return (
     <aside style={{
@@ -69,6 +70,8 @@ export default function Sidebar({ notifications }: SidebarProps) {
             <Link
               key={item.href}
               href={item.href}
+              prefetch
+              onMouseEnter={() => router.prefetch(item.href)}
               style={{
                 display: "flex",
                 alignItems: "center",

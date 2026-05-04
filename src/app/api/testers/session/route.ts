@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { getAuthedTester } from "@/lib/tester-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+// Edge Runtime : route appelee a chaque navigation pour la nav (Mon espace).
+// V8 isolates -> ~50ms boot vs ~1-3s cold start sur Node serverless.
+export const runtime = "edge";
+
 /**
  * GET /api/testers/session
  *

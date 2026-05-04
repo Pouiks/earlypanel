@@ -4,6 +4,9 @@ import { cookies } from "next/headers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { computeProfileCompleteness, REQUIRED_FIELDS } from "@/lib/profile-completeness";
 
+// Edge Runtime : route polled toutes les 30s + au mount du dashboard.
+export const runtime = "edge";
+
 async function getSupabaseClient() {
   const cookieStore = await cookies();
   return createServerClient(

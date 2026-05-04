@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 
 const NAV_ITEMS = [
@@ -14,6 +14,7 @@ const NAV_ITEMS = [
 
 export default function StaffSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
 
   return (
     <aside style={{
@@ -69,6 +70,8 @@ export default function StaffSidebar() {
             <Link
               key={item.href}
               href={item.href}
+              prefetch
+              onMouseEnter={() => router.prefetch(item.href)}
               style={{
                 display: "flex",
                 alignItems: "center",
