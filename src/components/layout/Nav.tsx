@@ -58,6 +58,7 @@ export default function Nav() {
         <div className="nav-links">
           <a href="#process">Comment ça marche</a>
           <a href="#tarifs">Tarifs</a>
+          <Link href="/testeurs">Devenir testeur</Link>
           <Link href="/entreprises">Vous êtes une entreprise ?</Link>
         </div>
       )}
