@@ -88,23 +88,25 @@ export default function HomePage() {
       <FaqJsonLd items={faqHomepage} />
       <AnnounceBar />
       <Nav />
-      <HeroLanding />
-      <Separator />
-      <StatementSection />
-      <Separator />
-      <ProcessSection />
-      <Separator />
-      <DifferentiatorsSection />
-      <Separator />
-      <LeadMagnetSection />
-      <Separator />
-      <AboutSection />
-      <Separator />
-      <FaqAccordion
-        eyebrow="Questions fréquentes"
-        title="Tout ce que vous voulez savoir sur earlypanel."
-        items={faqHomepage}
-      />
+      <main>
+        <HeroLanding />
+        <Separator />
+        <StatementSection />
+        <Separator />
+        <ProcessSection />
+        <Separator />
+        <DifferentiatorsSection />
+        <Separator />
+        <LeadMagnetSection />
+        <Separator />
+        <AboutSection />
+        <Separator />
+        <FaqAccordion
+          eyebrow="Questions fréquentes"
+          title="Tout ce que vous voulez savoir sur earlypanel."
+          items={faqHomepage}
+        />
+      </main>
       <Footer variant="index" />
     </>
   );

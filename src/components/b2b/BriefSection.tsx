@@ -6,7 +6,7 @@ export default function BriefSection() {
       <div className="brief-inner">
         <div className="brief-left">
           <div className="sec-eye">Démarrer un projet</div>
-          <div className="sec-title">Parlez-nous de votre besoin.</div>
+          <h2 className="sec-title">Parlez-nous de votre besoin.</h2>
           <p>Quelques infos suffisent. On revient vers vous sous 24h pour caler un appel et préciser ce qui peut être testé, comment, et avec quels profils.</p>
           <div className="brief-guarantees">
             <div className="brief-guarantee">

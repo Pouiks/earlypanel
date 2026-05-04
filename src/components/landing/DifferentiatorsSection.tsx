@@ -4,7 +4,7 @@ export default function DifferentiatorsSection() {
       <div className="diff-inner">
         <div className="diff-left">
           <div className="sec-eye">Pourquoi earlypanel</div>
-          <div className="sec-title">Ce qu&apos;un outil self-service ne fera jamais à votre place.</div>
+          <h2 className="sec-title">Ce qu&apos;un outil self-service ne fera jamais à votre place.</h2>
           <div className="diff-list">
             <div className="diff-item">
               <div className="diff-icon">
@@ -13,7 +13,7 @@ export default function DifferentiatorsSection() {
                 </svg>
               </div>
               <div>
-                <h4>Des vrais profils, pas un panel ouvert à tous</h4>
+                <h3>Des vrais profils, pas un panel ouvert à tous</h3>
                 <p>Quand vous nous dites que vous testez un outil de gestion de planning pour kinés, on ne vous envoie pas 15 freelances digitaux qui n&apos;ont jamais mis les pieds dans un cabinet médical. On va vraiment chercher dans notre panel ceux qui correspondent.</p>
               </div>
             </div>
@@ -24,7 +24,7 @@ export default function DifferentiatorsSection() {
                 </svg>
               </div>
               <div>
-                <h4>Le questionnaire est écrit avec vous</h4>
+                <h3>Le questionnaire est écrit avec vous</h3>
                 <p>On part de votre brief, on propose une première version, et on itère ensemble jusqu&apos;à ce que chaque question serve un objectif clair. Pas de copier-coller depuis un projet précédent.</p>
               </div>
             </div>
@@ -35,7 +35,7 @@ export default function DifferentiatorsSection() {
                 </svg>
               </div>
               <div>
-                <h4>Chaque test est lu par un humain</h4>
+                <h3>Chaque test est lu par un humain</h3>
                 <p>Pas d&apos;auto-validation, pas de score algorithmique. On lit les réponses une par une. Si quelque chose cloche (incohérence, réponse trop courte, sujet mal compris), on refuse le test et on en lance un autre, sans vous le facturer.</p>
               </div>
             </div>
@@ -46,7 +46,7 @@ export default function DifferentiatorsSection() {
                 </svg>
               </div>
               <div>
-                <h4>L&apos;analyse fait partie du livrable</h4>
+                <h3>L&apos;analyse fait partie du livrable</h3>
                 <p>Vous n&apos;avez pas à éplucher 200 verbatims pour en tirer un sens. On le fait pour vous, on priorise, et on vient présenter les résultats à votre équipe en visio. Vous repartez avec ce qu&apos;il faut décider, pas avec un tableur.</p>
               </div>
             </div>

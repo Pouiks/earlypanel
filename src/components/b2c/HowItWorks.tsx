@@ -3,7 +3,7 @@ export default function HowItWorks() {
     <section className="how" id="how">
       <div className="how-inner">
         <div className="sec-eye">Comment ça marche</div>
-        <div className="sec-title">De votre inscription au paiement, en quatre étapes.</div>
+        <h2 className="sec-title">De votre inscription au paiement, en quatre étapes.</h2>
         <div className="how-steps">
           <div className="how-step">
             <div className="how-num">01</div>

@@ -27,7 +27,7 @@ export default function Footer({ variant = "index" }: FooterProps) {
           {variant === "index" && (
             <>
               <div className="footer-col">
-                <h4>Service</h4>
+                <h3>Service</h3>
                 <ul>
                   <li><a href="#process">Comment ça marche</a></li>
                   <li><a href="#tarifs">Nos offres</a></li>
@@ -36,7 +36,7 @@ export default function Footer({ variant = "index" }: FooterProps) {
                 </ul>
               </div>
               <div className="footer-col">
-                <h4>Testeurs</h4>
+                <h3>Testeurs</h3>
                 <ul>
                   <li><Link href="/testeurs">Rejoindre le panel</Link></li>
                   <li><Link href="/testeurs#how">Comment ça marche</Link></li>
@@ -45,7 +45,7 @@ export default function Footer({ variant = "index" }: FooterProps) {
                 </ul>
               </div>
               <div className="footer-col">
-                <h4>Légal</h4>
+                <h3>Légal</h3>
                 <ul>
                   <li><Link href="/mentions-legales">Mentions légales</Link></li>
                   <li><Link href="/confidentialite">Politique de confidentialité</Link></li>
@@ -60,7 +60,7 @@ export default function Footer({ variant = "index" }: FooterProps) {
           {variant === "b2b" && (
             <>
               <div className="footer-col">
-                <h4>Service</h4>
+                <h3>Service</h3>
                 <ul>
                   <li><Link href="/#process">Comment ça marche</Link></li>
                   <li><Link href="/entreprises#tarifs">Tarifs</Link></li>
@@ -68,7 +68,7 @@ export default function Footer({ variant = "index" }: FooterProps) {
                 </ul>
               </div>
               <div className="footer-col">
-                <h4>Testeurs</h4>
+                <h3>Testeurs</h3>
                 <ul>
                   <li><Link href="/testeurs">Rejoindre le panel</Link></li>
                   <li><Link href="/testeurs#how">Comment ça marche</Link></li>
@@ -76,7 +76,7 @@ export default function Footer({ variant = "index" }: FooterProps) {
                 </ul>
               </div>
               <div className="footer-col">
-                <h4>Légal</h4>
+                <h3>Légal</h3>
                 <ul>
                   <li><Link href="/mentions-legales">Mentions légales</Link></li>
                   <li><Link href="/confidentialite">Confidentialité</Link></li>
@@ -90,7 +90,7 @@ export default function Footer({ variant = "index" }: FooterProps) {
           {variant === "b2c" && (
             <>
               <div className="footer-col">
-                <h4>Testeurs</h4>
+                <h3>Testeurs</h3>
                 <ul>
                   <li><a href="#register">Rejoindre le panel</a></li>
                   <li><a href="#how">Comment ça marche</a></li>
@@ -99,7 +99,7 @@ export default function Footer({ variant = "index" }: FooterProps) {
                 </ul>
               </div>
               <div className="footer-col">
-                <h4>Entreprises</h4>
+                <h3>Entreprises</h3>
                 <ul>
                   <li><Link href="/entreprises">Démarrer un test</Link></li>
                   <li><Link href="/entreprises#tarifs">Tarifs</Link></li>
@@ -107,7 +107,7 @@ export default function Footer({ variant = "index" }: FooterProps) {
                 </ul>
               </div>
               <div className="footer-col">
-                <h4>Légal</h4>
+                <h3>Légal</h3>
                 <ul>
                   <li><Link href="/mentions-legales">Mentions légales</Link></li>
                   <li><Link href="/confidentialite">Confidentialité</Link></li>

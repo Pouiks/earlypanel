@@ -10,7 +10,7 @@ export default function SectorPills() {
     <section className="sectors">
       <div className="sectors-inner">
         <div className="sec-eye">Secteurs</div>
-        <div className="sec-title">On teste pour tous les secteurs.</div>
+        <h2 className="sec-title">On teste pour tous les secteurs.</h2>
         <div className="sector-pills">
           {sectors.map((s) => (
             <div key={s} className="sector-pill">{s}</div>

@@ -120,24 +120,26 @@ export default function EntreprisesPage() {
 
       <AnnounceBar />
       <Nav />
-      <HeroB2B />
-      <Separator />
-      <ThreeMoments />
-      <Separator />
-      <UseCaseGrid />
-      <Separator />
-      <Comparison />
-      <Separator />
-      <BriefSection />
-      <Separator />
-      <SectorPills />
-      <Separator />
-      <FaqAccordion
-        eyebrow="Questions fréquentes"
-        title="Tout ce que vous voulez savoir."
-        items={faqB2B}
-      />
-      <CtaFinal />
+      <main>
+        <HeroB2B />
+        <Separator />
+        <ThreeMoments />
+        <Separator />
+        <UseCaseGrid />
+        <Separator />
+        <Comparison />
+        <Separator />
+        <BriefSection />
+        <Separator />
+        <SectorPills />
+        <Separator />
+        <FaqAccordion
+          eyebrow="Questions fréquentes"
+          title="Tout ce que vous voulez savoir."
+          items={faqB2B}
+        />
+        <CtaFinal />
+      </main>
       <Footer variant="b2b" />
     </>
   );

@@ -18,6 +18,32 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Cache stale CSS chunks plus longtemps + dont leak la version Next dans
+  // les headers. Micro-polish qui evite un fingerprinting pour rien.
+  poweredByHeader: false,
+
+  // Compression Brotli/Gzip explicite (Vercel le fait deja par defaut, mais
+  // on rend l'intention explicite pour les autres deploiements).
+  compress: true,
+
+  experimental: {
+    // Inline les chunks CSS critiques dans le HTML <style> au lieu de servir
+    // un fichier separe. Elimine le 2e round trip render-blocking sur la
+    // chaine critique LCP. Next.js 15+, stable en pratique sur landing
+    // statiques. Pour les pages avec beaucoup de CSS dynamique (dashboard
+    // staff/testeur), Next decide automatiquement de sortir un chunk separe.
+    inlineCss: true,
+
+    // Tree-shake plus agressivement les gros packages : Next n'inclut que
+    // les fonctions reellement utilisees, reduit le bundle JS de 10-30%.
+    optimizePackageImports: [
+      "@dnd-kit/core",
+      "@dnd-kit/sortable",
+      "@dnd-kit/utilities",
+      "react-markdown",
+    ],
+  },
+
   async headers() {
     return [
       {

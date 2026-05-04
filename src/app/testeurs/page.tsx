@@ -110,21 +110,23 @@ export default function TesteursPage() {
 
       <PreLaunchBanner />
       <Nav />
-      <HeroB2C />
-      <Separator />
-      <HowItWorks />
-      <Separator />
-      <EarnSection />
-      <Separator />
-      <ProfileGrid />
-      <Separator />
-      <RegisterSection />
-      <Separator />
-      <FaqAccordion
-        eyebrow="Questions fréquentes"
-        title="Vos questions, nos réponses."
-        items={faqB2C}
-      />
+      <main>
+        <HeroB2C />
+        <Separator />
+        <HowItWorks />
+        <Separator />
+        <EarnSection />
+        <Separator />
+        <ProfileGrid />
+        <Separator />
+        <RegisterSection />
+        <Separator />
+        <FaqAccordion
+          eyebrow="Questions fréquentes"
+          title="Vos questions, nos réponses."
+          items={faqB2C}
+        />
+      </main>
       <Footer variant="b2c" />
     </>
   );

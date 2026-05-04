@@ -3,7 +3,7 @@ export default function ProcessSection() {
     <section className="process" id="process">
       <div className="process-inner">
         <div className="sec-eye">Comment ça marche</div>
-        <div className="sec-title">Du brief au rapport, en cinq étapes.</div>
+        <h2 className="sec-title">Du brief au rapport, en cinq étapes.</h2>
         <div className="steps-grid">
           <div className="step-card">
             <div className="step-num">Étape 01</div>

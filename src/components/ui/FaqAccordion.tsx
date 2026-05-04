@@ -23,7 +23,7 @@ export default function FaqAccordion({ eyebrow, title, items }: FaqAccordionProp
     <section className="faq" id="faq">
       <div className="faq-inner">
         <div className="sec-eye">{eyebrow}</div>
-        <div className="sec-title">{title}</div>
+        <h2 className="sec-title">{title}</h2>
         <div className="faq-list">
           {items.map((item, i) => (
             <div key={i} className={`faq-item${openIdx === i ? " open" : ""}`}>
