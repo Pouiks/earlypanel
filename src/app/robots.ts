@@ -48,6 +48,10 @@ export default function robots(): MetadataRoute.Robots {
       },
     ],
     sitemap: `${BASE_URL}/sitemap.xml`,
-    host: BASE_URL,
+    // Note : la directive `Host` n'est PAS standard. C'etait une extension
+    // Yandex deprecated depuis 2018, jamais supportee par Google. Bing la
+    // signale comme "unknown directive". La canonicalisation se fait deja
+    // via 301 redirects (Vercel auto www->non-www) + <link rel="canonical">
+    // dans les metadata Next. On l'omet volontairement.
   };
 }

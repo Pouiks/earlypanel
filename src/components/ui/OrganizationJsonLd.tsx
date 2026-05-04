@@ -20,10 +20,10 @@ const ORG_JSON = {
   name: "earlypanel",
   legalName: "earlypanel",
   url: "https://earlypanel.fr",
-  logo: "https://earlypanel.fr/og_image_variant_a_5jours.svg",
+  logo: "https://earlypanel.fr/og-image.png",
   description:
     "Service français de tests utilisateurs B2B clés en main. Panel humain qualifié, NDA contractualisé, rapport livré en 5 jours.",
-  foundingDate: "2025",
+  foundingDate: "2026",
   areaServed: { "@type": "Country", name: "France" },
   knowsAbout: [
     "Tests utilisateurs",
@@ -44,8 +44,7 @@ const ORG_JSON = {
     },
   ],
   sameAs: [
-    // Reseaux sociaux a renseigner quand actifs (LinkedIn, X, etc.)
-    // "https://www.linkedin.com/company/earlypanel",
+    "https://www.linkedin.com/company/earlypanel/",
   ],
 };
 
