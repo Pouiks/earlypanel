@@ -37,7 +37,11 @@ export default function BottomNav({ notifications }: BottomNavProps) {
       fontFamily: "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif",
     }}>
       {NAV_ITEMS.map((item) => {
-        const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+        // Racine /app/dashboard : match exact uniquement (sinon active partout).
+        const isActive =
+          item.href === "/app/dashboard"
+            ? pathname === item.href
+            : pathname === item.href || pathname.startsWith(item.href + "/");
         const badgeCount: number = item.badgeKey && notifications ? notifications[item.badgeKey] : 0;
         return (
           <Link

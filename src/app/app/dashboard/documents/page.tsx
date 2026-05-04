@@ -212,11 +212,9 @@ export default function DocumentsPage() {
                           Consulter
                         </button>
                       )}
-                      {doc.nda_document_url && !doc.nda_document_url.startsWith("storage-error") && (
+                      {doc.nda_signed_at && (
                         <a
-                          href={doc.nda_document_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                          href={`/api/testers/documents/${doc.project_id}/download`}
                           style={{
                             padding: "8px 18px", fontSize: 13, fontWeight: 600,
                             color: "#fff", background: "#0A7A5A",

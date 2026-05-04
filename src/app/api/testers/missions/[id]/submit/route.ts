@@ -146,6 +146,16 @@ export async function POST(
       p_project_id: projectId,
     });
 
+    // Increment immediat de missions_completed pour feedback testeur.
+    // Si le staff rejette finalement (sloppy ou rating<3), il sera decremente
+    // dans /api/staff/projects/[id]/answers PATCH (cf. migration 032).
+    const { error: incErr } = await admin.rpc("increment_missions_completed", {
+      p_tester_id: authed.testerId,
+    });
+    if (incErr) {
+      console.warn("[mission/submit] increment_missions_completed RPC indispo:", incErr.message);
+    }
+
     const testerEmail = (pt.tester as { email?: string } | null)?.email ?? null;
     await logStaffAction(
       {

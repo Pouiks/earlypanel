@@ -192,14 +192,17 @@ export async function PATCH(
       });
     }
 
-    // BUG #9 : increment atomique via RPC (evite la race condition read-then-write).
-    if (!sloppy && rating >= 3) {
-      const { error: incErr } = await admin.rpc("increment_missions_completed", {
+    // missions_completed est incremente A LA SOUMISSION (cf. /api/testers/
+    // missions/[id]/submit). Ici, si le staff rejette le test (sloppy ou
+    // rating<3), on DECREMENTE pour annuler l'increment initial — la mission
+    // n'est finalement pas comptabilisee. Migration 032.
+    if (sloppy || rating < 3) {
+      const { error: decErr } = await admin.rpc("decrement_missions_completed", {
         p_tester_id: pt.tester_id,
       });
-      if (incErr) {
-        // Fallback non atomique si la migration RPC n'est pas encore deployee.
-        console.warn("[answers/PATCH] increment_missions_completed RPC indispo, fallback:", incErr.message);
+      if (decErr) {
+        // Fallback non atomique si la migration n'est pas encore deployee.
+        console.warn("[answers/PATCH] decrement_missions_completed RPC indispo, fallback:", decErr.message);
         const { data: t } = await admin
           .from("testers")
           .select("missions_completed")
@@ -208,7 +211,7 @@ export async function PATCH(
         const current = t?.missions_completed ?? 0;
         await admin
           .from("testers")
-          .update({ missions_completed: current + 1 })
+          .update({ missions_completed: Math.max(current - 1, 0) })
           .eq("id", pt.tester_id);
       }
     }

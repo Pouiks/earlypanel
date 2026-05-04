@@ -56,7 +56,14 @@ export default function Sidebar({ notifications }: SidebarProps) {
 
       <nav style={{ flex: 1, padding: "8px 12px" }}>
         {NAV_ITEMS.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+          // La racine /app/dashboard est active UNIQUEMENT en match exact, sinon
+          // elle s'active aussi sur /app/dashboard/missions etc. Pour les
+          // sous-routes, on accepte l'inclusion (ex: /app/dashboard/missions/123
+          // garde "Mes missions" actif).
+          const isActive =
+            item.href === "/app/dashboard"
+              ? pathname === item.href
+              : pathname === item.href || pathname.startsWith(item.href + "/");
           const badgeCount: number = item.badgeKey && notifications ? notifications[item.badgeKey] : 0;
           return (
             <Link

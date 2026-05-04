@@ -92,7 +92,10 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
 
   const fetchTesters = useCallback(async (signal?: AbortSignal) => {
     const params = new URLSearchParams();
-    params.set("status", "active");
+    // status="all" = active + pending. Permet au staff de voir aussi les
+    // inscrits dont le profil n'est pas encore termine (status=pending) pour
+    // les relancer. Les non-invitables sont desactives dans l'UI ci-dessous.
+    params.set("status", "all");
     if (search) params.set("search", search);
     // 1. Pre-filtre serveur sur le ciblage projet, sauf si "Voir hors cible".
     //    Note : ces params sont APPENDED, donc ils s'AJOUTENT aux filtres
