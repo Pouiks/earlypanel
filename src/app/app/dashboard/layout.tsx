@@ -5,7 +5,9 @@ import type { Tester } from "@/types/tester";
 import Sidebar from "@/components/dashboard/Sidebar";
 import BottomNav from "@/components/dashboard/BottomNav";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import OnboardingTour from "@/components/dashboard/OnboardingTour";
 import { NotificationProvider, useNotify } from "@/components/ui/NotificationProvider";
+import { shouldAutoTriggerTour } from "@/lib/onboarding-tour";
 
 export interface NotificationCounts {
   missions: number;
@@ -190,6 +192,32 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
     return () => clearInterval(interval);
   }, [notify]);
 
+  // Tour guide d'onboarding : auto-start a la 1ere visite si profil complet
+  // et tour ni complete ni skippe. Le bouton "?" dans la sidebar incremente
+  // tourTriggerKey pour relancer manuellement, sans toucher aux flags DB.
+  //
+  // La decision est CALCULEE DIRECTEMENT (pas de useState dans useEffect) :
+  // OnboardingTour ne reagit a `autoStart` qu'a son mount initial via une
+  // ref interne (lastTriggerKeyRef), donc des re-renders ulterieurs ou
+  // l'oscillation de cette valeur n'ont pas d'impact sur le declenchement.
+  const [tourTriggerKey, setTourTriggerKey] = useState(0);
+
+  async function persistTourState(action: "completed" | "skipped") {
+    try {
+      await fetch("/api/testers/onboarding/tour", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      // Refresh local state pour que la decision auto ne se relance pas si
+      // le user revient sur le dashboard dans la meme session.
+      fetchTester();
+    } catch {
+      // Silencieux : si le serveur est KO, le tour aura juste lieu de nouveau
+      // a la prochaine visite. Pas critique.
+    }
+  }
+
   return (
     <DashboardContext.Provider value={{
       tester, loading, notFound, notifications,
@@ -201,7 +229,10 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
         minHeight: "100vh",
       }}>
         <div className="dashboard-sidebar-desktop">
-          <Sidebar notifications={notifications} />
+          <Sidebar
+            notifications={notifications}
+            onHelpClick={() => setTourTriggerKey((k) => k + 1)}
+          />
         </div>
 
         <div className="dashboard-content">
@@ -215,6 +246,25 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
         <div className="dashboard-bottomnav-mobile">
           <BottomNav notifications={notifications} />
         </div>
+
+        {tester && (
+          <OnboardingTour
+            autoStart={shouldAutoTriggerTour(
+              {
+                profile_completed: tester.profile_completed,
+                onboarding_tour_completed_at: tester.onboarding_tour_completed_at,
+                onboarding_tour_skipped_at: tester.onboarding_tour_skipped_at,
+              },
+              {
+                viewportWidth:
+                  typeof window !== "undefined" ? window.innerWidth : 0,
+              },
+            )}
+            triggerKey={tourTriggerKey}
+            onComplete={() => persistTourState("completed")}
+            onSkip={() => persistTourState("skipped")}
+          />
+        )}
       </div>
 
       <style jsx>{`

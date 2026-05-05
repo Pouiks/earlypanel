@@ -7,19 +7,20 @@ import type { NotificationCounts } from "@/app/app/dashboard/layout";
 
 interface SidebarProps {
   notifications?: NotificationCounts;
+  onHelpClick?: () => void;
 }
 
 type NumericNotifKey = "missions" | "documents" | "profil";
 
-const NAV_ITEMS: { href: string; label: string; icon: string; badgeKey: NumericNotifKey | null; badgeType: "alert" | "info" }[] = [
-  { href: "/app/dashboard", label: "Tableau de bord", icon: "🏠", badgeKey: null, badgeType: "info" },
-  { href: "/app/dashboard/missions", label: "Mes missions", icon: "📋", badgeKey: "missions", badgeType: "info" },
-  { href: "/app/dashboard/gains", label: "Mes gains", icon: "💰", badgeKey: null, badgeType: "info" },
-  { href: "/app/dashboard/profil", label: "Mon profil", icon: "👤", badgeKey: "profil", badgeType: "alert" },
-  { href: "/app/dashboard/documents", label: "Mes documents", icon: "📄", badgeKey: "documents", badgeType: "alert" },
+const NAV_ITEMS: { href: string; label: string; icon: string; badgeKey: NumericNotifKey | null; badgeType: "alert" | "info"; tourId: string }[] = [
+  { href: "/app/dashboard", label: "Tableau de bord", icon: "🏠", badgeKey: null, badgeType: "info", tourId: "nav-dashboard" },
+  { href: "/app/dashboard/missions", label: "Mes missions", icon: "📋", badgeKey: "missions", badgeType: "info", tourId: "nav-missions" },
+  { href: "/app/dashboard/gains", label: "Mes gains", icon: "💰", badgeKey: null, badgeType: "info", tourId: "nav-gains" },
+  { href: "/app/dashboard/profil", label: "Mon profil", icon: "👤", badgeKey: "profil", badgeType: "alert", tourId: "nav-profil" },
+  { href: "/app/dashboard/documents", label: "Mes documents", icon: "📄", badgeKey: "documents", badgeType: "alert", tourId: "nav-documents" },
 ];
 
-export default function Sidebar({ notifications }: SidebarProps) {
+export default function Sidebar({ notifications, onHelpClick }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
 
@@ -38,22 +39,38 @@ export default function Sidebar({ notifications }: SidebarProps) {
       zIndex: 40,
       fontFamily: "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif",
     }}>
-      <Link href="/" style={{
-        padding: "0 24px 24px",
-        textDecoration: "none",
-        display: "block",
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 8,
+        padding: "0 20px 24px",
         borderBottom: "0.5px solid rgba(0,0,0,0.08)",
         marginBottom: 8,
       }}>
-        <span style={{
-          fontSize: 18,
-          fontWeight: 700,
-          color: "#1d1d1f",
-          letterSpacing: "-0.04em",
-        }}>
-          early<span style={{ color: "#0A7A5A" }}>panel</span>
-        </span>
-      </Link>
+        <Link href="/" style={{ textDecoration: "none", display: "block" }}>
+          <span style={{
+            fontSize: 18,
+            fontWeight: 700,
+            color: "#1d1d1f",
+            letterSpacing: "-0.04em",
+          }}>
+            early<span style={{ color: "#0A7A5A" }}>panel</span>
+          </span>
+        </Link>
+        {onHelpClick && (
+          <button
+            type="button"
+            onClick={onHelpClick}
+            data-tour="help-button"
+            aria-label="Relancer le tour guidé"
+            title="Relancer le tour guidé"
+            className="ep-help-button"
+          >
+            ?
+          </button>
+        )}
+      </div>
 
       <nav style={{ flex: 1, padding: "8px 12px" }}>
         {NAV_ITEMS.map((item) => {
@@ -71,6 +88,7 @@ export default function Sidebar({ notifications }: SidebarProps) {
               key={item.href}
               href={item.href}
               prefetch
+              data-tour={item.tourId}
               onMouseEnter={() => router.prefetch(item.href)}
               style={{
                 display: "flex",

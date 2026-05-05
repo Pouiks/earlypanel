@@ -59,6 +59,8 @@ export interface Tester {
   persona_id: string | null;
   persona_locked: boolean;
   persona?: TesterPersona | null;
+  onboarding_tour_completed_at: string | null;
+  onboarding_tour_skipped_at: string | null;
 }
 
 export type TesterInsert = Pick<Tester, "email" | "auth_user_id"> &

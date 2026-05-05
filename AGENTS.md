@@ -10,6 +10,13 @@ Avant toute modification non triviale, lire **`PROJECT_CONTEXT.md`** :
 - Section 9 (zones fragiles) et 10 (contrats implicites) → ce qui peut casser silencieusement
 - Section 12 (checklist) → à parcourir avant tout PR
 - Section 13 (playbook sécurité) → patterns d'auth, rate-limit, audit, RLS, crons
+- Section 14 (tests) → quand `npm test` est obligatoire, comment ajouter un test, ce que la CI fait / ne fait pas
+
+# Tests — obligation de non-régression
+
+Avant tout commit qui touche `src/lib/iban.ts`, `src/lib/reward-calculator.ts`, `src/lib/junk-detection.ts`, `src/lib/tester-cgu.ts`, `src/lib/rate-limit.ts` ou les conventions cents/euros : lancer `npm test` et **vérifier que les 125 tests passent**.
+
+Si tu modifies le comportement attendu (ex: nouveau pays IBAN, nouvelle grille rating), **mets à jour le test correspondant dans la même modification**. Référence : [`tests/CLAUDE.md`](tests/CLAUDE.md).
 
 # Règles de sécurité non-négociables
 

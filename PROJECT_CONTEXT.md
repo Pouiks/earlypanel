@@ -1323,3 +1323,88 @@ Le callback staff fait en plus un **double check** :
 3. Idempotence par event ID (cf. `record_stripe_event` RPC)
 
 > **RÈGLE** : Aucun webhook sans signature vérifiée. Aucun webhook sans idempotence par event ID.
+
+---
+
+## 14. TESTS — Stratégie de non-régression
+
+Doc complète : [`tests/CLAUDE.md`](tests/CLAUDE.md). CLAUDE.md ciblés par zone : [`src/lib/CLAUDE.md`](src/lib/CLAUDE.md), [`src/app/api/CLAUDE.md`](src/app/api/CLAUDE.md), [`src/app/api/cron/CLAUDE.md`](src/app/api/cron/CLAUDE.md), [`src/app/api/webhooks/CLAUDE.md`](src/app/api/webhooks/CLAUDE.md), [`supabase/migrations/CLAUDE.md`](supabase/migrations/CLAUDE.md).
+
+### 14.1 Stack actuelle
+
+| Outil | Rôle | Statut |
+|---|---|---|
+| **Vitest** | Tests unitaires sur `src/lib/*` | ✅ Implémenté (125 tests) |
+| **GitHub Actions** | CI sur push toutes branches + PR vers main | ✅ Implémenté |
+| **CLAUDE.md ciblés** | Règles non-négociables par zone (lus auto par les agents) | ✅ Implémenté |
+| Playwright (E2E) | Parcours critiques (inscription, login, NDA) | ❌ À venir |
+| Tests "guards" | Cohérence code ↔ CLAUDE.md (ex: search_path migrations) | ❌ À venir |
+| Smoke post-deploy | Healthcheck + POST IBAN test après deploy | ❌ À venir |
+
+### 14.2 Commandes
+
+```bash
+npm test              # Lance les 125 tests, ~1s
+npm run test:watch    # Mode dev, relance auto
+npm run test:ui       # UI navigateur Vitest
+```
+
+### 14.3 Couverture actuelle
+
+| Fichier source | Tests | Ce qui est verrouillé |
+|---|---|---|
+| `lib/iban.ts` | 43 | MOD-97-10 sur 6 pays SEPA, normalisation, BIC, whitelist fiscale |
+| `lib/reward-calculator.ts` | 20 | Tier override, multiplicateurs rating (5→1.10, 3→1, 1-2→0.85), invariants entier ≥0 |
+| `lib/junk-detection.ts` | 43 | Faux positifs (Le, Vu, D'Aubigne) + vrais junks (azerty, 12345, aaa) |
+| `lib/tester-cgu.ts` | 7 | Format `CGU_VERSION` `vMAJOR.MINOR-YYYY-MM`, sections RGPD/DAS-2/SEPA/eIDAS, hash déterministe |
+| `lib/rate-limit.ts` | 12 | 5/min IP, 3/h email, isolation buckets, reset window via fake timers |
+
+### 14.4 Quand la CI tourne
+
+Workflow : [`.github/workflows/test.yml`](.github/workflows/test.yml).
+
+| Action | CI tourne ? | Bloque le merge ? |
+|---|---|---|
+| `git push origin main` | ✅ Oui | ❌ Non (pas de Branch Protection configurée) |
+| `git push origin feature/xyz` | ✅ Oui | — |
+| PR ouverte vers `main` | ✅ Oui | ❌ Non (par défaut) |
+| Push branches `dependabot/**` ou `renovate/**` | ❌ Non (PR auto fait son run) | — |
+
+Pour bloquer un merge sur tests rouges → activer Branch Protection sur GitHub `Settings → Branches → main → Require status checks → unit`.
+
+### 14.5 Ce que la CI fait / ne fait PAS
+
+✅ Fait :
+- `npm ci` (install strict via lockfile)
+- `npm test` (125 tests Vitest)
+
+❌ Ne fait pas (volontairement, à corriger) :
+- `npm run typecheck` — fail sur `.next/types/validator.ts` stale (bug Next pré-existant)
+- `npm run lint` — fail sur `useTypewriter.ts` + `PreLaunchBanner.tsx` (hooks legacy)
+
+À réintégrer une fois le legacy nettoyé.
+
+### 14.6 Règle pour ajouter un test
+
+Si la modification touche **au moins un** des éléments suivants, **un test unitaire est obligatoire** dans la même PR :
+
+- Conventions monétaires (cents vs euros, `centsToEuros`, `total_earned`)
+- Validation IBAN (`validateIban`, `normalizeIban`, `getIbanLast4`)
+- Calcul de rémunération (`computeDefaultRewardCents`)
+- Texte ou version CGU (`CGU_TEXT`, `CGU_VERSION`)
+- Détection junk (`checkJunkValue`, `JUNK_WORDS`, `KEYBOARD_SEQUENCES`)
+- Rate-limit (`rateLimit`, `getClientIp`)
+
+Convention de nom : `tests/unit/<nom-fichier-source>.test.ts`. Voir [`tests/CLAUDE.md`](tests/CLAUDE.md) pour les patterns.
+
+### 14.7 Ce que les tests NE catchent PAS encore
+
+- Bugs de DB (RLS mal configurée, RPC sans `extensions` dans search_path → cf. bug migration 033)
+- Bugs d'auth de route (route sans `getStaffMember()`)
+- Bugs E2E UI
+- Bugs de cron (idempotence cassée → email envoyé 2×)
+- Bugs Stripe webhook (signature non vérifiée)
+
+→ Couverts par les CLAUDE.md ciblés (instructions pour l'agent qui modifie ces zones), pas par des tests automatisés. Les **tests guards Phase 2** combleront ce gap.
+
+> **RÈGLE** : Avant de retirer un test ou de le rendre conditionnel, demander **pourquoi**. Un test qui casse révèle soit une régression réelle, soit un changement de spec à valider explicitement (ex: bumper `CGU_VERSION` après modif du texte).

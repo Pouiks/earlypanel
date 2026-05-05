@@ -1,0 +1,51 @@
+name: tests
+
+on:
+  # CI sur toute PR ouverte vers main.
+  pull_request:
+    branches: [main]
+  # CI sur push vers n'importe quelle branche : feedback meme avant d'ouvrir une PR.
+  # `branches-ignore` exclut juste les branches techniques (dependabot, renovate)
+  # qui creeront leur propre PR de toute facon.
+  push:
+    branches-ignore:
+      - "dependabot/**"
+      - "renovate/**"
+
+jobs:
+  unit:
+    name: Unit tests + typecheck + lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Unit tests (Vitest)
+        run: npm test
+        env:
+          CI: true
+
+      # Lint et typecheck sont volontairement decouples pour le moment :
+      # - `npm run lint` echoue sur du code legacy (hooks React useEffect dans
+      #   PreLaunchBanner.tsx, useTypewriter.ts) qu'il faut nettoyer
+      #   independamment.
+      # - `npm run typecheck` echoue sur des types Next generes
+      #   (.next/types/validator.ts) qui pointent vers des fichiers supprimes.
+      #   A reintegrer apres `npm run build` ou via un tsconfig.test.json dedie.
+      #
+      # Les nouveaux fichiers (tests/, src/lib/CLAUDE.md, vitest.config.ts) ont
+      # ete valides individuellement avec : `npx eslint tests/ vitest.config.ts`
+      #
+      # Tant que le lint legacy n'est pas nettoye, la CI ne bloque que sur les
+      # tests unitaires (filet de securite minimum mais immediat).

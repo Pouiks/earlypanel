@@ -725,3 +725,152 @@ body { font-family: var(--font); background: #fff; color: var(--black); overflow
   .statement { padding-left: 6rem; padding-right: 6rem; }
   .footer { padding-left: 6rem; padding-right: 6rem; }
 }
+
+/* ════════════════════════════════════════════════
+   ONBOARDING TOUR — theme driver.js earlypanel
+   Surcharge le CSS par defaut de driver.js/dist/driver.css
+   pour matcher la palette verte et la typographie de l'app.
+   ════════════════════════════════════════════════ */
+
+.driver-popover.ep-tour-popover {
+  background: #fff;
+  color: var(--black);
+  border-radius: 14px;
+  box-shadow: 0 12px 48px rgba(10, 122, 90, 0.14), 0 2px 8px rgba(0,0,0,0.08);
+  font-family: var(--font);
+  padding: 20px 22px 16px;
+  max-width: 360px;
+  border: 0.5px solid rgba(10,122,90,0.12);
+}
+
+.driver-popover.ep-tour-popover .driver-popover-title {
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--black);
+  line-height: 1.35;
+  margin-bottom: 8px;
+}
+
+.driver-popover.ep-tour-popover .driver-popover-description {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--gray);
+}
+
+.driver-popover.ep-tour-popover .driver-popover-progress-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--gray-light);
+  letter-spacing: 0.01em;
+}
+
+.driver-popover.ep-tour-popover .driver-popover-footer {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.driver-popover.ep-tour-popover .driver-popover-navigation-btns {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.driver-popover.ep-tour-popover .driver-popover-prev-btn,
+.driver-popover.ep-tour-popover .driver-popover-next-btn {
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 980px;
+  border: none;
+  cursor: pointer;
+  transition: all 150ms ease;
+  text-shadow: none;
+}
+
+.driver-popover.ep-tour-popover .driver-popover-prev-btn {
+  background: transparent;
+  color: var(--gray);
+  border: 0.5px solid var(--border);
+}
+
+.driver-popover.ep-tour-popover .driver-popover-prev-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--black);
+}
+
+.driver-popover.ep-tour-popover .driver-popover-next-btn {
+  background: var(--green);
+  color: #fff;
+}
+
+.driver-popover.ep-tour-popover .driver-popover-next-btn:hover {
+  background: #0d8f68;
+}
+
+.driver-popover.ep-tour-popover .driver-popover-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--gray-light);
+  font-size: 18px;
+  border-radius: 6px;
+  transition: all 150ms ease;
+  padding: 0;
+}
+
+.driver-popover.ep-tour-popover .driver-popover-close-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--black);
+}
+
+.driver-popover.ep-tour-popover .driver-popover-arrow {
+  border-color: #fff;
+}
+
+/* Overlay : un peu plus tonique avec une teinte verte tres subtile. */
+.driver-overlay {
+  fill: rgba(15, 36, 30, 0.55) !important;
+}
+
+/* Bouton "?" ronde dans la sidebar — declencheur du tour. */
+.ep-help-button {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 0.5px solid var(--border);
+  background: #fff;
+  color: var(--gray);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 150ms ease;
+  font-family: var(--font);
+  padding: 0;
+  line-height: 1;
+}
+
+.ep-help-button:hover {
+  background: var(--green-bg);
+  color: var(--green);
+  border-color: rgba(10, 122, 90, 0.3);
+}
+
+.ep-help-button:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 2px;
+}
