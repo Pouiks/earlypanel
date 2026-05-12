@@ -157,6 +157,25 @@ function DashboardInner({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  // Banniere mobile : si l'utilisateur est sur petit ecran et n'a pas encore
+  // suivi le tour d'onboarding, on lui suggere de revenir sur ordinateur pour
+  // le decouvrir. On ne BLOQUE pas le mobile (il peut tout faire), c'est juste
+  // pedagogique. Cooldown long (7 jours) pour ne pas devenir un nag.
+  useEffect(() => {
+    if (!tester) return;
+    if (tester.onboarding_tour_completed_at) return;
+    if (tester.onboarding_tour_skipped_at) return;
+    if (typeof window === "undefined" || window.innerWidth >= 768) return;
+    notify({
+      type: "info",
+      title: "Découvrez votre espace en 30 secondes",
+      message:
+        "Un petit tour guidé est disponible sur ordinateur pour vous présenter chaque section de votre espace.",
+      dedupKey: "mobile-tour-suggestion",
+      cooldownMs: 7 * 24 * 60 * 60 * 1000,
+    });
+  }, [tester, notify]);
+
   // Polling 30s : detecte les nouveaux documents/missions et notifie.
   useEffect(() => {
     const interval = setInterval(async () => {
