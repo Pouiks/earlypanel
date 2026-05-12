@@ -77,8 +77,10 @@ export async function POST(request: NextRequest) {
     }
 
     const hashedToken = linkData.properties?.hashed_token;
+    // Lien email -> page de CONFIRMATION (anti-prefetch Gmail/Outlook).
+    // Cf. src/app/staff/auth/confirm/page.tsx pour le pourquoi.
     const magicLink = hashedToken
-      ? `${appUrl}/staff/auth/callback?token_hash=${encodeURIComponent(hashedToken)}&type=magiclink`
+      ? `${appUrl}/staff/auth/confirm?token_hash=${encodeURIComponent(hashedToken)}&type=magiclink`
       : linkData.properties?.action_link || "";
 
     if (!magicLink) {

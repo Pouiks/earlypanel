@@ -115,8 +115,9 @@ export async function POST(request: NextRequest) {
     }
 
     const hashedToken = linkData.properties?.hashed_token;
+    // Lien email -> page de CONFIRMATION (anti-prefetch Gmail/Outlook).
     const recoveryLink = hashedToken
-      ? `${appUrl}/staff/auth/callback?token_hash=${encodeURIComponent(hashedToken)}&type=recovery`
+      ? `${appUrl}/staff/auth/confirm?token_hash=${encodeURIComponent(hashedToken)}&type=recovery`
       : linkData.properties?.action_link || "";
 
     if (!recoveryLink) {

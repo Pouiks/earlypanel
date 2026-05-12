@@ -74,8 +74,12 @@ export async function POST(request: NextRequest) {
     }
 
     const hashedToken = linkData.properties?.hashed_token;
+    // Le lien email pointe vers la page de CONFIRMATION (et non le callback
+    // direct). Cela empeche Gmail Safe Browsing / Outlook ATP / les aper-
+    // cus iMessage de consommer le token via verifyOtp avant que le user
+    // ne clique. Voir src/app/app/auth/confirm/page.tsx pour le pourquoi.
     const magicLink = hashedToken
-      ? `${appUrl}/app/auth/callback?token_hash=${encodeURIComponent(hashedToken)}&type=magiclink`
+      ? `${appUrl}/app/auth/confirm?token_hash=${encodeURIComponent(hashedToken)}&type=magiclink`
       : linkData.properties?.action_link || "";
 
     if (!magicLink) {
