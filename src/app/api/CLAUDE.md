@@ -84,6 +84,16 @@ const { data, error } = await admin.from("...").select();
 
 `createAdminClient()` retourne `null` si `SUPABASE_SERVICE_ROLE_KEY` est absent (fail-closed).
 
+## 6.bis Dev local avec DB unique (prod) : SKIP_EMAILS
+
+Tant que le projet n'a qu'**une seule base Supabase** (pas de projet de dev séparé), tester en local pollue la prod : envoi de vrais mails, lignes dans `auth.users`, audit log, cooldowns email.
+
+**Solution court terme** : poser `SKIP_EMAILS=true` dans `.env.local`. La fonction `sendEmail()` court-circuite alors Resend et **imprime le magic link dans la console** du dev server. Tu copies-colles dans ton navigateur pour continuer le flow.
+
+**Garde-fou** : `sendEmail()` refuse `SKIP_EMAILS=true` si `NODE_ENV === "production"` (throw). Un magic link en log de prod = leak d'auth.
+
+Quand un vrai projet Supabase de dev sera mis en place, retirer `SKIP_EMAILS` du `.env.local` et envoyer vraiment via Resend test mode.
+
 ## 7. Données sensibles : jamais logguées, jamais retournées
 
 - ❌ `console.log({ iban })`, même en debug → un IBAN clair ne doit JAMAIS apparaître dans Vercel logs.

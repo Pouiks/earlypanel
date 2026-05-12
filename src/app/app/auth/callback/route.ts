@@ -65,8 +65,37 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(new URL("/app/login", origin));
   }
 
-  let profileCompleted = false;
   const admin = createAdminClient();
+
+  // Staff-aware : si l'utilisateur a un row dans `staff_members` (ou que son
+  // app_metadata.role est staff/admin), on le redirige direct vers /staff/dashboard.
+  // Sans ce check, un admin qui clique un magic link genere par /api/testers/login
+  // se retrouverait dans le flow testeur (-> /app/onboarding) puis serait redirige
+  // par le middleware, avec une transition visible. Avec ce check, on coupe court.
+  const role = (user.app_metadata?.role as string | undefined) ?? "tester";
+  if (role === "staff" || role === "admin") {
+    const staffResponse = NextResponse.redirect(new URL("/staff/dashboard", origin));
+    cookiesToApply.forEach(({ name, value, options }) => {
+      staffResponse.cookies.set(name, value, options);
+    });
+    return staffResponse;
+  }
+  if (admin) {
+    const { data: staffMember } = await admin
+      .from("staff_members")
+      .select("id")
+      .eq("auth_user_id", user.id)
+      .maybeSingle();
+    if (staffMember) {
+      const staffResponse = NextResponse.redirect(new URL("/staff/dashboard", origin));
+      cookiesToApply.forEach(({ name, value, options }) => {
+        staffResponse.cookies.set(name, value, options);
+      });
+      return staffResponse;
+    }
+  }
+
+  let profileCompleted = false;
   if (admin) {
     const { data: tester } = await admin
       .from("testers")

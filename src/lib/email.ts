@@ -31,6 +31,34 @@ export async function sendEmail({ to, subject, html, toName, attachments }: Send
     : "(absente)";
   log.info("send attempt", { from, to, subject, key_preview: keyPreview });
 
+  // SKIP_EMAILS=true (set via .env.local) : court-circuite Resend en local
+  // pour ne pas envoyer de vrais mails sur la DB de prod. On extrait le
+  // magic link du HTML si present, et on l'imprime dans la console pour que
+  // le dev puisse le copier-coller dans son navigateur. Ne JAMAIS activer
+  // en production (un magic link en log = leak d'auth).
+  if (process.env.SKIP_EMAILS === "true") {
+    if (process.env.NODE_ENV === "production") {
+      log.error("SKIP_EMAILS=true en PROD — refus pour eviter un leak d'auth");
+      throw new Error("SKIP_EMAILS interdit en production");
+    }
+    const linkMatch = html.match(/href="(https?:\/\/[^"]+\/(?:app|staff)\/auth\/callback[^"]*)"/);
+    const magicLink = linkMatch?.[1] ?? "(aucun lien magique detecte)";
+    log.warn("SKIP_EMAILS=true — mail NON envoye", {
+      to,
+      subject,
+      from,
+      magic_link: magicLink,
+    });
+    // Visibilité maximale dans la console dev (le `log.warn` est concis,
+    // ici on l'affiche en bloc pour copier-coller facile).
+    console.log("\n┌─ [SKIP_EMAILS] Mail intercepte ──────────────────────");
+    console.log(`│ To      : ${to}`);
+    console.log(`│ Subject : ${subject}`);
+    if (linkMatch) console.log(`│ Magic   : ${magicLink}`);
+    console.log("└──────────────────────────────────────────────────────\n");
+    return { success: true, mock: true as const };
+  }
+
   if (!apiKey) {
     log.warn("RESEND_API_KEY manquante — email NON envoye", { to, subject });
     return { success: true, mock: true as const };
