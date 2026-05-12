@@ -57,7 +57,7 @@ export default function Nav() {
       {isIndex && (
         <div className="nav-links">
           <a href="#process">Comment ça marche</a>
-          <a href="#tarifs">Tarifs</a>
+          <a href="/entreprises#brief">Démarrer un projet</a>
           <Link href="/testeurs">Devenir testeur</Link>
           <Link href="/entreprises">Vous êtes une entreprise ?</Link>
         </div>
@@ -123,7 +123,7 @@ export default function Nav() {
             <Link href="/testeurs" onClick={() => setMenuOpen(false)}>Devenir testeur</Link>
             {isIndex && <>
               <a href="#process" onClick={() => setMenuOpen(false)}>Comment ça marche</a>
-              <a href="#tarifs" onClick={() => setMenuOpen(false)}>Tarifs</a>
+              <a href="/entreprises#brief" onClick={() => setMenuOpen(false)}>Démarrer un projet</a>
             </>}
             <div className="mobile-menu-cta">
               {isAuthed ? (

@@ -30,7 +30,7 @@ export default function Footer({ variant = "index" }: FooterProps) {
                 <h3>Service</h3>
                 <ul>
                   <li><a href="#process">Comment ça marche</a></li>
-                  <li><a href="#tarifs">Nos offres</a></li>
+                  <li><Link href="/entreprises#brief">Démarrer un projet</Link></li>
                   <li><Link href="/entreprises">Page entreprises</Link></li>
                   <li><Link href="/entreprises#faq">FAQ clients</Link></li>
                 </ul>
@@ -63,7 +63,7 @@ export default function Footer({ variant = "index" }: FooterProps) {
                 <h3>Service</h3>
                 <ul>
                   <li><Link href="/#process">Comment ça marche</Link></li>
-                  <li><Link href="/entreprises#tarifs">Tarifs</Link></li>
+                  <li><Link href="/entreprises#brief">Démarrer un projet</Link></li>
                   <li><Link href="/entreprises#faq">FAQ</Link></li>
                 </ul>
               </div>
@@ -101,8 +101,8 @@ export default function Footer({ variant = "index" }: FooterProps) {
               <div className="footer-col">
                 <h3>Entreprises</h3>
                 <ul>
-                  <li><Link href="/entreprises">Démarrer un test</Link></li>
-                  <li><Link href="/entreprises#tarifs">Tarifs</Link></li>
+                  <li><Link href="/entreprises">Page entreprises</Link></li>
+                  <li><Link href="/entreprises#brief">Démarrer un projet</Link></li>
                   <li><Link href="/entreprises#faq">FAQ clients</Link></li>
                 </ul>
               </div>
