@@ -42,16 +42,32 @@ export async function PUT(
   const allowed = [
     "delivery_date", "summary", "bugs", "frictions",
     "recommendations", "impact_effort_matrix", "include_annexes",
+    "status",
   ];
   for (const key of allowed) {
     if (key in body) payload[key] = body[key];
   }
 
+  // Validation du statut (draft | published) + gestion de published_at.
+  if ("status" in payload) {
+    if (payload.status !== "draft" && payload.status !== "published") {
+      return NextResponse.json({ error: "Statut invalide" }, { status: 400 });
+    }
+  }
+
   const { data: existing } = await admin
     .from("project_reports")
-    .select("id")
+    .select("id, published_at")
     .eq("project_id", projectId)
     .maybeSingle();
+
+  // "Livré" = published : on date la livraison la 1re fois ; retour en draft
+  // (dé-livraison) efface la date de publication.
+  if (payload.status === "published") {
+    payload.published_at = existing?.published_at ?? new Date().toISOString();
+  } else if (payload.status === "draft") {
+    payload.published_at = null;
+  }
 
   if (existing) {
     const { data, error } = await admin

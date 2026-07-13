@@ -41,7 +41,11 @@ export async function sendEmail({ to, subject, html, toName, attachments }: Send
       log.error("SKIP_EMAILS=true en PROD — refus pour eviter un leak d'auth");
       throw new Error("SKIP_EMAILS interdit en production");
     }
-    const linkMatch = html.match(/href="(https?:\/\/[^"]+\/(?:app|staff)\/auth\/callback[^"]*)"/);
+    // Capture les liens d'auth testeur ET staff, qu'ils pointent vers
+    // /auth/callback (testeur) ou /auth/confirm (staff, page anti-prefetch
+    // Gmail/Outlook). Sans /confirm, le lien de connexion staff n'etait
+    // jamais imprime en local → impossible de se connecter en dev.
+    const linkMatch = html.match(/href="(https?:\/\/[^"]+\/(?:app|staff)\/auth\/(?:callback|confirm)[^"]*)"/);
     const magicLink = linkMatch?.[1] ?? "(aucun lien magique detecte)";
     log.warn("SKIP_EMAILS=true — mail NON envoye", {
       to,

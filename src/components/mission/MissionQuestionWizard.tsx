@@ -13,7 +13,7 @@
  * Les drafts (reponses) sont passes par le parent qui gere l'autosave 2s.
  */
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import ImageUploader from "@/components/mission/ImageUploader";
 import Markdown from "@/components/ui/Markdown";
 
@@ -232,8 +232,20 @@ export default function MissionQuestionWizard({
     sessionStorage.setItem(SESSION_STORAGE_PREFIX + projectId, String(step));
   }, [projectId, step, n]);
 
+  // Au changement de question (Suivant/Precedent), on recadre sur le HAUT DU
+  // WIDGET (barre "Question X sur N"), pas sur le haut de la page. Sinon le
+  // scroll remontait au-dessus du titre de mission / description / URLs et il
+  // fallait re-scroller a chaque clic. On saute le tout premier rendu pour ne
+  // pas provoquer de saut au chargement (ou a la restauration de l'etape
+  // depuis sessionStorage).
+  const rootRef = useRef<HTMLDivElement>(null);
+  const skipFirstScrollRef = useRef(true);
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (skipFirstScrollRef.current) {
+      skipFirstScrollRef.current = false;
+      return;
+    }
+    rootRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [step]);
 
   const goPrev = useCallback(() => {
@@ -284,7 +296,7 @@ export default function MissionQuestionWizard({
   };
 
   return (
-    <div className="q-widget" style={{ maxWidth: 680, margin: "0 auto" }}>
+    <div ref={rootRef} className="q-widget" style={{ maxWidth: 680, margin: "0 auto", scrollMarginTop: 16 }}>
       <div className="q-topbar">
         <div className="q-dots" aria-hidden>
           <div className="q-dot" style={{ background: "#FF5F57" }} />

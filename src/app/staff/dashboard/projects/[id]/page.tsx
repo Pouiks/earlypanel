@@ -101,11 +101,28 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   const [newEndDate, setNewEndDate] = useState("");
 
   async function handleStatusChange(newStatus: ProjectStatus) {
+    // Déjà dans cet état : ne rien faire (évite un PATCH inutile).
+    if (newStatus === project?.status) return;
+
     if (newStatus === "active" && project?.status !== "draft") {
       setNewEndDate("");
       setReactivateModal(true);
       return;
     }
+
+    // Transitions quasi-destructives : coupent l'envoi de NDA et l'accès
+    // testeur aux missions. On confirme explicitement (cf. bandeau d'alerte).
+    if (newStatus === "closed" || newStatus === "archived") {
+      const ok = await confirm({
+        title: newStatus === "closed" ? "Terminer ce projet ?" : "Archiver ce projet ?",
+        message:
+          "Cela arrête l'envoi de NDA et l'accès des testeurs aux missions en cours. Vous pourrez réactiver le projet ensuite en fixant une nouvelle date de fin.",
+        confirmLabel: newStatus === "closed" ? "Terminer" : "Archiver",
+        danger: true,
+      });
+      if (!ok) return;
+    }
+
     await applyStatusChange(newStatus);
   }
 

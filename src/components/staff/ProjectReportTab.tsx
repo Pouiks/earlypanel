@@ -91,6 +91,18 @@ interface CheckItem {
   done: boolean;
 }
 
+interface SourceVerbatim {
+  tester_id: string;
+  tester_readable: string;
+  question_text: string;
+  use_case_title: string;
+  answer_text: string;
+}
+interface ReportSources {
+  verbatims: SourceVerbatim[];
+  figures: { value: string; label: string }[];
+}
+
 export default function ProjectReportTab({ projectId }: Props) {
   const [report, setReport] = useState<ProjectReport | null>(null);
   const [loading, setLoading] = useState(true);
@@ -98,7 +110,14 @@ export default function ProjectReportTab({ projectId }: Props) {
   const [saved, setSaved] = useState(false);
   const [panel, setPanel] = useState<PanelTester[]>([]);
   const [hoverChecklist, setHoverChecklist] = useState(false);
-  const { notify, ConfirmModal } = useConfirm();
+  const { confirm, notify, ConfirmModal } = useConfirm();
+
+  // Matière première (réponses réelles + chiffres calculés) pour assister la
+  // rédaction sans retaper. Cf. GET /report/sources.
+  const [sources, setSources] = useState<ReportSources>({ verbatims: [], figures: [] });
+  // Index de la friction pour laquelle le sélecteur de verbatims est ouvert.
+  const [verbatimPickerIdx, setVerbatimPickerIdx] = useState<number | null>(null);
+  const [pickerQuery, setPickerQuery] = useState("");
 
   // Summary state
   const [deliveryDate, setDeliveryDate] = useState("");
@@ -123,10 +142,15 @@ export default function ProjectReportTab({ projectId }: Props) {
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      const [reportRes, testersRes] = await Promise.all([
+      const [reportRes, testersRes, sourcesRes] = await Promise.all([
         fetch(`/api/staff/projects/${projectId}/report`),
         fetch(`/api/staff/projects/${projectId}/testers`),
+        fetch(`/api/staff/projects/${projectId}/report/sources`),
       ]);
+
+      if (sourcesRes.ok) {
+        setSources(await sourcesRes.json());
+      }
 
       if (reportRes.ok) {
         const data: ProjectReport | null = await reportRes.json();
@@ -212,6 +236,35 @@ export default function ProjectReportTab({ projectId }: Props) {
     n[fIdx] = { ...n[fIdx], verbatims: [...n[fIdx].verbatims, { _key: nk(), text: "", tester_id: "" }] };
     setFrictions(n); dirty();
   }
+
+  // Insère un verbatim pré-rempli depuis une réponse réelle (pas de re-saisie).
+  function addVerbatimFromSource(fIdx: number, src: SourceVerbatim) {
+    const n = [...frictions];
+    n[fIdx] = {
+      ...n[fIdx],
+      verbatims: [...n[fIdx].verbatims, { _key: nk(), text: src.answer_text, tester_id: src.tester_id }],
+    };
+    setFrictions(n);
+    setVerbatimPickerIdx(null);
+    setPickerQuery("");
+    dirty();
+  }
+
+  // Ajoute un chiffre clé calculé (évite un doublon exact).
+  function addSuggestedFigure(fig: { value: string; label: string }) {
+    setKeyFigures((prev) => {
+      if (prev.some((k) => k.value === fig.value && k.label === fig.label)) return prev;
+      // Remplace la 1re ligne vide si présente, sinon append.
+      const emptyIdx = prev.findIndex((k) => !k.value.trim() && !k.label.trim());
+      if (emptyIdx >= 0) {
+        const next = [...prev];
+        next[emptyIdx] = fig;
+        return next;
+      }
+      return [...prev, fig];
+    });
+    dirty();
+  }
   function removeVerbatim(fIdx: number, vIdx: number) {
     const n = [...frictions];
     n[fIdx] = { ...n[fIdx], verbatims: n[fIdx].verbatims.filter((_, idx) => idx !== vIdx) };
@@ -264,45 +317,43 @@ export default function ProjectReportTab({ projectId }: Props) {
     return null;
   }
 
-  // --- Save ---
-  async function handleSave() {
-    setSaving(true);
+  // Construit le corps de sauvegarde à partir de l'état courant du formulaire.
+  function buildReportBody(): Record<string, unknown> {
     const summary: ReportSummary = {
       verdict: verdict.trim() || undefined,
       key_figures: keyFigures.filter((kf) => kf.value.trim() || kf.label.trim()),
       top_actions: topActions.filter((a) => a.trim()),
     };
-
     const cleanBugs: ReportBug[] = bugs
       .filter((b) => b.description.trim())
       .map(({ _key, ...b }) => ({ ...b, description: b.description.trim() }));
-
     const cleanFrictions: ReportFriction[] = frictions
       .filter((f) => f.title.trim())
       .map(({ _key, verbatims, ...f }) => ({
         ...f, title: f.title.trim(),
-        verbatims: verbatims
-          .filter((v) => v.text.trim())
-          .map((v) => ({ text: v.text, tester_id: v.tester_id })),
+        verbatims: verbatims.filter((v) => v.text.trim()).map((v) => ({ text: v.text, tester_id: v.tester_id })),
       }));
-
     const cleanRecos: ReportRecommendation[] = recos
       .filter((r) => r.title.trim())
       .map(({ _key, ...r }) => ({ ...r, title: r.title.trim() }));
+    return {
+      delivery_date: deliveryDate || null,
+      summary,
+      bugs: cleanBugs,
+      frictions: cleanFrictions,
+      recommendations: cleanRecos,
+      impact_effort_matrix: matrix,
+    };
+  }
 
+  // --- Save ---
+  async function handleSave() {
+    setSaving(true);
     const res = await fetch(`/api/staff/projects/${projectId}/report`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        delivery_date: deliveryDate || null,
-        summary,
-        bugs: cleanBugs,
-        frictions: cleanFrictions,
-        recommendations: cleanRecos,
-        impact_effort_matrix: matrix,
-      }),
+      body: JSON.stringify(buildReportBody()),
     });
-
     setSaving(false);
     if (res.ok) {
       const data = await res.json();
@@ -311,6 +362,36 @@ export default function ProjectReportTab({ projectId }: Props) {
     } else {
       const err = await res.json();
       await notify({ title: "Erreur", message: err.error || "Erreur lors de l'enregistrement" });
+    }
+  }
+
+  // Marque le rapport comme livré (published) ou le repasse en brouillon.
+  // On sauvegarde d'abord le contenu courant pour figer exactement ce qui est
+  // livré (évite de "livrer" une version différente de ce qui est à l'écran).
+  const [publishing, setPublishing] = useState(false);
+  async function setPublished(published: boolean) {
+    if (published) {
+      const ok = await confirm({
+        title: "Marquer le rapport comme livré ?",
+        message: "Le contenu actuel sera enregistré et daté comme livré. Le client pourra le consulter. Vous pourrez le repasser en brouillon si besoin.",
+        confirmLabel: "Marquer comme livré",
+      });
+      if (!ok) return;
+    }
+    setPublishing(true);
+    const res = await fetch(`/api/staff/projects/${projectId}/report`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...buildReportBody(), status: published ? "published" : "draft" }),
+    });
+    setPublishing(false);
+    if (res.ok) {
+      const data = await res.json();
+      setReport(data);
+      setSaved(true);
+    } else {
+      const err = await res.json();
+      await notify({ title: "Erreur", message: err.error || "Erreur lors du changement de statut" });
     }
   }
 
@@ -332,8 +413,30 @@ export default function ProjectReportTab({ projectId }: Props) {
             {report ? `Dernière sauvegarde : ${new Date(report.updated_at).toLocaleString("fr-FR")}` : "Nouveau rapport — aucune donnée enregistrée."}
           </p>
         </div>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+          {report && (
+            <span style={{
+              fontSize: 12, fontWeight: 600, padding: "5px 12px", borderRadius: 980,
+              background: report.status === "published" ? "#D1FAE5" : "#F1F1F3",
+              color: report.status === "published" ? "#065F46" : "#6E6E73",
+            }}>
+              {report.status === "published"
+                ? `Livré le ${report.published_at ? new Date(report.published_at).toLocaleDateString("fr-FR") : "—"}`
+                : "Brouillon"}
+            </span>
+          )}
           {saved && <span style={{ fontSize: 13, color: "#0A7A5A", fontWeight: 500 }}>Enregistré</span>}
+          <a
+            href={`/staff/dashboard/projects/${projectId}/report/view`}
+            target="_blank" rel="noopener noreferrer"
+            style={{
+              padding: "8px 18px", fontSize: 13, fontWeight: 600, color: "#1d1d1f",
+              background: "#fff", border: "1px solid rgba(0,0,0,0.12)", borderRadius: 980,
+              textDecoration: "none", fontFamily: "inherit",
+            }}
+          >
+            Voir le rapport ↗
+          </a>
           <button onClick={handleSave} disabled={saving} style={{
             padding: "8px 20px", fontSize: 13, fontWeight: 700, color: "#fff",
             background: "#0A7A5A", border: "none", borderRadius: 980,
@@ -342,6 +445,23 @@ export default function ProjectReportTab({ projectId }: Props) {
           }}>
             {saving ? "Enregistrement…" : "Enregistrer"}
           </button>
+          {report?.status === "published" ? (
+            <button onClick={() => setPublished(false)} disabled={publishing} style={{
+              padding: "8px 18px", fontSize: 13, fontWeight: 600, color: "#6e6e73",
+              background: "#f5f5f7", border: "1px solid rgba(0,0,0,0.12)", borderRadius: 980,
+              cursor: publishing ? "wait" : "pointer", fontFamily: "inherit", opacity: publishing ? 0.6 : 1,
+            }}>
+              {publishing ? "…" : "Repasser en brouillon"}
+            </button>
+          ) : (
+            <button onClick={() => setPublished(true)} disabled={publishing} style={{
+              padding: "8px 18px", fontSize: 13, fontWeight: 700, color: "#fff",
+              background: "#1d1d1f", border: "none", borderRadius: 980,
+              cursor: publishing ? "wait" : "pointer", fontFamily: "inherit", opacity: publishing ? 0.6 : 1,
+            }}>
+              {publishing ? "…" : "Marquer comme livré"}
+            </button>
+          )}
         </div>
       </div>
 
@@ -378,6 +498,32 @@ export default function ProjectReportTab({ projectId }: Props) {
             </div>
           ))}
           <button type="button" onClick={addKeyFigure} style={smallBtn}>+ Chiffre clé</button>
+
+          {sources.figures.length > 0 && (
+            <div style={{ marginTop: 12 }}>
+              <div style={{ fontSize: 11, color: "#86868B", marginBottom: 6 }}>Suggestions calculées (cliquez pour ajouter) :</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {sources.figures.map((f, i) => {
+                  const already = keyFigures.some((k) => k.value === f.value && k.label === f.label);
+                  return (
+                    <button
+                      key={i} type="button" disabled={already}
+                      onClick={() => addSuggestedFigure(f)}
+                      style={{
+                        padding: "5px 12px", fontSize: 12, fontWeight: 600, borderRadius: 980,
+                        border: "1px solid rgba(10,122,90,0.3)",
+                        background: already ? "#f5f5f7" : "#f0faf5",
+                        color: already ? "#c4c4c8" : "#0A7A5A",
+                        cursor: already ? "default" : "pointer", fontFamily: "inherit",
+                      }}
+                    >
+                      {already ? "✓ " : "+ "}<strong>{f.value}</strong> {f.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         <div>
@@ -539,9 +685,20 @@ export default function ProjectReportTab({ projectId }: Props) {
             </div>
 
             <div>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8, gap: 8, flexWrap: "wrap" }}>
                 <label style={{ ...labelStyle, margin: 0 }}>Verbatims ({fr.verbatims.length})</label>
-                <button type="button" onClick={() => addVerbatim(fIdx)} style={{ ...smallBtn, fontSize: 11, padding: "4px 10px" }}>+ Verbatim</button>
+                <div style={{ display: "flex", gap: 6 }}>
+                  {sources.verbatims.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => { setVerbatimPickerIdx(fIdx); setPickerQuery(""); }}
+                      style={{ ...smallBtn, fontSize: 11, padding: "4px 10px" }}
+                    >
+                      Depuis les réponses ({sources.verbatims.length})
+                    </button>
+                  )}
+                  <button type="button" onClick={() => addVerbatim(fIdx)} style={{ ...smallBtn, fontSize: 11, padding: "4px 10px", background: "#fff", color: "#6e6e73", borderColor: "rgba(0,0,0,0.12)" }}>+ Vide</button>
+                </div>
               </div>
               {fr.verbatims.map((v, vIdx) => (
                 <div key={v._key} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
@@ -718,11 +875,11 @@ export default function ProjectReportTab({ projectId }: Props) {
             background: allDone ? "#f0faf5" : "#f5f5f7",
             border: allDone ? "1.5px solid rgba(10,122,90,0.2)" : "1.5px solid rgba(0,0,0,0.08)",
           }}>
-            <h3 style={{ fontSize: 14, fontWeight: 700, color: "#1d1d1f", margin: "0 0 4px" }}>Export &amp; Livrables</h3>
+            <h3 style={{ fontSize: 14, fontWeight: 700, color: "#1d1d1f", margin: "0 0 4px" }}>Livrables</h3>
             <p style={{ fontSize: 12, color: "#86868B", margin: "0 0 16px" }}>
               {allDone
-                ? "Toutes les étapes sont complètes. Vous pouvez générer le rapport."
-                : `${missing.length} étape${missing.length > 1 ? "s" : ""} manquante${missing.length > 1 ? "s" : ""} avant de pouvoir générer le rapport.`}
+                ? "Le rapport est complet. Consultez-le, téléchargez-le en PDF, ou marquez-le comme livré."
+                : `${missing.length} étape${missing.length > 1 ? "s" : ""} recommandée${missing.length > 1 ? "s" : ""} avant de livrer le rapport (non bloquant).`}
             </p>
 
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "flex-start" }}>
@@ -731,20 +888,17 @@ export default function ProjectReportTab({ projectId }: Props) {
                 onMouseLeave={() => setHoverChecklist(false)}
               >
                 <a
-                  href={allDone ? `/api/staff/projects/${projectId}/export?format=json` : undefined}
-                  download={allDone ? true : undefined}
-                  onClick={allDone ? undefined : (e) => e.preventDefault()}
+                  href={`/staff/dashboard/projects/${projectId}/report/view`}
+                  target="_blank" rel="noopener noreferrer"
                   style={{
                     display: "inline-flex", alignItems: "center", gap: 8,
                     padding: "10px 20px", fontSize: 13, fontWeight: 700,
-                    color: allDone ? "#fff" : "#86868B",
-                    background: allDone ? "#0A7A5A" : "#e5e5e5",
+                    color: "#fff", background: "#0A7A5A",
                     border: "none", borderRadius: 980, textDecoration: "none",
-                    cursor: allDone ? "pointer" : "default",
-                    fontFamily: "inherit", transition: "all 200ms",
+                    cursor: "pointer", fontFamily: "inherit", transition: "all 200ms",
                   }}
                 >
-                  Générer le rapport
+                  Voir / Télécharger le rapport (PDF) ↗
                 </a>
 
                 {hoverChecklist && !allDone && (
@@ -789,12 +943,73 @@ export default function ProjectReportTab({ projectId }: Props) {
                   transition: "all 200ms",
                 }}
               >
-                Télécharger le CSV réponses
+                CSV des réponses (annexe)
               </a>
+            </div>
+            <p style={{ fontSize: 11, color: "#c4c4c8", margin: "12px 0 0" }}>
+              Besoin des données brutes structurées ?{" "}
+              <a href={`/api/staff/projects/${projectId}/export?format=json`} download style={{ color: "#86868B" }}>
+                Export JSON (pipeline technique)
+              </a>
+            </p>
+          </div>
+        );
+      })()}
+
+      {/* Sélecteur de verbatims depuis les réponses réelles */}
+      {verbatimPickerIdx !== null && (() => {
+        const q = pickerQuery.trim().toLowerCase();
+        const list = q
+          ? sources.verbatims.filter((v) =>
+              v.answer_text.toLowerCase().includes(q) ||
+              v.tester_readable.toLowerCase().includes(q) ||
+              v.question_text.toLowerCase().includes(q))
+          : sources.verbatims;
+        return (
+          <div
+            style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+            onClick={() => setVerbatimPickerIdx(null)}
+          >
+            <div
+              style={{ background: "#fff", borderRadius: 20, width: "100%", maxWidth: 640, maxHeight: "80vh", display: "flex", flexDirection: "column", boxShadow: "0 8px 40px rgba(0,0,0,0.18)" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ padding: "20px 24px 12px", borderBottom: "0.5px solid rgba(0,0,0,0.08)" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                  <h3 style={{ fontSize: 16, fontWeight: 700, color: "#1d1d1f", margin: 0 }}>Insérer un verbatim depuis les réponses</h3>
+                  <button type="button" onClick={() => setVerbatimPickerIdx(null)} style={{ background: "none", border: "none", fontSize: 22, color: "#86868B", cursor: "pointer", lineHeight: 1 }}>&times;</button>
+                </div>
+                <input
+                  type="text" value={pickerQuery} onChange={(e) => setPickerQuery(e.target.value)}
+                  placeholder="Filtrer par texte, testeur (T01…) ou question…"
+                  autoFocus
+                  style={{ ...inputStyle, background: "#f5f5f7" }}
+                />
+              </div>
+              <div style={{ overflowY: "auto", padding: "12px 24px 20px" }}>
+                {list.length === 0 ? (
+                  <p style={{ fontSize: 13, color: "#86868B", textAlign: "center", padding: "24px 0" }}>Aucune réponse texte ne correspond.</p>
+                ) : list.map((v, i) => (
+                  <button
+                    key={i} type="button"
+                    onClick={() => addVerbatimFromSource(verbatimPickerIdx, v)}
+                    style={{ display: "block", width: "100%", textAlign: "left", background: "#fafafa", border: "0.5px solid rgba(0,0,0,0.08)", borderRadius: 12, padding: "12px 14px", marginBottom: 8, cursor: "pointer", fontFamily: "inherit" }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "#f0faf5")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "#fafafa")}
+                  >
+                    <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 4 }}>
+                      <span style={{ fontSize: 11, fontWeight: 700, color: "#0A7A5A", background: "#f0faf5", padding: "2px 8px", borderRadius: 980 }}>{v.tester_readable}</span>
+                      <span style={{ fontSize: 11, color: "#86868B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v.use_case_title ? `${v.use_case_title} · ` : ""}{v.question_text}</span>
+                    </div>
+                    <div style={{ fontSize: 13.5, color: "#1d1d1f", fontStyle: "italic", lineHeight: 1.5 }}>« {v.answer_text} »</div>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         );
       })()}
+
       <ConfirmModal />
     </div>
   );

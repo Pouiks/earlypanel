@@ -1037,6 +1037,18 @@ Utilisé par :
 
 ---
 
+### C24 — Règlement des versements : `paid` = argent confirmé (fiabilisé 2026-07-13)
+
+Le passage d'un versement à `paid` signifie « le paiement est confirmé » — jamais « on a cliqué payer ».
+
+- **`payouts/pay` ne pose JAMAIS `paid`.** Il refuse un montant ≤ 0 € (« Aucun montant à verser »), refuse une absence de destination (« Coordonnées de paiement manquantes »), sinon **initie** le transfert et laisse le versement *en cours* (`status='pending'` + `stripe_transfer_id` renseigné).
+- **Le passage à `paid` + le crédit `total_earned` viennent UNIQUEMENT du retour de paiement** : vrai webhook Stripe `transfer.paid`, ou simulation dev `/payouts/simulate-stripe`. Les deux appellent la brique unique [`src/lib/payout-settlement.ts`](src/lib/payout-settlement.ts) (`settlePayoutPaid` / `settlePayoutFailed`).
+- **Statuts d'affichage dérivés** (pas de colonne dédiée) via [`src/lib/payout-status.ts`](src/lib/payout-status.ts) : `final=0` → « Aucun versement dû » ; `pending` + `stripe_transfer_id` → « En cours ». Ne jamais afficher `paid` pour un montant nul.
+- **Crédit idempotent** via `tester_earnings_ledger` (migration 021) : un payout crédite `total_earned` **une seule fois**, quel que soit le nombre de confirmations. Le rail SEPA (`payouts/mark-paid`) crédite via le même ledger (corrigé — il ne le faisait pas).
+- **`reversed`** annule le crédit (`revert_tester_earnings`) même sur un versement déjà `paid`.
+
+> **RÈGLE** : Ne jamais réintroduire un chemin qui pose `paid` sans passage par `settlePayoutPaid`, ni sans destination valide, ni pour un montant ≤ 0. Couvert par les steps 19-24 de `scripts/e2e/run.mjs` et `tests/unit/payout-status.test.ts`.
+
 ## 11. LISTES DE VALEURS CANONIQUES
 
 ### Secteurs (onboarding tester vs landing vs staff)
@@ -1334,10 +1346,11 @@ Doc complète : [`tests/CLAUDE.md`](tests/CLAUDE.md). CLAUDE.md ciblés par zone
 
 | Outil | Rôle | Statut |
 |---|---|---|
-| **Vitest** | Tests unitaires sur `src/lib/*` | ✅ Implémenté (125 tests) |
+| **Vitest** | Tests unitaires sur `src/lib/*` | ✅ Implémenté (144 tests) |
 | **GitHub Actions** | CI sur push toutes branches + PR vers main | ✅ Implémenté |
 | **CLAUDE.md ciblés** | Règles non-négociables par zone (lus auto par les agents) | ✅ Implémenté |
-| Playwright (E2E) | Parcours critiques (inscription, login, NDA) | ❌ À venir |
+| **Scripts E2E API** (`scripts/e2e/`) | Parcours complet client→projet→scénario→NDA→mission→notation→payout via les vraies routes, 21 étapes assertées. `npm run e2e:run` / `npm run e2e:cleanup` (cascade + vérif zéro reste). Cf. [`scripts/e2e/README.md`](scripts/e2e/README.md) | ✅ Implémenté |
+| Playwright (E2E navigateur) | Parcours critiques via UI réelle (inscription, login, NDA) | ❌ À venir |
 | Tests "guards" | Cohérence code ↔ CLAUDE.md (ex: search_path migrations) | ❌ À venir |
 | Smoke post-deploy | Healthcheck + POST IBAN test après deploy | ❌ À venir |
 

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useConfirm } from "@/components/ui/ConfirmModal";
+import { getPayoutDisplayStatus } from "@/lib/payout-status";
 
 interface PayoutRow {
   id: string;
@@ -18,6 +19,9 @@ interface PayoutRow {
     stripe_account_id: string | null;
   };
 }
+
+// Simulation du retour Stripe : disponible uniquement hors production.
+const SIMULATION_ENABLED = process.env.NODE_ENV !== "production";
 
 interface ProjectPayoutsTabProps {
   projectId: string;
@@ -105,15 +109,15 @@ export default function ProjectPayoutsTab({ projectId }: ProjectPayoutsTabProps)
   async function paySelected() {
     const ids = [...selected].filter((id) => {
       const p = payouts.find((x) => x.id === id);
-      return p && p.status !== "paid";
+      return p && getPayoutDisplayStatus(p).payable;
     });
     if (ids.length === 0) {
-      setMessage("Sélectionnez au moins un versement en attente.");
+      setMessage("Sélectionnez au moins un versement payable (en attente, montant > 0 €).");
       return;
     }
     const ok = await confirm({
       title: `Déclencher ${ids.length} versement(s) ?`,
-      message: "Les transferts Stripe seront initialisés immédiatement.",
+      message: "Les transferts Stripe seront initialisés. Le versement passe « En cours » jusqu'à confirmation du paiement.",
       confirmLabel: "Déclencher",
     });
     if (!ok) return;
@@ -136,9 +140,32 @@ export default function ProjectPayoutsTab({ projectId }: ProjectPayoutsTabProps)
           failed.map((f: { error?: string }) => f.error).join(" · ") || "Certains versements ont échoué"
         );
       } else {
-        setMessage("Versements traités.");
+        setMessage("Versements initialisés — en attente de confirmation du paiement.");
       }
       setSelected(new Set());
+      await load();
+    } finally {
+      setPaying(false);
+    }
+  }
+
+  // Dev uniquement : rejoue le retour de paiement Stripe (webhook simulé)
+  // pour confirmer ou faire échouer un versement « En cours ».
+  async function simulateReturn(payoutId: string, outcome: "paid" | "failed" | "reversed") {
+    setPaying(true);
+    setMessage(null);
+    try {
+      const res = await fetch(`/api/staff/projects/${projectId}/payouts/simulate-stripe`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ payout_id: payoutId, outcome }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setMessage(data.error || "Erreur simulation");
+        return;
+      }
+      setMessage(`Retour Stripe simulé : ${outcome}.`);
       await load();
     } finally {
       setPaying(false);
@@ -167,8 +194,8 @@ export default function ProjectPayoutsTab({ projectId }: ProjectPayoutsTabProps)
       {message && (
         <div style={{
           marginBottom: 16, padding: 12, borderRadius: 10,
-          background: message.includes("traités") ? "#f0faf5" : "#fef2f2",
-          color: message.includes("traités") ? "#0A7A5A" : "#b91c1c",
+          background: /initialisés|simulé/.test(message) ? "#f0faf5" : "#fef2f2",
+          color: /initialisés|simulé/.test(message) ? "#0A7A5A" : "#b91c1c",
           fontSize: 13,
         }}>
           {message}
@@ -204,10 +231,14 @@ export default function ProjectPayoutsTab({ projectId }: ProjectPayoutsTabProps)
             </tr>
           </thead>
           <tbody>
-            {payouts.map((p) => (
+            {payouts.map((p) => {
+              const disp = getPayoutDisplayStatus(p);
+              const amountEditable = disp.payable; // pending/failed avec montant > 0
+              const isProcessing = disp.key === "processing";
+              return (
               <tr key={p.id} style={{ borderTop: "0.5px solid rgba(0,0,0,0.06)" }}>
                 <td style={{ padding: 10 }}>
-                  {p.status !== "paid" && (
+                  {disp.payable && (
                     <input
                       type="checkbox"
                       checked={selected.has(p.id)}
@@ -219,15 +250,13 @@ export default function ProjectPayoutsTab({ projectId }: ProjectPayoutsTabProps)
                 <td style={{ padding: 10 }}>
                   {p.tester.first_name} {p.tester.last_name}
                   <div style={{ fontSize: 11, color: "#86868b" }}>{p.tester.email}</div>
-                  {!p.tester.stripe_account_id && p.final_amount_cents > 0 && (
-                    <div style={{ fontSize: 11, color: "#d97706" }}>Stripe non connecté</div>
+                  {!p.tester.stripe_account_id && p.final_amount_cents > 0 && p.status !== "paid" && (
+                    <div style={{ fontSize: 11, color: "#d97706" }}>Coordonnées de paiement manquantes</div>
                   )}
                 </td>
                 <td style={{ padding: 10 }}>{centsToEuros(p.calculated_amount_cents)} €</td>
                 <td style={{ padding: 10 }}>
-                  {p.status === "paid" ? (
-                    centsToEuros(p.final_amount_cents) + " €"
-                  ) : (
+                  {amountEditable ? (
                     <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                       <input
                         type="text"
@@ -252,25 +281,57 @@ export default function ProjectPayoutsTab({ projectId }: ProjectPayoutsTabProps)
                         OK
                       </button>
                     </div>
+                  ) : (
+                    centsToEuros(p.final_amount_cents) + " €"
                   )}
                 </td>
                 <td style={{ padding: 10 }}>
                   <span style={{
                     padding: "4px 10px", borderRadius: 980, fontSize: 11, fontWeight: 600,
-                    background: p.status === "paid" ? "#f0faf5" : "#fef3c7",
-                    color: p.status === "paid" ? "#0A7A5A" : "#92400e",
+                    background: disp.bg, color: disp.color,
                   }}>
-                    {p.status}
+                    {disp.label}
                   </span>
                   {p.last_error && (
                     <div style={{ fontSize: 11, color: "#dc2626", marginTop: 4 }}>{p.last_error}</div>
+                  )}
+                  {isProcessing && SIMULATION_ENABLED && (
+                    <div style={{ display: "flex", gap: 6, marginTop: 6 }}>
+                      <button
+                        type="button"
+                        disabled={paying}
+                        onClick={() => simulateReturn(p.id, "paid")}
+                        title="Simuler un retour Stripe transfer.paid"
+                        style={{
+                          padding: "3px 8px", fontSize: 10, fontWeight: 700,
+                          background: "#0A7A5A", color: "#fff", border: "none",
+                          borderRadius: 6, cursor: "pointer", fontFamily: "inherit",
+                        }}
+                      >
+                        Simuler payé
+                      </button>
+                      <button
+                        type="button"
+                        disabled={paying}
+                        onClick={() => simulateReturn(p.id, "failed")}
+                        title="Simuler un retour Stripe transfer.failed"
+                        style={{
+                          padding: "3px 8px", fontSize: 10, fontWeight: 700,
+                          background: "#fff", color: "#b91c1c", border: "1px solid #f3c0c0",
+                          borderRadius: 6, cursor: "pointer", fontFamily: "inherit",
+                        }}
+                      >
+                        Simuler échec
+                      </button>
+                    </div>
                   )}
                 </td>
                 <td style={{ padding: 10, fontSize: 11, color: "#86868b" }}>
                   {p.stripe_transfer_id || "—"}
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>

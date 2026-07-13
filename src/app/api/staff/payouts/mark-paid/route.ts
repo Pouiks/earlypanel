@@ -83,6 +83,30 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: updateErr.message }, { status: 500 });
   }
 
+  // 2bis. Credit `total_earned` (idempotent par payout_id via le ledger).
+  // Sans ca, un testeur paye par SEPA afficherait "Payé" mais "Total perçu 0 €".
+  // Le meme ledger sert au rail Stripe → aucun double credit possible.
+  for (const r of eligible) {
+    const cents = (r.final_amount_cents as number) ?? 0;
+    if (cents <= 0) continue;
+    const amountEuros = cents / 100;
+    const { error: creditErr } = await admin.rpc("credit_tester_earnings", {
+      p_payout_id: r.id,
+      p_tester_id: r.tester_id,
+      p_amount_euros: amountEuros,
+    });
+    if (creditErr) {
+      console.warn("[payouts/mark-paid] credit_tester_earnings RPC indispo, fallback:", creditErr.message);
+      const { data: t } = await admin
+        .from("testers")
+        .select("total_earned")
+        .eq("id", r.tester_id)
+        .maybeSingle();
+      const prev = Number(t?.total_earned ?? 0);
+      await admin.from("testers").update({ total_earned: prev + amountEuros }).eq("id", r.tester_id);
+    }
+  }
+
   // 3. Audit log.
   const totalCents = eligible.reduce((s, r) => s + (r.final_amount_cents as number), 0);
   await logStaffAction(

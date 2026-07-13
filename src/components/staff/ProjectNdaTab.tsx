@@ -80,19 +80,28 @@ export default function ProjectNdaTab({ projectId, companyName }: ProjectNdaTabP
   const [saving, setSaving] = useState(false);
   const [title, setTitle] = useState("Accord de confidentialité (NDA)");
   const [contentHtml, setContentHtml] = useState("");
-  const [toast, setToast] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; isError: boolean } | null>(null);
+  const [loadError, setLoadError] = useState(false);
 
   const fetchNda = useCallback(async () => {
-    const res = await fetch(`/api/staff/projects/${projectId}/nda`);
-    if (res.ok) {
-      const data = await res.json();
-      if (data) {
-        setNda(data);
-        setTitle(data.title);
-        setContentHtml(data.content_html);
+    try {
+      const res = await fetch(`/api/staff/projects/${projectId}/nda`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data) {
+          setNda(data);
+          setTitle(data.title);
+          setContentHtml(data.content_html);
+        }
+        setLoadError(false);
+      } else {
+        setLoadError(true);
       }
+    } catch {
+      setLoadError(true);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [projectId]);
 
   useEffect(() => { fetchNda(); }, [fetchNda]);
@@ -111,7 +120,12 @@ export default function ProjectNdaTab({ projectId, companyName }: ProjectNdaTabP
         setTitle(data.title);
         setContentHtml(data.content_html);
         showToast("NDA créé avec le template par défaut");
+      } else {
+        const err = await res.json().catch(() => ({}));
+        showToast(err.error || "Échec de la création du NDA. Réessayez.", true);
       }
+    } catch {
+      showToast("Erreur réseau — le NDA n'a pas été créé.", true);
     } finally {
       setSaving(false);
     }
@@ -129,19 +143,48 @@ export default function ProjectNdaTab({ projectId, companyName }: ProjectNdaTabP
         const data = await res.json();
         setNda(data);
         showToast("NDA enregistré");
+      } else {
+        const err = await res.json().catch(() => ({}));
+        // NDA = document juridique : un echec de save NE DOIT JAMAIS etre silencieux.
+        showToast(err.error || "Échec de l'enregistrement — vos modifications ne sont PAS sauvegardées.", true);
       }
+    } catch {
+      showToast("Erreur réseau — vos modifications ne sont PAS sauvegardées.", true);
     } finally {
       setSaving(false);
     }
   }
 
-  function showToast(message: string) {
-    setToast(message);
-    setTimeout(() => setToast(null), 3000);
+  function showToast(message: string, isError = false) {
+    setToast({ message, isError });
+    setTimeout(() => setToast(null), isError ? 6000 : 3000);
   }
 
   if (loading) {
     return <div style={{ textAlign: "center", padding: "40px 0", color: "#86868B", fontSize: 14 }}>Chargement…</div>;
+  }
+
+  if (!nda && loadError) {
+    return (
+      <div role="alert" style={{
+        background: "#fef2f2", borderRadius: 20, border: "1px solid #fecaca",
+        padding: "40px 32px", textAlign: "center",
+      }}>
+        <div style={{ fontSize: 40, marginBottom: 16 }}>⚠️</div>
+        <h3 style={{ fontSize: 18, fontWeight: 700, color: "#b91c1c", margin: "0 0 8px" }}>
+          Chargement du NDA impossible
+        </h3>
+        <p style={{ fontSize: 14, color: "#991b1b", margin: "0 0 24px" }}>
+          Une erreur est survenue. On ne sait pas si un NDA existe déjà — ne créez pas de doublon avant d&apos;avoir réessayé.
+        </p>
+        <button onClick={fetchNda} style={{
+          padding: "12px 28px", fontSize: 14, fontWeight: 700, color: "#fff",
+          background: "#b91c1c", border: "none", borderRadius: 980, cursor: "pointer", fontFamily: "inherit",
+        }}>
+          Réessayer
+        </button>
+      </div>
+    );
   }
 
   if (!nda) {
@@ -172,14 +215,31 @@ export default function ProjectNdaTab({ projectId, companyName }: ProjectNdaTabP
   return (
     <div>
       {toast && (
-        <div style={{
+        <div role={toast.isError ? "alert" : "status"} style={{
           position: "fixed", bottom: 24, right: 24, zIndex: 9999,
-          background: "#0A7A5A", color: "#fff", padding: "12px 24px",
-          borderRadius: 12, fontSize: 13, fontWeight: 600,
+          background: toast.isError ? "#b91c1c" : "#0A7A5A", color: "#fff", padding: "12px 24px",
+          borderRadius: 12, fontSize: 13, fontWeight: 600, maxWidth: 380,
           boxShadow: "0 4px 20px rgba(0,0,0,0.15)",
           animation: "fadeIn 200ms",
         }}>
-          {toast}
+          {toast.message}
+        </div>
+      )}
+
+      {loadError && (
+        <div role="alert" style={{
+          background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 12,
+          padding: "12px 16px", marginBottom: 16, fontSize: 13, color: "#b91c1c",
+          display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12,
+        }}>
+          <span>Impossible de charger le NDA. Vérifiez votre connexion.</span>
+          <button onClick={fetchNda} style={{
+            padding: "6px 14px", fontSize: 12, fontWeight: 700, color: "#b91c1c",
+            background: "#fff", border: "1px solid #f3c0c0", borderRadius: 980,
+            cursor: "pointer", fontFamily: "inherit",
+          }}>
+            Réessayer
+          </button>
         </div>
       )}
 

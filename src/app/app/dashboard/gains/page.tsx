@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useTester, useNotifications } from "../layout";
 import EmptyState from "@/components/dashboard/EmptyState";
+import { getPayoutDisplayStatus } from "@/lib/payout-status";
 
 interface PayoutRow {
   id: string;
@@ -11,18 +12,12 @@ interface PayoutRow {
   final_amount_cents: number;
   calculated_amount_cents: number;
   status: string;
+  stripe_transfer_id: string | null;
   paid_at: string | null;
   exported_at: string | null;
   sepa_batch_ref: string | null;
   project: { title: string; company_name: string | null; ref_number: string | null } | null;
 }
-
-const STATUS_MAP: Record<string, { label: string; bg: string; color: string }> = {
-  pending: { label: "En attente", bg: "#FEF3C7", color: "#92600A" },
-  approved: { label: "Approuvé", bg: "#DBEAFE", color: "#1E40AF" },
-  paid: { label: "Payé", bg: "#D1FAE5", color: "#065F46" },
-  failed: { label: "Échoué", bg: "#FEE2E2", color: "#991B1B" },
-};
 
 function centsToEuros(c: number): string {
   return (c / 100).toFixed(2).replace(".", ",") + " €";
@@ -60,7 +55,9 @@ export default function GainsPage() {
     return <div style={{ padding: "60px 0", textAlign: "center", color: "#86868B" }}>Chargement…</div>;
   }
 
-  const nextPending = payouts.find((p) => p.status === "pending" || p.status === "approved");
+  const nextPending = payouts.find(
+    (p) => (p.status === "pending" || p.status === "approved") && (p.final_amount_cents ?? 0) > 0,
+  );
 
   return (
     <div>
@@ -183,7 +180,7 @@ export default function GainsPage() {
             <span style={{ textAlign: "right" }}>Date</span>
           </div>
           {payouts.map((p) => {
-            const st = STATUS_MAP[p.status] ?? STATUS_MAP.pending;
+            const st = getPayoutDisplayStatus(p);
             return (
               <div
                 key={p.id}
@@ -195,9 +192,9 @@ export default function GainsPage() {
               >
                 <span style={{ fontWeight: 600, color: "#1d1d1f", display: "flex", flexDirection: "column" }}>
                   <span>{p.project?.title ?? "—"}</span>
-                  {p.exported_at && p.status !== "paid" && (
-                    <span style={{ fontSize: 11, color: "#0A7A5A", fontWeight: 500, marginTop: 2 }}>
-                      Virement programmé · sous 1-2 jours ouvrés
+                  {(st.key === "processing" || (p.exported_at && p.status !== "paid")) && (
+                    <span style={{ fontSize: 11, color: "#1E40AF", fontWeight: 500, marginTop: 2 }}>
+                      Virement en cours · sous 1-2 jours ouvrés
                     </span>
                   )}
                 </span>

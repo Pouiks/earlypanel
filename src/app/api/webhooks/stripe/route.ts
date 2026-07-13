@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { centsToEuros } from "@/lib/reward-calculator";
 import { logStaffAction } from "@/lib/audit";
 import { logger } from "@/lib/logger";
+import { settlePayoutPaid, settlePayoutFailed } from "@/lib/payout-settlement";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 const log = logger("webhook/stripe");
 
@@ -69,52 +72,18 @@ export async function POST(request: NextRequest) {
     const transfer = event.data.object as import("stripe").Stripe.Transfer;
     const payoutId = transfer.metadata?.payout_id;
     if (payoutId) {
-      const { data: existing } = await admin
-        .from("tester_payouts")
-        .select("id, status, tester_id, final_amount_cents")
-        .eq("id", payoutId)
-        .maybeSingle();
-
-      if (existing) {
-        // G6 : marque "paid" de maniere atomique : ne change que si pas deja paid.
-        await admin
-          .from("tester_payouts")
-          .update({
-            status: "paid",
-            stripe_transfer_id: transfer.id,
-            paid_at: new Date().toISOString(),
-            last_error: null,
-          })
-          .eq("id", payoutId)
-          .neq("status", "paid");
-
-        // G8 : credit idempotent via ledger (un seul credit par payout_id),
-        // peu importe combien de fois pay/route.ts ET le webhook tentent de
-        // crediter le meme payout.
-        const amountEuros = centsToEuros(existing.final_amount_cents ?? 0);
-        const { error: creditErr } = await admin.rpc("credit_tester_earnings", {
-          p_payout_id: payoutId,
-          p_tester_id: existing.tester_id,
-          p_amount_euros: amountEuros,
+      // Reglement via la brique partagee (meme code que la simulation dev) :
+      // transition atomique → paid + credit idempotent de total_earned.
+      const res = await settlePayoutPaid(admin, { payoutId, transferId: transfer.id });
+      if (res.ok && !res.alreadyPaid) {
+        await logStaffAction({
+          staff_id: null,
+          staff_email: "stripe.webhook",
+          action: "payout.paid",
+          entity_type: "payout",
+          entity_id: payoutId,
+          metadata: { stripe_event_id: event.id, transfer_id: transfer.id, credited: res.credited },
         });
-        if (creditErr) {
-          // Fallback non-idempotent (race possible) si la migration 021 n'est
-          // pas deployee. On verifie au moins que le payout n'etait pas deja
-          // paye pour limiter la double comptabilisation.
-          console.warn("[stripe webhook] credit_tester_earnings RPC indispo, fallback:", creditErr.message);
-          if (existing.status !== "paid") {
-            const { data: tester } = await admin
-              .from("testers")
-              .select("total_earned")
-              .eq("id", existing.tester_id)
-              .maybeSingle();
-            const prev = Number(tester?.total_earned ?? 0);
-            await admin
-              .from("testers")
-              .update({ total_earned: prev + amountEuros })
-              .eq("id", existing.tester_id);
-          }
-        }
       }
     }
   }
@@ -123,24 +92,13 @@ export async function POST(request: NextRequest) {
     const transfer = event.data.object as import("stripe").Stripe.Transfer;
     const payoutId = transfer.metadata?.payout_id;
     if (payoutId) {
-      await admin
-        .from("tester_payouts")
-        .update({
-          status: "failed",
-          last_error: eventType,
-        })
-        .eq("id", payoutId)
-        .neq("status", "paid");
-
-      // G8 : sur un transfer.reversed, on annule le credit total_earned
-      // (best-effort via RPC). Sur transfer.failed, le credit n'a normalement
-      // pas eu lieu mais on tente quand meme la reversion (no-op si rien).
-      const { error: revErr } = await admin.rpc("revert_tester_earnings", {
-        p_payout_id: payoutId,
+      // reversed = l'argent est repris apres coup → on annule le credit meme
+      // si le versement etait deja paid. failed = echec avant credit.
+      await settlePayoutFailed(admin, {
+        payoutId,
+        reason: eventType,
+        revertCredit: eventType === "transfer.reversed",
       });
-      if (revErr) {
-        console.warn("[stripe webhook] revert_tester_earnings RPC indispo:", revErr.message);
-      }
 
       await logStaffAction({
         staff_id: null,

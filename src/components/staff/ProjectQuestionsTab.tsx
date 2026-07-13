@@ -229,7 +229,7 @@ export default function ProjectQuestionsTab({ projectId, onUpdate }: ProjectQues
   const [previewBriefKeys, setPreviewBriefKeys] = useState<Set<string>>(new Set());
   // Modal de prevue testeur ouvert ou non.
   const [previewOpen, setPreviewOpen] = useState(false);
-  const { ConfirmModal } = useConfirm();
+  const { confirm, ConfirmModal } = useConfirm();
 
   // Refs pour orchestrer l'autosave sans recreer la fonction a chaque change.
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -527,7 +527,19 @@ export default function ProjectQuestionsTab({ projectId, onUpdate }: ProjectQues
     });
   }
 
-  function removeUseCase(i: number) {
+  async function removeUseCase(i: number) {
+    const uc = useCases[i];
+    const qCount = uc?.questions.length ?? 0;
+    const ok = await confirm({
+      title: "Supprimer ce scénario ?",
+      message:
+        qCount > 0
+          ? `Ce scénario et ses ${qCount} question${qCount > 1 ? "s" : ""} seront supprimés. Si des testeurs y ont déjà répondu, la suppression sera refusée (les réponses sont protégées).`
+          : "Ce scénario sera supprimé définitivement.",
+      confirmLabel: "Supprimer",
+      danger: true,
+    });
+    if (!ok) return;
     mutate((prev) => prev.filter((_, idx) => idx !== i));
   }
 
@@ -563,7 +575,17 @@ export default function ProjectQuestionsTab({ projectId, onUpdate }: ProjectQues
     });
   }
 
-  function removeCriterion(ucIdx: number, cIdx: number) {
+  async function removeCriterion(ucIdx: number, cIdx: number) {
+    const label = useCases[ucIdx]?.criteria[cIdx]?.label?.trim();
+    const ok = await confirm({
+      title: "Supprimer ce critère de succès ?",
+      message: label
+        ? `« ${label} » sera retiré. Les complétions déjà cochées pour ce critère seront perdues.`
+        : "Ce critère de succès sera supprimé.",
+      confirmLabel: "Supprimer",
+      danger: true,
+    });
+    if (!ok) return;
     mutate((prev) => {
       const next = [...prev];
       next[ucIdx] = {
@@ -607,7 +629,17 @@ export default function ProjectQuestionsTab({ projectId, onUpdate }: ProjectQues
     });
   }
 
-  function removeQuestion(ucIdx: number, qIdx: number) {
+  async function removeQuestion(ucIdx: number, qIdx: number) {
+    const qText = useCases[ucIdx]?.questions[qIdx]?.question_text?.trim();
+    const ok = await confirm({
+      title: "Supprimer cette question ?",
+      message: qText
+        ? `« ${qText.slice(0, 80)}${qText.length > 80 ? "…" : ""} » sera supprimée. Si des testeurs y ont déjà répondu, la suppression sera refusée.`
+        : "Cette question sera supprimée. Si des testeurs y ont déjà répondu, la suppression sera refusée.",
+      confirmLabel: "Supprimer",
+      danger: true,
+    });
+    if (!ok) return;
     mutate((prev) => {
       const next = [...prev];
       next[ucIdx] = {

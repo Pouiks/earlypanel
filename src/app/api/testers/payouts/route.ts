@@ -60,6 +60,7 @@ export async function GET() {
       final_amount_cents,
       calculated_amount_cents,
       status,
+      stripe_transfer_id,
       paid_at,
       exported_at,
       sepa_batch_ref,
@@ -76,8 +77,11 @@ export async function GET() {
   const totalPaidCents = list
     .filter((p) => p.status === "paid")
     .reduce((sum, p) => sum + (p.final_amount_cents ?? 0), 0);
+  // "En attente" = tout ce qui a un montant a verser et n'est pas encore paye
+  // (inclut les versements "en cours" = pending + transfert initie). Les
+  // lignes a 0 € (rien a payer) n'y figurent pas.
   const totalPendingCents = list
-    .filter((p) => p.status === "pending" || p.status === "approved")
+    .filter((p) => (p.status === "pending" || p.status === "approved") && (p.final_amount_cents ?? 0) > 0)
     .reduce((sum, p) => sum + (p.final_amount_cents ?? 0), 0);
 
   return NextResponse.json({
