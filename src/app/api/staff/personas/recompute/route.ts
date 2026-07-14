@@ -10,6 +10,9 @@ export async function POST() {
   const admin = createAdminClient();
   if (!admin) return NextResponse.json({ error: "Config serveur manquante" }, { status: 500 });
 
-  const result = await recomputeAllPersonas(admin);
+  // Recompute COMPLET (pas seulement les personas vides) : le bouton staff
+  // « Recalculer tous les testeurs » doit re-classer tout le monde selon les
+  // regles courantes ET backfiller job_family/seniority.
+  const result = await recomputeAllPersonas(admin, { onlyEmpty: false });
   return NextResponse.json(result);
 }

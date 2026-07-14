@@ -1,3 +1,5 @@
+import type { JobFamily, Seniority } from "@/lib/job-taxonomy";
+
 export type TesterStatus = "pending" | "active" | "suspended" | "rejected" | "inactive";
 export type TesterGender = "female" | "male" | "non_binary" | "prefer_not_to_say";
 
@@ -30,6 +32,11 @@ export interface Tester {
   company_size: string | null;
   digital_level: DigitalLevel | null;
   csp: string | null;
+  // Taxonomie derivee du job_title (cf. lib/job-classifier.ts) : alimente le
+  // matching des personas. Peut etre null tant que le testeur n'a pas ete
+  // (re)classe.
+  job_family: JobFamily | null;
+  seniority: Seniority | null;
   tools: string[];
   browsers: string[];
   devices: string[];

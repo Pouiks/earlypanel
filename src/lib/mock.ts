@@ -31,6 +31,8 @@ export const MOCK_TESTER: Tester = {
   company_size: "51-200",
   digital_level: "intermediaire",
   csp: "Cadre / Profession intellectuelle supérieure",
+  job_family: "hr",
+  seniority: "confirmed",
   tools: ["Notion", "Slack", "Google Meet"],
   browsers: ["Chrome", "Firefox"],
   devices: ["Ordi Windows", "iPhone"],

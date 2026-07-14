@@ -1,6 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { JOB_FAMILIES, SENIORITIES } from "@/lib/job-taxonomy";
+
+interface MatchingRules {
+  job_title_keywords?: string[];
+  sectors?: string[];
+  digital_levels?: string[];
+  company_sizes?: string[];
+  seniorities?: string[];
+  job_families?: string[];
+  any_of?: MatchingRules[];
+}
 
 interface Persona {
   id: string;
@@ -11,12 +22,7 @@ interface Persona {
   max_reward_cents: number;
   /** Indemnité ferme versée au testeur par mission. Source de vérité pour le paiement. */
   payout_per_mission_cents: number;
-  matching_rules: {
-    job_title_keywords?: string[];
-    sectors?: string[];
-    digital_levels?: string[];
-    company_sizes?: string[];
-  };
+  matching_rules: MatchingRules;
   priority: number;
   is_active: boolean;
   is_fallback: boolean;
@@ -240,12 +246,41 @@ function PersonaEditor({
   const [sectors, setSectors] = useState((persona.matching_rules?.sectors ?? []).join(", "));
   const [levels, setLevels] = useState((persona.matching_rules?.digital_levels ?? []).join(", "));
   const [sizes, setSizes] = useState((persona.matching_rules?.company_sizes ?? []).join(", "));
+  const [senior, setSenior] = useState((persona.matching_rules?.seniorities ?? []).join(", "));
+  const [families, setFamilies] = useState((persona.matching_rules?.job_families ?? []).join(", "));
+
+  // Règle « avancée » (OU de sous-jeux, ex. Niche Premium) : non représentable
+  // par des champs plats → on édite le JSON brut pour ne pas l'écraser.
+  const isAdvanced = Array.isArray(persona.matching_rules?.any_of);
+  const [advancedJson, setAdvancedJson] = useState(
+    JSON.stringify(persona.matching_rules ?? {}, null, 2)
+  );
+  const [jsonError, setJsonError] = useState<string | null>(null);
 
   function parseList(s: string): string[] {
     return s.split(",").map((x) => x.trim()).filter(Boolean);
   }
 
   async function submit() {
+    let matching_rules: MatchingRules;
+    if (isAdvanced) {
+      try {
+        matching_rules = JSON.parse(advancedJson);
+        setJsonError(null);
+      } catch {
+        setJsonError("JSON invalide — corrige la syntaxe avant d'enregistrer.");
+        return;
+      }
+    } else {
+      matching_rules = {
+        job_title_keywords: parseList(kw),
+        sectors: parseList(sectors),
+        digital_levels: parseList(levels),
+        company_sizes: parseList(sizes),
+        seniorities: parseList(senior),
+        job_families: parseList(families),
+      };
+    }
     await onSave({
       name,
       description: description.trim() || null,
@@ -255,12 +290,7 @@ function PersonaEditor({
       priority: Number(priority) || 0,
       is_active: isActive,
       is_fallback: isFallback,
-      matching_rules: {
-        job_title_keywords: parseList(kw),
-        sectors: parseList(sectors),
-        digital_levels: parseList(levels),
-        company_sizes: parseList(sizes),
-      },
+      matching_rules,
     });
   }
 
@@ -312,26 +342,62 @@ function PersonaEditor({
         L&apos;indemnite ferme est ce que vous payez au testeur (et facturez au client + marge). Min/Max sont les ranges affiches a l&apos;inscription.
       </p>
 
-      <div>
-        <label style={labelStyle}>Mots-cles fonction (separes par virgule)</label>
-        <textarea value={kw} onChange={(e) => setKw(e.target.value)} rows={2} style={{ ...inputStyle, resize: "vertical" }} placeholder="DAF, directeur, head of…" />
-      </div>
-
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+      {isAdvanced ? (
         <div>
-          <label style={labelStyle}>Secteurs (slug)</label>
-          <input value={sectors} onChange={(e) => setSectors(e.target.value)} style={inputStyle} placeholder="finance, sante…" />
+          <label style={labelStyle}>Règle avancée (JSON)</label>
+          <p style={{ fontSize: 11, color: "#86868B", margin: "0 0 6px", fontStyle: "italic" }}>
+            Ce persona utilise une règle « OU » (<code>any_of</code>), non représentable par des champs simples. Édite le JSON directement.
+          </p>
+          <textarea
+            value={advancedJson}
+            onChange={(e) => setAdvancedJson(e.target.value)}
+            rows={10}
+            spellCheck={false}
+            style={{ ...inputStyle, resize: "vertical", fontFamily: "monospace", fontSize: 12 }}
+          />
+          {jsonError && <p style={{ fontSize: 12, color: "#b91c1c", margin: "6px 0 0" }}>{jsonError}</p>}
         </div>
-        <div>
-          <label style={labelStyle}>Niveaux digitaux</label>
-          <input value={levels} onChange={(e) => setLevels(e.target.value)} style={inputStyle} placeholder="avance, expert" />
-        </div>
-      </div>
+      ) : (
+        <>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div>
+              <label style={labelStyle}>Séniorités</label>
+              <input value={senior} onChange={(e) => setSenior(e.target.value)} style={inputStyle} placeholder="executive, management, confirmed" />
+              <p style={{ fontSize: 10, color: "#86868B", margin: "3px 0 0" }}>Valeurs : {SENIORITIES.join(", ")}</p>
+            </div>
+            <div>
+              <label style={labelStyle}>Familles de métier</label>
+              <input value={families} onChange={(e) => setFamilies(e.target.value)} style={inputStyle} placeholder="tech-product, finance, legal…" />
+              <p style={{ fontSize: 10, color: "#86868B", margin: "3px 0 0" }}>Valeurs : {JOB_FAMILIES.join(", ")}</p>
+            </div>
+          </div>
 
-      <div>
-        <label style={labelStyle}>Tailles d&apos;entreprise</label>
-        <input value={sizes} onChange={(e) => setSizes(e.target.value)} style={inputStyle} placeholder="51-200, 201-1000, 1000+" />
-      </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            <div>
+              <label style={labelStyle}>Niveaux digitaux</label>
+              <input value={levels} onChange={(e) => setLevels(e.target.value)} style={inputStyle} placeholder="avance, expert" />
+            </div>
+            <div>
+              <label style={labelStyle}>Tailles d&apos;entreprise</label>
+              <input value={sizes} onChange={(e) => setSizes(e.target.value)} style={inputStyle} placeholder="201-1000, 1000+" />
+            </div>
+          </div>
+
+          <details>
+            <summary style={{ fontSize: 12, color: "#6e6e73", cursor: "pointer" }}>Critères hérités (mots-clés / secteurs)</summary>
+            <div style={{ marginTop: 8, display: "grid", gap: 8 }}>
+              <div>
+                <label style={labelStyle}>Mots-clés fonction (séparés par virgule)</label>
+                <textarea value={kw} onChange={(e) => setKw(e.target.value)} rows={2} style={{ ...inputStyle, resize: "vertical" }} placeholder="DAF, directeur, head of…" />
+              </div>
+              <div>
+                <label style={labelStyle}>Secteurs (slug)</label>
+                <input value={sectors} onChange={(e) => setSectors(e.target.value)} style={inputStyle} placeholder="finance, sante…" />
+              </div>
+            </div>
+          </details>
+        </>
+      )}
 
       <div style={{ display: "flex", gap: 20, alignItems: "center", flexWrap: "wrap" }}>
         <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "#1d1d1f" }}>
