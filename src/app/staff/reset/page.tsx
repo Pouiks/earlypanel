@@ -8,7 +8,7 @@ type State = "checking" | "ready" | "loading" | "done" | "error";
 const MIN_LENGTH = 12;
 
 function passwordStrength(pw: string): { score: number; label: string; color: string } {
-  if (pw.length === 0) return { score: 0, label: "—", color: "#d2d2d7" };
+  if (pw.length === 0) return { score: 0, label: "", color: "#d2d2d7" };
   let score = 0;
   if (pw.length >= MIN_LENGTH) score++;
   if (pw.length >= 16) score++;
@@ -18,7 +18,7 @@ function passwordStrength(pw: string): { score: number; label: string; color: st
   const labels = ["Très faible", "Faible", "Moyen", "Bon", "Fort"];
   const colors = ["#e53e3e", "#dd6b20", "#d69e2e", "#38a169", "#0A7A5A"];
   const idx = Math.max(0, Math.min(score - 1, 4));
-  return { score, label: labels[idx] ?? "—", color: colors[idx] ?? "#d2d2d7" };
+  return { score, label: labels[idx] ?? "", color: colors[idx] ?? "#d2d2d7" };
 }
 
 export default function StaffResetPage() {

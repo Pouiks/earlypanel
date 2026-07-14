@@ -44,7 +44,7 @@ export const GENDER_EXPORT_LABELS: Record<string, string> = {
   female: "Femme",
   male: "Homme",
   non_binary: "Non-binaire",
-  prefer_not_to_say: "—",
+  prefer_not_to_say: "Non précisé",
 };
 
 export const DIGITAL_LEVEL_LABELS: Record<string, string> = {

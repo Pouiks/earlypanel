@@ -88,7 +88,7 @@ export default function GainsPage() {
         />
         <StatCard
           label="Prochain virement"
-          value={nextPending ? centsToEuros(nextPending.final_amount_cents) : "—"}
+          value={nextPending ? centsToEuros(nextPending.final_amount_cents) : "Aucun"}
           color="#1d1d1f"
           sub={nextPending ? nextPending.project?.title ?? "" : "Aucun en attente"}
         />
@@ -191,7 +191,7 @@ export default function GainsPage() {
                 }}
               >
                 <span style={{ fontWeight: 600, color: "#1d1d1f", display: "flex", flexDirection: "column" }}>
-                  <span>{p.project?.title ?? "—"}</span>
+                  <span>{p.project?.title ?? "Projet"}</span>
                   {(st.key === "processing" || (p.exported_at && p.status !== "paid")) && (
                     <span style={{ fontSize: 11, color: "#1E40AF", fontWeight: 500, marginTop: 2 }}>
                       Virement en cours · sous 1-2 jours ouvrés

@@ -84,7 +84,7 @@ function buildJsonResponse(
     if (!t) return null;
     return {
       readable_id: testerMap.get(t.id as string) ?? "?",
-      gender: GENDER_EXPORT_LABELS[(t.gender as string) ?? ""] ?? "—",
+      gender: GENDER_EXPORT_LABELS[(t.gender as string) ?? ""] ?? "Non précisé",
       age: computeAge(t.birth_date as string | null),
       city: t.city ?? null,
       digital_level: DIGITAL_LEVEL_LABELS[(t.digital_level as string) ?? ""] ?? null,

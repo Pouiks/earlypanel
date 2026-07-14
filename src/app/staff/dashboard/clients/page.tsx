@@ -263,7 +263,7 @@ function ClientModal({
             <div>
               <label style={label}>Taille</label>
               <select style={input} value={form.company_size || ""} onChange={(e) => set("company_size", e.target.value)}>
-                <option value="">—</option>
+                <option value="">Sélectionner…</option>
                 <option value="1-10">1-10</option>
                 <option value="11-50">11-50</option>
                 <option value="51-200">51-200</option>

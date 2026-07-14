@@ -202,7 +202,7 @@ export default function ProfilPage() {
             <span style={{ fontSize: 18, flexShrink: 0 }}>&#9888;&#65039;</span>
             <div style={{ flex: 1 }}>
               <p style={{ fontSize: 13, fontWeight: 700, color: "#92400e", margin: "0 0 4px" }}>
-                Profil à compléter — {completeness.count} champ{completeness.count > 1 ? "s" : ""} manquant{completeness.count > 1 ? "s" : ""}
+                Profil à compléter : {completeness.count} champ{completeness.count > 1 ? "s" : ""} manquant{completeness.count > 1 ? "s" : ""}
               </p>
               <p style={{ fontSize: 12, color: "#a16207", margin: 0, lineHeight: 1.5 }}>
                 Vous ne pourrez pas être invité(e) à des projets ni signer de NDA tant que tous les champs requis ne sont pas renseignés.

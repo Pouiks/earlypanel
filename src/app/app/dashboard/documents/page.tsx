@@ -106,7 +106,7 @@ export default function DocumentsPage() {
                           {doc.nda?.title || "Accord de confidentialité"}
                         </p>
                         <p style={{ fontSize: 12, color: "#86868B", margin: "2px 0 0" }}>
-                          {doc.project?.title || "Projet"}{doc.project?.company_name ? ` — ${doc.project.company_name}` : ""}
+                          {doc.project?.title || "Projet"}{doc.project?.company_name ? ` · ${doc.project.company_name}` : ""}
                         </p>
                         {doc.nda_sent_at && (
                           <p style={{ fontSize: 11, color: "#b45309", margin: "4px 0 0" }}>
@@ -189,7 +189,7 @@ export default function DocumentsPage() {
                           {doc.nda?.title || "Accord de confidentialité"}
                         </p>
                         <p style={{ fontSize: 12, color: "#86868B", margin: "2px 0 0" }}>
-                          {doc.project?.title || "Projet"}{doc.project?.company_name ? ` — ${doc.project.company_name}` : ""}
+                          {doc.project?.title || "Projet"}{doc.project?.company_name ? ` · ${doc.project.company_name}` : ""}
                         </p>
                         {doc.nda_signed_at && (
                           <p style={{ fontSize: 11, color: "#0A7A5A", margin: "4px 0 0", fontWeight: 600 }}>
@@ -263,7 +263,7 @@ export default function DocumentsPage() {
                   {previewDoc.nda?.title || "Accord de confidentialité"}
                 </h3>
                 <p style={{ fontSize: 12, color: "#86868B", margin: "4px 0 0" }}>
-                  {previewDoc.project?.title}{previewDoc.project?.company_name ? ` — ${previewDoc.project.company_name}` : ""}
+                  {previewDoc.project?.title}{previewDoc.project?.company_name ? ` · ${previewDoc.project.company_name}` : ""}
                 </p>
               </div>
               <button

@@ -13,7 +13,7 @@ import FaqJsonLd from "@/components/ui/FaqJsonLd";
 import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "earlypanel — Tests utilisateurs clés en main",
+  title: "earlypanel · Tests utilisateurs clés en main",
   description:
     "Des vrais utilisateurs testent votre produit. Questionnaires ciblés, analyse actionnelle, livraison en 5 jours. Clés en main.",
   alternates: { canonical: "https://earlypanel.fr" },
@@ -50,7 +50,7 @@ const faqHomepage = [
   },
   {
     q: "À qui s'adresse earlypanel ?",
-    a: "À deux audiences : (1) côté entreprise, les équipes produit qui veulent valider un parcours utilisateur avant ou après mise en production — Product Managers, designers, fondateurs, agences clientes finales ; (2) côté testeur, les particuliers résidant en France qui souhaitent un complément de revenu en testant des produits digitaux 15-40 minutes par mission, rémunéré par virement SEPA. Les deux audiences ont des espaces dédiés sur le site : /entreprises pour démarrer un projet, /testeurs pour devenir testeur rémunéré.",
+    a: "À deux audiences : (1) côté entreprise, les équipes produit qui veulent valider un parcours utilisateur avant ou après mise en production (Product Managers, designers, fondateurs, agences clientes finales) ; (2) côté testeur, les particuliers résidant en France qui souhaitent un complément de revenu en testant des produits digitaux 15-40 minutes par mission, rémunéré par virement SEPA. Les deux audiences ont des espaces dédiés sur le site : /entreprises pour démarrer un projet, /testeurs pour devenir testeur rémunéré.",
   },
   {
     q: "Comment se déroule un test utilisateur avec earlypanel ?",

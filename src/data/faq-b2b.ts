@@ -4,7 +4,7 @@ export const faqB2B: FaqItem[] = [
   {
     question: "Mon produit n'est pas terminé, peut-on quand même tester ?",
     answer:
-      "Oui, c'est même recommandé. On teste des maquettes Figma, des prototypes cliquables, des URLs de staging — plus tôt vous testez, moins les corrections coûtent cher.",
+      "Oui, c'est même recommandé. On teste des maquettes Figma, des prototypes cliquables, des URLs de staging : plus tôt vous testez, moins les corrections coûtent cher.",
   },
   {
     question: "Comment garantissez-vous la confidentialité de mon produit ?",

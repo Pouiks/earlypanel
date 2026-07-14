@@ -62,9 +62,9 @@ describe("computeDeviceSummary — résumé de configuration", () => {
 });
 
 describe("labels d'export", () => {
-  it("mappe le genre (prefer_not_to_say → tiret)", () => {
+  it("mappe le genre (prefer_not_to_say → 'Non précisé')", () => {
     expect(GENDER_EXPORT_LABELS.female).toBe("Femme");
-    expect(GENDER_EXPORT_LABELS.prefer_not_to_say).toBe("—");
+    expect(GENDER_EXPORT_LABELS.prefer_not_to_say).toBe("Non précisé");
   });
   it("mappe le niveau digital (debutant → Novice)", () => {
     expect(DIGITAL_LEVEL_LABELS.debutant).toBe("Novice");

@@ -976,7 +976,7 @@ export default function ProjectQuestionsTab({ projectId, onUpdate }: ProjectQues
                                             <input
                                               type="text" value={q.question_hint}
                                               onChange={(e) => updateQuestion(ucIdx, qIdx, "question_hint", e.target.value)}
-                                              placeholder="Conseil de rédaction (optionnel) — aide le testeur à mieux répondre"
+                                              placeholder="Conseil de rédaction (optionnel) : aide le testeur à mieux répondre"
                                               style={{ ...inputStyle, fontSize: 12, background: "#fff", border: "0.5px dashed rgba(0,0,0,0.12)" }}
                                               onFocus={focusBorder} onBlur={blurBorder}
                                             />
@@ -1003,7 +1003,7 @@ export default function ProjectQuestionsTab({ projectId, onUpdate }: ProjectQues
                                                   <input
                                                     type="number" min={1} value={q.min_chars_hint}
                                                     onChange={(e) => updateQuestion(ucIdx, qIdx, "min_chars_hint", e.target.value)}
-                                                    placeholder="—"
+                                                    placeholder=""
                                                     style={{
                                                       width: 70, fontSize: 12, padding: "4px 8px",
                                                       border: "0.5px solid rgba(0,0,0,0.12)", borderRadius: 6,
@@ -1029,7 +1029,7 @@ export default function ProjectQuestionsTab({ projectId, onUpdate }: ProjectQues
                                                       borderRadius: 6, padding: "4px 8px", fontFamily: "inherit", cursor: "pointer",
                                                     }}
                                                   >
-                                                    <option value="">— Toujours afficher</option>
+                                                    <option value="">Toujours afficher</option>
                                                     {potentialParents.map((p) => {
                                                       const realIdx = uc.questions.findIndex((x) => x._key === p._key);
                                                       const label = (p.question_text || `Question ${realIdx + 1}`).slice(0, 50);

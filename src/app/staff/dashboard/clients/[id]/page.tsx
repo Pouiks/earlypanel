@@ -290,7 +290,7 @@ function Field({
         select ? (
           <select style={inputStyle} value={value} onChange={(e) => onChange(e.target.value)}>
             {select.map((s) => (
-              <option key={s} value={s}>{s || "—"}</option>
+              <option key={s} value={s}>{s || "Sélectionner…"}</option>
             ))}
           </select>
         ) : textarea ? (
@@ -299,7 +299,7 @@ function Field({
           <input style={inputStyle} value={value} onChange={(e) => onChange(e.target.value)} />
         )
       ) : (
-        <div style={staticStyle}>{value || <span style={{ color: "#86868B" }}>—</span>}</div>
+        <div style={staticStyle}>{value || <span style={{ color: "#86868B" }}>Non renseigné</span>}</div>
       )}
     </div>
   );

@@ -271,7 +271,7 @@ export default function StaffTestersPage() {
           </div>
           {filtered.map((t) => {
             const sc = STATUS_COLORS[t.status] ?? STATUS_COLORS.pending;
-            const fullName = `${t.first_name ?? ""} ${t.last_name ?? ""}`.trim() || "—";
+            const fullName = `${t.first_name ?? ""} ${t.last_name ?? ""}`.trim() || "Non renseigné";
             const availConfirmed = !!t.available_until && new Date(t.available_until).getTime() >= Date.now();
             return (
               <div
@@ -292,7 +292,7 @@ export default function StaffTestersPage() {
                     <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{fullName}</span>
                     {t.status === "active" && t.payment_info_configured === false && (
                       <span
-                        title="Coordonnees bancaires non renseignees — ne peut pas etre paye, donc pas eligible aux invitations projet."
+                        title="Coordonnees bancaires non renseignees : ne peut pas etre paye, donc pas eligible aux invitations projet."
                         style={{
                           display: "inline-flex",
                           alignItems: "center",
@@ -318,14 +318,14 @@ export default function StaffTestersPage() {
                 </div>
                 <div style={{ minWidth: 0 }}>
                   <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {t.job_title || "—"}
+                    {t.job_title || "Non renseigné"}
                   </div>
                   <div style={{ fontSize: 12, color: "#86868B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {t.sector || "—"}
+                    {t.sector || "Non renseigné"}
                   </div>
                 </div>
                 <div style={{ fontSize: 12, color: t.persona ? "#0A7A5A" : "#86868B" }}>
-                  {t.persona?.name || "—"}
+                  {t.persona?.name || "Non renseigné"}
                 </div>
                 <div>
                   <span style={{

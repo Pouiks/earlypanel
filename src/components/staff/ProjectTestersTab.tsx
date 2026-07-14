@@ -493,7 +493,7 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
                         )}
                       </div>
                       <div style={{ fontSize: 11, color: "#86868B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                        {t.job_title || "—"} · {t.sector || "—"}
+                        {t.job_title || "Non renseigné"} · {t.sector || "Non renseigné"}
                       </div>
                     </div>
                     <div style={{ display: "flex", gap: 4 }}>

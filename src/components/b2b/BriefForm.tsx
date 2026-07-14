@@ -12,7 +12,7 @@ export default function BriefForm() {
       <div className="form-row">
         <label>Type de produit à tester</label>
         <select defaultValue="">
-          <option value="" disabled>— Sélectionner</option>
+          <option value="" disabled>Sélectionner…</option>
           <option>SaaS B2B</option>
           <option>Application mobile</option>
           <option>Site e-commerce</option>
@@ -28,10 +28,10 @@ export default function BriefForm() {
       <div className="form-row">
         <label>Budget indicatif</label>
         <select defaultValue="">
-          <option value="" disabled>— Sélectionner</option>
+          <option value="" disabled>Sélectionner…</option>
           <option>{`< 1 000 €`}</option>
-          <option>1 000 € — 3 000 €</option>
-          <option>3 000 € — 10 000 €</option>
+          <option>1 000 € à 3 000 €</option>
+          <option>3 000 € à 10 000 €</option>
           <option>{`> 10 000 €`}</option>
           <option>À définir ensemble</option>
         </select>

@@ -216,7 +216,7 @@ export async function generateNdaPdf(params: NdaPdfParams): Promise<Uint8Array> 
   const pages = doc.getPages();
   for (let i = 0; i < pages.length; i++) {
     const p = pages[i];
-    const footerText = `earlypanel — Confidentiel — ${v.nda_ref} — Page ${i + 1}/${pages.length}`;
+    const footerText = `earlypanel · Confidentiel · ${v.nda_ref} · Page ${i + 1}/${pages.length}`;
     p.drawText(footerText, { x: PAGE_MARGIN, y: 25, size: 8, font, color: rgb(0.6, 0.6, 0.6) });
   }
 
@@ -278,7 +278,7 @@ export function buildNdaVariables(opts: {
 export function defaultNdaHtml(): string {
   return `
 <h2>ACCORD DE NON-DIVULGATION (NDA)</h2>
-<h3>Accord de Confidentialité — Mission Testeur</h3>
+<h3>Accord de Confidentialité · Mission Testeur</h3>
 
 <p><strong>Entre les soussignés :</strong></p>
 
@@ -295,7 +295,7 @@ export function defaultNdaHtml(): string {
 <p>Dans le cadre de la mission de test utilisateur référencée <strong>{{project_ref}}</strong>, portant sur le produit digital <strong>« {{project_title}} »</strong> développé par la société <strong>{{company_name}}</strong> (ci-après « le Client »), earlypanel souhaite faire appel aux services du Testeur pour réaliser une session de test et répondre à un questionnaire d'évaluation.</p>
 <p>Le Testeur sera amené à accéder à des informations, fonctionnalités et interfaces non encore rendues publiques, susceptibles de constituer des informations confidentielles au sens du présent accord.</p>
 
-<h2>ARTICLE 1 — DÉFINITION DES INFORMATIONS CONFIDENTIELLES</h2>
+<h2>ARTICLE 1 : DÉFINITION DES INFORMATIONS CONFIDENTIELLES</h2>
 <p>Sont considérées comme <strong>Informations Confidentielles</strong> toutes les informations, données, documents, matériaux, logiciels, interfaces, maquettes, prototypes, spécifications techniques, fonctionnalités, éléments visuels, workflows, contenus éditoriaux, données commerciales ou stratégiques auxquels le Testeur aura accès dans le cadre de la mission.</p>
 <p>Sont notamment visés sans que cette liste soit limitative :</p>
 <li>L'accès à l'interface du produit en version bêta ou pré-production</li>
@@ -304,7 +304,7 @@ export function defaultNdaHtml(): string {
 <li>Les questionnaires, grilles d'évaluation et méthodologies de test</li>
 <li>Toute donnée ou information relative aux choix de conception du produit</li>
 
-<h2>ARTICLE 2 — OBLIGATIONS DU TESTEUR</h2>
+<h2>ARTICLE 2 : OBLIGATIONS DU TESTEUR</h2>
 <p>Le Testeur s'engage à <strong>garder strictement confidentielles</strong> toutes les Informations Confidentielles auxquelles il aura accès dans le cadre de la mission.</p>
 <p>Le Testeur s'engage notamment à :</p>
 <li>Ne pas divulguer, communiquer, reproduire ou transmettre les Informations Confidentielles à quelque tiers que ce soit</li>
@@ -314,18 +314,18 @@ export function defaultNdaHtml(): string {
 <li>Informer immédiatement earlypanel en cas de divulgation accidentelle ou non autorisée</li>
 <p>Ces obligations s'appliquent pendant toute la durée de la mission et pendant une période de <strong>2 (deux) ans</strong> à compter de la fin de la mission.</p>
 
-<h2>ARTICLE 3 — PROPRIÉTÉ INTELLECTUELLE</h2>
+<h2>ARTICLE 3 : PROPRIÉTÉ INTELLECTUELLE</h2>
 <p>Le Testeur reconnaît que l'ensemble des Informations Confidentielles demeurent la propriété exclusive de earlypanel et/ou du Client.</p>
 <p>Les réponses, observations et retours fournis par le Testeur dans le cadre de la mission deviennent la propriété de earlypanel, qui peut les transmettre au Client sous forme anonymisée ou pseudonymisée.</p>
 
-<h2>ARTICLE 4 — DONNÉES PERSONNELLES</h2>
+<h2>ARTICLE 4 : DONNÉES PERSONNELLES</h2>
 <p>Dans le cadre du présent accord, earlypanel traite des données personnelles relatives au Testeur conformément au Règlement Général sur la Protection des Données (RGPD) et à la politique de confidentialité disponible sur earlypanel.fr.</p>
 <p>Le Testeur dispose d'un droit d'accès, de rectification et de suppression de ses données en écrivant à contact@earlypanel.fr.</p>
 
-<h2>ARTICLE 5 — RESPONSABILITÉ ET SANCTIONS</h2>
+<h2>ARTICLE 5 : RESPONSABILITÉ ET SANCTIONS</h2>
 <p>Toute violation des obligations de confidentialité pourra engager la responsabilité civile et, le cas échéant, pénale du Testeur. earlypanel se réserve le droit de suspendre l'accès à la plateforme et de réclamer réparation du préjudice subi.</p>
 
-<h2>ARTICLE 6 — DURÉE ET LOI APPLICABLE</h2>
+<h2>ARTICLE 6 : DURÉE ET LOI APPLICABLE</h2>
 <p>Le présent accord prend effet à la date de sa signature et demeure en vigueur pendant <strong>2 (deux) ans</strong> après la fin de la mission. Il est soumis au droit français. Tout litige sera porté devant les tribunaux compétents de Paris.</p>
 `.trim();
 }

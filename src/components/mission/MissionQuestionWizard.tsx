@@ -83,7 +83,7 @@ function jobFromTester(t: MissionWizardTester | null | undefined): string {
 }
 
 function useDeviceLabel(): string {
-  const [label, setLabel] = useState("—");
+  const [label, setLabel] = useState("");
   useEffect(() => {
     const ua = navigator.userAgent;
     const isMobile = /Mobi|Android|iPhone|iPad|webOS|BlackBerry|IEMobile|Opera Mini/i.test(ua);
@@ -478,8 +478,8 @@ export default function MissionQuestionWizard({
               })}
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 11, color: "#86868B" }}>
-              <span>1 — Pas du tout</span>
-              <span>5 — Tout à fait</span>
+              <span>1 · Pas du tout</span>
+              <span>5 · Tout à fait</span>
             </div>
           </>
         )}
@@ -570,13 +570,13 @@ export default function MissionQuestionWizard({
 
         {isLast && previewMode && (
           <div style={{ marginTop: 20, padding: "10px 14px", background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 10, fontSize: 12, color: "#92400e", textAlign: "center" }}>
-            Mode prévisualisation — vos réponses ne sont pas enregistrées.
+            Mode prévisualisation : vos réponses ne sont pas enregistrées.
           </div>
         )}
 
         {isLast && completed && (
           <p style={{ margin: "20px 0 0", fontSize: 13, color: "#0A7A5A", fontWeight: 600 }}>
-            Mission soumise — lecture seule
+            Mission soumise · lecture seule
           </p>
         )}
       </div>

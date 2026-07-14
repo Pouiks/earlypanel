@@ -309,7 +309,7 @@ export function buildAvailabilityCampaignEmail(opts: {
         <tr><td style="padding:32px;">
           <p style="font-size:16px;color:#1d1d1f;margin:0 0 16px;font-weight:600;">${greeting}</p>
           <p style="font-size:14px;color:#6e6e73;line-height:1.6;margin:0 0 8px;">Êtes-vous toujours disponible pour réaliser des tests utilisateurs ?</p>
-          <p style="font-size:14px;color:#6e6e73;line-height:1.6;margin:0 0 24px;">Quand une mission correspond à votre profil, il faut pouvoir y répondre vite. Confirmez votre disponibilité pour les <strong>3 prochains mois</strong> — ou indiquez que vous ne souhaitez plus recevoir d'offres.</p>
+          <p style="font-size:14px;color:#6e6e73;line-height:1.6;margin:0 0 24px;">Quand une mission correspond à votre profil, il faut pouvoir y répondre vite. Confirmez votre disponibilité pour les <strong>3 prochains mois</strong>, ou indiquez que vous ne souhaitez plus recevoir d'offres.</p>
 
           <table cellpadding="0" cellspacing="0" style="margin:0 0 12px;"><tr><td>
             <a href="${opts.ouiUrl}" style="display:inline-block;background:#0A7A5A;color:#fff;padding:14px 28px;border-radius:980px;font-size:15px;font-weight:700;text-decoration:none;">Oui, je suis disponible (3 mois) →</a>

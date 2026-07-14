@@ -45,7 +45,7 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "earlypanel — Tests utilisateurs livrés en 5 jours",
+        alt: "earlypanel · Tests utilisateurs livrés en 5 jours",
         type: "image/png",
       },
     ],
@@ -95,7 +95,7 @@ const faqB2B = [
   },
   {
     q: "Tests utilisateurs et RGPD : où sont stockées les données collectées ?",
-    a: "100% en Europe. Notre infrastructure (base de données et stockage des documents) est hébergée par Supabase en région européenne, donc soumise au RGPD. Les IBAN des testeurs sont chiffrés en base (jamais affichés en clair). Les NDA signés sont stockés dans un bucket privé avec URLs signées à durée limitée. Toutes les actions sensibles (signature, accès aux données, paiement) sont consignées dans un audit log immuable. Notre panel est exclusivement basé en France métropolitaine — aucune donnée ne quitte l'UE.",
+    a: "100% en Europe. Notre infrastructure (base de données et stockage des documents) est hébergée par Supabase en région européenne, donc soumise au RGPD. Les IBAN des testeurs sont chiffrés en base (jamais affichés en clair). Les NDA signés sont stockés dans un bucket privé avec URLs signées à durée limitée. Toutes les actions sensibles (signature, accès aux données, paiement) sont consignées dans un audit log immuable. Notre panel est exclusivement basé en France métropolitaine : aucune donnée ne quitte l'UE.",
   },
   {
     q: "Que se passe-t-il si les résultats du test ne sont pas exploitables ?",

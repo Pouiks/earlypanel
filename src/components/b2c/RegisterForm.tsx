@@ -240,7 +240,7 @@ export default function RegisterForm() {
       <div className="form-row">
         <label>Secteur d&apos;activité</label>
         <select value={sector} onChange={(e) => setSector(e.target.value)}>
-          <option value="">— Sélectionner</option>
+          <option value="">Sélectionner…</option>
           {SECTORS.map((s) => (
             <option key={s} value={s}>{s}</option>
           ))}

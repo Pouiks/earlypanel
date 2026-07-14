@@ -66,9 +66,9 @@ const SEVERITY_COLORS: Record<Severity, { bg: string; text: string }> = {
 };
 const IMPACT_LABELS: Record<Impact, string> = { blocking: "Bloquant", slow: "Ralentissant", minor: "Mineur" };
 const PRIORITY_LABELS: Record<Priority, { label: string; bg: string; text: string }> = {
-  P1: { label: "P1 — Critique", bg: "#fef2f2", text: "#dc2626" },
-  P2: { label: "P2 — Important", bg: "#fffbeb", text: "#d97706" },
-  P3: { label: "P3 — Souhaitable", bg: "#f5f5f7", text: "#6e6e73" },
+  P1: { label: "P1 · Critique", bg: "#fef2f2", text: "#dc2626" },
+  P2: { label: "P2 · Important", bg: "#fffbeb", text: "#d97706" },
+  P3: { label: "P3 · Souhaitable", bg: "#f5f5f7", text: "#6e6e73" },
 };
 const EFFORT_LABELS: Record<TechEffort, string> = { low: "Faible", medium: "Moyen", high: "Élevé" };
 const MATRIX_QUADRANTS: { key: keyof ReportImpactEffortMatrix; label: string; desc: string; color: string }[] = [
@@ -410,7 +410,7 @@ export default function ProjectReportTab({ projectId }: Props) {
             Rapport de mission
           </h2>
           <p style={{ fontSize: 12, color: "#86868B", margin: "4px 0 0" }}>
-            {report ? `Dernière sauvegarde : ${new Date(report.updated_at).toLocaleString("fr-FR")}` : "Nouveau rapport — aucune donnée enregistrée."}
+            {report ? `Dernière sauvegarde : ${new Date(report.updated_at).toLocaleString("fr-FR")}` : "Nouveau rapport : aucune donnée enregistrée."}
           </p>
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
@@ -421,7 +421,7 @@ export default function ProjectReportTab({ projectId }: Props) {
               color: report.status === "published" ? "#065F46" : "#6E6E73",
             }}>
               {report.status === "published"
-                ? `Livré le ${report.published_at ? new Date(report.published_at).toLocaleDateString("fr-FR") : "—"}`
+                ? (report.published_at ? `Livré le ${new Date(report.published_at).toLocaleDateString("fr-FR")}` : "Livré")
                 : "Brouillon"}
             </span>
           )}
@@ -477,7 +477,7 @@ export default function ProjectReportTab({ projectId }: Props) {
       {/* ========== SUMMARY ========== */}
       <div style={card}>
         <h3 style={{ fontSize: 14, fontWeight: 700, color: "#1d1d1f", margin: "0 0 4px" }}>Synthèse executive</h3>
-        <p style={{ fontSize: 12, color: "#86868B", margin: "0 0 18px" }}>Page 2 — verdict global, chiffres clés et actions prioritaires.</p>
+        <p style={{ fontSize: 12, color: "#86868B", margin: "0 0 18px" }}>Page 2 : verdict global, chiffres clés et actions prioritaires.</p>
 
         <div style={{ marginBottom: 18 }}>
           <label style={labelStyle}>Verdict</label>
@@ -546,7 +546,7 @@ export default function ProjectReportTab({ projectId }: Props) {
           <h3 style={{ fontSize: 14, fontWeight: 700, color: "#1d1d1f", margin: 0 }}>Bugs ({bugs.length})</h3>
           <button type="button" onClick={addBug} style={smallBtn}>+ Bug</button>
         </div>
-        <p style={{ fontSize: 12, color: "#86868B", margin: "0 0 16px" }}>Page 6 — bugs techniques rencontrés par les testeurs.</p>
+        <p style={{ fontSize: 12, color: "#86868B", margin: "0 0 16px" }}>Page 6 : bugs techniques rencontrés par les testeurs.</p>
 
         {bugs.length === 0 && (
           <div style={{ padding: 24, textAlign: "center", color: "#86868B", fontSize: 13 }}>
@@ -627,7 +627,7 @@ export default function ProjectReportTab({ projectId }: Props) {
           <h3 style={{ fontSize: 14, fontWeight: 700, color: "#1d1d1f", margin: 0 }}>Frictions ({frictions.length})</h3>
           <button type="button" onClick={addFriction} style={smallBtn}>+ Friction</button>
         </div>
-        <p style={{ fontSize: 12, color: "#86868B", margin: "0 0 16px" }}>Pages 7-8 — points de friction UX identifiés, avec verbatims testeurs et analyse.</p>
+        <p style={{ fontSize: 12, color: "#86868B", margin: "0 0 16px" }}>Pages 7-8 : points de friction UX identifiés, avec verbatims testeurs et analyse.</p>
 
         {frictions.length === 0 && (
           <div style={{ padding: 24, textAlign: "center", color: "#86868B", fontSize: 13 }}>
@@ -704,7 +704,7 @@ export default function ProjectReportTab({ projectId }: Props) {
                 <div key={v._key} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
                   <select value={v.tester_id} onChange={(e) => updateVerbatim(fIdx, vIdx, "tester_id", e.target.value)}
                     style={{ ...inputStyle, width: 160, flex: "0 0 160px", cursor: "pointer", fontSize: 12 }} onFocus={focus} onBlur={blur}>
-                    <option value="">— Testeur —</option>
+                    <option value="">Sélectionner un testeur…</option>
                     {panel.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
                   </select>
                   <input type="text" value={v.text} onChange={(e) => updateVerbatim(fIdx, vIdx, "text", e.target.value)}
@@ -723,7 +723,7 @@ export default function ProjectReportTab({ projectId }: Props) {
           <h3 style={{ fontSize: 14, fontWeight: 700, color: "#1d1d1f", margin: 0 }}>Recommandations ({recos.length})</h3>
           <button type="button" onClick={addReco} style={smallBtn}>+ Recommandation</button>
         </div>
-        <p style={{ fontSize: 12, color: "#86868B", margin: "0 0 16px" }}>Page 10 — actions à mettre en place, classées par priorité et effort technique.</p>
+        <p style={{ fontSize: 12, color: "#86868B", margin: "0 0 16px" }}>Page 10 : actions à mettre en place, classées par priorité et effort technique.</p>
 
         {recos.length === 0 && (
           <div style={{ padding: 24, textAlign: "center", color: "#86868B", fontSize: 13 }}>
@@ -756,9 +756,9 @@ export default function ProjectReportTab({ projectId }: Props) {
                   <label style={labelStyle}>Priorité</label>
                   <select value={reco.priority} onChange={(e) => updateReco(rIdx, "priority", e.target.value as Priority)}
                     style={{ ...inputStyle, cursor: "pointer" }} onFocus={focus} onBlur={blur}>
-                    <option value="P1">P1 — Critique</option>
-                    <option value="P2">P2 — Important</option>
-                    <option value="P3">P3 — Souhaitable</option>
+                    <option value="P1">P1 · Critique</option>
+                    <option value="P2">P2 · Important</option>
+                    <option value="P3">P3 · Souhaitable</option>
                   </select>
                 </div>
                 <div>
@@ -776,7 +776,7 @@ export default function ProjectReportTab({ projectId }: Props) {
                 <div>
                   <label style={labelStyle}>Résout quel problème</label>
                   <input type="text" value={reco.solves ?? ""} onChange={(e) => updateReco(rIdx, "solves", e.target.value)}
-                    placeholder="Friction #2 — formulaire confus" style={inputStyle} onFocus={focus} onBlur={blur} />
+                    placeholder="Friction #2 : formulaire confus" style={inputStyle} onFocus={focus} onBlur={blur} />
                 </div>
                 <div>
                   <label style={labelStyle}>Impact attendu</label>
@@ -792,7 +792,7 @@ export default function ProjectReportTab({ projectId }: Props) {
       {/* ========== IMPACT/EFFORT MATRIX — Page 11 ========== */}
       <div style={card}>
         <h3 style={{ fontSize: 14, fontWeight: 700, color: "#1d1d1f", margin: "0 0 4px" }}>Matrice impact / effort</h3>
-        <p style={{ fontSize: 12, color: "#86868B", margin: "0 0 18px" }}>Page 11 — classez chaque recommandation dans un quadrant.</p>
+        <p style={{ fontSize: 12, color: "#86868B", margin: "0 0 18px" }}>Page 11 : classez chaque recommandation dans un quadrant.</p>
 
         {recos.filter((r) => r.title.trim()).length === 0 ? (
           <div style={{ padding: 24, textAlign: "center", color: "#86868B", fontSize: 13 }}>

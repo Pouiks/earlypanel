@@ -372,7 +372,7 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
               onBlur={(e) => e.currentTarget.style.borderColor = "rgba(0,0,0,0.12)"}
             />
             <p style={{ fontSize: 11, color: "#86868b", margin: "6px 0 0" }}>
-              Par défaut : hier à 9h — modifiable.
+              Par défaut : hier à 9h · modifiable.
             </p>
           </div>
           <div>
@@ -387,7 +387,7 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
               onBlur={(e) => e.currentTarget.style.borderColor = "rgba(0,0,0,0.12)"}
             />
             <p style={{ fontSize: 11, color: "#86868b", margin: "6px 0 0" }}>
-              Par défaut : dans 2 jours à 18h — modifiable.
+              Par défaut : dans 2 jours à 18h · modifiable.
             </p>
           </div>
         </div>
@@ -411,7 +411,7 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
             style={{ ...inputStyle, cursor: "pointer" }}
             disabled={clientsLoading}
           >
-            <option value="">— Aucun (saisie libre ci-dessous) —</option>
+            <option value="">Aucun (saisie libre ci-dessous)</option>
             {clients.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.company_name}
@@ -702,7 +702,7 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
                         type="number" min={0} max={100}
                         value={field.value}
                         onChange={(e) => field.setter(e.target.value)}
-                        placeholder="—"
+                        placeholder=""
                         style={{ ...inputStyle, textAlign: "center" }}
                         onFocus={(e) => e.currentTarget.style.borderColor = "#0A7A5A"}
                         onBlur={(e) => e.currentTarget.style.borderColor = "rgba(0,0,0,0.12)"}
@@ -717,7 +717,7 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
                       type="text"
                       value={finding}
                       onChange={(e) => updateFinding(i, e.target.value)}
-                      placeholder="Images non optimisées — 14 images servies dans un format non adapté…"
+                      placeholder="Images non optimisées : 14 images servies dans un format non adapté…"
                       style={{ ...inputStyle, flex: 1, fontSize: 13 }}
                       onFocus={(e) => e.currentTarget.style.borderColor = "#0A7A5A"}
                       onBlur={(e) => e.currentTarget.style.borderColor = "rgba(0,0,0,0.12)"}

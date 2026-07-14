@@ -163,7 +163,7 @@ export default function StaffPayoutsPage() {
   async function handleMarkBatchPaid(batchRef: string, count: number) {
     const ok = await confirm({
       title: `Marquer "${batchRef}" comme paye ?`,
-      message: `Les ${count} testeur(s) du lot recevront un email de confirmation. Cette action n'execute pas le virement — assurez-vous qu'il a deja ete fait chez Qonto.`,
+      message: `Les ${count} testeur(s) du lot recevront un email de confirmation. Cette action n'execute pas le virement : assurez-vous qu'il a deja ete fait chez Qonto.`,
       confirmLabel: "Confirmer",
     });
     if (!ok) return;
@@ -232,7 +232,7 @@ export default function StaffPayoutsPage() {
             {batchesWaiting.map((b) => (
               <div key={b.ref} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
                 <div style={{ fontSize: 13, color: "#92400e" }}>
-                  <strong>{b.ref}</strong> — {b.count} virement(s), total {fmtAmount(b.total)}
+                  <strong>{b.ref}</strong> · {b.count} virement(s), total {fmtAmount(b.total)}
                 </div>
                 <button
                   onClick={() => handleMarkBatchPaid(b.ref, b.count)}
@@ -313,7 +313,7 @@ export default function StaffPayoutsPage() {
           boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
         }}>
           <div style={{ fontSize: 13, fontWeight: 600 }}>
-            {selected.size} ligne(s) selectionnee(s) — total {fmtAmount(totalSelected)}
+            {selected.size} ligne(s) selectionnee(s) · total {fmtAmount(totalSelected)}
           </div>
           <div style={{ display: "flex", gap: 8 }}>
             <button
@@ -383,7 +383,7 @@ export default function StaffPayoutsPage() {
           </div>
           {filtered.map((p) => {
             const sc = STATUS_COLORS[p.status];
-            const fullName = `${p.tester?.first_name ?? ""} ${p.tester?.last_name ?? ""}`.trim() || "—";
+            const fullName = `${p.tester?.first_name ?? ""} ${p.tester?.last_name ?? ""}`.trim() || "Non renseigné";
             const isEligible = (p.status === "pending" || p.status === "approved") && !p.exported_at && p.payment_info_configured;
             const isSelected = selected.has(p.id);
             return (
@@ -424,7 +424,7 @@ export default function StaffPayoutsPage() {
                 </div>
                 <div style={{ minWidth: 0 }}>
                   <div style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {p.project?.title || "—"}
+                    {p.project?.title || "Non renseigné"}
                   </div>
                   <div style={{ fontSize: 11, color: "#86868B" }}>
                     {p.project?.ref_number ?? p.project?.company_name ?? ""}
@@ -439,10 +439,10 @@ export default function StaffPayoutsPage() {
                   </span>
                 </div>
                 <div style={{ fontSize: 11, color: "#86868B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {p.sepa_batch_ref ? <code style={{ fontSize: 11 }}>{p.sepa_batch_ref}</code> : "—"}
+                  {p.sepa_batch_ref ? <code style={{ fontSize: 11 }}>{p.sepa_batch_ref}</code> : "Aucun"}
                 </div>
                 <div style={{ fontSize: 11, color: "#86868B" }}>
-                  {p.paid_at ? new Date(p.paid_at).toLocaleDateString("fr-FR") : (p.exported_at ? `Exporte ${new Date(p.exported_at).toLocaleDateString("fr-FR")}` : "—")}
+                  {p.paid_at ? new Date(p.paid_at).toLocaleDateString("fr-FR") : (p.exported_at ? `Exporte ${new Date(p.exported_at).toLocaleDateString("fr-FR")}` : "Non renseignée")}
                 </div>
               </div>
             );

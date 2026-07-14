@@ -68,9 +68,9 @@ const QUADRANTS: { key: keyof Matrix; label: string; desc: string; color: string
 ];
 
 function fmtDate(d: string | null | undefined): string {
-  if (!d) return "—";
+  if (!d) return "Non renseigné";
   const date = new Date(d);
-  if (isNaN(date.getTime())) return "—";
+  if (isNaN(date.getTime())) return "Non renseigné";
   return date.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
 }
 
@@ -244,10 +244,10 @@ export default function ReportViewPage({ params }: { params: Promise<{ id: strin
                     <tr key={p.readable_id} style={{ borderTop: "0.5px solid rgba(0,0,0,0.08)" }}>
                       <td style={{ padding: "8px 10px", fontWeight: 700, color: "#0A7A5A" }}>{p.readable_id}</td>
                       <td style={{ padding: "8px 10px" }}>{p.gender}</td>
-                      <td style={{ padding: "8px 10px" }}>{p.age ?? "—"}</td>
-                      <td style={{ padding: "8px 10px" }}>{p.city ?? "—"}</td>
-                      <td style={{ padding: "8px 10px" }}>{p.digital_level ?? "—"}</td>
-                      <td style={{ padding: "8px 10px" }}>{p.job_title ?? "—"}</td>
+                      <td style={{ padding: "8px 10px" }}>{p.age ?? "Non renseigné"}</td>
+                      <td style={{ padding: "8px 10px" }}>{p.city ?? "Non renseignée"}</td>
+                      <td style={{ padding: "8px 10px" }}>{p.digital_level ?? "Non renseigné"}</td>
+                      <td style={{ padding: "8px 10px" }}>{p.job_title ?? "Non renseigné"}</td>
                       <td style={{ padding: "8px 10px", color: "#6e6e73" }}>{p.device_summary}</td>
                     </tr>
                   ))}
@@ -348,9 +348,9 @@ export default function ReportViewPage({ params }: { params: Promise<{ id: strin
                     <div key={q.key} style={{ padding: 14, borderRadius: 12, border: `1.5px solid ${q.color}33`, background: `${q.color}0a`, breakInside: "avoid" }}>
                       <div style={{ fontSize: 13, fontWeight: 700, color: q.color }}>{q.label}</div>
                       <div style={{ fontSize: 11, color: "#86868B", marginBottom: 8 }}>{q.desc}</div>
-                      {ids.length === 0 ? <div style={{ fontSize: 12, color: "#c4c4c8" }}>—</div> : (
+                      {ids.length === 0 ? <div style={{ fontSize: 12, color: "#c4c4c8" }}>Aucune</div> : (
                         <ul style={{ margin: 0, paddingLeft: 16, fontSize: 13 }}>
-                          {ids.map((rid) => <li key={rid}>{recoById.get(rid)?.title ?? "—"}</li>)}
+                          {ids.map((rid) => <li key={rid}>{recoById.get(rid)?.title ?? "Sans titre"}</li>)}
                         </ul>
                       )}
                     </div>
@@ -366,7 +366,7 @@ export default function ReportViewPage({ params }: { params: Promise<{ id: strin
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 12 }}>
                 {([["Performance", data.project.audit_scores.performance], ["Accessibilité", data.project.audit_scores.accessibility], ["SEO", data.project.audit_scores.seo], ["Best practices", data.project.audit_scores.best_practices]] as const).map(([label, score]) => (
                   <div key={label} style={{ flex: "1 1 120px", background: "#f5f5f7", borderRadius: 12, padding: "14px 16px", textAlign: "center" }}>
-                    <div style={{ fontSize: 24, fontWeight: 800, color: (score ?? 0) >= 90 ? "#0A7A5A" : (score ?? 0) >= 50 ? "#d97706" : "#dc2626" }}>{score ?? "—"}</div>
+                    <div style={{ fontSize: 24, fontWeight: 800, color: (score ?? 0) >= 90 ? "#0A7A5A" : (score ?? 0) >= 50 ? "#d97706" : "#dc2626" }}>{score ?? "n.d."}</div>
                     <div style={{ fontSize: 12, color: "#6e6e73" }}>{label}</div>
                   </div>
                 ))}

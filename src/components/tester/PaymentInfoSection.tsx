@@ -233,7 +233,7 @@ export default function PaymentInfoSection() {
             </div>
           )}
           <div style={{ marginTop: 12, fontSize: 12, color: "#86868B" }}>
-            CGU signees le {info.cgu_signed_at ? new Date(info.cgu_signed_at).toLocaleDateString("fr-FR") : "—"} (version {info.cgu_version})
+            {info.cgu_signed_at ? `CGU signees le ${new Date(info.cgu_signed_at).toLocaleDateString("fr-FR")}` : "CGU signees"} (version {info.cgu_version})
             {info.cgu_current_version && info.cgu_version !== info.cgu_current_version && (
               <span style={{ display: "block", color: "#92400e", marginTop: 4, fontWeight: 600 }}>
                 Une nouvelle version des CGU est disponible. Mettez a jour votre IBAN pour resigner.

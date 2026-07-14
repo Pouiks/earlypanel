@@ -70,7 +70,7 @@ export default function StaffDashboardPage() {
   }
 
   function formatDateTime(iso: string | null | undefined): string {
-    if (!iso) return "—";
+    if (!iso) return "Non renseignée";
     return new Date(iso).toLocaleString("fr-FR", {
       day: "numeric",
       month: "short",

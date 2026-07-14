@@ -78,7 +78,7 @@ export default function AvailabilitySection({ tester, onChanged }: Props) {
       <div style={{ marginBottom: 18 }}>
         {isInactive ? (
           <span style={{ display: "inline-block", padding: "6px 14px", borderRadius: 980, fontSize: 13, fontWeight: 600, background: "#F1F1F3", color: "#6E6E73" }}>
-            Compte désactivé — vous ne recevez plus d&apos;offres
+            Compte désactivé : vous ne recevez plus d&apos;offres
           </span>
         ) : confirmed ? (
           <span style={{ display: "inline-block", padding: "6px 14px", borderRadius: 980, fontSize: 13, fontWeight: 600, background: "#D1FAE5", color: "#065F46" }}>

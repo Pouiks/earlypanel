@@ -316,7 +316,7 @@ export default function TesterDrawer({ testerId, onClose }: TesterDrawerProps) {
 
               <Section title="Zone dangereuse">
                 <p style={{ fontSize: 12, color: "#86868B", lineHeight: 1.5, margin: "0 0 12px" }}>
-                  Suppression definitive : compte testeur + auth + donnees liees (NDA, missions en cours, IBAN). Action loggee dans l&apos;audit. A reserver aux faux comptes / spam — sinon utiliser le statut &laquo;&nbsp;rejete&nbsp;&raquo;.
+                  Suppression definitive : compte testeur + auth + donnees liees (NDA, missions en cours, IBAN). Action loggee dans l&apos;audit. A reserver aux faux comptes / spam, sinon utiliser le statut &laquo;&nbsp;rejete&nbsp;&raquo;.
                 </p>
                 <button
                   onClick={() => { setDeleteOpen(true); setDeleteConfirmEmail(""); setDeleteError(null); }}

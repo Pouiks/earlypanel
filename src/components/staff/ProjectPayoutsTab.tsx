@@ -140,7 +140,7 @@ export default function ProjectPayoutsTab({ projectId }: ProjectPayoutsTabProps)
           failed.map((f: { error?: string }) => f.error).join(" · ") || "Certains versements ont échoué"
         );
       } else {
-        setMessage("Versements initialisés — en attente de confirmation du paiement.");
+        setMessage("Versements initialisés : en attente de confirmation du paiement.");
       }
       setSelected(new Set());
       await load();
@@ -327,7 +327,7 @@ export default function ProjectPayoutsTab({ projectId }: ProjectPayoutsTabProps)
                   )}
                 </td>
                 <td style={{ padding: 10, fontSize: 11, color: "#86868b" }}>
-                  {p.stripe_transfer_id || "—"}
+                  {p.stripe_transfer_id || "Aucun"}
                 </td>
               </tr>
               );

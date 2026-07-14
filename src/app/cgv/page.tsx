@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import LegalLayout from "@/components/layout/LegalLayout";
 
 export const metadata: Metadata = {
-  title: "CGV — earlypanel",
+  title: "CGV · earlypanel",
   description: "Conditions générales de vente d'earlypanel.",
   alternates: { canonical: "https://earlypanel.fr/cgv" },
   robots: { index: true, follow: true },

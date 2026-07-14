@@ -25,7 +25,7 @@ export const scenarios: Scenario[] = [
       "Qu'est-ce qui vous a empêché de finaliser votre commande ?",
     hint: "Pensez aux informations demandées, aux étapes, aux messages affichés.",
     answer:
-      "Tout allait bien jusqu'à la saisie de ma carte. Le formulaire a vidé tous mes champs après que j'ai corrigé le numéro.\n\nJ'ai dû tout ressaisir 3 fois. À la 3ème tentative j'ai abandonné.\n\nAussi : les frais de livraison n'apparaissent qu'à la dernière étape — c'est frustrant.",
+      "Tout allait bien jusqu'à la saisie de ma carte. Le formulaire a vidé tous mes champs après que j'ai corrigé le numéro.\n\nJ'ai dû tout ressaisir 3 fois. À la 3ème tentative j'ai abandonné.\n\nAussi : les frais de livraison n'apparaissent qu'à la dernière étape, c'est frustrant.",
     progress: "Question 4 sur 7",
     pct: "57%",
     fill: "57%",
@@ -43,7 +43,7 @@ export const scenarios: Scenario[] = [
       "Avez-vous trouvé facilement l'information que vous cherchiez ?",
     hint: "Dites-nous où vous avez cherché et ce que vous avez trouvé ou non.",
     answer:
-      "Je cherchais le rapport des congés sur les 6 derniers mois.\n\nJ'ai d'abord cliqué sur \"Rapports\" puis \"Congés\" mais les filtres de date ne fonctionnent pas comme prévu — impossible de choisir une plage personnalisée.\n\nJ'ai finalement trouvé en passant par \"Export\", ce qui n'est vraiment pas logique.",
+      "Je cherchais le rapport des congés sur les 6 derniers mois.\n\nJ'ai d'abord cliqué sur \"Rapports\" puis \"Congés\" mais les filtres de date ne fonctionnent pas comme prévu, impossible de choisir une plage personnalisée.\n\nJ'ai finalement trouvé en passant par \"Export\", ce qui n'est vraiment pas logique.",
     progress: "Question 2 sur 5",
     pct: "40%",
     fill: "40%",

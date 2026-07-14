@@ -141,7 +141,7 @@ export default function ProjectReviewTab({ projectId }: Props) {
           Dépouillement ({totalAnswers} réponses)
         </h2>
         <p style={{ fontSize: 12, color: "#86868B", margin: "4px 0 0" }}>
-          Vue en lecture seule — toutes les réponses testeurs groupées par cas d&apos;usage et par question.
+          Vue en lecture seule : toutes les réponses testeurs groupées par cas d&apos;usage et par question.
         </p>
       </div>
 
