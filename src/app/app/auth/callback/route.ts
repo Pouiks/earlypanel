@@ -3,11 +3,30 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { backfillConnectionIfStuck } from "@/lib/tester-activation-repair";
 
+/**
+ * Valide une destination `next` interne pour éviter tout open-redirect.
+ * N'autorise que des chemins de l'espace testeur (`/app/…`, hors `/app/auth/…`).
+ * Le hash (#) n'est jamais transmis au serveur → on ne conserve que path+query.
+ */
+function safeNext(raw: string | null, origin: string): string | null {
+  if (!raw) return null;
+  try {
+    const u = new URL(raw, origin);
+    if (u.origin !== origin) return null;
+    if (!u.pathname.startsWith("/app/")) return null;
+    if (u.pathname.startsWith("/app/auth/")) return null;
+    return u.pathname + u.search;
+  } catch {
+    return null;
+  }
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type");
+  const next = safeNext(searchParams.get("next"), origin);
 
   const cookiesToApply: { name: string; value: string; options: CookieOptions }[] = [];
 
@@ -117,7 +136,9 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  const redirectUrl = profileCompleted ? "/app/dashboard" : "/app/onboarding";
+  // Testeur : destination `next` custom (lien de campagne) seulement si le
+  // profil est complet ; sinon l'onboarding reste prioritaire.
+  const redirectUrl = profileCompleted ? (next ?? "/app/dashboard") : "/app/onboarding";
   const response = NextResponse.redirect(new URL(redirectUrl, origin));
 
   cookiesToApply.forEach(({ name, value, options }) => {

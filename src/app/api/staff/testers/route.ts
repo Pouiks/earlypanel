@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
 
   let query = admin
     .from("testers")
-    .select("id, email, first_name, last_name, phone, gender, city, postal_code, job_title, sector, company_size, digital_level, csp, birth_date, tools, browsers, devices, phone_model, mobile_os, connection, availability, interests, ux_experience, status, profile_completed, created_at, tier, quality_score, missions_completed, total_earned, persona_id, persona_locked, persona:tester_personas(id, slug, name)")
+    .select("id, email, first_name, last_name, phone, gender, city, postal_code, job_title, sector, company_size, digital_level, csp, birth_date, tools, browsers, devices, phone_model, mobile_os, connection, availability, interests, ux_experience, status, profile_completed, created_at, tier, quality_score, missions_completed, total_earned, available_until, availability_responded_at, availability_check_sent_at, persona_id, persona_locked, persona:tester_personas(id, slug, name)")
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 
@@ -69,6 +69,12 @@ export async function GET(request: NextRequest) {
     }
   } else {
     query = query.in("status", ["active", "pending"]);
+  }
+
+  // Filtre "disponibilité confirmée" : testeurs dont la fenêtre `available_until`
+  // n'est pas expirée. Pour trouver vite des testeurs quand une offre tombe.
+  if (searchParams.get("available") === "confirmed") {
+    query = query.gte("available_until", new Date().toISOString());
   }
 
   // Helper : quote pour PostgREST or() (double quotes doublees a l'interieur).

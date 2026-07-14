@@ -1,4 +1,4 @@
-export type TesterStatus = "pending" | "active" | "suspended" | "rejected";
+export type TesterStatus = "pending" | "active" | "suspended" | "rejected" | "inactive";
 export type TesterGender = "female" | "male" | "non_binary" | "prefer_not_to_say";
 
 export interface TesterPersona {
@@ -61,6 +61,10 @@ export interface Tester {
   persona?: TesterPersona | null;
   onboarding_tour_completed_at: string | null;
   onboarding_tour_skipped_at: string | null;
+  // Disponibilité datée (migration 035) — distincte de `availability` (fréquence).
+  available_until: string | null;
+  availability_responded_at: string | null;
+  availability_check_sent_at: string | null;
 }
 
 export type TesterInsert = Pick<Tester, "email" | "auth_user_id"> &

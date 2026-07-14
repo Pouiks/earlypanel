@@ -29,6 +29,7 @@ if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
 - `/api/lead-magnet` — formulaire public
 - `/api/internal/ping-indexnow` — interne (pas exposé publiquement)
 - `/api/webhooks/stripe` — auth via signature, pas via cookie
+- `/api/testers/availability` — clic email campagne dispo. Auth via **token signé HMAC** (`verifyActionToken`, `src/lib/action-token.ts`), pas via cookie. Actions idempotentes/non destructives uniquement.
 
 ## 2. Anti-énumération sur les routes auth
 

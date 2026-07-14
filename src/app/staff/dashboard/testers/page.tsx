@@ -33,6 +33,7 @@ interface TesterRow {
   persona_id: string | null;
   persona: { id: string; slug: string; name: string } | null;
   payment_info_configured?: boolean;
+  available_until?: string | null;
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -40,12 +41,14 @@ const STATUS_LABELS: Record<string, string> = {
   active: "Actif",
   suspended: "Suspendu",
   rejected: "Rejeté",
+  inactive: "Désactivé",
 };
 const STATUS_COLORS: Record<string, { bg: string; fg: string }> = {
   pending: { bg: "#fff7e6", fg: "#b45309" },
   active: { bg: "#f0faf5", fg: "#0A7A5A" },
   suspended: { bg: "#fef2f2", fg: "#b91c1c" },
   rejected: { bg: "#f5f5f7", fg: "#6e6e73" },
+  inactive: { bg: "#f1f1f3", fg: "#6e6e73" },
 };
 
 const FILTERS = [
@@ -53,6 +56,7 @@ const FILTERS = [
   { value: "active", label: "Actifs" },
   { value: "pending", label: "En attente" },
   { value: "suspended", label: "Suspendus" },
+  { value: "inactive", label: "Désactivés" },
   { value: "rejected", label: "Rejetés" },
 ];
 
@@ -65,6 +69,10 @@ export default function StaffTestersPage() {
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [filters, setFilters] = useState<TesterAdvancedFilterState>(() => emptyTesterFilters());
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [availableOnly, setAvailableOnly] = useState(false);
+  const [campaignOpen, setCampaignOpen] = useState(false);
+  const [campaignBusy, setCampaignBusy] = useState(false);
+  const [campaignMsg, setCampaignMsg] = useState<string | null>(null);
 
   const load = useCallback(async (signal?: AbortSignal) => {
     setLoading(true);
@@ -72,6 +80,7 @@ export default function StaffTestersPage() {
     try {
       const params = new URLSearchParams();
       params.set("status", filter);
+      if (availableOnly) params.set("available", "confirmed");
       appendTesterFiltersToParams(params, filters);
       const res = await fetch(
         `/api/staff/testers?${params.toString()}`,
@@ -92,7 +101,23 @@ export default function StaffTestersPage() {
     } finally {
       if (!signal?.aborted) setLoading(false);
     }
-  }, [filter, filters]);
+  }, [filter, filters, availableOnly]);
+
+  async function sendCampaign() {
+    setCampaignBusy(true);
+    setCampaignMsg(null);
+    try {
+      const res = await fetch("/api/staff/testers/availability-campaign", { method: "POST" });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error((data as { error?: string }).error || `Erreur ${res.status}`);
+      setCampaignMsg(`Relance envoyée à ${data.sent} testeur(s) sur ${data.total} ciblé(s).`);
+      setCampaignOpen(false);
+    } catch (e) {
+      setCampaignMsg(e instanceof Error ? e.message : "Erreur");
+    } finally {
+      setCampaignBusy(false);
+    }
+  }
 
   // Debounce 200ms + AbortController : un changement de filtre cleanup la requete
   // en cours et le timer pendant. Seule la derniere intention utilisateur fait
@@ -133,7 +158,22 @@ export default function StaffTestersPage() {
             {testers.length} testeur(s) sur ce filtre
           </p>
         </div>
+        <button
+          onClick={() => { setCampaignOpen(true); setCampaignMsg(null); }}
+          style={{
+            padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff",
+            background: "#0A7A5A", border: "none", borderRadius: 980, cursor: "pointer", fontFamily: "inherit",
+          }}
+        >
+          Relance de disponibilité
+        </button>
       </div>
+
+      {campaignMsg && (
+        <div style={{ background: "#f0faf5", border: "1px solid rgba(10,122,90,0.2)", borderRadius: 12, padding: "12px 16px", marginBottom: 16, color: "#0A7A5A", fontSize: 13 }}>
+          {campaignMsg}
+        </div>
+      )}
 
       <div style={{ display: "flex", gap: 12, marginBottom: 16, flexWrap: "wrap", alignItems: "center" }}>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
@@ -166,6 +206,19 @@ export default function StaffTestersPage() {
           title="Filtres avances (secteur, CSP, age, metier)"
         >
           Filtres avances{advancedCount > 0 ? ` · ${advancedCount}` : ""}
+        </button>
+        <button
+          onClick={() => setAvailableOnly((v) => !v)}
+          title="Ne montrer que les testeurs dont la disponibilité est confirmée (non expirée)"
+          style={{
+            padding: "7px 16px", fontSize: 13, fontWeight: 600,
+            color: availableOnly ? "#065F46" : "#6e6e73",
+            background: availableOnly ? "#D1FAE5" : "transparent",
+            border: availableOnly ? "1.5px solid #0A7A5A" : "1px solid rgba(0,0,0,0.1)",
+            borderRadius: 980, cursor: "pointer", fontFamily: "inherit",
+          }}
+        >
+          ✓ Dispo confirmée
         </button>
         <input
           type="search"
@@ -219,6 +272,7 @@ export default function StaffTestersPage() {
           {filtered.map((t) => {
             const sc = STATUS_COLORS[t.status] ?? STATUS_COLORS.pending;
             const fullName = `${t.first_name ?? ""} ${t.last_name ?? ""}`.trim() || "—";
+            const availConfirmed = !!t.available_until && new Date(t.available_until).getTime() >= Date.now();
             return (
               <div
                 key={t.id}
@@ -297,10 +351,37 @@ export default function StaffTestersPage() {
                   <span style={{ padding: "3px 10px", fontSize: 11, fontWeight: 600, borderRadius: 980, background: sc.bg, color: sc.fg }}>
                     {STATUS_LABELS[t.status] || t.status}
                   </span>
+                  {availConfirmed && (
+                    <div style={{ fontSize: 10, color: "#0A7A5A", marginTop: 3, fontWeight: 600 }}>
+                      dispo → {new Date(t.available_until!).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" })}
+                    </div>
+                  )}
                 </div>
               </div>
             );
           })}
+        </div>
+      )}
+
+      {campaignOpen && (
+        <div
+          style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.4)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+          onClick={() => !campaignBusy && setCampaignOpen(false)}
+        >
+          <div style={{ background: "#fff", borderRadius: 20, padding: 28, width: "100%", maxWidth: 440 }} onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ fontSize: 17, fontWeight: 700, color: "#1d1d1f", margin: "0 0 8px" }}>Envoyer la relance de disponibilité ?</h3>
+            <p style={{ fontSize: 13, color: "#6e6e73", lineHeight: 1.6, margin: "0 0 20px" }}>
+              Un email « êtes-vous toujours disponible ? » (2 boutons Oui / gérer mon compte) sera envoyé à <strong>tous les testeurs actifs</strong> au profil complet, sauf ceux déjà relancés il y a moins de 7 jours. Ré-appelable pour drainer un gros volume.
+            </p>
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+              <button type="button" disabled={campaignBusy} onClick={() => setCampaignOpen(false)} style={{ padding: "10px 20px", fontSize: 13, fontWeight: 600, color: "#6e6e73", background: "#fff", border: "1px solid rgba(0,0,0,0.12)", borderRadius: 980, cursor: "pointer", fontFamily: "inherit" }}>
+                Annuler
+              </button>
+              <button type="button" disabled={campaignBusy} onClick={sendCampaign} style={{ padding: "10px 22px", fontSize: 13, fontWeight: 700, color: "#fff", background: "#0A7A5A", border: "none", borderRadius: 980, cursor: campaignBusy ? "wait" : "pointer", fontFamily: "inherit", opacity: campaignBusy ? 0.6 : 1 }}>
+                {campaignBusy ? "Envoi…" : "Envoyer la relance"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

@@ -7,6 +7,13 @@ import MetricCard from "@/components/dashboard/MetricCard";
 import StatusBanner from "@/components/dashboard/StatusBanner";
 import EmptyState from "@/components/dashboard/EmptyState";
 import CountdownTimer from "@/components/ui/CountdownTimer";
+import { useNotify } from "@/components/ui/NotificationProvider";
+
+function fmtDate(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? "" : d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+}
 
 interface MissionItem {
   id: string;
@@ -24,6 +31,7 @@ interface MissionItem {
 
 export default function DashboardHome() {
   const { tester } = useTester();
+  const { notify } = useNotify();
   const [missions, setMissions] = useState<MissionItem[]>([]);
   const [missionsLoading, setMissionsLoading] = useState(true);
 
@@ -42,6 +50,21 @@ export default function DashboardHome() {
     }
     load();
   }, []);
+
+  // Toast de confirmation après un clic "Oui je suis dispo" depuis l'email.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (new URLSearchParams(window.location.search).get("availability") === "confirmed") {
+      notify({
+        type: "success",
+        title: "Disponibilité confirmée",
+        message: "Merci ! Vous recevrez les offres de test des 3 prochains mois.",
+        dedupKey: "availability-confirmed",
+      });
+      // Nettoie l'URL pour ne pas re-notifier au refresh.
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+  }, [notify]);
 
   if (!tester) {
     return (
@@ -80,6 +103,48 @@ export default function DashboardHome() {
       </div>
 
       <StatusBanner status={tester.status} profileCompleted={tester.profile_completed} />
+
+      {/* Disponibilité (campagne) : bandeau réactivation si désactivé, sinon badge dispo */}
+      {tester.status === "inactive" ? (
+        <div style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap",
+          background: "#f5f5f7", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 14,
+          padding: "14px 18px", marginBottom: 16,
+        }}>
+          <span style={{ fontSize: 14, color: "#1d1d1f", fontWeight: 500 }}>
+            Votre compte est <strong>désactivé</strong> — vous ne recevez plus d&apos;offres de test.
+          </span>
+          <Link href="/app/dashboard/profil?section=disponibilite" style={{
+            padding: "8px 18px", fontSize: 13, fontWeight: 700, color: "#fff", background: "#0A7A5A",
+            borderRadius: 980, textDecoration: "none", whiteSpace: "nowrap",
+          }}>
+            Réactiver mon compte →
+          </Link>
+        </div>
+      ) : (tester.available_until && new Date(tester.available_until).getTime() >= Date.now()) ? (
+        <div style={{
+          background: "#D1FAE5", color: "#065F46", borderRadius: 14, padding: "12px 18px",
+          marginBottom: 16, fontSize: 14, fontWeight: 600,
+        }}>
+          ✓ Disponible pour des offres de test jusqu&apos;au {fmtDate(tester.available_until)}
+        </div>
+      ) : (
+        <div style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap",
+          background: "#FEF3C7", border: "1px solid #FDE68A", borderRadius: 14,
+          padding: "14px 18px", marginBottom: 16,
+        }}>
+          <span style={{ fontSize: 14, color: "#92600A", fontWeight: 500 }}>
+            Confirmez votre disponibilité pour recevoir rapidement les offres de test.
+          </span>
+          <Link href="/app/dashboard/profil?section=disponibilite" style={{
+            padding: "8px 18px", fontSize: 13, fontWeight: 700, color: "#fff", background: "#0A7A5A",
+            borderRadius: 980, textDecoration: "none", whiteSpace: "nowrap",
+          }}>
+            Confirmer →
+          </Link>
+        </div>
+      )}
 
       {/* Mission en evidence */}
       {featured && (

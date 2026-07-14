@@ -61,6 +61,9 @@ export const MOCK_TESTER: Tester = {
   persona: null,
   onboarding_tour_completed_at: null,
   onboarding_tour_skipped_at: null,
+  available_until: null,
+  availability_responded_at: null,
+  availability_check_sent_at: null,
 };
 
 const MOCK_TESTER_BLANK: Tester = {

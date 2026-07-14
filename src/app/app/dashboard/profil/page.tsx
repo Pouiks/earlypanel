@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useTester } from "../layout";
 import type { Tester, DigitalLevel, MobileOS, ConnectionType, Availability, UxExperience } from "@/types/tester";
 import PillSelect from "@/components/ui/PillSelect";
 import Toast from "@/components/ui/Toast";
 import PaymentInfoSection from "@/components/tester/PaymentInfoSection";
 import DeleteAccountSection from "@/components/tester/DeleteAccountSection";
+import AvailabilitySection from "@/components/tester/AvailabilitySection";
 import {
   computeProfileCompleteness,
   CATEGORY_LABELS,
@@ -89,6 +90,19 @@ export default function ProfilPage() {
   useEffect(() => {
     if (tester?.birth_date && !birthDisplay) setBirthDisplay(isoToDisplay(tester.birth_date));
   }, [tester?.birth_date]);
+
+  // Scroll auto vers la section "Disponibilité & compte" quand on arrive via
+  // un lien de campagne (?section=disponibilite). One-shot.
+  const scrolledToSection = useRef(false);
+  useEffect(() => {
+    if (scrolledToSection.current || !tester || typeof window === "undefined") return;
+    if (new URLSearchParams(window.location.search).get("section") !== "disponibilite") return;
+    scrolledToSection.current = true;
+    const t = setTimeout(() => {
+      document.getElementById("disponibilite-compte")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 300);
+    return () => clearTimeout(t);
+  }, [tester]);
   const handleBirthChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setBirthDisplay(prev => {
       const next = formatBirthInput(e.target.value, prev);
@@ -453,6 +467,9 @@ export default function ProfilPage() {
           {saving === "avail" ? "Sauvegarde…" : "Sauvegarder"}
         </button>
       </div>
+
+      {/* Disponibilité & gestion du compte (campagne de disponibilité) */}
+      <AvailabilitySection tester={tester} onChanged={refreshTester} />
 
       {/* Finance — IBAN + signature CGU */}
       <PaymentInfoSection />

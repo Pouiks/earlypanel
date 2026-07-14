@@ -45,7 +45,7 @@ export async function sendEmail({ to, subject, html, toName, attachments }: Send
     // /auth/callback (testeur) ou /auth/confirm (staff, page anti-prefetch
     // Gmail/Outlook). Sans /confirm, le lien de connexion staff n'etait
     // jamais imprime en local → impossible de se connecter en dev.
-    const linkMatch = html.match(/href="(https?:\/\/[^"]+\/(?:app|staff)\/auth\/(?:callback|confirm)[^"]*)"/);
+    const linkMatch = html.match(/href="(https?:\/\/[^"]+\/(?:app|staff)\/auth\/(?:callback|confirm|availability)[^"]*)"/);
     const magicLink = linkMatch?.[1] ?? "(aucun lien magique detecte)";
     log.warn("SKIP_EMAILS=true — mail NON envoye", {
       to,
@@ -276,6 +276,52 @@ export function buildWelcomeEmail(magicLink: string, firstName?: string): string
         </td></tr>
         <tr><td style="padding:20px 32px;border-top:0.5px solid rgba(0,0,0,0.08);">
           <p style="font-size:11px;color:#86868B;margin:0;">earlypanel · <a href="https://earlypanel.fr/confidentialite" style="color:#86868B;">Confidentialité</a> · <a href="https://earlypanel.fr/cgu" style="color:#86868B;">CGU</a></p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`.trim();
+}
+
+/**
+ * Email de campagne de disponibilité : 2 boutons cliquables sans login.
+ * `ouiUrl` / `nonUrl` pointent vers la page interstitielle /app/auth/availability
+ * (protégée contre les scanners), qui appelle ensuite la route d'action.
+ */
+export function buildAvailabilityCampaignEmail(opts: {
+  firstName?: string | null;
+  ouiUrl: string;
+  nonUrl: string;
+}): string {
+  const greeting = opts.firstName ? `Bonjour ${escapeHtml(opts.firstName)},` : "Bonjour,";
+  return `
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f5f5f7;font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f7;padding:40px 20px;">
+    <tr><td align="center">
+      <table width="100%" style="max-width:520px;background:#fff;border-radius:20px;overflow:hidden;">
+        <tr><td style="background:#0A7A5A;padding:24px 32px;">
+          <span style="font-size:18px;font-weight:700;color:#fff;letter-spacing:-0.5px;">early<span style="color:#2DD4A0;">panel</span></span>
+        </td></tr>
+        <tr><td style="padding:32px;">
+          <p style="font-size:16px;color:#1d1d1f;margin:0 0 16px;font-weight:600;">${greeting}</p>
+          <p style="font-size:14px;color:#6e6e73;line-height:1.6;margin:0 0 8px;">Êtes-vous toujours disponible pour réaliser des tests utilisateurs ?</p>
+          <p style="font-size:14px;color:#6e6e73;line-height:1.6;margin:0 0 24px;">Quand une mission correspond à votre profil, il faut pouvoir y répondre vite. Confirmez votre disponibilité pour les <strong>3 prochains mois</strong> — ou indiquez que vous ne souhaitez plus recevoir d'offres.</p>
+
+          <table cellpadding="0" cellspacing="0" style="margin:0 0 12px;"><tr><td>
+            <a href="${opts.ouiUrl}" style="display:inline-block;background:#0A7A5A;color:#fff;padding:14px 28px;border-radius:980px;font-size:15px;font-weight:700;text-decoration:none;">Oui, je suis disponible (3 mois) →</a>
+          </td></tr></table>
+          <table cellpadding="0" cellspacing="0"><tr><td>
+            <a href="${opts.nonUrl}" style="display:inline-block;background:#fff;color:#6e6e73;padding:13px 26px;border:1px solid rgba(0,0,0,0.15);border-radius:980px;font-size:14px;font-weight:600;text-decoration:none;">Non / gérer mon compte</a>
+          </td></tr></table>
+
+          <p style="font-size:12px;color:#86868B;line-height:1.5;margin:28px 0 0;">Ces liens sont personnels et valables 3 mois. Si vous n'êtes plus intéressé(e), le second bouton vous permet de vous mettre en pause ou de désactiver votre compte.</p>
+        </td></tr>
+        <tr><td style="padding:20px 32px;border-top:0.5px solid rgba(0,0,0,0.08);">
+          <p style="font-size:11px;color:#86868B;margin:0;">earlypanel · <a href="https://earlypanel.fr/confidentialite" style="color:#86868B;">Confidentialité</a></p>
         </td></tr>
       </table>
     </td></tr>

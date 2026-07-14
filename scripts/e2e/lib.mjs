@@ -5,6 +5,19 @@
 
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import { createHmac } from "node:crypto";
+
+// Recalcule un token d'action signé (le harness ne lit pas les emails — il
+// reconstruit le token comme il reconstruit déjà les magic links via REST).
+// Doit rester aligné sur src/lib/action-token.ts.
+export function makeActionToken(env, tid, act, ttlSec = 90 * 86400) {
+  const secret = env.ACTION_TOKEN_SECRET;
+  if (!secret) throw new Error("ACTION_TOKEN_SECRET manquant dans .env.local");
+  const exp = Math.floor(Date.now() / 1000) + ttlSec;
+  const body = Buffer.from(JSON.stringify({ tid, act, exp })).toString("base64url");
+  const sig = createHmac("sha256", secret).update(body).digest("base64url");
+  return `${body}.${sig}`;
+}
 
 // ---------------------------------------------------------------------
 // Chargement .env / .env.local (le .env.local prime, comme Next.js)
