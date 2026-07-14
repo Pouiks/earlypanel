@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import * as Sentry from "@sentry/nextjs";
 
 // W5 : page d'erreur globale (s'affiche en cas d'exception runtime sur n'importe
 // quelle page enfant). Doit etre Client Component (Next.js requirement).
@@ -12,9 +13,15 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
+    // Forward a Sentry (GlitchTip) : sans ca, les erreurs des Server Components
+    // sont swallow par cet error boundary et n'arrivent pas dans le monitoring.
+    // Le digest Next.js permet de correler ce client-side event avec l'event
+    // server-side automatiquement capture par onRequestError() dans instrumentation.ts.
+    Sentry.captureException(error, {
+      tags: { source: "global-error-boundary" },
+      contexts: error.digest ? { nextjs: { digest: error.digest } } : undefined,
+    });
     console.error("[GlobalError]", error);
-    // Hook Sentry : si Sentry est configure, captureException sera appele ici
-    // (cf. plan batch 4).
   }, [error]);
 
   return (

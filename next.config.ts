@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 // M1 : security headers globaux. CSP volontairement absente pour cette passe
 // (risque de casser tiptap, iframes Stripe, tracking Resend) ; a evaluer
@@ -54,4 +55,16 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Wrap with Sentry plugin so the SDK can instrument server/edge bundles and
+// load the sibling sentry.{client,server,edge}.config.ts files automatically.
+// We talk to a self-hosted GlitchTip (Sentry-compatible), so we disable every
+// option that would try to phone home to sentry.io: no source-map upload,
+// no telemetry beacon, no automatic Vercel cron monitor wiring.
+export default withSentryConfig(nextConfig, {
+  silent: true,
+  telemetry: false,
+  widenClientFileUpload: false,
+  sourcemaps: {
+    disable: true,
+  },
+});
