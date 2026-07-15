@@ -73,6 +73,7 @@ export default function StaffTestersPage() {
   const [campaignOpen, setCampaignOpen] = useState(false);
   const [campaignBusy, setCampaignBusy] = useState(false);
   const [campaignMsg, setCampaignMsg] = useState<string | null>(null);
+  const [testEmail, setTestEmail] = useState("");
 
   const load = useCallback(async (signal?: AbortSignal) => {
     setLoading(true);
@@ -103,15 +104,24 @@ export default function StaffTestersPage() {
     }
   }, [filter, filters, availableOnly]);
 
-  async function sendCampaign() {
+  async function sendCampaign(testEmailArg?: string) {
+    const isTest = typeof testEmailArg === "string" && testEmailArg.includes("@");
     setCampaignBusy(true);
     setCampaignMsg(null);
     try {
-      const res = await fetch("/api/staff/testers/availability-campaign", { method: "POST" });
+      const res = await fetch("/api/staff/testers/availability-campaign", {
+        method: "POST",
+        headers: isTest ? { "Content-Type": "application/json" } : undefined,
+        body: isTest ? JSON.stringify({ test_email: testEmailArg.trim() }) : undefined,
+      });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error((data as { error?: string }).error || `Erreur ${res.status}`);
-      setCampaignMsg(`Relance envoyée à ${data.sent} testeur(s) sur ${data.total} ciblé(s).`);
-      setCampaignOpen(false);
+      if (isTest) {
+        setCampaignMsg(`Test envoyé à ${data.sent} destinataire(s) — ${testEmailArg.trim()}. Vérifie ta boîte + les 2 boutons.`);
+      } else {
+        setCampaignMsg(`Relance envoyée à ${data.sent} testeur(s) sur ${data.total} ciblé(s).`);
+        setCampaignOpen(false);
+      }
     } catch (e) {
       setCampaignMsg(e instanceof Error ? e.message : "Erreur");
     } finally {
@@ -370,14 +380,39 @@ export default function StaffTestersPage() {
         >
           <div style={{ background: "#fff", borderRadius: 20, padding: 28, width: "100%", maxWidth: 440 }} onClick={(e) => e.stopPropagation()}>
             <h3 style={{ fontSize: 17, fontWeight: 700, color: "#1d1d1f", margin: "0 0 8px" }}>Envoyer la relance de disponibilité ?</h3>
-            <p style={{ fontSize: 13, color: "#6e6e73", lineHeight: 1.6, margin: "0 0 20px" }}>
+            <p style={{ fontSize: 13, color: "#6e6e73", lineHeight: 1.6, margin: "0 0 16px" }}>
               Un email « êtes-vous toujours disponible ? » (2 boutons Oui / gérer mon compte) sera envoyé à <strong>tous les testeurs actifs</strong> au profil complet, sauf ceux déjà relancés il y a moins de 7 jours. Ré-appelable pour drainer un gros volume.
             </p>
+
+            {/* Envoi test à un seul destinataire — valider le rendu + les liens avant le tir de masse. */}
+            <div style={{ background: "#f5f5f7", borderRadius: 12, padding: 12, marginBottom: 18 }}>
+              <label style={{ fontSize: 12, fontWeight: 600, color: "#6e6e73", display: "block", marginBottom: 6 }}>
+                Envoi test à un testeur (email) — ne consomme pas le cooldown
+              </label>
+              <div style={{ display: "flex", gap: 8 }}>
+                <input
+                  type="email"
+                  value={testEmail}
+                  onChange={(e) => setTestEmail(e.target.value)}
+                  placeholder="email d'un testeur existant"
+                  style={{ flex: 1, padding: "8px 10px", fontSize: 13, borderRadius: 8, border: "1px solid rgba(0,0,0,0.12)", fontFamily: "inherit" }}
+                />
+                <button
+                  type="button"
+                  disabled={campaignBusy || !testEmail.includes("@")}
+                  onClick={() => sendCampaign(testEmail)}
+                  style={{ padding: "8px 14px", fontSize: 13, fontWeight: 600, color: "#0A7A5A", background: "#fff", border: "1px solid #0A7A5A", borderRadius: 980, cursor: campaignBusy || !testEmail.includes("@") ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: campaignBusy || !testEmail.includes("@") ? 0.5 : 1, whiteSpace: "nowrap" }}
+                >
+                  Test
+                </button>
+              </div>
+            </div>
+
             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
               <button type="button" disabled={campaignBusy} onClick={() => setCampaignOpen(false)} style={{ padding: "10px 20px", fontSize: 13, fontWeight: 600, color: "#6e6e73", background: "#fff", border: "1px solid rgba(0,0,0,0.12)", borderRadius: 980, cursor: "pointer", fontFamily: "inherit" }}>
                 Annuler
               </button>
-              <button type="button" disabled={campaignBusy} onClick={sendCampaign} style={{ padding: "10px 22px", fontSize: 13, fontWeight: 700, color: "#fff", background: "#0A7A5A", border: "none", borderRadius: 980, cursor: campaignBusy ? "wait" : "pointer", fontFamily: "inherit", opacity: campaignBusy ? 0.6 : 1 }}>
+              <button type="button" disabled={campaignBusy} onClick={() => sendCampaign()} style={{ padding: "10px 22px", fontSize: 13, fontWeight: 700, color: "#fff", background: "#0A7A5A", border: "none", borderRadius: 980, cursor: campaignBusy ? "wait" : "pointer", fontFamily: "inherit", opacity: campaignBusy ? 0.6 : 1 }}>
                 {campaignBusy ? "Envoi…" : "Envoyer la relance"}
               </button>
             </div>
