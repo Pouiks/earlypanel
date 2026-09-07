@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import RichTextEditor from "@/components/ui/RichTextEditor";
 import PillSelect from "@/components/ui/PillSelect";
+import TargetCriteriaEditor from "@/components/staff/TargetCriteriaEditor";
+import { parseTargetCriteria, type TargetCriteria } from "@/lib/target-criteria";
 import type { Project } from "@/types/staff";
 import { SECTORS as SECTOR_OPTIONS, CSPS } from "@/lib/taxonomy";
 import { GENDER_VALUES, GENDER_LABELS, LEGACY_GENDER_MAP, LEGACY_CSP_MAP } from "@/lib/tester-vocab";
@@ -33,6 +35,8 @@ export interface ProjectFormData {
   target_sector: string;
   target_sector_restricted: boolean;
   target_locations: string[];
+  target_criteria?: TargetCriteria;
+  target_headcount?: number | null;
   status?: string;
   /** Montant de base affiché en euros dans le formulaire ; envoyé en centimes par le parent */
   base_reward_cents?: number | null;
@@ -229,6 +233,9 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
   const [targetSector, setTargetSector] = useState(initialData?.target_sector ?? "");
   const [targetLocations, setTargetLocations] = useState<string[]>(initialData?.target_locations ?? []);
   const [locationInput, setLocationInput] = useState("");
+  // Cible client etendue (migration 039) + effectif voulu.
+  const [criteria, setCriteria] = useState<TargetCriteria>(() => parseTargetCriteria(initialData?.target_criteria));
+  const [targetHeadcount, setTargetHeadcount] = useState(initialData?.target_headcount?.toString() ?? "");
 
   function addUrl() { setUrls([...urls, ""]); }
   function removeUrl(i: number) { setUrls(urls.filter((_, idx) => idx !== i)); }
@@ -304,6 +311,8 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
         target_sector: targetSectorRestricted ? targetSector : "",
         target_sector_restricted: targetSectorRestricted,
         target_locations: targetLocations,
+        target_criteria: criteria,
+        target_headcount: targetHeadcount ? parseInt(targetHeadcount) : null,
         client_id: clientId,
         business_objective: businessObjective.trim() || undefined,
         scope_included: scopeIncluded.filter((s) => s.trim()),
@@ -877,6 +886,29 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
             </div>
           )}
         </div>
+      </div>
+
+      {/* SECTION: Cible client etendue */}
+      <div style={sectionStyle}>
+        <h2 style={sectionTitleStyle}>Cible client</h2>
+        <p style={{ fontSize: 13, color: "#86868B", margin: "-6px 0 18px" }}>
+          Ce que le client attend de ses testeurs, dans le vocabulaire du formulaire de catégorisation. Sert à noter et classer le catalogue dans l&apos;onglet Testeurs.
+        </p>
+        <div style={{ marginBottom: 20 }}>
+          <label style={labelStyle}>Nombre de testeurs voulus</label>
+          <input
+            type="number"
+            min={1}
+            max={200}
+            value={targetHeadcount}
+            onChange={(e) => setTargetHeadcount(e.target.value)}
+            placeholder="Ex : 8"
+            style={{ ...inputStyle, width: 120 }}
+            onFocus={(e) => e.currentTarget.style.borderColor = "#0A7A5A"}
+            onBlur={(e) => e.currentTarget.style.borderColor = "rgba(0,0,0,0.12)"}
+          />
+        </div>
+        <TargetCriteriaEditor value={criteria} onChange={setCriteria} />
       </div>
 
       {/* Submit */}

@@ -4,7 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 import type { Tester } from "@/types/tester";
 import TesterDrawer from "./TesterDrawer";
 import TesterAdvancedFilters from "./TesterAdvancedFilters";
-import { GENDER_LABELS, LEGACY_GENDER_MAP, LEGACY_CSP_MAP } from "@/lib/tester-vocab";
+import { LEGACY_GENDER_MAP, LEGACY_CSP_MAP } from "@/lib/tester-vocab";
+import { buildTarget, evaluateTester, requiredServerParams, activeCriteria, type ProjectTarget } from "@/lib/target-match";
+import { CRITERION_LABELS } from "@/lib/target-criteria";
 import {
   emptyTesterFilters,
   countActiveTesterFilters,
@@ -57,14 +59,9 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
   const [submitting, setSubmitting] = useState(false);
   // Pre-filtre auto sur le ciblage projet (target_sector, target_csp, target_age_min/max).
   // Si l'utilisateur clique "Voir hors cible", on bypass ce pre-filtre.
-  const [projectTargeting, setProjectTargeting] = useState<{
-    sector: string | null;
-    csp: string[];
-    gender: string[];
-    locations: string[];
-    ageMin: number | null;
-    ageMax: number | null;
-  } | null>(null);
+  // Cible projet complete (colonnes target_* + target_criteria), cf. target-match.ts.
+  // Les obligatoires filtrent (serveur + client), les souhaites notent.
+  const [projectTargeting, setProjectTargeting] = useState<ProjectTarget | null>(null);
   const [showOutOfTarget, setShowOutOfTarget] = useState(false);
   const { notify, confirm, ConfirmModal } = useConfirm();
 
@@ -80,15 +77,13 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
       const res = await fetch(`/api/staff/projects/${projectId}`);
       if (!res.ok) return;
       const data = await res.json();
-      setProjectTargeting({
-        sector: (data.target_sector_restricted && data.target_sector ? String(data.target_sector) : null),
-        // Valeurs normalisees (migration 038) ; mapping defensif pour un projet non migre.
-        csp: Array.isArray(data.target_csp) ? data.target_csp.filter((s: unknown): s is string => typeof s === "string").map((c: string) => LEGACY_CSP_MAP[c] ?? c) : [],
-        gender: Array.isArray(data.target_gender) ? data.target_gender.filter((s: unknown): s is string => typeof s === "string").map((g: string) => LEGACY_GENDER_MAP[g] ?? g) : [],
-        locations: Array.isArray(data.target_locations) ? data.target_locations.filter((s: unknown): s is string => typeof s === "string") : [],
-        ageMin: typeof data.target_age_min === "number" ? data.target_age_min : null,
-        ageMax: typeof data.target_age_max === "number" ? data.target_age_max : null,
-      });
+      // Mapping defensif des anciens libelles (projets non migres en 038).
+      const mapped = {
+        ...data,
+        target_gender: Array.isArray(data.target_gender) ? data.target_gender.map((g: string) => LEGACY_GENDER_MAP[g] ?? g) : [],
+        target_csp: Array.isArray(data.target_csp) ? data.target_csp.map((c: string) => LEGACY_CSP_MAP[c] ?? c) : [],
+      };
+      setProjectTargeting(buildTarget(mapped));
     } catch { /* fallback: pas de pre-filtre */ }
   }, [projectId]);
 
@@ -103,14 +98,10 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
     //    Note : ces params sont APPENDED, donc ils s'AJOUTENT aux filtres
     //    avances du staff. C'est volontaire : si le projet cible Paris ET
     //    le staff ajoute "secteur Tech", on cumule pour affiner.
+    //    Seuls les criteres OBLIGATOIRES filtrables cote API sont envoyes ;
+    //    les autres obligatoires sont appliques cote client (requiredOk).
     if (projectTargeting && !showOutOfTarget) {
-      if (projectTargeting.sector) params.append("sector", projectTargeting.sector);
-      projectTargeting.csp.forEach((c) => params.append("csp", c));
-      projectTargeting.gender.forEach((g) => params.append("gender", g));
-      // Toutes les villes ciblees (OR cote API), pas seulement la premiere.
-      projectTargeting.locations.forEach((loc) => params.append("location", loc));
-      if (projectTargeting.ageMin !== null) params.set("age_min", String(projectTargeting.ageMin));
-      if (projectTargeting.ageMax !== null) params.set("age_max", String(projectTargeting.ageMax));
+      requiredServerParams(projectTargeting, params);
     }
     // 2. Filtres avances ajoutes par le staff dans le panneau partage.
     appendTesterFiltersToParams(params, filters);
@@ -269,9 +260,18 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
     await fetchAssigned();
   }
 
-  const filteredCatalog = allTesters
+  // Evaluation face a la cible : obligatoires -> exclusion (sauf « Voir hors
+  // cible »), souhaites -> score. Tri par score decroissant puis nom.
+  const evaluated = allTesters
     .filter((t) => !assignedTesterIds.has(t.id))
-    .sort((a, b) => (a.last_name ?? "").localeCompare(b.last_name ?? ""));
+    .map((t) => ({ t, ev: projectTargeting ? evaluateTester(t, projectTargeting) : null }))
+    .filter(({ ev }) => showOutOfTarget || !ev || ev.requiredOk)
+    .sort((a, b) => ((b.ev?.score ?? 0) - (a.ev?.score ?? 0)) || (a.t.last_name ?? "").localeCompare(b.t.last_name ?? ""));
+  const filteredCatalog = evaluated.map((x) => x.t);
+  const evalById = new Map(evaluated.map((x) => [x.t.id, x.ev]));
+  const criteriaKeys = projectTargeting ? activeCriteria(projectTargeting) : [];
+  const requiredKeys = new Set(projectTargeting?.required ?? []);
+  const perfectCount = evaluated.filter(({ ev }) => ev && ev.requiredOk && ev.total > 0 && ev.score === ev.total).length;
 
   const selectedCatalogCount = [...selected].filter((id) => !assignedTesterIds.has(id)).length;
 
@@ -338,11 +338,7 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
             />
           </div>
 
-          {projectTargeting && (
-            projectTargeting.sector || projectTargeting.csp.length > 0 ||
-            projectTargeting.gender.length > 0 || projectTargeting.locations.length > 0 ||
-            projectTargeting.ageMin !== null || projectTargeting.ageMax !== null
-          ) && (
+          {projectTargeting && criteriaKeys.length > 0 && (
             <div style={{
               background: showOutOfTarget ? "#f5f5f7" : "#f0faf5",
               border: "1px solid " + (showOutOfTarget ? "rgba(0,0,0,0.08)" : "rgba(10,122,90,0.2)"),
@@ -351,20 +347,18 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
               display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center", justifyContent: "space-between",
             }}>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <strong style={{ marginRight: 6 }}>{showOutOfTarget ? "Pre-filtre desactive" : "Cible projet"} :</strong>
-                {projectTargeting.sector && <span style={{ marginRight: 8 }}>secteur {projectTargeting.sector}</span>}
-                {projectTargeting.csp.length > 0 && <span style={{ marginRight: 8 }}>CSP {projectTargeting.csp.join(", ")}</span>}
-                {projectTargeting.gender.length > 0 && <span style={{ marginRight: 8 }}>genre {projectTargeting.gender.map((g) => GENDER_LABELS[g] ?? g).join(", ")}</span>}
-                {projectTargeting.locations.length > 0 && (
-                  <span style={{ marginRight: 8 }}>
-                    loc. {projectTargeting.locations.join(", ")}
-                  </span>
-                )}
-                {(projectTargeting.ageMin !== null || projectTargeting.ageMax !== null) && (
-                  <span>
-                    {projectTargeting.ageMin ?? "?"}-{projectTargeting.ageMax ?? "?"} ans
-                  </span>
-                )}
+                <div style={{ marginBottom: 4 }}>
+                  <strong style={{ marginRight: 6 }}>{showOutOfTarget ? "Obligatoires désactivés" : "Cible client"} :</strong>
+                  {criteriaKeys.map((k) => (
+                    <span key={k} title={requiredKeys.has(k) ? "Obligatoire : exclut" : "Souhaité : note"} style={{ display: "inline-block", marginRight: 6, padding: "1px 8px", borderRadius: 980, fontSize: 11, fontWeight: 600, background: requiredKeys.has(k) ? "#fef2f2" : "rgba(255,255,255,0.7)", color: requiredKeys.has(k) ? "#b91c1c" : "inherit", border: "1px solid rgba(0,0,0,0.06)" }}>
+                      {CRITERION_LABELS[k]}{requiredKeys.has(k) ? " !" : ""}
+                    </span>
+                  ))}
+                </div>
+                <div style={{ color: showOutOfTarget ? "#6e6e73" : "#1d1d1f" }}>
+                  <strong>{filteredCatalog.length}</strong> {showOutOfTarget ? "au catalogue" : "remplissent les obligatoires"} · <strong>{perfectCount}</strong> cochent tout
+                  {projectTargeting.headcount ? <> · effectif voulu <strong>{projectTargeting.headcount}</strong></> : null}
+                </div>
               </div>
               <button
                 onClick={() => setShowOutOfTarget((v) => !v)}
@@ -494,13 +488,45 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
                       </div>
                       <div style={{ fontSize: 11, color: "#86868B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {t.job_title || "Non renseigné"} · {t.sector || "Non renseigné"}
+                        {(t as { age?: number | null }).age ? ` · ${(t as { age?: number | null }).age} ans` : ""}
+                        {t.city ? ` · ${t.city}` : ""}
+                        {t.tier && t.tier !== "standard" ? ` · ${t.tier}` : ""}
                       </div>
+                      {(() => {
+                        const ev = evalById.get(t.id);
+                        if (!ev || ev.details.length === 0) return null;
+                        return (
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 4 }}>
+                            {ev.details.map((d) => (
+                              <span
+                                key={d.key}
+                                title={`${d.label} : attendu ${d.expected} · ${d.actual}`}
+                                style={{
+                                  padding: "1px 7px", fontSize: 10, fontWeight: 600, borderRadius: 980,
+                                  background: d.ok ? "#e6f6ef" : d.unknown ? "#f5f5f7" : "#fef2f2",
+                                  color: d.ok ? "#0A7A5A" : d.unknown ? "#9a9aa0" : "#b91c1c",
+                                  border: d.required ? "1px solid currentColor" : "1px solid transparent",
+                                }}
+                              >
+                                {d.ok ? "✓" : d.unknown ? "?" : "✗"} {d.label}
+                              </span>
+                            ))}
+                          </div>
+                        );
+                      })()}
                     </div>
-                    <div style={{ display: "flex", gap: 4 }}>
-                      <span style={{
-                        padding: "2px 8px", fontSize: 10, fontWeight: 600, borderRadius: 980,
-                        background: "#f5f5f7", color: "#6e6e73",
-                      }}>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4 }}>
+                      {(() => {
+                        const ev = evalById.get(t.id);
+                        if (!ev || ev.total === 0) return null;
+                        const full = ev.score === ev.total;
+                        return (
+                          <span title="Critères souhaités satisfaits" style={{ padding: "2px 9px", fontSize: 11, fontWeight: 700, borderRadius: 980, background: full ? "#0A7A5A" : "#f0faf5", color: full ? "#fff" : "#0A7A5A" }}>
+                            {ev.score} / {ev.total}
+                          </span>
+                        );
+                      })()}
+                      <span style={{ padding: "2px 8px", fontSize: 10, fontWeight: 600, borderRadius: 980, background: "#f5f5f7", color: "#6e6e73" }}>
                         {t.digital_level || "?"}
                       </span>
                     </div>

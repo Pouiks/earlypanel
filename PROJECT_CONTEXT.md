@@ -1181,6 +1181,11 @@ if (!rlEmail.ok) return NextResponse.json({ success: true }); // anti-énumérat
 - `projects.target_gender` / `target_csp` / `target_sector` stockent les MÊMES valeurs que les colonnes testeurs (migration 038 normalise l'existant ; `LEGACY_*_MAP` en lecture défensive).
 - `GET /api/staff/testers` : strict par défaut sur csp / gender / mobile_os (`include_unknown=1` pour tolérer les NULL), `location` multi (OR), `count=1` renvoie `{ total }`.
 
+**Cible client et score (2026-09-07, livraison 2)** :
+- `projects.target_criteria` JSONB + `target_headcount` (migration 039). Forme `TargetCriteria` dans `src/lib/target-criteria.ts` : persona, métier (mots-clés OR), taille, niveau digital, appareils, navigateurs, OS mobile, connexion, outils, intérêts, disponibilité, expérience UX, et `required[]` (critères obligatoires, y compris les historiques genre/âge/CSP/secteur/villes).
+- `src/lib/target-match.ts` : `buildTarget(project)`, `evaluateTester(tester, target)` → `{ score, total, requiredOk, details[] }`, `requiredServerParams` (pré-filtre API sur les obligatoires filtrables ; les autres obligatoires sont filtrés côté client). Valeur testeur absente = non satisfait mais `unknown` (pastille grise).
+- Onglet Testeurs projet : catalogue trié par score, pastilles par critère, bandeau « N remplissent les obligatoires · M cochent tout · effectif voulu ». Éditeur : `TargetCriteriaEditor` dans ProjectForm. Principe acté : on classe, on n'exclut que l'impossible.
+
 ### 13.3 Anti-énumération (auth/recovery)
 
 Routes concernées : `/api/staff/login/magic`, `/api/staff/forgot`, `/api/staff/recover-owner`, `/api/testers/login`, `/api/testers/register`.

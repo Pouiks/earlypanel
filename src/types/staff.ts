@@ -38,6 +38,9 @@ export interface Project {
   target_sector: string | null;
   target_sector_restricted: boolean;
   target_locations: string[];
+  /** Cible etendue (migration 039), voir src/lib/target-criteria.ts */
+  target_criteria?: Record<string, unknown> | null;
+  target_headcount?: number | null;
   /** Montant de base en centimes (hors grille tier) */
   base_reward_cents?: number | null;
   /** Grille optionnelle par tier, centimes : { "standard": 2000, "expert": 2500 } */
