@@ -15,8 +15,6 @@ export const metadata: Metadata = {
   },
 };
 
-// Placeholder a remplacer avant mise en ligne : [TVA] (« TVA non applicable,
-// article 293 B du CGI » ou « N° TVA intracommunautaire : FRxx... »).
 export default function CgvPage() {
   return (
     <LegalLayout title="Conditions générales de vente" lastUpdated="7 septembre 2026">
@@ -36,7 +34,7 @@ export default function CgvPage() {
 
       <h2>3. Prix et paiement</h2>
       <p>
-        Les prix sont exprimés en euros hors taxes. [TVA]. Le paiement s&apos;effectue en deux fois : cinquante pour cent (50 %) à la commande, cinquante pour cent (50 %) à la remise du rapport. Les factures sont payables par virement bancaire à trente (30) jours à compter de leur date d&apos;émission. En cas de retard de paiement, des pénalités sont exigibles de plein droit au taux de refinancement de la Banque centrale européenne majoré de dix (10) points, ainsi qu&apos;une indemnité forfaitaire de recouvrement de quarante (40) euros, conformément à l&apos;article L441-10 du Code de commerce.
+        Les prix sont exprimés en euros hors taxes. TVA non applicable, article 293 B du CGI. Le paiement s&apos;effectue en deux fois : cinquante pour cent (50 %) à la commande, cinquante pour cent (50 %) à la remise du rapport. Les factures sont payables par virement bancaire à trente (30) jours à compter de leur date d&apos;émission. En cas de retard de paiement, des pénalités sont exigibles de plein droit au taux de refinancement de la Banque centrale européenne majoré de dix (10) points, ainsi qu&apos;une indemnité forfaitaire de recouvrement de quarante (40) euros, conformément à l&apos;article L441-10 du Code de commerce.
       </p>
 
       <h2>4. Délais</h2>

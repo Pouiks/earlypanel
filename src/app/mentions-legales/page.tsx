@@ -15,15 +15,12 @@ export const metadata: Metadata = {
   },
 };
 
-// Placeholders a remplacer avant mise en ligne : [SIRET], [ADRESSE], [TVA].
-// [TVA] = « TVA non applicable, article 293 B du CGI » ou « N° TVA
-// intracommunautaire : FRxx... ».
 export default function MentionsLegalesPage() {
   return (
     <LegalLayout title="Mentions légales" lastUpdated="7 septembre 2026">
       <h2>1. Éditeur du site</h2>
       <p>
-        Le site <strong>earlypanel.fr</strong> est édité par Virgile Joinville, entrepreneur individuel (micro-entreprise), SIRET [SIRET], [ADRESSE]. [TVA].
+        Le site <strong>earlypanel.fr</strong> est édité par Virgile Joinville, entrepreneur individuel (micro-entreprise), SIREN 848 300 117, 117 rue Pierre Bouyeron, 34070 Montpellier, France. TVA non applicable, article 293 B du CGI.
       </p>
       <p>
         Directeur de la publication : Virgile Joinville. Contact : <a href="mailto:contact@earlypanel.fr">contact@earlypanel.fr</a>.
