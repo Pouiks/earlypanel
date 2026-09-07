@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { GET as runNdaReminders } from "../nda-reminders/route";
 import { GET as runProjectReminders } from "../project-reminders/route";
+import { GET as runProfileReminders } from "../profile-reminders/route";
 import { logStaffAction } from "@/lib/audit";
 
 export const runtime = "nodejs";
@@ -13,6 +14,7 @@ export const runtime = "nodejs";
 // orchestre les 2 reminders precedemment separes :
 //   - /api/cron/nda-reminders (relance NDA non signe > 3j)
 //   - /api/cron/project-reminders (rappel mi-parcours)
+//   - /api/cron/profile-reminders (profil incomplet, status pending)
 //
 // Les endpoints individuels restent accessibles pour debug / retry manuel
 // via curl, mais ne sont plus declenches automatiquement par vercel.json.
@@ -75,6 +77,7 @@ export async function GET(request: Request) {
   // rester appelables individuellement aussi (route legacy, debug curl).
   const ndaResult = await callSafely("nda-reminders", runNdaReminders, request);
   const midwayResult = await callSafely("project-reminders", runProjectReminders, request);
+  const profileResult = await callSafely("profile-reminders", runProfileReminders, request);
 
   await logStaffAction({
     staff_id: null,
@@ -86,6 +89,8 @@ export async function GET(request: Request) {
       nda_body: ndaResult.body,
       midway_status: midwayResult.status,
       midway_body: midwayResult.body,
+      profile_status: profileResult.status,
+      profile_body: profileResult.body,
     },
   });
 
@@ -94,5 +99,6 @@ export async function GET(request: Request) {
   return NextResponse.json({
     nda_reminders: ndaResult,
     project_reminders: midwayResult,
+    profile_reminders: profileResult,
   });
 }

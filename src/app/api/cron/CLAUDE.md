@@ -103,6 +103,7 @@ await logStaffAction({
 | `/api/cron/daily-reminders` | quotidien | Cooldown email 24h |
 | `/api/cron/nda-reminders` | quotidien | Cooldown 3j (`nda_reminder_sent_at`) |
 | `/api/cron/project-reminders` | quotidien | One-shot `project_midway_reminder_sent_at` |
+| `/api/cron/profile-reminders` | quotidien (via daily-reminders) | Cooldown 7j `profile_reminder_sent_at` + plafond 3 `profile_reminder_count` |
 
 ## Checklist avant PR
 

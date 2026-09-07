@@ -501,6 +501,8 @@ GET /api/cron/project-reminders (cron quotidien, 09h00 UTC)
 ```
 
 > Idempotence garantie par les colonnes `nda_reminder_sent_at` (cooldown 3j) et `project_midway_reminder_sent_at` (one-shot par projet/testeur).
+>
+> **Relance profil incomplet** (`/api/cron/profile-reminders`, appelé par `daily-reminders`) : testeurs `status='pending'`, `profile_completed=false`, inscrits depuis plus de 2 jours. Magic link vers `/app/onboarding`, liste des champs manquants (`computeProfileCompleteness`). Cooldown 7j (`profile_reminder_sent_at`), plafond 3 relances (`profile_reminder_count`), le 3e email annonce que c'est le dernier. Un testeur passé `inactive` (opt-out) ou `active` sort du filtre.
 
 ### Flux 11 : Audit de signature NDA (preuve juridique)
 
@@ -793,6 +795,8 @@ profil = 1 si (address OR city OR postal_code OR birth_date) manquant, sinon 0
 | profile_step | INTEGER | DEFAULT 1 |
 | persona_id | UUID | FK → tester_personas ON DELETE SET NULL |
 | persona_locked | BOOLEAN | NOT NULL DEFAULT false |
+| profile_reminder_sent_at | TIMESTAMPTZ | migration 037, idempotence cron profile-reminders |
+| profile_reminder_count | INTEGER | NOT NULL DEFAULT 0, plafond 3 relances |
 
 #### `staff_members`
 | Colonne | Type | Contraintes |
