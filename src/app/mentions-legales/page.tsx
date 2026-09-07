@@ -20,7 +20,7 @@ export default function MentionsLegalesPage() {
     <LegalLayout title="Mentions légales" lastUpdated="7 septembre 2026">
       <h2>1. Éditeur du site</h2>
       <p>
-        Le site <strong>earlypanel.fr</strong> est édité par Virgile Joinville, entrepreneur individuel (micro-entreprise), SIREN 848 300 117, 117 rue Pierre Bouyeron, 34070 Montpellier, France. TVA non applicable, article 293 B du CGI.
+        Le site <strong>earlypanel.fr</strong> est édité par Virgile Joinville, entrepreneur individuel (micro-entreprise), SIRET 848 300 117 00027, 117 rue Pierre Bouyeron, 34070 Montpellier, France. TVA non applicable, article 293 B du CGI.
       </p>
       <p>
         Directeur de la publication : Virgile Joinville. Contact : <a href="mailto:contact@earlypanel.fr">contact@earlypanel.fr</a>.
