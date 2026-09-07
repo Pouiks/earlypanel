@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import RichTextEditor from "@/components/ui/RichTextEditor";
 import PillSelect from "@/components/ui/PillSelect";
 import type { Project } from "@/types/staff";
-import { SECTORS as SECTOR_OPTIONS } from "@/lib/taxonomy";
+import { SECTORS as SECTOR_OPTIONS, CSPS } from "@/lib/taxonomy";
+import { GENDER_VALUES, GENDER_LABELS, LEGACY_GENDER_MAP, LEGACY_CSP_MAP } from "@/lib/tester-vocab";
 
 interface ProjectFormProps {
   initialData?: Project & { client_id?: string | null };
@@ -60,19 +61,15 @@ interface ClientLite {
   contact_phone: string | null;
 }
 
-const GENDERS = ["Homme", "Femme", "Autre"];
-
-const CSP_OPTIONS = [
-  "Agriculteurs",
-  "Artisans / Commerçants",
-  "Cadres / Prof. intellectuelles",
-  "Professions intermédiaires",
-  "Employés",
-  "Ouvriers",
-  "Retraités",
-  "Étudiants",
-  "Sans activité",
-];
+// Ciblage : MEMES valeurs que les colonnes testeurs (tester-vocab / taxonomy).
+// Les anciens libelles libres (« Homme », « Cadres / Prof. intellectuelles »)
+// ne matchaient aucune ligne : le catalogue projet restait vide.
+const GENDERS: string[] = [...GENDER_VALUES];
+const CSP_OPTIONS: string[] = [...CSPS];
+const normalizeGenders = (arr: string[] | null | undefined) =>
+  (arr ?? []).map((g) => LEGACY_GENDER_MAP[g] ?? g).filter((g) => GENDERS.includes(g));
+const normalizeCsps = (arr: string[] | null | undefined) =>
+  (arr ?? []).map((c) => LEGACY_CSP_MAP[c] ?? c).filter((c) => CSP_OPTIONS.includes(c));
 
 // Secteurs : taxonomie centralisee dans src/lib/taxonomy.ts. Importee plus bas.
 
@@ -224,10 +221,10 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
   // Les questions sont composees dans l'onglet "Scenarios" du projet
   // (canvas outline). Plus de questions a la creation.
 
-  const [targetGender, setTargetGender] = useState<string[]>(initialData?.target_gender ?? []);
+  const [targetGender, setTargetGender] = useState<string[]>(() => normalizeGenders(initialData?.target_gender));
   const [targetAgeMin, setTargetAgeMin] = useState(initialData?.target_age_min?.toString() ?? "");
   const [targetAgeMax, setTargetAgeMax] = useState(initialData?.target_age_max?.toString() ?? "");
-  const [targetCsp, setTargetCsp] = useState<string[]>(initialData?.target_csp ?? []);
+  const [targetCsp, setTargetCsp] = useState<string[]>(() => normalizeCsps(initialData?.target_csp));
   const [targetSectorRestricted, setTargetSectorRestricted] = useState(initialData?.target_sector_restricted ?? false);
   const [targetSector, setTargetSector] = useState(initialData?.target_sector ?? "");
   const [targetLocations, setTargetLocations] = useState<string[]>(initialData?.target_locations ?? []);
@@ -740,7 +737,7 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
 
         <div style={{ marginBottom: 20 }}>
           <label style={labelStyle}>Genre</label>
-          <PillSelect options={GENDERS} value={targetGender} onChange={(v) => setTargetGender(v as string[])} multiple />
+          <PillSelect options={GENDERS} labels={GENDER_LABELS} value={targetGender} onChange={(v) => setTargetGender(v as string[])} multiple />
         </div>
 
         <div style={{ marginBottom: 20 }}>
@@ -789,15 +786,18 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
             Restreindre à un domaine d&apos;activité
           </label>
           {targetSectorRestricted && (
-            <input
-              type="text"
+            <select
               value={targetSector}
               onChange={(e) => setTargetSector(e.target.value)}
-              placeholder="Ex : Banque, Tech, Santé…"
               style={{ ...inputStyle, marginTop: 8 }}
-              onFocus={(e) => e.currentTarget.style.borderColor = "#0A7A5A"}
-              onBlur={(e) => e.currentTarget.style.borderColor = "rgba(0,0,0,0.12)"}
-            />
+            >
+              <option value="">Choisir un secteur…</option>
+              {targetSector && !(SECTOR_OPTIONS as readonly string[]).includes(targetSector) && (
+                // Valeur libre heritee d'un ancien projet : conservee tant qu'on ne la change pas.
+                <option value={targetSector}>{targetSector} (valeur libre, ne filtre pas)</option>
+              )}
+              {SECTOR_OPTIONS.map((sec) => <option key={sec} value={sec}>{sec}</option>)}
+            </select>
           )}
         </div>
 

@@ -10,35 +10,24 @@
 
 import { SECTORS, CSPS } from "@/lib/taxonomy";
 import {
+  GENDER_OPTIONS,
+  DIGITAL_LEVEL_OPTIONS,
+  CONNECTIONS,
+  DEVICES,
+  BROWSERS,
+  MOBILE_OS,
+  COMPANY_SIZES,
+  TIER_OPTIONS,
+} from "@/lib/tester-vocab";
+import {
   type TesterAdvancedFilterState,
   emptyTesterFilters,
   countActiveTesterFilters,
 } from "@/lib/tester-filters";
 
-const GENDER_OPTIONS: Array<{ value: string; label: string }> = [
-  { value: "female", label: "Femme" },
-  { value: "male", label: "Homme" },
-  { value: "non_binary", label: "Non-binaire" },
-  { value: "prefer_not_to_say", label: "Ne se prononce pas" },
-];
-
-const DIGITAL_LEVELS: Array<{ value: string; label: string }> = [
-  { value: "debutant", label: "Débutant" },
-  { value: "intermediaire", label: "Intermédiaire" },
-  { value: "avance", label: "Avancé" },
-  { value: "expert", label: "Expert" },
-];
-
-const CONNECTIONS = ["Fibre", "ADSL", "4G/5G"];
-const DEVICES = ["PC Windows", "PC Linux", "Mac", "iPhone", "Smartphone Android", "iPad", "Tablette Android", "Autre smartphone", "Autre tablette"];
-const BROWSERS = ["Chrome", "Firefox", "Safari", "Edge", "Brave", "Opera", "Arc", "Autre"];
-const MOBILE_OS = ["iOS", "Android"];
-const COMPANY_SIZES = ["1-10", "11-50", "51-200", "201-1000", "1000+"];
-const TIERS = [
-  { value: "standard", label: "Standard" },
-  { value: "expert", label: "Expert" },
-  { value: "premium", label: "Premium" },
-];
+// Vocabulaires : src/lib/tester-vocab.ts (partages avec l'onboarding).
+const DIGITAL_LEVELS = DIGITAL_LEVEL_OPTIONS;
+const TIERS = TIER_OPTIONS;
 
 interface Props {
   value: TesterAdvancedFilterState;
@@ -70,9 +59,19 @@ export default function TesterAdvancedFilters({ value, onChange, hideSections }:
       gap: 22,
     }}>
       <FilterSection title="Démographie">
+        <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "#1d1d1f", cursor: "pointer" }}>
+          <input
+            type="checkbox"
+            checked={f.includeUnknown}
+            onChange={(e) => update({ includeUnknown: e.target.checked })}
+            style={{ width: 14, height: 14, accentColor: "#0A7A5A" }}
+          />
+          Inclure les profils non renseignés (CSP, genre, OS mobile)
+          <span style={{ color: "#86868B" }}>· sinon seuls les testeurs qui ont la valeur sont comptés</span>
+        </label>
         <FilterField label="Genre">
           <PillGroup
-            options={GENDER_OPTIONS}
+            options={[...GENDER_OPTIONS]}
             selected={f.gender}
             onToggle={(v) => toggleInSet("gender", v)}
           />
@@ -133,7 +132,7 @@ export default function TesterAdvancedFilters({ value, onChange, hideSections }:
       <FilterSection title="Équipement & Niveau digital">
         <FilterField label="Niveau digital">
           <PillGroup
-            options={DIGITAL_LEVELS}
+            options={[...DIGITAL_LEVELS]}
             selected={f.digitalLevel}
             onToggle={(v) => toggleInSet("digitalLevel", v)}
           />
@@ -187,7 +186,7 @@ export default function TesterAdvancedFilters({ value, onChange, hideSections }:
         <FilterSection title="Profil interne (staff)">
           <FilterField label="Tier qualité">
             <PillGroup
-              options={TIERS}
+              options={[...TIERS]}
               selected={f.tier}
               onToggle={(v) => toggleInSet("tier", v)}
             />

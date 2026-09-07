@@ -5,9 +5,11 @@ interface PillSelectProps {
   value: string | string[];
   onChange: (value: string | string[]) => void;
   multiple?: boolean;
+  /** Libelles d'affichage par valeur (la valeur stockee reste celle de options). */
+  labels?: Record<string, string>;
 }
 
-export default function PillSelect({ options, value, onChange, multiple = false }: PillSelectProps) {
+export default function PillSelect({ options, value, onChange, multiple = false, labels }: PillSelectProps) {
   const selected = Array.isArray(value) ? value : value ? [value] : [];
 
   function toggle(option: string) {
@@ -45,7 +47,7 @@ export default function PillSelect({ options, value, onChange, multiple = false 
               whiteSpace: "nowrap",
             }}
           >
-            {option}
+            {labels?.[option] ?? option}
           </button>
         );
       })}

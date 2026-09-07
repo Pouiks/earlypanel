@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import type { Tester } from "@/types/tester";
 import TesterDrawer from "./TesterDrawer";
 import TesterAdvancedFilters from "./TesterAdvancedFilters";
+import { GENDER_LABELS, LEGACY_GENDER_MAP, LEGACY_CSP_MAP } from "@/lib/tester-vocab";
 import {
   emptyTesterFilters,
   countActiveTesterFilters,
@@ -81,8 +82,9 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
       const data = await res.json();
       setProjectTargeting({
         sector: (data.target_sector_restricted && data.target_sector ? String(data.target_sector) : null),
-        csp: Array.isArray(data.target_csp) ? data.target_csp.filter((s: unknown): s is string => typeof s === "string") : [],
-        gender: Array.isArray(data.target_gender) ? data.target_gender.filter((s: unknown): s is string => typeof s === "string") : [],
+        // Valeurs normalisees (migration 038) ; mapping defensif pour un projet non migre.
+        csp: Array.isArray(data.target_csp) ? data.target_csp.filter((s: unknown): s is string => typeof s === "string").map((c: string) => LEGACY_CSP_MAP[c] ?? c) : [],
+        gender: Array.isArray(data.target_gender) ? data.target_gender.filter((s: unknown): s is string => typeof s === "string").map((g: string) => LEGACY_GENDER_MAP[g] ?? g) : [],
         locations: Array.isArray(data.target_locations) ? data.target_locations.filter((s: unknown): s is string => typeof s === "string") : [],
         ageMin: typeof data.target_age_min === "number" ? data.target_age_min : null,
         ageMax: typeof data.target_age_max === "number" ? data.target_age_max : null,
@@ -105,9 +107,8 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
       if (projectTargeting.sector) params.append("sector", projectTargeting.sector);
       projectTargeting.csp.forEach((c) => params.append("csp", c));
       projectTargeting.gender.forEach((g) => params.append("gender", g));
-      if (projectTargeting.locations.length > 0) {
-        params.set("location", projectTargeting.locations[0]);
-      }
+      // Toutes les villes ciblees (OR cote API), pas seulement la premiere.
+      projectTargeting.locations.forEach((loc) => params.append("location", loc));
       if (projectTargeting.ageMin !== null) params.set("age_min", String(projectTargeting.ageMin));
       if (projectTargeting.ageMax !== null) params.set("age_max", String(projectTargeting.ageMax));
     }
@@ -353,11 +354,10 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
                 <strong style={{ marginRight: 6 }}>{showOutOfTarget ? "Pre-filtre desactive" : "Cible projet"} :</strong>
                 {projectTargeting.sector && <span style={{ marginRight: 8 }}>secteur {projectTargeting.sector}</span>}
                 {projectTargeting.csp.length > 0 && <span style={{ marginRight: 8 }}>CSP {projectTargeting.csp.join(", ")}</span>}
-                {projectTargeting.gender.length > 0 && <span style={{ marginRight: 8 }}>genre {projectTargeting.gender.join(", ")}</span>}
+                {projectTargeting.gender.length > 0 && <span style={{ marginRight: 8 }}>genre {projectTargeting.gender.map((g) => GENDER_LABELS[g] ?? g).join(", ")}</span>}
                 {projectTargeting.locations.length > 0 && (
                   <span style={{ marginRight: 8 }}>
-                    loc. {projectTargeting.locations[0]}
-                    {projectTargeting.locations.length > 1 && ` (+${projectTargeting.locations.length - 1})`}
+                    loc. {projectTargeting.locations.join(", ")}
                   </span>
                 )}
                 {(projectTargeting.ageMin !== null || projectTargeting.ageMax !== null) && (

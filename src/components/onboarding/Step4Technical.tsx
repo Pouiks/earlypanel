@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { BROWSERS as VOCAB_BROWSERS, DEVICES as VOCAB_DEVICES, MOBILE_OS as VOCAB_MOBILE_OS, CONNECTIONS as VOCAB_CONNECTIONS } from "@/lib/tester-vocab";
 import type { Tester, ConnectionType } from "@/types/tester";
 import PillSelect from "@/components/ui/PillSelect";
 
@@ -10,14 +11,11 @@ interface Step4Props {
   loading: boolean;
 }
 
-const BROWSERS = ["Chrome", "Firefox", "Safari", "Edge", "Brave", "Opera", "Arc", "Autre"];
-const DEVICES = [
-  "PC Windows", "PC Linux", "Mac",
-  "iPhone", "Smartphone Android", "Autre smartphone",
-  "iPad", "Tablette Android", "Autre tablette",
-];
-const MOBILE_OS = ["iOS", "Android", "HarmonyOS", "Autre", "Aucun smartphone"];
-const CONNECTIONS: ConnectionType[] = ["Fibre", "ADSL", "4G/5G"];
+// Vocabulaires partages avec les filtres staff : src/lib/tester-vocab.ts.
+const BROWSERS: string[] = [...VOCAB_BROWSERS];
+const DEVICES: string[] = [...VOCAB_DEVICES];
+const MOBILE_OS: string[] = [...VOCAB_MOBILE_OS];
+const CONNECTIONS: ConnectionType[] = [...VOCAB_CONNECTIONS] as ConnectionType[];
 
 const inputStyle: React.CSSProperties = {
   width: "100%",

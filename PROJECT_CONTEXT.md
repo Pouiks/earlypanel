@@ -1176,6 +1176,11 @@ if (!rlEmail.ok) return NextResponse.json({ success: true }); // anti-énumérat
 - `POST /api/testers/register` : en plus du rate-limit IP 5/h, rate-limit email 3/h, honeypot `website` (réponse 200 factice si rempli), vérification Cloudflare Turnstile **fail-closed dès que `TURNSTILE_SECRET_KEY` est définie** (sans secret : pas de vérification, dev only). Le widget côté client n'apparaît que si `NEXT_PUBLIC_TURNSTILE_SITE_KEY` est définie.
 - Le double opt-in testeur est le magic link : `email_confirm: false` à la création, le compte n'est utilisable qu'après clic.
 
+**Ciblage projet et filtres testeurs (2026-09-07, livraison 1)** :
+- Vocabulaires fermés partagés dans `src/lib/tester-vocab.ts` (genre, niveau digital, connexion, appareils, navigateurs, OS mobile, taille entreprise, tier) : importés par l'onboarding Step4, les filtres staff et le formulaire projet. Secteurs et CSP restent dans `taxonomy.ts`.
+- `projects.target_gender` / `target_csp` / `target_sector` stockent les MÊMES valeurs que les colonnes testeurs (migration 038 normalise l'existant ; `LEGACY_*_MAP` en lecture défensive).
+- `GET /api/staff/testers` : strict par défaut sur csp / gender / mobile_os (`include_unknown=1` pour tolérer les NULL), `location` multi (OR), `count=1` renvoie `{ total }`.
+
 ### 13.3 Anti-énumération (auth/recovery)
 
 Routes concernées : `/api/staff/login/magic`, `/api/staff/forgot`, `/api/staff/recover-owner`, `/api/testers/login`, `/api/testers/register`.

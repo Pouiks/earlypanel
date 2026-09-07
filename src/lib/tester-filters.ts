@@ -24,6 +24,11 @@ export interface TesterAdvancedFilterState {
   mobileOs: Set<string>;
   location: string;
   tier: Set<string>;
+  /**
+   * Inclure les profils dont CSP / genre / OS mobile ne sont pas renseignes.
+   * false = strict (« 20 femmes cadres » = 20 femmes cadres).
+   */
+  includeUnknown: boolean;
 }
 
 export function emptyTesterFilters(): TesterAdvancedFilterState {
@@ -42,6 +47,7 @@ export function emptyTesterFilters(): TesterAdvancedFilterState {
     mobileOs: new Set(),
     location: "",
     tier: new Set(),
+    includeUnknown: false,
   };
 }
 
@@ -78,5 +84,6 @@ export function appendTesterFiltersToParams(
   if (f.jobTitle.trim()) params.set("job_title", f.jobTitle.trim());
   if (f.ageMin.trim()) params.set("age_min", f.ageMin.trim());
   if (f.ageMax.trim()) params.set("age_max", f.ageMax.trim());
-  if (f.location.trim()) params.set("location", f.location.trim());
+  if (f.location.trim()) params.append("location", f.location.trim());
+  if (f.includeUnknown) params.set("include_unknown", "1");
 }
