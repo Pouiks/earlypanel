@@ -19,10 +19,10 @@ import { BOOKING_DURATION_MIN, PRICE_RANGE_LABEL } from "@/lib/cta-links";
 export const metadata: Metadata = {
   // Title B2B optimise : intention "tests utilisateurs" + qualifier "B2B"
   // + benefice "clés en main". Description riche en mots-cles longue traine.
-  title: "Tests utilisateurs B2B clés en main · 5 jours · NDA inclus",
+  title: "Tests utilisateurs B2B · Rapport en 5 jours · NDA inclus",
   // Description <= 155 caracteres pour ne pas etre tronquee dans la SERP.
   description:
-    "Tests utilisateurs pour startups et agences : testeurs choisis à la main, NDA inclus, rapport rédigé en 5 jours. Forfait fixe sur devis.",
+    "Tests utilisateurs clés en main pour startups et agences : panel sélectionné à la main, NDA, rapport rédigé et restitué en 5 jours. Devis sous 48h.",
   alternates: { canonical: "/entreprises" },
   openGraph: {
     title: "Tests utilisateurs B2B clés en main · earlypanel",
@@ -30,6 +30,7 @@ export const metadata: Metadata = {
       "Testeurs choisis à la main. NDA inclus. Rapport rédigé en 5 jours. Forfait fixe sur devis.",
     url: "/entreprises",
     type: "website",
+    locale: "fr_FR",
     images: [
       {
         url: "/og-image.png",
