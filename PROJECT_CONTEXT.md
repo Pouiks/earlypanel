@@ -503,6 +503,8 @@ GET /api/cron/project-reminders (cron quotidien, 09h00 UTC)
 > Idempotence garantie par les colonnes `nda_reminder_sent_at` (cooldown 3j) et `project_midway_reminder_sent_at` (one-shot par projet/testeur).
 >
 > **Relance profil incomplet** (`/api/cron/profile-reminders`, appelé par `daily-reminders`) : testeurs `status='pending'`, `profile_completed=false`, inscrits depuis plus de 2 jours. Magic link vers `/app/onboarding`, liste des champs manquants (`computeProfileCompleteness`). Cooldown 5j (`profile_reminder_sent_at`), plafond 3 relances (`profile_reminder_count`), le 3e email annonce la mise en pause. 5j après la 3e relance sans complétion : `pending → inactive` (filtre atomique sur le statut précédent). Réversible : à la fin de l'onboarding, un testeur `inactive` est repassé `pending` dans le même UPDATE pour que le trigger puisse l'activer. `?dry_run=1` liste les cibles sans rien envoyer, `?limit=N` borne un passage.
+>
+> Logique partagée dans `src/lib/profile-reminder.ts` (`sendProfileReminder`, `describeReminderState`). Vue staff `/staff/dashboard/relances` (API `GET /api/staff/testers/profile-reminders`) : état de relance par testeur, champs manquants, bouton « Relancer maintenant » (`POST /api/staff/testers/[id]/profile-reminder`, plafond 3 respecté, audit `tester.profile_reminder_manual`).
 
 ### Flux 11 : Audit de signature NDA (preuve juridique)
 

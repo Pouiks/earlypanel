@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { sendEmail, buildProfileReminderEmail } from "@/lib/email";
 import { tryGetAppUrl } from "@/lib/app-url";
 import { logStaffAction } from "@/lib/audit";
 import { logger } from "@/lib/logger";
 import { computeProfileCompleteness } from "@/lib/profile-completeness";
+import {
+  PROFILE_REMINDER_AFTER_DAYS,
+  PROFILE_REMINDER_COOLDOWN_DAYS,
+  PROFILE_REMINDER_MAX,
+  sendProfileReminder,
+} from "@/lib/profile-reminder";
 
 const log = logger("cron/profile-reminders");
 
@@ -29,9 +34,7 @@ export const runtime = "nodejs";
 //   ?dry_run=1  : aucune ecriture, aucun email ; renvoie la liste des cibles
 //   ?limit=N    : borne le nombre d'emails de ce passage (max BATCH_LIMIT)
 
-const PROFILE_REMINDER_AFTER_DAYS = 2;
-const PROFILE_REMINDER_COOLDOWN_DAYS = 5;
-const PROFILE_REMINDER_MAX = 3;
+// Cadence : voir src/lib/profile-reminder.ts (partage avec l'action staff).
 const BATCH_LIMIT = 200;
 
 export async function GET(request: Request) {
@@ -119,53 +122,15 @@ export async function GET(request: Request) {
   const skipped = (candidates?.length ?? 0) - targets.length;
   const errors: { tester_id: string; reason: string }[] = [];
 
-  for (const { tester, completeness, reminderNumber } of targets) {
+  for (const { tester } of targets) {
     try {
-      const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
-        type: "magiclink",
-        email: tester.email,
-        options: { redirectTo: `${appUrl}/app/auth/callback` },
-      });
-      const hashedToken = linkData?.properties?.hashed_token;
-      if (linkErr || !hashedToken) {
-        throw new Error(linkErr?.message || "magic link indisponible");
-      }
-      const callback = new URL(`${appUrl}/app/auth/callback`);
-      callback.searchParams.set("token_hash", hashedToken);
-      callback.searchParams.set("type", "magiclink");
-      callback.searchParams.set("next", "/app/onboarding");
-
-      const isLast = reminderNumber >= PROFILE_REMINDER_MAX;
-      await sendEmail({
-        to: tester.email,
-        toName: `${tester.first_name ?? ""} ${tester.last_name ?? ""}`.trim() || undefined,
-        subject: isLast
-          ? "Dernier rappel : votre profil earlypanel est incomplet"
-          : `Il manque ${completeness.count} information${completeness.count > 1 ? "s" : ""} à votre profil earlypanel`,
-        html: buildProfileReminderEmail({
-          firstName: tester.first_name ?? null,
-          missingCount: completeness.count,
-          missingLabels: completeness.missing.map((m) => m.label),
-          magicLink: callback.toString(),
-          reminderNumber,
-          isLast,
-          pauseAfterDays: PROFILE_REMINDER_COOLDOWN_DAYS,
-        }),
-      });
-
-      // Idempotence : APRES l'envoi reussi.
-      const { error: updErr } = await admin
-        .from("testers")
-        .update({ profile_reminder_sent_at: nowIso, profile_reminder_count: reminderNumber, updated_at: nowIso })
-        .eq("id", tester.id);
-      if (updErr) {
-        console.error("[cron/profile-reminders] update failed", tester.id, updErr.message);
-        errors.push({ tester_id: tester.id, reason: "update_failed_post_email" });
-      }
+      await sendProfileReminder(admin, tester, appUrl);
       reminded++;
     } catch (mailErr) {
-      console.error("[cron/profile-reminders] email failed for", tester.id, mailErr);
-      errors.push({ tester_id: tester.id, reason: mailErr instanceof Error ? mailErr.message : "email_failed" });
+      const reason = mailErr instanceof Error ? mailErr.message : "email_failed";
+      if (reason.startsWith("update_failed_post_email")) reminded++;
+      console.error("[cron/profile-reminders] failed for", tester.id, reason);
+      errors.push({ tester_id: tester.id, reason });
     }
   }
 
