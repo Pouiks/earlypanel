@@ -9,13 +9,10 @@ import Footer from "@/components/layout/Footer";
 export default function LegalLayout({
   title,
   lastUpdated,
-  temporary = false,
   children,
 }: {
   title: string;
   lastUpdated: string;
-  /** Affiche un bandeau "document temporaire phase de pre-lancement" en haut */
-  temporary?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -23,11 +20,6 @@ export default function LegalLayout({
       <Nav />
       <main className="legal-main">
         <div className="legal-inner">
-          {temporary && (
-            <div className="legal-temp-banner" role="status">
-              <strong>📄 Document temporaire · Phase de pré-lancement.</strong> earlypanel est actuellement en phase d&apos;ouverture du panel testeurs, exploité à titre personnel par son fondateur. Ce document sera mis à jour lors de la constitution de la structure commerciale officielle.
-            </div>
-          )}
           <div className="legal-eyebrow">Document légal</div>
           <h1 className="legal-title">{title}</h1>
           <p className="legal-updated">Dernière mise à jour : {lastUpdated}</p>
@@ -45,17 +37,6 @@ export default function LegalLayout({
           max-width: 760px;
           margin: 0 auto;
         }
-        .legal-temp-banner {
-          background: #fef3c7;
-          border-left: 3px solid #f59e0b;
-          padding: 14px 18px;
-          margin: 0 0 32px;
-          border-radius: 8px;
-          font-size: 13px;
-          color: #78350f;
-          line-height: 1.6;
-        }
-        .legal-temp-banner strong { color: #92400e; }
         .legal-eyebrow {
           font-size: 12px;
           font-weight: 600;

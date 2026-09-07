@@ -2,28 +2,30 @@ import type { Metadata } from "next";
 import LegalLayout from "@/components/layout/LegalLayout";
 
 export const metadata: Metadata = {
-  // Le template du layout ajoute " · earlypanel" : titre unique sans doublon.
-  title: "Politique de confidentialité",
-  description: "Politique de confidentialité d'earlypanel : traitement des données conforme RGPD.",
-  alternates: { canonical: "/confidentialite" },
-  // noindex tant que le document est marque "temporaire / pre-lancement" :
-  // on ne veut pas que Google ou un LLM cite un texte qui dit qu'aucune
-  // activite commerciale n'est exercee. Repasser a index: true quand la
-  // structure juridique et les CGV definitives seront publiees.
+  title: "Politique de confidentialité", // le template du layout ajoute « · earlypanel »
+  description: "Politique de confidentialité d'earlypanel : traitement des données personnelles conforme au RGPD.",
   robots: { index: false, follow: true },
+  alternates: { canonical: "/confidentialite" },
+  openGraph: {
+    title: "Politique de confidentialité · earlypanel",
+    description: "Traitement des données personnelles conforme au RGPD.",
+    url: "/confidentialite",
+    type: "article",
+    locale: "fr_FR",
+  },
 };
 
 export default function ConfidentialitePage() {
   return (
-    <LegalLayout title="Politique de confidentialité" lastUpdated="28 avril 2026" temporary>
+    <LegalLayout title="Politique de confidentialité" lastUpdated="7 septembre 2026">
       <h2>1. Responsable du traitement</h2>
       <p>
-        Le responsable du traitement de vos données personnelles est l&apos;éditeur du site earlypanel.fr, agissant à titre personnel pendant la phase de pré-lancement (cf. <a href="/mentions-legales">Mentions légales</a>). Il est joignable à l&apos;adresse <a href="mailto:contact@earlypanel.fr">contact@earlypanel.fr</a>.
+        Le responsable du traitement de vos données personnelles est l&apos;éditeur du site earlypanel.fr (cf. <a href="/mentions-legales">Mentions légales</a>). Il est joignable à l&apos;adresse <a href="mailto:contact@earlypanel.fr">contact@earlypanel.fr</a>.
       </p>
 
       <h2>2. Données collectées</h2>
       <p>
-        Pendant la phase de pré-lancement, earlypanel collecte uniquement les données nécessaires à la constitution du panel testeurs.
+        earlypanel collecte uniquement les données nécessaires à la constitution du panel testeurs, à la réalisation des missions et au versement des rémunérations.
       </p>
 
       <h3>2.1 Données collectées à l&apos;inscription</h3>
@@ -47,12 +49,12 @@ export default function ConfidentialitePage() {
       </ul>
 
       <p>
-        <strong>Aucune donnée bancaire n&apos;est collectée à ce stade.</strong> Les données de paiement (IBAN, etc.) ne seront collectées qu&apos;au moment du lancement officiel des missions rémunérées, via Stripe Connect (responsable de traitement distinct, conforme PCI-DSS).
+        <strong>Données de paiement.</strong> L&apos;IBAN est collecté dans l&apos;espace testeur, uniquement pour le versement des rémunérations par virement. Il est chiffré en base de données et n&apos;est jamais affiché en clair ni transmis par email.
       </p>
 
       <h2>3. Bases légales et finalités</h2>
       <ul>
-        <li><strong>Consentement explicite</strong> à l&apos;inscription : constitution du panel testeurs en vue d&apos;un démarrage prochain des missions.</li>
+        <li><strong>Consentement explicite</strong> à l&apos;inscription : constitution du panel testeurs et proposition de missions adaptées au profil.</li>
         <li><strong>Intérêt légitime</strong> : sécurité de la plateforme, prévention de fraude, amélioration du service.</li>
       </ul>
 
@@ -66,7 +68,7 @@ export default function ConfidentialitePage() {
       <h2>5. Destinataires des données</h2>
       <p>Vos données peuvent être transmises à :</p>
       <ul>
-        <li>L&apos;éditeur du site (responsable du traitement) à titre personnel.</li>
+        <li>L&apos;éditeur du site (responsable du traitement).</li>
         <li>Nos sous-traitants techniques : Vercel (hébergement, US/UE), Supabase (base de données, UE), Resend (emails transactionnels, US).</li>
       </ul>
       <p>
