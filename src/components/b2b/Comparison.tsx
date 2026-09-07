@@ -1,11 +1,13 @@
-/**
- * Section differenciation : earlypanel vs alternatives.
- *
- * On reste neutre et factuel : on explique pourquoi un service avec un
- * humain dans la boucle resoud des problemes que ni un outil seul ni un
- * freelance seul ne resolvent au meme prix.
- */
+import { PRICE_RANGE_LABEL } from "@/lib/cta-links";
 
+/**
+ * Section differenciation : pourquoi un service plutot qu'un outil.
+ *
+ * Prix : une seule formulation sur tout le site. Un forfait FIXE par
+ * mission, chiffre sur devis apres l'atelier de cadrage, dans la fourchette
+ * publique de la FAQ. "Forfait" et "devis" ne se contredisent pas : le
+ * devis fixe le forfait, il n'y a pas de facturation au temps passe.
+ */
 export default function Comparison() {
   return (
     <section className="comparison">
@@ -15,7 +17,7 @@ export default function Comparison() {
           Pourquoi un <em>service</em>&nbsp;plutôt qu&apos;un outil
         </h2>
         <p className="comparison-sub">
-          Vos équipes savent ce qu&apos;elles veulent valider. Elles n&apos;ont juste pas le temps de recruter les testeurs, écrire les questions, lire les retours et en tirer un rapport exploitable. earlypanel prend en charge ces étapes, en 5 jours ouvrés, à un tarif forfaitaire, pour que vos équipes gardent leur temps pour ce qu&apos;elles font de mieux.
+          Vos équipes savent ce qu&apos;elles veulent valider. Elles n&apos;ont juste pas le temps de recruter les testeurs, écrire les questions, lire les retours et en tirer un rapport exploitable. earlypanel prend en charge ces étapes, en 5 jours ouvrés, sur devis (devis sous 48h, généralement {PRICE_RANGE_LABEL} selon le nombre et la rareté des profils), pour que vos équipes gardent leur temps pour ce qu&apos;elles font de mieux.
         </p>
       </div>
 

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Nav from "@/components/layout/Nav";
-import PreLaunchBanner from "@/components/layout/PreLaunchBanner";
 import HeroB2C from "@/components/b2c/HeroB2C";
 import Separator from "@/components/ui/Separator";
 import HowItWorks from "@/components/b2c/HowItWorks";
@@ -99,7 +98,6 @@ export default function TesteursPage() {
         ]}
       />
 
-      <PreLaunchBanner />
       <Nav />
       <main>
         <HeroB2C />

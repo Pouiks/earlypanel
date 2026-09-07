@@ -78,7 +78,7 @@ const faqB2B = [
   },
   {
     q: "Comment sélectionnez-vous les testeurs B2B ?",
-    a: "Sélection humaine, mission par mission. Vous décrivez votre cible (métier, secteur d'activité, ancienneté, taille d'entreprise, équipement, niveau digital) lors de l'atelier de cadrage. On pioche manuellement dans notre panel de profils français qualifiés les personnes qui correspondent. Pas d'algorithme de matching qui simule une cible : un humain regarde chaque profil et valide. Ça change tout pour les niches (santé, juridique, finance, IT).",
+    a: "Sélection humaine, mission par mission. Vous décrivez votre cible (métier, secteur d'activité, ancienneté, taille d'entreprise, équipement, niveau digital) lors de l'atelier de cadrage. On pioche manuellement dans notre panel de 85+ profils français qualifiés les personnes qui correspondent. Pas d'algorithme de matching qui simule une cible : un humain regarde chaque profil et valide. Ça change tout pour les niches (santé, juridique, finance, IT).",
   },
   {
     q: "Quel est le délai pour obtenir un rapport de test utilisateur ?",

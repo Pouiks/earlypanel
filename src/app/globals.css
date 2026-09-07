@@ -874,3 +874,80 @@ body { font-family: var(--font); background: #fff; color: var(--black); overflow
   outline: 2px solid var(--green);
   outline-offset: 2px;
 }
+
+/* ── SEO / ACCESSIBILITE : texte visible des lecteurs d'ecran et des crawlers uniquement ── */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+/* ── HONEYPOT anti-bot (formulaires publics) ── */
+.hp-field { position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+
+/* ── ANNOUNCE (lien) ── */
+a.announce { display: block; text-decoration: none; }
+
+/* ── HERO : kicker mot-cle dans le H1 B2B ── */
+.h1-kicker { display: block; font-size: .5em; font-weight: 700; letter-spacing: -.01em; color: var(--green); margin-bottom: .35em; }
+
+/* ── FOOTER : rappel testeurs ── */
+.footer-tester-hint { font-size: 12px; color: rgba(255,255,255,.55); margin-top: 1rem; line-height: 1.5; }
+.footer-tester-hint a { color: rgba(255,255,255,.85); text-decoration: underline; text-underline-offset: 2px; }
+
+/* ── ABOUT : photo + credibilite ── */
+.about-body { display: grid; grid-template-columns: 1fr; gap: 1.5rem; align-items: start; }
+.about-body.has-photo { grid-template-columns: 160px 1fr; }
+.about-photo { width: 160px; height: 160px; border-radius: 20px; object-fit: cover; border: 0.5px solid var(--border); }
+.about-credentials { list-style: none; padding: 0; margin: 0 0 1.25rem; display: grid; gap: 6px; font-size: 14px; color: var(--gray); }
+.about-credentials li { padding-left: 18px; position: relative; }
+.about-credentials li::before { content: ''; position: absolute; left: 0; top: 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+
+/* ── COMPARAISON : table semantique 3 colonnes ── */
+.compare-caption { font-size: 12px; font-weight: 700; color: var(--gray-light); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 1.25rem; }
+.compare-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.compare-table th, .compare-table td { padding: 10px 8px; text-align: left; vertical-align: top; border-bottom: 0.5px solid var(--border); line-height: 1.4; }
+.compare-table thead th { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--gray-light); }
+.compare-table thead th.compare-th-us { color: var(--green); }
+.compare-table tbody th { font-weight: 600; color: var(--black); width: 28%; }
+.compare-table tbody td { color: var(--gray); }
+.compare-table td.compare-td-us { color: var(--green); font-weight: 600; background: var(--green-bg); }
+.compare-table tbody tr:last-child th, .compare-table tbody tr:last-child td { border-bottom: none; }
+
+/* ── SECTEURS : 3 cartes ── */
+.sector-cards { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: 2rem; }
+@media (min-width: 800px) { .sector-cards { grid-template-columns: repeat(3, 1fr); } }
+.sector-card { background: #fff; border: 0.5px solid var(--border); border-radius: 16px; padding: 1.5rem; }
+.sector-card h3 { font-size: 17px; font-weight: 700; letter-spacing: -.02em; margin-bottom: .5rem; }
+.sector-card p { font-size: 14px; color: var(--gray); line-height: 1.6; }
+.sector-proof { display: inline-block; margin-top: 12px; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: var(--radius-pill); background: var(--green-bg); color: var(--green); }
+
+/* ── MOMENTS : lien vers landing ── */
+.moment-link { display: inline-block; margin-top: 1rem; font-size: 13px; font-weight: 600; color: var(--green); text-decoration: none; }
+.moment-link:hover { text-decoration: underline; }
+
+/* ── LANDING SITUATION (pages /test-*, /agences) ── */
+.situation-hero { padding: clamp(3rem,8vh,6rem) clamp(1.5rem,5vw,3rem) clamp(2rem,5vh,4rem); max-width: var(--content); margin: 0 auto; }
+.situation-hero h1 { font-size: clamp(30px,4vw,50px); font-weight: 700; line-height: 1.08; letter-spacing: -.04em; color: var(--black); margin: 0 0 1.25rem; }
+.situation-hero h1 em { font-style: normal; color: var(--green); }
+.situation-lede { font-size: clamp(15px,1.5vw,18px); color: var(--gray); line-height: 1.6; max-width: 62ch; margin-bottom: 2rem; }
+.situation-section { padding: clamp(2.5rem,6vh,4.5rem) clamp(1.5rem,5vw,3rem); }
+.situation-section.alt { background: var(--bg-secondary); }
+.situation-inner { max-width: var(--content); margin: 0 auto; }
+.situation-inner h2 { font-size: clamp(24px,3vw,34px); font-weight: 700; letter-spacing: -.03em; line-height: 1.15; margin-bottom: 1rem; }
+.situation-inner p, .situation-inner li { font-size: 15.5px; color: #3a3a3c; line-height: 1.65; }
+.situation-inner p { margin-bottom: 1rem; max-width: 70ch; }
+.situation-inner ul { padding-left: 1.25rem; margin: 0 0 1rem; max-width: 70ch; }
+.situation-inner li { margin-bottom: .5rem; }
+.situation-steps { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: 1.5rem; }
+@media (min-width: 800px) { .situation-steps { grid-template-columns: repeat(3, 1fr); } }
+.situation-step { background: #fff; border: 0.5px solid var(--border); border-radius: 16px; padding: 1.25rem; }
+.situation-step .step-num { margin-bottom: .5rem; }
+.situation-step h3 { font-size: 16px; font-weight: 700; margin-bottom: .4rem; letter-spacing: -.01em; }
+.situation-step p { font-size: 14px; margin: 0; }
+.situation-cta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 1.5rem; }
+.about-photo-placeholder { display: flex; align-items: center; justify-content: center; background: var(--green-bg); color: var(--green); font-size: 40px; font-weight: 700; letter-spacing: -.04em; }
+@media (max-width: 600px) { .about-body.has-photo { grid-template-columns: 1fr; } }
+
+/* ── NAV : lien secondaire texte + rappel testeurs sur la home ── */
+.nav-textlink { font-size: 13px; color: var(--gray); text-decoration: none; padding: 7px 4px; }
+.nav-textlink:hover { color: var(--black); }
+.tester-hint { background: var(--bg-secondary); border-top: 0.5px solid var(--border); text-align: center; padding: 14px 1.5rem; font-size: 13px; color: var(--gray); }
+.tester-hint a { color: var(--green); font-weight: 600; text-decoration: none; }
+.tester-hint a:hover { text-decoration: underline; }

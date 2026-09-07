@@ -1,6 +1,6 @@
 # earlypanel
 
-> Service français de tests utilisateurs B2B clés en main. Testeurs sélectionnés manuellement selon la cible, questionnaire co-construit, relecture humaine de chaque réponse, NDA signé avant tout échange, rapport rédigé et restitution en visio sous 5 jours ouvrés.
+> Service français de tests utilisateurs B2B clés en main. Panel de 85+ testeurs sélectionnés à la main selon la cible, questionnaire co-construit, relecture humaine de chaque réponse, NDA signé avant tout échange, rapport rédigé et restitution en visio sous 5 jours ouvrés.
 
 earlypanel s'adresse aux équipes produit (fondateurs, CPO, Product Managers, designers) de startups et scale-ups SaaS, ainsi qu'aux agences digitales et studios produit qui construisent pour des clients finaux. Le service recrute des testeurs rémunérés en France qui ressemblent aux vrais utilisateurs du produit, les fait tester (maquette Figma, staging, production), lit chaque réponse et remet un rapport actionnable.
 
