@@ -10,6 +10,7 @@ import LeadMagnetSection from "@/components/landing/LeadMagnetSection";
 import AboutSection from "@/components/landing/AboutSection";
 import FaqAccordion from "@/components/ui/FaqAccordion";
 import FaqJsonLd from "@/components/ui/FaqJsonLd";
+import ServiceJsonLd from "@/components/ui/ServiceJsonLd";
 import Footer from "@/components/layout/Footer";
 import { BOOKING_DURATION_MIN, PRICE_RANGE_LABEL } from "@/lib/cta-links";
 
@@ -21,19 +22,6 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Service",
-  name: "earlypanel",
-  description:
-    "Tests utilisateurs clés en main. Panel humain, questionnaires ciblés, rapport actionnable livré en 5 jours.",
-  url: "https://www.earlypanel.fr",
-  provider: {
-    "@type": "Organization",
-    name: "earlypanel",
-    url: "https://www.earlypanel.fr",
-  },
-};
 
 // FAQ homepage : questions brand-level / service-level (qu'est-ce que c'est,
 // pour qui, comment ça marche). Volontairement plus large que /entreprises et
@@ -83,10 +71,8 @@ const faqHomepage = [
 export default function HomePage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      {/* JSON-LD Service + FAQPage (meme tableau que <FaqAccordion>). Organization est dans le layout. */}
+      <ServiceJsonLd />
       <FaqJsonLd items={faqHomepage} />
       <AnnounceBar />
       <Nav />
