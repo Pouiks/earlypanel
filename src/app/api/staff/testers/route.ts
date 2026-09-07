@@ -6,6 +6,9 @@ import { ageFromBirthDate } from "@/lib/taxonomy";
 // Edge Runtime : route appelee a chaque ouverture de l'onglet Testeurs et
 // pour le pre-filtrage du catalogue projet. Cold start Node = ~1-2s, Edge = ~50ms.
 export const runtime = "edge";
+// Edge tourne pres du visiteur par defaut (Paris) : 3 allers-retours vers
+// Supabase Stockholm en serie. On epingle l'execution a cote de la base.
+export const preferredRegion = "arn1";
 
 const SELECT_COLUMNS =
   "id, email, first_name, last_name, phone, gender, city, postal_code, job_title, sector, company_size, digital_level, csp, birth_date, tools, browsers, devices, phone_model, mobile_os, connection, availability, interests, ux_experience, status, profile_completed, created_at, tier, quality_score, missions_completed, total_earned, available_until, availability_responded_at, availability_check_sent_at, persona_id, persona_locked, persona:tester_personas(id, slug, name)";
@@ -139,9 +142,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ total: count ?? 0 });
   }
 
-  const { data, error } = await applyFilters(
-    admin.from("testers").select(SELECT_COLUMNS).order("created_at", { ascending: false }).range(offset, offset + limit - 1),
-  );
+  // Les deux lectures sont independantes : en parallele plutot qu'en serie
+  // (tester_payment_info ne contient que des ids, table petite).
+  const [{ data, error }, { data: paymentRows }] = await Promise.all([
+    applyFilters(
+      admin.from("testers").select(SELECT_COLUMNS).order("created_at", { ascending: false }).range(offset, offset + limit - 1),
+    ),
+    admin.from("tester_payment_info").select("tester_id"),
+  ]);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -152,11 +160,6 @@ export async function GET(request: NextRequest) {
   // Annotation "payment_info_configured" : existence d'une ligne
   // tester_payment_info (IBAN + CGU paiement), sans ramener les donnees.
   if (rows.length > 0) {
-    const ids = rows.map((r) => (r as { id: string }).id);
-    const { data: paymentRows } = await admin
-      .from("tester_payment_info")
-      .select("tester_id")
-      .in("tester_id", ids);
     const configuredSet = new Set((paymentRows ?? []).map((p) => p.tester_id));
     const annotated = rows.map((r) => {
       const row = r as { id: string; birth_date: string | null };

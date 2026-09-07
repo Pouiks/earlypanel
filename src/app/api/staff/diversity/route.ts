@@ -6,6 +6,9 @@ import { SECTORS, CSPS, AGE_BUCKETS, ageFromBirthDate, ageBucketLabel } from "@/
 // Edge Runtime : page diversite consultee occasionnellement, mais l'agregat
 // est petit. Cold start eviting compense largement.
 export const runtime = "edge";
+// Edge tourne pres du visiteur par defaut (Paris) : 3 allers-retours vers
+// Supabase Stockholm en serie. On epingle l'execution a cote de la base.
+export const preferredRegion = "arn1";
 
 /**
  * GET /api/staff/diversity
