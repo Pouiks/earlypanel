@@ -2,7 +2,7 @@ export default function HowItWorks() {
   return (
     <section className="how" id="how">
       <div className="how-inner">
-        <div className="sec-eye">Comment ça marche</div>
+        <div className="sec-eye">Devenir testeur rémunéré : 4 étapes</div>
         <h2 className="sec-title">De votre inscription au paiement, en quatre étapes.</h2>
         <div className="how-steps">
           <div className="how-step">

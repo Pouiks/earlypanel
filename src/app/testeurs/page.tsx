@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   // + chiffre attractif. Description : freins addresses (gratuit, paiement).
   title: "Devenir testeur rémunéré · Jusqu'à 100 € par mission",
   description:
-    "Devenez testeur rémunéré pour applications et sites web. Inscription gratuite, paiement sous 72h par virement. Missions sur mesure adaptées à votre profil (salarié, freelance, étudiant, parent au foyer). 25 min en moyenne par mission.",
+    "Devenez testeur d'applications et de sites internet rémunéré, depuis chez vous. Inscription gratuite, 15 à 100 € par mission, paiement sous 72h par virement. 25 min en moyenne par test.",
   alternates: { canonical: "/testeurs" },
   openGraph: {
     title: "Devenir testeur rémunéré · earlypanel",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "earlypanel · Tests utilisateurs livrés en 5 jours",
+        alt: "earlypanel · Devenir testeur rémunéré",
         type: "image/png",
       },
     ],
@@ -47,11 +47,11 @@ export const metadata: Metadata = {
 const faqB2C = [
   {
     q: "Comment devenir testeur rémunéré en France ?",
-    a: "L'inscription est gratuite et prend environ 5 minutes. Vous renseignez votre profil (métier, équipement, centres d'intérêt) puis votre IBAN pour les paiements. Une fois votre profil validé, vous recevez par email les invitations à des missions de test qui correspondent à votre profil. Vous acceptez ou refusez librement. Les missions paient entre 15 et 100 € selon votre profil et la durée du test.",
+    a: "L'inscription est gratuite et prend environ 5 minutes. Vous renseignez votre profil (métier, équipement, centres d'intérêt) puis votre IBAN pour les paiements. Une fois votre profil validé, vous recevez par email les invitations à des missions de test rémunéré à domicile qui correspondent à votre profil : tester des sites internet, des applications mobiles ou des maquettes. Vous acceptez ou refusez librement. Les missions paient entre 15 et 100 € selon votre profil et la durée du test.",
   },
   {
     q: "Combien gagne un testeur d'applications par mois ?",
-    a: "Cela dépend de votre profil et de votre disponibilité. En moyenne 30 à 150 €/mois pour les profils courants (1 à 3 missions). Les profils rares ou très spécialisés (médecin, avocat, DAF, ingénieur niche) reçoivent plus de propositions et peuvent atteindre 200-400 €/mois. Ce n'est pas un revenu principal mais un complément régulier, modulable selon votre disponibilité réelle.",
+    a: "Cela dépend de votre profil et de votre disponibilité. Gagner de l'argent en testant des applications reste un complément : en moyenne 30 à 150 €/mois pour les profils courants (1 à 3 missions). Les profils rares ou très spécialisés (médecin, avocat, DAF, ingénieur niche) reçoivent plus de propositions et peuvent atteindre 200-400 €/mois. Ce n'est pas un revenu principal mais un complément régulier, modulable selon votre disponibilité réelle.",
   },
   {
     q: "Combien de temps prend un test utilisateur ?",
@@ -82,8 +82,8 @@ const faqB2C = [
     a: "Variable selon votre profil et la demande client. En moyenne 1 à 3 missions par mois pour les profils standards, parfois plus pour les profils rares (santé, juridique, finance) ou très spécialisés. Aucun engagement de fréquence : earlypanel ne garantit pas un volume minimal. C'est un complément de revenu, pas un emploi régulier. Plus votre profil est complet et précis, plus les invitations sont pertinentes.",
   },
   {
-    q: "Tester des applications est-il un vrai complément de revenu fiable ?",
-    a: "Oui, à condition d'être réaliste sur le volume. earlypanel n'est pas un système qui promet « 1000 € par semaine en testant des apps depuis chez vous » (ce serait un mensonge). C'est une plateforme professionnelle de tests utilisateurs B2B où des entreprises clientes paient pour des retours qualitatifs. Le complément de revenu est réel mais modulable, adapté à des étudiants, parents au foyer, salariés en complément, retraités, freelances entre deux missions.",
+    q: "earlypanel est-il fiable, ou est-ce une arnaque ?",
+    a: "earlypanel est une société française (SIREN 848 300 117), qui paie ses testeurs par virement SEPA sous 72h après validation, sans jamais demander d'argent : l'inscription est gratuite, il n'y a ni frais, ni formation payante, ni achat à effectuer. Ce n'est pas un site d'avis rémunérés ni un système qui promet « 1000 € par semaine en testant des apps depuis chez vous » (ce serait un mensonge). C'est un service professionnel de tests utilisateurs B2B : des entreprises clientes paient pour des retours qualitatifs sur leur produit, et une partie de ce prix rémunère le testeur. Le complément de revenu est réel mais modulable, adapté à des étudiants, parents au foyer, salariés en complément, retraités, freelances entre deux missions.",
   },
 ];
 

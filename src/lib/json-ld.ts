@@ -79,7 +79,7 @@ export function serviceJsonLd() {
     name: "Tests utilisateurs clés en main",
     serviceType: "Tests utilisateurs",
     description:
-      `Tests utilisateurs clés en main pour équipes produit, startups et agences. Testeurs sélectionnés à la main selon la cible, questionnaire co-construit, relecture humaine de chaque réponse, NDA signé avant tout échange, rapport rédigé et restitution en visio sous 5 jours ouvrés. Devis sous 48h après un atelier de cadrage offert, généralement ${PRICE_RANGE_LABEL}.`,
+      `Service de tests utilisateurs à distance, clés en main, pour équipes produit, startups et agences. Test UX non modéré sur maquette Figma, staging, application mobile ou produit en production. Testeurs recrutés à la main selon la cible, questionnaire co-construit, relecture humaine de chaque réponse, NDA signé avant tout échange, rapport rédigé et restitution en visio sous 5 jours ouvrés. Devis sous 48h après un atelier de cadrage offert, généralement ${PRICE_RANGE_LABEL}.`,
     provider: { "@id": ORGANIZATION_ID },
     areaServed: { "@type": "Country", name: "FR" },
     url: `${SITE_URL}/entreprises`,

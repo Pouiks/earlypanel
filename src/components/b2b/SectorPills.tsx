@@ -7,20 +7,23 @@
  * affiche la description qualitative seule. Ne jamais mettre un chiffre
  * qu'on ne peut pas prouver en sortant un export testeurs.
  */
+// Paragraphes de ~40 mots qui decrivent les profils reels du panel : c'est
+// ce qui donne du poids semantique a "healthtech", "fintech", "SaaS B2B"
+// (une liste de mots isoles n'en a aucun).
 const SECTORS: { name: string; desc: string; proof: string | null }[] = [
   {
     name: "SaaS B2B et outils métier",
-    desc: "Onboarding, dashboards, workflows de facturation, RH ou gestion : nos testeurs manipulent des outils pro au quotidien.",
+    desc: "Product managers, responsables RH, comptables, chefs de projet, commerciaux : des testeurs qui passent leurs journées dans un CRM, un outil de facturation ou un dashboard, et qui savent dire pourquoi un onboarding SaaS B2B les perd dès le deuxième écran.",
     proof: null,
   },
   {
-    name: "Santé",
-    desc: "Praticiens libéraux, personnel hospitalier, patients : des profils rares que les panels ouverts n'ont pas.",
+    name: "Santé et healthtech",
+    desc: "Médecins généralistes, infirmiers libéraux, kinés, pharmaciens, personnel hospitalier, mais aussi patients chroniques : pour tester une application de prise de rendez-vous, un logiciel métier ou un parcours patient avec des gens qui connaissent la réalité d'un cabinet.",
     proof: null,
   },
   {
-    name: "Finance, assurance et juridique",
-    desc: "DAF, comptables, courtiers, juristes : pour tester un produit réglementé avec des gens qui connaissent la contrainte.",
+    name: "Finance, fintech, assurance et juridique",
+    desc: "DAF, contrôleurs de gestion, experts-comptables, courtiers, juristes d'entreprise, gérants de PME : pour tester un produit fintech, une plateforme de facturation ou un service réglementé avec des utilisateurs qui vivent la contrainte KYC, TVA ou conformité au quotidien.",
     proof: null,
   },
 ];
@@ -29,10 +32,10 @@ export default function SectorPills() {
   return (
     <section className="sectors">
       <div className="sectors-inner">
-        <div className="sec-eye">Secteurs</div>
+        <div className="sec-eye">Panel qualifié par secteur : SaaS B2B, santé, finance</div>
         <h2 className="sec-title">Trois secteurs où notre panel est vraiment fort.</h2>
         <p className="sec-sub">
-          On peut recruter ailleurs, mais c&apos;est ici que la sélection manuelle fait la différence face à un panel grand public.
+          On peut recruter des testeurs ailleurs, mais c&apos;est ici que la sélection manuelle fait la différence face à un panel grand public.
         </p>
         <div className="sector-cards">
           {SECTORS.map((s) => (

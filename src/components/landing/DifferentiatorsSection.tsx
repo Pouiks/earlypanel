@@ -23,7 +23,7 @@ export default function DifferentiatorsSection() {
     <section className="diff-section">
       <div className="diff-inner">
         <div className="diff-left">
-          <div className="sec-eye">Pourquoi earlypanel</div>
+          <div className="sec-eye">Service de tests utilisateurs vs sondage maison</div>
           <h2 className="sec-title">Ce qu&apos;un sondage maison ne fera jamais à votre place.</h2>
           <div className="diff-list">
             <div className="diff-item">
@@ -34,7 +34,7 @@ export default function DifferentiatorsSection() {
               </div>
               <div>
                 <h3>Des vrais profils, pas vos dix clients les plus sympas</h3>
-                <p>Quand vous nous dites que vous testez un outil de gestion de planning pour kinés, on ne vous envoie pas 15 freelances digitaux qui n&apos;ont jamais mis les pieds dans un cabinet médical. On va vraiment chercher dans notre panel ceux qui correspondent, et qui ne vous connaissent pas.</p>
+                <p>Quand vous nous dites que vous testez un outil de gestion de planning pour kinés, on ne vous envoie pas 15 freelances digitaux qui n&apos;ont jamais mis les pieds dans un cabinet médical. Le recrutement des testeurs se fait à la main dans notre panel qualifié, parmi ceux qui correspondent, et qui ne vous connaissent pas.</p>
               </div>
             </div>
             <div className="diff-item">
@@ -73,7 +73,7 @@ export default function DifferentiatorsSection() {
           </div>
         </div>
         <div className="diff-right">
-          <p className="compare-caption">Faire soi-même, freelance UX ou earlypanel</p>
+          <p className="compare-caption">Faire soi-même, freelance UX research ou service de tests utilisateurs</p>
           <table className="compare-table">
             <thead>
               <tr>

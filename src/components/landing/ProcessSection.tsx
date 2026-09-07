@@ -2,10 +2,10 @@ export default function ProcessSection() {
   return (
     <section className="process" id="process">
       <div className="process-inner">
-        <div className="sec-eye">Comment ça marche</div>
+        <div className="sec-eye">Déroulé d&apos;un test utilisateur à distance</div>
         <h2 className="sec-title">Du brief au rapport, en cinq étapes.</h2>
         <p className="sec-sub">
-          Cinq jours ouvrés, parce que vous recevez un rapport rédigé et une restitution, pas quarante vidéos brutes à visionner vous-même.
+          Un test utilisateur non modéré, mené à distance, livré en cinq jours ouvrés, parce que vous recevez un rapport rédigé et une restitution, pas quarante vidéos brutes à visionner vous-même.
         </p>
         <div className="steps-grid">
           <div className="step-card">
@@ -17,7 +17,7 @@ export default function ProcessSection() {
           <div className="step-card">
             <div className="step-num">Étape 02</div>
             <h3>Questionnaire sur mesure</h3>
-            <p>On rédige les questions ensemble. Vous voyez la version finale avant qu&apos;elle parte aux testeurs, et vous pouvez tout ajuster : l&apos;ordre, le ton, ce qu&apos;on demande explicitement, ce qu&apos;on laisse ouvert. Pas de template tout fait.</p>
+            <p>On rédige les questions ensemble, comme le ferait un UX researcher. Vous voyez la version finale avant qu&apos;elle parte aux testeurs, et vous pouvez tout ajuster : l&apos;ordre, le ton, ce qu&apos;on demande explicitement, ce qu&apos;on laisse ouvert. Pas de template tout fait.</p>
             <span className="step-pill">Validé par le client</span>
           </div>
           <div className="step-card">
@@ -35,7 +35,7 @@ export default function ProcessSection() {
           <div className="step-card" style={{ gridColumn: "1 / -1", borderTop: "0.5px solid var(--border)" }}>
             <div className="step-num">Étape 05</div>
             <h3>Rapport et restitution</h3>
-            <p>Vous recevez un document avec ce qu&apos;on a vraiment appris : les frictions identifiées, les verbatims qui les illustrent, ce qui est prioritaire à corriger et ce qui peut attendre. On en discute ensemble en visio juste après, pour que votre équipe reparte avec des actions concrètes au lieu d&apos;un PDF qu&apos;on archive. C&apos;est pour ça qu&apos;on annonce cinq jours et pas 48 heures : les plateformes qui livrent en 48 h vous livrent des enregistrements bruts, et le travail d&apos;analyse reste chez vous.</p>
+            <p>Vous recevez un rapport de test utilisateur avec ce qu&apos;on a vraiment appris : les frictions identifiées, les verbatims qui les illustrent, ce qui est prioritaire à corriger et ce qui peut attendre. On en discute ensemble en visio juste après, pour que votre équipe reparte avec des actions concrètes au lieu d&apos;un PDF qu&apos;on archive. C&apos;est pour ça qu&apos;on annonce cinq jours et pas 48 heures : les plateformes qui livrent en 48 h vous livrent des enregistrements bruts, et le travail d&apos;analyse reste chez vous.</p>
             <span className="step-pill">Rapport rédigé sous 5 jours ouvrés</span>
           </div>
         </div>

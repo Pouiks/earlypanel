@@ -2,9 +2,9 @@ export default function UseCaseGrid() {
   return (
     <section className="usecases">
       <div className="uc-inner">
-        <div className="sec-eye">Sur quoi on travaille</div>
+        <div className="sec-eye">Supports testés : maquette Figma, staging, app mobile, e-commerce</div>
         <h2 className="sec-title">Concrètement, on peut tester quoi ?</h2>
-        <p className="sec-sub">Quel que soit le moment où vous nous appelez, voici les formats qu&apos;on prend en charge. Si votre support n&apos;est pas dans cette liste, écrivez-nous, on regardera ensemble.</p>
+        <p className="sec-sub">Quel que soit le moment où vous nous appelez, voici les formats qu&apos;on teste à distance. Si votre support n&apos;est pas dans cette liste, écrivez-nous, on regardera ensemble.</p>
         <div className="uc-grid">
           <div className="uc-card">
             <div className="uc-icon">
@@ -27,7 +27,7 @@ export default function UseCaseGrid() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A7A5A" strokeWidth="2" strokeLinecap="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" /></svg>
             </div>
             <h3>Produit en production</h3>
-            <p>Votre SaaS est live mais vous voulez comprendre pourquoi un parcours convertit mal. On cible la zone précise (checkout, onboarding, dashboard) sans toucher à vos données réelles.</p>
+            <p>Votre SaaS est live mais vous voulez comprendre pourquoi le taux de conversion d&apos;un parcours est en dessous de vos attentes. On cible la zone précise (checkout, onboarding, dashboard) sans toucher à vos données réelles.</p>
             <span className="uc-example">SaaS · App mobile · Site web</span>
           </div>
           <div className="uc-card">

@@ -21,7 +21,7 @@ export default function ProfileGrid() {
   return (
     <section className="profiles">
       <div className="profiles-inner">
-        <div className="sec-eye">Qui peut rejoindre le panel ?</div>
+        <div className="sec-eye">Recrutement de testeurs : qui peut s&apos;inscrire</div>
         <h2 className="sec-title">Tous les profils sont les bienvenus.</h2>
         <p style={{ fontSize: "15px", color: "var(--gray)", lineHeight: 1.6, marginTop: ".75rem", maxWidth: "540px" }}>
           Vous n&apos;avez pas besoin d&apos;être un expert en tech. On cherche des utilisateurs authentiques, pas des professionnels du test.

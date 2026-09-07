@@ -3,7 +3,7 @@ export default function EarnSection() {
     <section className="earn" id="pay">
       <div className="earn-inner">
         <div className="earn-left">
-          <div className="sec-eye">Rémunération</div>
+          <div className="sec-eye">Combien gagne un testeur rémunéré</div>
           <h2>
             De <span style={{ color: "var(--primary)" }}>15 à 100 €</span> par test,
             <br />selon votre profil.

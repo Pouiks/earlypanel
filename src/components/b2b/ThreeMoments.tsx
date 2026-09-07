@@ -33,7 +33,7 @@ export const MOMENTS = [
     actions: [
       "On envoie 10 à 20 testeurs sur votre URL de staging avec un parcours précis à effectuer.",
       "On documente les points de friction qu'aucun de vos collègues n'a vus, parce qu'ils connaissent le produit par cœur.",
-      "Vous arbitrez avant le lancement : quels bugs UX bloquent un go-live, lesquels peuvent attendre la v1.1.",
+      "Vous arbitrez avant le lancement : quels problèmes d'expérience utilisateur bloquent un go-live, lesquels peuvent attendre la v1.1.",
     ],
     when: "Entre la pre-prod stabilisée et le J-7 du lancement. Si vous nous appelez la veille, on vous dira d'attendre la version suivante.",
   },
@@ -42,11 +42,11 @@ export const MOMENTS = [
     href: "/test-conversion-funnel",
     eyebrow: "Optimisation post-lancement",
     title: "Le produit est live. Le funnel ne convertit pas comme prévu.",
-    body: "Vous avez lancé. Les analytics vous disent où les utilisateurs partent, mais pas pourquoi. Vos hypothèses internes tournent en rond. C'est le moment de demander directement aux utilisateurs ce qu'ils ont vécu, et d'arrêter de spéculer en réunion.",
+    body: "Vous avez lancé. Le taux de conversion n'est pas celui attendu, les analytics vous disent où les utilisateurs partent, mais pas pourquoi. Vos hypothèses internes tournent en rond. C'est le moment de demander directement aux utilisateurs ce qu'ils ont vécu, et d'arrêter de spéculer en réunion.",
     actions: [
       "On cible la zone précise du parcours qui pose problème (checkout, onboarding, dashboard, fonctionnalité X).",
       "On recrute des profils qui ressemblent vraiment à votre base utilisateur, pas des testeurs grand public.",
-      "On vous remet les verbatims annotés et la priorisation des frictions à corriger pour débloquer la conversion.",
+      "On vous remet les verbatims annotés et la priorisation des frictions à corriger pour débloquer le taux de conversion.",
     ],
     when: "Quand vos métriques disent « il y a un problème » sans que votre équipe sache lequel. Quand la roadmap se construit sur des hypothèses non vérifiées.",
   },
@@ -56,7 +56,7 @@ export default function ThreeMoments() {
   return (
     <section className="moments" id="situations">
       <div className="moments-inner">
-        <div className="sec-eye">À quel moment nous appeler</div>
+        <div className="sec-eye">Quand faire un test utilisateur : 3 moments</div>
         <h2 className="sec-title">Trois situations où l&apos;on fait appel à un test utilisateur.</h2>
         <p className="sec-sub">
           Ce ne sont pas des phases que vous traversez forcément toutes. Identifiez celle où vous êtes aujourd&apos;hui, c&apos;est à ce moment-là qu&apos;un test apporte le plus de valeur.

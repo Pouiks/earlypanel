@@ -17,17 +17,17 @@ import Footer from "@/components/layout/Footer";
 import { BOOKING_DURATION_MIN, PRICE_RANGE_LABEL } from "@/lib/cta-links";
 
 export const metadata: Metadata = {
-  // Title B2B optimise : intention "tests utilisateurs" + qualifier "B2B"
-  // + benefice "clés en main". Description riche en mots-cles longue traine.
-  title: "Tests utilisateurs B2B · Rapport en 5 jours · NDA inclus",
+  // Page pilier "service de tests utilisateurs a distance". Title et OG
+  // volontairement differents de la home (marque) pour ne pas se cannibaliser.
+  title: "Service de tests utilisateurs à distance pour startups et agences",
   // Description <= 155 caracteres pour ne pas etre tronquee dans la SERP.
   description:
-    "Tests utilisateurs clés en main pour startups et agences : panel sélectionné à la main, NDA, rapport rédigé et restitué en 5 jours. Devis sous 48h.",
+    "Test UX à distance sur maquette Figma, staging ou produit live : recrutement de testeurs à la main, NDA, rapport rédigé en 5 jours. Devis sous 48h.",
   alternates: { canonical: "/entreprises" },
   openGraph: {
-    title: "Tests utilisateurs B2B clés en main · earlypanel",
+    title: "Service de tests utilisateurs à distance pour startups et agences",
     description:
-      "Testeurs choisis à la main. NDA inclus. Rapport rédigé en 5 jours. Forfait fixe sur devis.",
+      "Maquette Figma, staging, app mobile, e-commerce. Testeurs recrutés à la main, NDA inclus, rapport UX rédigé en 5 jours. Devis sous 48h.",
     url: "/entreprises",
     type: "website",
     locale: "fr_FR",
@@ -53,16 +53,20 @@ export const metadata: Metadata = {
 // Google Suggest + "People Also Ask" sur "tests utilisateurs".
 const faqB2B = [
   {
+    q: "Comment se déroule un test utilisateur à distance avec earlypanel ?",
+    a: "Quatre étapes. (1) Atelier de cadrage offert : on cerne votre objectif et votre cible utilisateur. (2) Co-construction du questionnaire : nous proposons une première version, on itère ensemble jusqu'à ce que chaque question serve un objectif clair. (3) Recrutement des testeurs à la main dans notre panel selon les critères convenus (métier, secteur, niveau digital, équipement, localisation). (4) Lancement du test non modéré : chaque testeur suit le parcours seul, à distance, depuis son propre appareil, et répond par écrit ; nous validons manuellement chaque réponse, puis livrons un rapport rédigé avec restitution en visioconférence. Délai standard : 5 jours ouvrés à partir du lancement.",
+  },
+  {
     q: "Combien coûte un test utilisateur en B2B ?",
     a: `Le tarif d'un test utilisateur B2B varie en fonction du profil recherché et de la complexité du parcours testé. Chez earlypanel, c'est un forfait fixe par mission, chiffré après l'atelier de cadrage : nombre de testeurs, niveau de niche du profil (un DAF coûte plus qu'un grand public), durée du test, livrable attendu. Comptez généralement ${PRICE_RANGE_LABEL} pour un projet complet livré en 5 jours, NDA et restitution inclus. Pas d'abonnement, pas de facturation au temps passé. Pour un chiffre précis, prenez ${BOOKING_DURATION_MIN} minutes avec nous : on chiffre sur le call.`,
   },
   {
     q: "Combien de testeurs faut-il pour un test utilisateur ?",
-    a: "Pour détecter 80% des problèmes d'utilisabilité majeurs, 5 à 8 testeurs suffisent (recherche de Jakob Nielsen, validée depuis 30 ans). Pour valider une hypothèse statistique ou comparer deux variantes (A/B), il faut 30+ testeurs. La règle pratique : 5-8 pour explorer et identifier des frictions, 12-20 pour mesurer la conversion sur un parcours, 30+ pour des chiffres significatifs. On vous oriente sur le bon volume pendant le cadrage selon votre objectif.",
+    a: "Pour détecter 80% des problèmes d'utilisabilité majeurs, 5 à 8 testeurs suffisent (recherche de Jakob Nielsen, Nielsen Norman Group, validée depuis 30 ans). Pour valider une hypothèse statistique ou comparer deux variantes (A/B), il faut 30+ testeurs. La règle pratique : 5-8 pour explorer et identifier des frictions d'expérience utilisateur, 12-20 pour mesurer le taux de conversion sur un parcours, 30+ pour des chiffres significatifs. On vous oriente sur le bon volume pendant le cadrage selon votre objectif.",
   },
   {
     q: "Peut-on faire tester une maquette Figma avant de développer ?",
-    a: "Oui, et c'est même recommandé. Une maquette Figma cliquable se teste exactement comme un produit en production : on partage le lien à nos testeurs, on définit un parcours à exécuter (s'inscrire, configurer un compte, lancer une action), et on collecte leurs réactions. Corriger un problème de parcours en phase Figma coûte environ 10x moins cher qu'en post-déploiement. Idéal entre la fin du design et le démarrage du dev.",
+    a: "Oui, et c'est même recommandé. Une maquette Figma cliquable se teste à distance exactement comme un produit en production : on partage le lien à nos testeurs, on définit un parcours à exécuter (s'inscrire, configurer un compte, lancer une action), et on collecte leurs réactions. Corriger un problème de parcours en phase Figma coûte environ 10x moins cher qu'en post-déploiement. Idéal entre la fin du design et le démarrage du dev.",
   },
   {
     q: "Tests utilisateurs et confidentialité : comment protéger un produit non-lancé ?",
@@ -70,15 +74,15 @@ const faqB2B = [
   },
   {
     q: "Quelle est la différence entre tests utilisateurs et A/B testing ?",
-    a: "L'A/B testing mesure quantitativement quelle variante convertit le mieux (besoin de trafic existant et d'un volume statistiquement significatif). Les tests utilisateurs collectent qualitativement le pourquoi des comportements (5-10 personnes qui verbalisent leurs blocages). Les deux sont complémentaires : on utilise les tests utilisateurs en amont pour identifier les frictions à corriger, et l'A/B test en aval pour valider l'amélioration auprès du trafic réel.",
+    a: "L'A/B testing mesure quantitativement quelle variante a le meilleur taux de conversion (besoin de trafic existant et d'un volume statistiquement significatif). Les tests utilisateurs collectent qualitativement le pourquoi des comportements (5-10 personnes qui verbalisent leurs blocages). Les deux sont complémentaires : on utilise le test UX en amont pour identifier les frictions à corriger, et l'A/B test en aval pour valider l'amélioration du taux de conversion auprès du trafic réel.",
   },
   {
     q: "Quand faire un test utilisateur dans un projet produit ?",
-    a: "Trois moments à fort ROI : (1) entre le design et le dev, sur maquette Figma, pour valider que le parcours est compris avant d'investir dans du code ; (2) avant le lancement, sur staging, pour repérer les frictions invisibles à l'équipe interne qui connaît le produit par cœur ; (3) en post-lancement, quand un funnel ne convertit pas comme prévu, pour comprendre pourquoi sans deviner. Plus tôt vous testez, moins ça coûte.",
+    a: "Trois moments à fort ROI : (1) entre le design et le dev, sur maquette Figma, pour valider que le parcours est compris avant d'investir dans du code ; (2) avant le lancement, sur staging, pour repérer les frictions invisibles à l'équipe interne qui connaît le produit par cœur ; (3) en post-lancement, quand le taux de conversion d'un funnel n'est pas celui prévu, pour comprendre pourquoi sans deviner. Plus tôt vous testez, moins ça coûte.",
   },
   {
-    q: "Comment sélectionnez-vous les testeurs B2B ?",
-    a: "Sélection humaine, mission par mission. Vous décrivez votre cible (métier, secteur d'activité, ancienneté, taille d'entreprise, équipement, niveau digital) lors de l'atelier de cadrage. On pioche manuellement dans notre panel de 85+ profils français qualifiés les personnes qui correspondent. Pas d'algorithme de matching qui simule une cible : un humain regarde chaque profil et valide. Ça change tout pour les niches (santé, juridique, finance, IT).",
+    q: "Comment recrutez-vous les testeurs B2B ?",
+    a: "Recrutement des testeurs à la main, mission par mission. Vous décrivez votre cible (métier, secteur d'activité, ancienneté, taille d'entreprise, équipement, niveau digital) lors de l'atelier de cadrage. On pioche manuellement dans notre panel de 85+ profils français qualifiés les personnes qui correspondent. Pas d'algorithme de matching qui simule une cible : un humain regarde chaque profil et valide. Ça change tout pour les niches (santé, juridique, finance, IT).",
   },
   {
     q: "Quel est le délai pour obtenir un rapport de test utilisateur ?",
@@ -125,7 +129,7 @@ export default function EntreprisesPage() {
         <SectorPills />
         <Separator />
         <FaqAccordion
-          eyebrow="Questions fréquentes"
+          eyebrow="Questions fréquentes sur les tests utilisateurs"
           title="Tout ce que vous voulez savoir."
           items={faqB2B}
         />

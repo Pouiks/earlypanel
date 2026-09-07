@@ -12,12 +12,12 @@ export default function Comparison() {
   return (
     <section className="comparison">
       <div className="comparison-inner">
-        <div className="comparison-eyebrow">Pourquoi earlypanel</div>
+        <div className="comparison-eyebrow">Service de test UX vs outil self-service</div>
         <h2 className="comparison-title">
           Pourquoi un <em>service</em>&nbsp;plutôt qu&apos;un outil
         </h2>
         <p className="comparison-sub">
-          Vos équipes savent ce qu&apos;elles veulent valider. Elles n&apos;ont juste pas le temps de recruter les testeurs, écrire les questions, lire les retours et en tirer un rapport exploitable. earlypanel prend en charge ces étapes, en 5 jours ouvrés, sur devis (devis sous 48h, généralement {PRICE_RANGE_LABEL} selon le nombre et la rareté des profils), pour que vos équipes gardent leur temps pour ce qu&apos;elles font de mieux.
+          Vos équipes savent ce qu&apos;elles veulent valider. Elles n&apos;ont juste pas le temps de faire le recrutement des testeurs, écrire les questions, lire les retours et en tirer un rapport d&apos;expérience utilisateur exploitable. earlypanel prend en charge ces étapes, en 5 jours ouvrés, sur devis (devis sous 48h, généralement {PRICE_RANGE_LABEL} selon le nombre et la rareté des profils), pour que vos équipes gardent leur temps pour ce qu&apos;elles font de mieux.
         </p>
       </div>
 

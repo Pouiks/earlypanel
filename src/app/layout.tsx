@@ -19,9 +19,9 @@ export const metadata: Metadata = {
   authors: [{ name: "earlypanel" }],
   metadataBase: new URL("https://www.earlypanel.fr"),
   openGraph: {
-    title: "earlypanel — Tests utilisateurs B2B clés en main",
+    title: "earlypanel · Tests utilisateurs clés en main",
     description:
-      "Testeurs choisis à la main, réponses relues par un humain, NDA inclus. Rapport rédigé en 5 jours, pas des vidéos brutes.",
+      "Un service de tests utilisateurs à distance : panel sélectionné à la main, questionnaire écrit avec vous, rapport rédigé en 5 jours.",
     type: "website",
     locale: "fr_FR",
     url: "/",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "earlypanel — Tests utilisateurs B2B clés en main",
+    title: "earlypanel · Tests utilisateurs clés en main",
     description: "Testeurs choisis à la main. NDA inclus. Rapport rédigé en 5 jours.",
     images: ["/og-image.png"],
   },

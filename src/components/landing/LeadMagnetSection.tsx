@@ -34,8 +34,8 @@ export default function LeadMagnetSection() {
   return (
     <section className="leadmag" id="rapport">
       <div className="leadmag-inner">
-        <h2>Voyez à quoi ressemble<br /><em>un rapport earlypanel.</em></h2>
-        <p>Avant de réserver un appel, recevez un exemple complet de livrable : synthèse, carte des frictions, verbatims, priorisation et recommandations.</p>
+        <h2>Voyez à quoi ressemble<br /><em>un rapport de test utilisateur.</em></h2>
+        <p>Avant de réserver un appel, recevez un exemple complet de livrable : synthèse, carte des frictions UX, verbatims, priorisation et recommandations.</p>
 
         {status === "sent" ? (
           <p className="lead-success">Le rapport a été envoyé à <strong>{email}</strong>. Pensez à vérifier vos spams.</p>

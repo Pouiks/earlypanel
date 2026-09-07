@@ -14,7 +14,7 @@ export default function HeroB2C() {
         </div>
         <h1>Testez des produits, <em>gagnez un complément de revenu.</em></h1>
         <p className="hero-sub-b2c">
-          earlypanel met en relation des entreprises qui veulent valider leur produit avec des testeurs comme vous. Chaque mission consiste à essayer un site, une app ou une maquette, puis à répondre à quelques questions précises sur ce que vous avez vécu. C&apos;est tout. Vous le faites depuis chez vous, quand ça vous arrange.</p>
+          earlypanel met en relation des entreprises qui veulent valider leur produit avec des testeurs d&apos;applications et de sites internet comme vous. Chaque mission consiste à essayer un site, une app ou une maquette, puis à répondre à quelques questions précises sur ce que vous avez vécu. C&apos;est tout. Un test rémunéré à domicile, quand ça vous arrange.</p>
         <button
           className="btn-green-big"
           onClick={() => document.getElementById("register")?.scrollIntoView({ behavior: "smooth" })}
