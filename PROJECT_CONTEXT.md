@@ -266,7 +266,7 @@ SCORE_DELTA_NDA_UNSIGNED_AT_CLOSURE = -15
 ### Flux 1 : Inscription testeur
 
 ```
-POST /api/testers/register { email, first_name?, last_name? }
+POST /api/testers/register { email, job_title (requis), first_name?, last_name?, sector?, city?, devices? (liste blanche PC Windows/Mac/iPhone/Smartphone Android), digital_level?, availability?, website (honeypot, doit rester vide), turnstile_token? }
   ├─ Supabase Auth: admin.createUser({ email, email_confirm: false })
   │   └─ Si "already been registered" → 409
   ├─ INSERT testers: status="pending", profile_step=1, source="landing"
@@ -1164,6 +1164,11 @@ if (!rlEmail.ok) return NextResponse.json({ success: true }); // anti-énumérat
 ```
 
 > **LIMITE CONNUE** : `lib/rate-limit.ts` est in-memory (cf. C15). En prod Vercel, chaque instance a son propre compteur. Acceptable pour anti-bot basique, insuffisant contre un attaquant motivé.
+
+**Formulaires publics marketing (2026-09-07)** :
+- `POST /api/brief` (formulaire /entreprises#brief) : rate-limit IP 5/min + email 3/h, honeypot `website`, junk-detection sur prénom/nom, email interne via `buildBriefAdminEmail`. Pas de DB.
+- `POST /api/testers/register` : en plus du rate-limit IP 5/h, rate-limit email 3/h, honeypot `website` (réponse 200 factice si rempli), vérification Cloudflare Turnstile **fail-closed dès que `TURNSTILE_SECRET_KEY` est définie** (sans secret : pas de vérification, dev only). Le widget côté client n'apparaît que si `NEXT_PUBLIC_TURNSTILE_SITE_KEY` est définie.
+- Le double opt-in testeur est le magic link : `email_confirm: false` à la création, le compte n'est utilisable qu'après clic.
 
 ### 13.3 Anti-énumération (auth/recovery)
 

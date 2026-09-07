@@ -141,6 +141,7 @@ export function buildNewTesterAdminEmail(opts: {
     sector?: string | null;
     job_title?: string | null;
     city?: string | null;
+    devices?: string[] | null;
     digital_level?: string | null;
     availability?: string | null;
   };
@@ -168,6 +169,9 @@ export function buildNewTesterAdminEmail(opts: {
   }
   if (opts.prefilledFields?.city) {
     filledAtRegistration.push({ key: "city", label: "Ville", value: opts.prefilledFields.city });
+  }
+  if (opts.prefilledFields?.devices?.length) {
+    filledAtRegistration.push({ key: "devices", label: "Équipement", value: opts.prefilledFields.devices.join(", ") });
   }
   if (opts.prefilledFields?.digital_level) {
     filledAtRegistration.push({ key: "digital_level", label: "Niveau digital", value: opts.prefilledFields.digital_level });

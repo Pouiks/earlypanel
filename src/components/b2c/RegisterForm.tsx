@@ -1,5 +1,10 @@
 "use client";
 import { useState } from "react";
+import Script from "next/script";
+
+// Cloudflare Turnstile (anti-bot). Sans cle publique, le widget n'est pas
+// rendu et le serveur ne verifie rien (dev local). Voir .env.example.
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim() || "";
 
 type FormState = "idle" | "loading" | "success" | "error";
 
@@ -18,6 +23,14 @@ const SECTORS = [
   "Transport / Logistique",
   "Industrie",
   "Autre",
+] as const;
+
+// Equipement : memes valeurs que Step4Technical (colonne testers.devices).
+const DEVICE_OPTIONS = [
+  { label: "Ordinateur Windows", value: "PC Windows" },
+  { label: "Mac", value: "Mac" },
+  { label: "iPhone", value: "iPhone" },
+  { label: "Android", value: "Smartphone Android" },
 ] as const;
 
 const DIGITAL_LEVELS_UI = ["Débutant", "Intermédiaire", "Avancé", "Expert"] as const;
@@ -51,6 +64,13 @@ export default function RegisterForm() {
   const [digitalLevel, setDigitalLevel] = useState<DigitalLevelUI>("Intermédiaire");
   const [availability, setAvailability] = useState<AvailabilityUI>("1 à 2 missions par mois");
   const [email, setEmail] = useState("");
+  const [jobTitle, setJobTitle] = useState("");
+  const [city, setCity] = useState("");
+  const [devices, setDevices] = useState<string[]>([]);
+
+  function toggleDevice(value: string) {
+    setDevices((d) => (d.includes(value) ? d.filter((x) => x !== value) : [...d, value]));
+  }
   const [formState, setFormState] = useState<FormState>("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [mockMode, setMockMode] = useState(false);
@@ -59,9 +79,15 @@ export default function RegisterForm() {
     setDigitalLevel(level);
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!email) return;
+    const form = e.currentTarget;
+    // Honeypot : champ invisible, rempli uniquement par les bots.
+    const website = (form.elements.namedItem("website") as HTMLInputElement | null)?.value ?? "";
+    // Token Turnstile injecte par le widget dans un input cache du form.
+    const turnstileToken =
+      (form.querySelector<HTMLInputElement>('input[name="cf-turnstile-response"]')?.value) ?? "";
 
     setFormState("loading");
     setErrorMsg("");
@@ -79,8 +105,13 @@ export default function RegisterForm() {
           first_name: firstName.trim() || undefined,
           last_name: lastName.trim() || undefined,
           sector: sector || undefined,
+          job_title: jobTitle.trim(),
+          city: city.trim() || undefined,
+          devices,
           digital_level: DIGITAL_LEVEL_MAP[digitalLevel],
           availability: AVAILABILITY_MAP[availability],
+          website,
+          turnstile_token: turnstileToken,
         }),
       });
 
@@ -237,6 +268,10 @@ export default function RegisterForm() {
           required
         />
       </div>
+      <div className="form-2col">
+        <div className="form-row"><label>Métier / poste actuel *</label><input type="text" placeholder="Infirmière libérale, DAF, développeur…" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} maxLength={120} required /></div>
+        <div className="form-row"><label>Ville</label><input type="text" placeholder="Montpellier" value={city} onChange={(e) => setCity(e.target.value)} maxLength={120} autoComplete="address-level2" /></div>
+      </div>
       <div className="form-row">
         <label>Secteur d&apos;activité</label>
         <select value={sector} onChange={(e) => setSector(e.target.value)}>
@@ -245,6 +280,22 @@ export default function RegisterForm() {
             <option key={s} value={s}>{s}</option>
           ))}
         </select>
+      </div>
+      <div className="form-row">
+        <label>Équipement</label>
+        <div className="form-pills" role="group" aria-label="Équipement">
+          {DEVICE_OPTIONS.map((d) => (
+            <button
+              key={d.value}
+              type="button"
+              className={`form-pill${devices.includes(d.value) ? " active" : ""}`}
+              aria-pressed={devices.includes(d.value)}
+              onClick={() => toggleDevice(d.value)}
+            >
+              {d.label}
+            </button>
+          ))}
+        </div>
       </div>
       <div className="form-row">
         <label>Aisance digitale</label>
@@ -270,6 +321,19 @@ export default function RegisterForm() {
         </select>
       </div>
 
+      {/* Honeypot anti-bot : invisible pour un humain. */}
+      <div className="hp-field" aria-hidden="true">
+        <label htmlFor="register-website">Site web</label>
+        <input id="register-website" name="website" type="text" tabIndex={-1} autoComplete="off" />
+      </div>
+
+      {TURNSTILE_SITE_KEY && (
+        <>
+          <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="lazyOnload" />
+          <div className="cf-turnstile" data-sitekey={TURNSTILE_SITE_KEY} data-theme="light" style={{ margin: "8px 0" }} />
+        </>
+      )}
+
       {errorMsg && (
         <p style={{ color: "#e53e3e", fontSize: 13, margin: "8px 0" }}>{errorMsg}</p>
       )}
@@ -282,7 +346,7 @@ export default function RegisterForm() {
       >
         {formState === "loading" ? "Inscription en cours…" : "Créer mon profil →"}
       </button>
-      <p className="form-note">En créant votre profil, vous acceptez nos CGU testeurs. Vos données sont protégées conformément au RGPD.</p>
+      <p className="form-note">En créant votre profil, vous acceptez nos CGU testeurs. Vous recevez ensuite un lien de confirmation par email (double opt-in) : sans clic, aucun compte n&apos;est activé. Vos données sont protégées conformément au RGPD.</p>
     </form>
   );
 }

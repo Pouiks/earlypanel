@@ -5,6 +5,35 @@ import { tryGetAppUrl } from "@/lib/app-url";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { checkJunkFields } from "@/lib/junk-detection";
 
+/**
+ * Verification Cloudflare Turnstile. Fail-closed des que TURNSTILE_SECRET_KEY
+ * est definie : token absent ou invalide = refus. Sans secret (dev local,
+ * ou widget pas encore configure) on laisse passer.
+ */
+async function verifyTurnstile(token: unknown, ip: string): Promise<boolean> {
+  const secret = process.env.TURNSTILE_SECRET_KEY?.trim();
+  if (!secret) return true;
+  if (typeof token !== "string" || !token) return false;
+  try {
+    const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ secret, response: token, remoteip: ip }),
+    });
+    const data = (await res.json()) as { success?: boolean };
+    return data.success === true;
+  } catch (err) {
+    console.error("[Register] Turnstile verify failed", err);
+    return false;
+  }
+}
+
+function cleanText(v: unknown, max: number): string | null {
+  if (typeof v !== "string") return null;
+  const t = v.trim().slice(0, max);
+  return t || null;
+}
+
 export async function POST(request: NextRequest) {
   try {
     // M4 : rate limit anti-bot. 5 inscriptions par heure et par IP.
@@ -22,9 +51,19 @@ export async function POST(request: NextRequest) {
       first_name,
       last_name,
       sector,
+      job_title,
+      city,
+      devices,
       digital_level,
       availability,
+      website,
+      turnstile_token,
     } = await request.json();
+
+    // Honeypot rempli : bot. On repond comme un succes pour ne rien reveler.
+    if (typeof website === "string" && website.trim()) {
+      return NextResponse.json({ success: true });
+    }
 
     if (!email || typeof email !== "string") {
       return NextResponse.json(
@@ -38,6 +77,28 @@ export async function POST(request: NextRequest) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(emailNormalized)) {
       return NextResponse.json({ error: "Email invalide" }, { status: 400 });
+    }
+
+    // Metier requis : un panel « selectionne a la main » ne peut pas trier
+    // des profils sans poste. Verifie avant tout appel DB.
+    if (typeof job_title !== "string" || !job_title.trim()) {
+      return NextResponse.json({ error: "Indiquez votre métier ou poste actuel" }, { status: 400 });
+    }
+
+    // Rate-limit par email (3/h) : evite qu'on cible un compte precis.
+    const rlEmail = rateLimit(`register:email:${emailNormalized}`, { windowMs: 60 * 60 * 1000, max: 3 });
+    if (!rlEmail.ok) {
+      return NextResponse.json(
+        { error: "Trop de tentatives pour cet email, reessayez plus tard" },
+        { status: 429, headers: { "Retry-After": String(Math.ceil(rlEmail.retryAfterMs / 1000)) } }
+      );
+    }
+
+    if (!(await verifyTurnstile(turnstile_token, ip))) {
+      return NextResponse.json(
+        { error: "Vérification anti-robot échouée. Rechargez la page et réessayez." },
+        { status: 400 }
+      );
     }
 
     // Detection des inscriptions bidons (azerty / Test Test / aaaa...).
@@ -131,6 +192,16 @@ export async function POST(request: NextRequest) {
       typeof availability === "string" && ALLOWED_AVAILABILITY.has(availability)
         ? availability
         : null;
+    // Metier + ville : texte libre borne. Pre-remplissent l'onboarding (step 2
+    // et step 1) ; le trigger d'activation exige les 18 champs, donc aucun
+    // risque d'activer un profil incomplet.
+    const safeJobTitle = cleanText(job_title, 120);
+    const safeCity = cleanText(city, 120);
+    // Equipement : liste blanche alignee sur Step4Technical / testers.devices.
+    const ALLOWED_DEVICES = new Set(["PC Windows", "Mac", "iPhone", "Smartphone Android"]);
+    const safeDevices = Array.isArray(devices)
+      ? Array.from(new Set(devices.filter((d): d is string => typeof d === "string" && ALLOWED_DEVICES.has(d))))
+      : [];
 
     const { error: insertError } = await adminClient
       .from("testers")
@@ -143,6 +214,9 @@ export async function POST(request: NextRequest) {
         // Le testeur arrivera sur step 1 mais step 2 aura deja sector +
         // digital_level remplis, et step 5 aura availability rempli.
         sector: safeSector,
+        job_title: safeJobTitle,
+        city: safeCity,
+        devices: safeDevices,
         digital_level: safeDigital,
         availability: safeAvailability,
         status: "pending",
@@ -219,6 +293,9 @@ export async function POST(request: NextRequest) {
             // qualite/profil de l'inscription en un coup d'oeil cote staff.
             prefilledFields: {
               sector: safeSector,
+              job_title: safeJobTitle,
+              city: safeCity,
+              devices: safeDevices,
               digital_level: safeDigital,
               availability: safeAvailability,
             },
