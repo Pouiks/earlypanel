@@ -27,7 +27,7 @@ export const MOMENTS = [
   {
     slug: "staging",
     href: "/test-pre-lancement-staging",
-    eyebrow: "Validation pré-lancement",
+    eyebrow: "Validation avant lancement",
     title: "Le produit est prêt. Mais est-ce que les clients vont comprendre ?",
     body: "Vous êtes à quelques semaines du go-live. Le code marche, l'équipe est confiante en interne, mais personne d'extérieur n'a encore mis les mains dedans. C'est le moment de vérifier que vos utilisateurs vivent le produit comme vous l'imaginez, pas comme vous le craignez.",
     actions: [

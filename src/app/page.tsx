@@ -17,7 +17,9 @@ import { BOOKING_DURATION_MIN, PRICE_RANGE_LABEL } from "@/lib/cta-links";
 
 export const metadata: Metadata = {
   // Le template du layout ajoute deja " · earlypanel" : ne pas le repeter ici.
-  title: "Tests utilisateurs clés en main pour équipes produit",
+  // title.template ne s'applique qu'aux segments enfants : la home (meme segment
+  // que le layout) doit porter la marque elle-meme.
+  title: { absolute: "Tests utilisateurs clés en main pour équipes produit · earlypanel" },
   description:
     "Tests utilisateurs clés en main : testeurs choisis à la main, questionnaire écrit avec vous, réponses relues par un humain, rapport rédigé en 5 jours. Le rapport, pas le tableur.",
   alternates: { canonical: "/" },

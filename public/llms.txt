@@ -8,7 +8,7 @@ Différence vs alternatives : un sondage maison envoyé à dix clients donne des
 
 ## Pour les entreprises clientes
 
-- [Tests utilisateurs B2B clés en main](https://www.earlypanel.fr/entreprises): offre, trois situations (maquette Figma, pré-lancement, funnel qui ne convertit pas), formats testés, FAQ, formulaire de demande
+- [Tests utilisateurs B2B clés en main](https://www.earlypanel.fr/entreprises): offre, trois situations (maquette Figma, avant lancement, funnel qui ne convertit pas), formats testés, FAQ, formulaire de demande
 - [Tester une maquette Figma avec de vrais utilisateurs](https://www.earlypanel.fr/test-maquette-figma)
 - [Tester un produit avant le lancement (staging)](https://www.earlypanel.fr/test-pre-lancement-staging)
 - [Comprendre pourquoi un funnel ne convertit pas](https://www.earlypanel.fr/test-conversion-funnel)

@@ -66,7 +66,7 @@ const faqB2B = [
   },
   {
     q: "Tests utilisateurs et confidentialité : comment protéger un produit non-lancé ?",
-    a: "Tout démarre par un NDA contractualisé, signé électroniquement avec valeur de preuve eIDAS, AVANT tout échange de matériel. Côté client comme côté testeurs. Les credentials d'accès créés pour le test (compte de démo, URL de staging) ne quittent pas le périmètre, sont supprimés à la clôture de la mission, et l'audit log conserve la traçabilité (qui a accédé, quand, depuis quelle IP). Conforme RGPD et adapté aux produits pré-lancement.",
+    a: "Tout démarre par un NDA contractualisé, signé électroniquement avec valeur de preuve eIDAS, AVANT tout échange de matériel. Côté client comme côté testeurs. Les credentials d'accès créés pour le test (compte de démo, URL de staging) ne quittent pas le périmètre, sont supprimés à la clôture de la mission, et l'audit log conserve la traçabilité (qui a accédé, quand, depuis quelle IP). Conforme RGPD et adapté aux produits pas encore lancés.",
   },
   {
     q: "Quelle est la différence entre tests utilisateurs et A/B testing ?",
@@ -74,7 +74,7 @@ const faqB2B = [
   },
   {
     q: "Quand faire un test utilisateur dans un projet produit ?",
-    a: "Trois moments à fort ROI : (1) entre le design et le dev, sur maquette Figma, pour valider que le parcours est compris avant d'investir dans du code ; (2) en phase de pré-lancement, sur staging, pour repérer les frictions invisibles à l'équipe interne qui connaît le produit par cœur ; (3) en post-lancement, quand un funnel ne convertit pas comme prévu, pour comprendre pourquoi sans deviner. Plus tôt vous testez, moins ça coûte.",
+    a: "Trois moments à fort ROI : (1) entre le design et le dev, sur maquette Figma, pour valider que le parcours est compris avant d'investir dans du code ; (2) avant le lancement, sur staging, pour repérer les frictions invisibles à l'équipe interne qui connaît le produit par cœur ; (3) en post-lancement, quand un funnel ne convertit pas comme prévu, pour comprendre pourquoi sans deviner. Plus tôt vous testez, moins ça coûte.",
   },
   {
     q: "Comment sélectionnez-vous les testeurs B2B ?",

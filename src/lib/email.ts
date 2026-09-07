@@ -280,7 +280,7 @@ export function buildWelcomeEmail(magicLink: string, firstName?: string): string
           <div style="margin:32px 0 0;padding:16px 18px;background:#fef3c7;border-radius:12px;border-left:3px solid #f59e0b;">
             <p style="font-size:13px;color:#78350f;line-height:1.6;margin:0 0 6px;font-weight:600;">À savoir avant de continuer</p>
             <p style="font-size:12px;color:#92400e;line-height:1.6;margin:0;">
-              earlypanel est en <strong>phase de pré-lancement</strong>. La fréquence des missions dépend de votre profil et de la demande client : <strong>aucune mission n'est garantie</strong>. Vous serez contacté(e) par email dès qu'une opportunité correspond à votre profil.
+              Les missions vous sont proposées <strong>au cas par cas</strong>, quand un client cherche votre profil. Leur fréquence dépend de votre profil et de la demande client : <strong>aucune mission n'est garantie</strong>. Vous serez contacté(e) par email dès qu'une opportunité correspond à votre profil.
             </p>
           </div>
 

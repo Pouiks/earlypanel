@@ -21,7 +21,7 @@ const faq = [
     a: "Vous créez des comptes de démonstration dédiés (ou un accès par lien protégé). On transmet les identifiants aux testeurs uniquement après signature du NDA, dans le questionnaire earlypanel. À la clôture de la mission, vous supprimez les comptes ; notre audit log conserve qui a accédé et quand.",
   },
   {
-    q: "Quand faut-il lancer un test de pré-lancement ?",
+    q: "Quand faut-il tester avant le lancement ?",
     a: "Entre la pré-prod stabilisée et le J-7 du lancement. Trop tôt, les bugs techniques polluent les retours UX. Trop tard, vous n'avez plus le temps de corriger. Si vous nous appelez la veille du lancement, on vous conseillera de tester la version suivante plutôt que de faire un test pour rien.",
   },
   {
@@ -43,7 +43,7 @@ export default function TestPreLancementPage() {
     <SituationLanding
       path="/test-pre-lancement-staging"
       breadcrumbName="Tester avant le lancement"
-      eyebrow="Validation pré-lancement · Sur votre URL de staging"
+      eyebrow="Validation avant lancement · Sur votre URL de staging"
       h1={<>Tester votre produit <em>avant le lancement</em>, avec des gens qui ne le connaissent pas.</>}
       lede="Le code marche, l'équipe est confiante, et personne d'extérieur n'a encore mis les mains dedans. Dix à vingt testeurs sélectionnés à la main parcourent votre staging, et vous savez ce qui bloque avant que vos premiers clients ne le découvrent."
       problem={{
@@ -51,7 +51,7 @@ export default function TestPreLancementPage() {
         paragraphs: [
           "À quelques semaines du go-live, tout le monde en interne sait où cliquer, quel champ remplir, ce que veut dire chaque libellé. Ce savoir invisible cache les frictions qu'un nouvel utilisateur rencontrera dans les trente premières secondes.",
           "Les tests QA vérifient que les fonctionnalités marchent. Ils ne vérifient pas qu'un utilisateur les trouve, les comprend et va jusqu'au bout. Le premier retour honnête arrive souvent sous forme de désinscription, sans explication.",
-          "Un test de pré-lancement earlypanel envoie sur votre staging des profils qui ressemblent à vos futurs clients, avec un parcours précis à effectuer, et documente chaque point où ils hésitent, se trompent ou abandonnent.",
+          "Un test avant lancement earlypanel envoie sur votre staging des profils qui ressemblent à vos futurs clients, avec un parcours précis à effectuer, et documente chaque point où ils hésitent, se trompent ou abandonnent.",
         ],
       }}
       method={{
