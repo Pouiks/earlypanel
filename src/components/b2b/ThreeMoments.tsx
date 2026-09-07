@@ -1,15 +1,19 @@
+import Link from "next/link";
+
 /**
  * Section "3 moments metier" : structure la page B2B autour du cycle de
  * vie produit du visiteur (avant code / avant lancement / une fois en
- * prod). Complementaire de UseCaseGrid juste apres, qui liste les formats
- * techniques (Figma, URL recette, mobile, etc.) supportes.
+ * prod). Chaque moment a sa landing SEO dediee (voir `href`).
  *
- * Objectif copywriting : que le PM/Head of Product se reconnaisse dans
- * un moment precis, pas dans une grille technique abstraite.
+ * Note copywriting : on dit "on nous contacte", pas "nos clients nous
+ * contactent". Tant qu'il n'y a pas de reference nommee, on ne laisse pas
+ * entendre qu'il y a un portefeuille clients.
  */
 
-const MOMENTS = [
+export const MOMENTS = [
   {
+    slug: "figma",
+    href: "/test-maquette-figma",
     eyebrow: "Validation early-stage",
     title: "Vous avez une idée. Pas encore une ligne de code.",
     body: "Vous avez investi du temps en design, vous avez une maquette Figma ou un prototype cliquable, et la question vous brûle : est-ce qu'on construit le bon produit, ou est-ce qu'on s'apprête à payer 6 mois de dev pour rien ?",
@@ -21,6 +25,8 @@ const MOMENTS = [
     when: "Idéalement entre la fin du design et le début du développement. Plus tôt vous testez, moins ça coûte cher de corriger.",
   },
   {
+    slug: "staging",
+    href: "/test-pre-lancement-staging",
     eyebrow: "Validation pré-lancement",
     title: "Le produit est prêt. Mais est-ce que les clients vont comprendre ?",
     body: "Vous êtes à quelques semaines du go-live. Le code marche, l'équipe est confiante en interne, mais personne d'extérieur n'a encore mis les mains dedans. C'est le moment de vérifier que vos utilisateurs vivent le produit comme vous l'imaginez, pas comme vous le craignez.",
@@ -32,6 +38,8 @@ const MOMENTS = [
     when: "Entre la pre-prod stabilisée et le J-7 du lancement. Si vous nous appelez la veille, on vous dira d'attendre la version suivante.",
   },
   {
+    slug: "funnel",
+    href: "/test-conversion-funnel",
     eyebrow: "Optimisation post-lancement",
     title: "Le produit est live. Le funnel ne convertit pas comme prévu.",
     body: "Vous avez lancé. Les analytics vous disent où les utilisateurs partent, mais pas pourquoi. Vos hypothèses internes tournent en rond. C'est le moment de demander directement aux utilisateurs ce qu'ils ont vécu, et d'arrêter de spéculer en réunion.",
@@ -46,10 +54,10 @@ const MOMENTS = [
 
 export default function ThreeMoments() {
   return (
-    <section className="moments">
+    <section className="moments" id="situations">
       <div className="moments-inner">
         <div className="sec-eye">À quel moment nous appeler</div>
-        <h2 className="sec-title">Trois situations où nos clients nous contactent.</h2>
+        <h2 className="sec-title">Trois situations où l&apos;on fait appel à un test utilisateur.</h2>
         <p className="sec-sub">
           Ce ne sont pas des phases que vous traversez forcément toutes. Identifiez celle où vous êtes aujourd&apos;hui, c&apos;est à ce moment-là qu&apos;un test apporte le plus de valeur.
         </p>
@@ -69,6 +77,9 @@ export default function ThreeMoments() {
               <div className="moment-when">
                 <strong>Quand nous appeler.</strong> {m.when}
               </div>
+              <Link href={m.href} className="moment-link">
+                En savoir plus sur ce cas →
+              </Link>
             </article>
           ))}
         </div>

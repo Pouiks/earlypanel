@@ -1,15 +1,15 @@
 export default function EarnSection() {
   return (
-    <section className="earn">
+    <section className="earn" id="pay">
       <div className="earn-inner">
         <div className="earn-left">
           <div className="sec-eye">Rémunération</div>
           <h2>
-            Jusqu&apos;à <span style={{ color: "var(--primary)" }}>100€</span> par test,
+            De <span style={{ color: "var(--primary)" }}>15 à 100 €</span> par test,
             <br />selon votre profil.
           </h2>
           <p>
-            Combien vous gagnez dépend de trois choses : à quel point votre profil est recherché, combien de temps prend la mission, et le secteur du client. Un cadre médical avec 15 ans d&apos;expérience qui teste un logiciel hospitalier sera mieux payé qu&apos;un test de site e-commerce grand public, et c&apos;est normal.
+            Une mission grand public de 20 minutes paie autour de 15 à 25 €. Les 100 € concernent les profils rares sur des parcours longs. Combien vous gagnez dépend de trois choses : à quel point votre profil est recherché, combien de temps prend la mission, et le secteur du client. Un cadre médical avec 15 ans d&apos;expérience qui teste un logiciel hospitalier sera mieux payé qu&apos;un test de site e-commerce grand public, et c&apos;est normal.
           </p>
           <p style={{ fontSize: "13px", color: "var(--gray-light)", lineHeight: 1.6 }}>
             Après votre inscription, votre fourchette s&apos;affiche dans votre espace. Le paiement passe par virement SEPA classique. Côté impôts, ces revenus sont à déclarer comme revenus complémentaires : c&apos;est à vous de le faire, on vous fournira un récapitulatif annuel pour faciliter.

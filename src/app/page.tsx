@@ -12,6 +12,7 @@ import FaqAccordion from "@/components/ui/FaqAccordion";
 import FaqJsonLd from "@/components/ui/FaqJsonLd";
 import ServiceJsonLd from "@/components/ui/ServiceJsonLd";
 import Footer from "@/components/layout/Footer";
+import TesterHint from "@/components/layout/TesterHint";
 import { BOOKING_DURATION_MIN, PRICE_RANGE_LABEL } from "@/lib/cta-links";
 
 export const metadata: Metadata = {
@@ -94,6 +95,7 @@ export default function HomePage() {
           items={faqHomepage}
         />
       </main>
+      <TesterHint />
       <Footer variant="index" />
     </>
   );
