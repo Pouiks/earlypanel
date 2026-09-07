@@ -10,8 +10,8 @@
  * Usage :
  *   <BreadcrumbJsonLd
  *     items={[
- *       { name: "Accueil", url: "https://earlypanel.fr" },
- *       { name: "Entreprises", url: "https://earlypanel.fr/entreprises" },
+ *       { name: "Accueil", url: "https://www.earlypanel.fr" },
+ *       { name: "Entreprises", url: "https://www.earlypanel.fr/entreprises" },
  *     ]}
  *   />
  */

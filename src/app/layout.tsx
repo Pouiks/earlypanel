@@ -9,31 +9,22 @@ export const metadata: Metadata = {
   // Title : structure "promesse + marque" optimisee SEO. Mots-cles : tests
   // utilisateurs, panel humain, livraison rapide, France.
   title: {
-    default: "Tests utilisateurs clés en main · Panel humain qualifié — earlypanel",
+    default: "Tests utilisateurs clés en main · earlypanel",
     template: "%s · earlypanel",
   },
   description:
-    "Service de tests utilisateurs B2B en France. Panel humain de 75+ testeurs qualifiés (SaaS, fintech, healthtech, e-commerce). NDA contractualisé, atelier de cadrage offert, rapport livré en 5 jours.",
-  keywords: [
-    "tests utilisateurs",
-    "user testing France",
-    "panel testeurs",
-    "test UX",
-    "test produit SaaS",
-    "audit utilisateur",
-    "test MVP",
-    "tests qualitatifs",
-    "earlypanel",
-  ],
+    "Tests utilisateurs clés en main pour équipes produit. Testeurs choisis à la main, réponses relues par un humain, NDA inclus, rapport rédigé en 5 jours.",
+  // Pas de meta keywords : ignoree par Google depuis 2009, et elle expose la
+  // strategie SEO aux concurrents pour rien.
   authors: [{ name: "earlypanel" }],
-  metadataBase: new URL("https://earlypanel.fr"),
+  metadataBase: new URL("https://www.earlypanel.fr"),
   openGraph: {
     title: "earlypanel — Tests utilisateurs B2B clés en main",
     description:
-      "Panel humain de 75+ testeurs. NDA contractualisé. Rapport actionnable en 5 jours. Pour startups, scale-ups, agences digitales.",
+      "Testeurs choisis à la main, réponses relues par un humain, NDA inclus. Rapport rédigé en 5 jours, pas des vidéos brutes.",
     type: "website",
     locale: "fr_FR",
-    url: "https://earlypanel.fr",
+    url: "/",
     siteName: "earlypanel",
     images: [
       {
@@ -48,7 +39,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "earlypanel — Tests utilisateurs B2B clés en main",
-    description: "75+ testeurs qualifiés. NDA inclus. Rapport en 5 jours.",
+    description: "Testeurs choisis à la main. NDA inclus. Rapport rédigé en 5 jours.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -63,7 +54,7 @@ export const metadata: Metadata = {
     },
   },
   alternates: {
-    canonical: "https://earlypanel.fr",
+    canonical: "/",
   },
   // Icones du site : detectees par tous les browsers + iOS (Apple touch icon).
   // Les fichiers sont dans /public et servis a la racine.

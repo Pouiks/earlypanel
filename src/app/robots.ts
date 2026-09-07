@@ -23,7 +23,9 @@ import type { MetadataRoute } from "next";
  * Doc : https://nextjs.org/docs/app/api-reference/file-conventions/metadata/robots
  */
 
-const BASE_URL = "https://earlypanel.fr";
+import { SITE_URL } from "@/lib/site";
+
+const BASE_URL = SITE_URL;
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -51,7 +53,7 @@ export default function robots(): MetadataRoute.Robots {
     // Note : la directive `Host` n'est PAS standard. C'etait une extension
     // Yandex deprecated depuis 2018, jamais supportee par Google. Bing la
     // signale comme "unknown directive". La canonicalisation se fait deja
-    // via 301 redirects (Vercel auto www->non-www) + <link rel="canonical">
+    // via 308 redirect apex -> www (Vercel > Domains) + <link rel="canonical">
     // dans les metadata Next. On l'omet volontairement.
   };
 }

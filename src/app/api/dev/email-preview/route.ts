@@ -18,7 +18,7 @@ export const runtime = "nodejs";
  *
  * Sans `type` : page d'index listant les emails prévisualisables.
  */
-const SAMPLE_BASE = "https://earlypanel.fr";
+const SAMPLE_BASE = "https://www.earlypanel.fr";
 
 const TEMPLATES: Record<string, { label: string; render: () => string }> = {
   availability: {

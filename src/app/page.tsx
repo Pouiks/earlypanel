@@ -11,12 +11,14 @@ import AboutSection from "@/components/landing/AboutSection";
 import FaqAccordion from "@/components/ui/FaqAccordion";
 import FaqJsonLd from "@/components/ui/FaqJsonLd";
 import Footer from "@/components/layout/Footer";
+import { BOOKING_DURATION_MIN, PRICE_RANGE_LABEL } from "@/lib/cta-links";
 
 export const metadata: Metadata = {
-  title: "earlypanel · Tests utilisateurs clés en main",
+  // Le template du layout ajoute deja " · earlypanel" : ne pas le repeter ici.
+  title: { absolute: "Tests utilisateurs clés en main pour équipes produit · earlypanel" },
   description:
-    "Des vrais utilisateurs testent votre produit. Questionnaires ciblés, analyse actionnelle, livraison en 5 jours. Clés en main.",
-  alternates: { canonical: "https://earlypanel.fr" },
+    "Tests utilisateurs clés en main : testeurs choisis à la main, questionnaire écrit avec vous, réponses relues par un humain, rapport rédigé en 5 jours. Le rapport, pas le tableur.",
+  alternates: { canonical: "/" },
 };
 
 const jsonLd = {
@@ -25,11 +27,11 @@ const jsonLd = {
   name: "earlypanel",
   description:
     "Tests utilisateurs clés en main. Panel humain, questionnaires ciblés, rapport actionnable livré en 5 jours.",
-  url: "https://earlypanel.fr",
+  url: "https://www.earlypanel.fr",
   provider: {
     "@type": "Organization",
     name: "earlypanel",
-    url: "https://earlypanel.fr",
+    url: "https://www.earlypanel.fr",
   },
 };
 
@@ -58,11 +60,11 @@ const faqHomepage = [
   },
   {
     q: "Combien coûte un test utilisateur chez earlypanel ?",
-    a: "Le tarif est sur mesure, calculé après l'atelier de cadrage gratuit. Les variables principales : nombre de testeurs (5 à 30 selon l'objectif), niveau de niche du profil cible (un grand public coûte moins qu'un cardiologue ou un DAF), durée du parcours testé, et complexité du livrable. Pour un projet typique avec 8-15 testeurs et un rapport rédigé livré en 5 jours, comptez entre 1500 et 6000 € HT. Aucun abonnement annuel, paiement à la livraison.",
+    a: `Un forfait fixe par mission, chiffré sur devis après l'atelier de cadrage gratuit. Les variables principales : nombre de testeurs (5 à 30 selon l'objectif), niveau de niche du profil cible (un grand public coûte moins qu'un cardiologue ou un DAF), durée du parcours testé, et complexité du livrable. Pour un projet typique avec 8-15 testeurs et un rapport rédigé livré en 5 jours, comptez ${PRICE_RANGE_LABEL}. Aucun abonnement, pas de facturation au temps passé : 50 % à la commande, 50 % à la remise du rapport.`,
   },
   {
-    q: "Pourquoi choisir earlypanel plutôt qu'un outil SaaS comme UserTesting ou Maze ?",
-    a: "Trois différences structurelles. (1) Sélection humaine des testeurs : on lit chaque profil un par un selon vos critères, là où les SaaS s'appuient sur du matching automatique qui rate les niches. (2) Co-construction du questionnaire : un humain de l'équipe vous accompagne sur la rédaction au lieu d'utiliser un template générique. (3) Rapport rédigé livré + restitution équipe en visioconférence, là où les SaaS livrent un dashboard de verbatims bruts à analyser vous-même. earlypanel est un service, pas un outil que vous configurez seul.",
+    q: "Pourquoi choisir earlypanel plutôt qu'un outil SaaS comme UserTesting ou Maze, ou qu'un freelance UX ?",
+    a: "Face à un outil self-service, trois différences structurelles. (1) Sélection humaine des testeurs : on lit chaque profil un par un selon vos critères, là où les SaaS s'appuient sur du matching automatique qui rate les niches. (2) Co-construction du questionnaire : un humain de l'équipe vous accompagne sur la rédaction au lieu d'utiliser un template générique. (3) Rapport rédigé livré + restitution équipe en visioconférence, là où les SaaS livrent un dashboard de verbatims bruts à analyser vous-même. earlypanel est un service, pas un outil que vous configurez seul. Face à un freelance UX research (300 à 600 € par jour sur Malt), la différence est le panel : le freelance doit recruter les testeurs dans son réseau ou le vôtre, ce qui prend 2 à 4 semaines ; nous les avons déjà, sélectionnés et qualifiés, et le rapport arrive en 5 jours.",
   },
   {
     q: "earlypanel est-il disponible hors de France ?",
@@ -74,7 +76,7 @@ const faqHomepage = [
   },
   {
     q: "Comment démarrer un projet avec earlypanel ?",
-    a: "Réservez un appel gratuit de 30 minutes via le bouton « Réserver un appel » du site. On échange sur votre besoin (produit à tester, cible utilisateur, délai souhaité), on identifie si nos profils correspondent, et on vous envoie un devis personnalisé sous 48 heures. Si vous validez, on attaque l'atelier de cadrage la semaine suivante. Premier rapport livrable typiquement 7-10 jours après le premier appel.",
+    a: `Réservez un appel gratuit de ${BOOKING_DURATION_MIN} minutes via le bouton « Réserver un appel » du site, ou demandez d'abord le rapport d'exemple si vous voulez voir le livrable avant de parler à quelqu'un. On échange sur votre besoin (produit à tester, cible utilisateur, délai souhaité), on identifie si nos profils correspondent, et on vous envoie un forfait chiffré sous 48 heures. Si vous validez, on attaque l'atelier de cadrage la semaine suivante. Premier rapport livrable typiquement 7-10 jours après le premier appel.`,
   },
 ];
 
@@ -90,14 +92,13 @@ export default function HomePage() {
       <Nav />
       <main>
         <HeroLanding />
+        <LeadMagnetSection />
         <Separator />
         <StatementSection />
         <Separator />
         <ProcessSection />
         <Separator />
         <DifferentiatorsSection />
-        <Separator />
-        <LeadMagnetSection />
         <Separator />
         <AboutSection />
         <Separator />

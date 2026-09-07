@@ -15,25 +15,15 @@ import Footer from "@/components/layout/Footer";
 export const metadata: Metadata = {
   // Title B2C : exact match du mot-cle principal "devenir testeur remunere"
   // + chiffre attractif. Description : freins addresses (gratuit, paiement).
-  title: "Devenir testeur rémunéré · Jusqu'à 100€ par mission",
+  title: "Devenir testeur rémunéré · 15 à 100 € par mission",
   description:
     "Devenez testeur rémunéré pour applications et sites web. Inscription gratuite, paiement sous 72h par virement. Missions sur mesure adaptées à votre profil (salarié, freelance, étudiant, parent au foyer). 25 min en moyenne par mission.",
-  keywords: [
-    "devenir testeur rémunéré",
-    "testeur d'applications rémunéré",
-    "test produit payé",
-    "complément de revenu",
-    "panel testeur France",
-    "user testing rémunéré",
-    "tests utilisateurs payés",
-    "missions rémunérées en ligne",
-  ],
-  alternates: { canonical: "https://earlypanel.fr/testeurs" },
+  alternates: { canonical: "/testeurs" },
   openGraph: {
     title: "Devenir testeur rémunéré · earlypanel",
     description:
-      "Inscription gratuite. Jusqu'à 100€ par mission. Paiement sous 72h. 75+ testeurs déjà inscrits.",
-    url: "https://earlypanel.fr/testeurs",
+      "Inscription gratuite. 15 à 100 € par mission selon votre profil. Paiement sous 72h par virement.",
+    url: "/testeurs",
     type: "website",
     images: [
       {
@@ -103,8 +93,8 @@ export default function TesteursPage() {
       <FaqJsonLd items={faqB2C} />
       <BreadcrumbJsonLd
         items={[
-          { name: "Accueil", url: "https://earlypanel.fr" },
-          { name: "Devenir testeur", url: "https://earlypanel.fr/testeurs" },
+          { name: "Accueil", url: "https://www.earlypanel.fr" },
+          { name: "Devenir testeur", url: "https://www.earlypanel.fr/testeurs" },
         ]}
       />
 

@@ -111,10 +111,10 @@ export function buildLeadMagnetEmail(): string {
           <p style="font-size:14px;color:#6e6e73;line-height:1.6;margin:0 0 8px;">Merci pour votre intérêt !</p>
           <p style="font-size:14px;color:#6e6e73;line-height:1.6;margin:0 0 8px;">Vous trouverez en pièce jointe un exemple complet de rapport earlypanel : KPIs, verbatims, carte des frictions et recommandations actionnables.</p>
           <p style="font-size:14px;color:#6e6e73;line-height:1.6;margin:0 0 28px;">Une question ? Répondez directement à cet email.</p>
-          <a href="https://earlypanel.fr/entreprises" style="display:inline-block;background:#0A7A5A;color:#fff;padding:14px 28px;border-radius:980px;font-size:15px;font-weight:700;text-decoration:none;">Découvrir nos formules →</a>
+          <a href="https://www.earlypanel.fr/entreprises" style="display:inline-block;background:#0A7A5A;color:#fff;padding:14px 28px;border-radius:980px;font-size:15px;font-weight:700;text-decoration:none;">Découvrir nos formules →</a>
         </td></tr>
         <tr><td style="padding:20px 32px;border-top:0.5px solid rgba(0,0,0,0.08);">
-          <p style="font-size:11px;color:#86868B;margin:0;">earlypanel · <a href="https://earlypanel.fr" style="color:#86868B;">Confidentialité</a></p>
+          <p style="font-size:11px;color:#86868B;margin:0;">earlypanel · <a href="https://www.earlypanel.fr" style="color:#86868B;">Confidentialité</a></p>
         </td></tr>
       </table>
     </td></tr>
@@ -139,6 +139,8 @@ export function buildNewTesterAdminEmail(opts: {
   source?: string | null;
   prefilledFields?: {
     sector?: string | null;
+    job_title?: string | null;
+    city?: string | null;
     digital_level?: string | null;
     availability?: string | null;
   };
@@ -160,6 +162,12 @@ export function buildNewTesterAdminEmail(opts: {
   if (opts.lastName) filledAtRegistration.push({ key: "last_name", label: "Nom", value: opts.lastName });
   if (opts.prefilledFields?.sector) {
     filledAtRegistration.push({ key: "sector", label: "Secteur", value: opts.prefilledFields.sector });
+  }
+  if (opts.prefilledFields?.job_title) {
+    filledAtRegistration.push({ key: "job_title", label: "Métier", value: opts.prefilledFields.job_title });
+  }
+  if (opts.prefilledFields?.city) {
+    filledAtRegistration.push({ key: "city", label: "Ville", value: opts.prefilledFields.city });
   }
   if (opts.prefilledFields?.digital_level) {
     filledAtRegistration.push({ key: "digital_level", label: "Niveau digital", value: opts.prefilledFields.digital_level });
@@ -275,7 +283,7 @@ export function buildWelcomeEmail(magicLink: string, firstName?: string): string
           <p style="font-size:12px;color:#86868B;line-height:1.5;margin:24px 0 0;">Ce lien de connexion est valable 24h. Si vous n'avez pas demandé cet accès, ignorez cet email.</p>
         </td></tr>
         <tr><td style="padding:20px 32px;border-top:0.5px solid rgba(0,0,0,0.08);">
-          <p style="font-size:11px;color:#86868B;margin:0;">earlypanel · <a href="https://earlypanel.fr/confidentialite" style="color:#86868B;">Confidentialité</a> · <a href="https://earlypanel.fr/cgu" style="color:#86868B;">CGU</a></p>
+          <p style="font-size:11px;color:#86868B;margin:0;">earlypanel · <a href="https://www.earlypanel.fr/confidentialite" style="color:#86868B;">Confidentialité</a> · <a href="https://www.earlypanel.fr/cgu" style="color:#86868B;">CGU</a></p>
         </td></tr>
       </table>
     </td></tr>
@@ -321,11 +329,52 @@ export function buildAvailabilityCampaignEmail(opts: {
           <p style="font-size:12px;color:#86868B;line-height:1.5;margin:28px 0 0;">Ces liens sont personnels et valables 3 mois. Si vous n'êtes plus intéressé(e), le second bouton vous permet de vous mettre en pause ou de désactiver votre compte.</p>
         </td></tr>
         <tr><td style="padding:20px 32px;border-top:0.5px solid rgba(0,0,0,0.08);">
-          <p style="font-size:11px;color:#86868B;margin:0;">earlypanel · <a href="https://earlypanel.fr/confidentialite" style="color:#86868B;">Confidentialité</a></p>
+          <p style="font-size:11px;color:#86868B;margin:0;">earlypanel · <a href="https://www.earlypanel.fr/confidentialite" style="color:#86868B;">Confidentialité</a></p>
         </td></tr>
       </table>
     </td></tr>
   </table>
 </body>
 </html>`.trim();
+}
+
+/**
+ * Email interne : nouveau brief B2B recu via /entreprises#brief.
+ * Contenu saisi par un inconnu : tout est echappe avant insertion HTML.
+ */
+export function buildBriefAdminEmail(opts: {
+  email: string;
+  firstName: string;
+  lastName: string;
+  company: string;
+  productType: string;
+  budget: string;
+  need: string;
+  ip: string;
+  userAgent: string;
+}): string {
+  const esc = (s: string) =>
+    s
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  const row = (label: string, value: string) =>
+    `<tr><td style="padding:6px 12px 6px 0;color:#6e6e73;white-space:nowrap;vertical-align:top">${label}</td><td style="padding:6px 0">${value ? esc(value) : "<em>Non renseigné</em>"}</td></tr>`;
+  const name = `${opts.firstName} ${opts.lastName}`.trim();
+  return `
+<div style="font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;font-size:14px;color:#1d1d1f;line-height:1.5">
+  <h2 style="font-size:18px;margin:0 0 12px">Nouveau brief entreprise</h2>
+  <table style="border-collapse:collapse">
+    ${row("Contact", name)}
+    ${row("Email", opts.email)}
+    ${row("Entreprise", opts.company)}
+    ${row("Produit", opts.productType)}
+    ${row("Budget", opts.budget)}
+  </table>
+  <h3 style="font-size:14px;margin:18px 0 6px">Besoin</h3>
+  <p style="white-space:pre-wrap;background:#f5f5f7;padding:12px;border-radius:8px;margin:0">${esc(opts.need)}</p>
+  <p style="color:#86868b;font-size:12px;margin-top:18px">IP ${esc(opts.ip)} · ${esc(opts.userAgent)}</p>
+  <p style="margin-top:12px"><a href="mailto:${esc(opts.email)}">Répondre à ${esc(opts.email)}</a></p>
+</div>`;
 }

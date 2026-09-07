@@ -2,10 +2,15 @@ import type { Metadata } from "next";
 import LegalLayout from "@/components/layout/LegalLayout";
 
 export const metadata: Metadata = {
-  title: "CGU · earlypanel",
+  // Le template du layout ajoute " · earlypanel" : titre unique sans doublon.
+  title: "Conditions générales d'utilisation",
   description: "Conditions générales d'utilisation de la plateforme earlypanel pendant la phase de pré-lancement.",
-  alternates: { canonical: "https://earlypanel.fr/cgu" },
-  robots: { index: true, follow: true },
+  alternates: { canonical: "/cgu" },
+  // noindex tant que le document est marque "temporaire / pre-lancement" :
+  // on ne veut pas que Google ou un LLM cite un texte qui dit qu'aucune
+  // activite commerciale n'est exercee. Repasser a index: true quand la
+  // structure juridique et les CGV definitives seront publiees.
+  robots: { index: false, follow: true },
 };
 
 export default function CguPage() {
@@ -13,7 +18,7 @@ export default function CguPage() {
     <LegalLayout title="Conditions générales d'utilisation" lastUpdated="28 avril 2026" temporary>
       <h2>1. Objet</h2>
       <p>
-        Les présentes Conditions Générales d&apos;Utilisation (CGU) régissent l&apos;accès et l&apos;utilisation de la plateforme earlypanel, accessible à <a href="https://earlypanel.fr">earlypanel.fr</a>, pendant sa <strong>phase de pré-lancement</strong>. earlypanel a vocation, à terme, à mettre en relation des entreprises souhaitant tester leurs produits numériques avec des testeurs rémunérés.
+        Les présentes Conditions Générales d&apos;Utilisation (CGU) régissent l&apos;accès et l&apos;utilisation de la plateforme earlypanel, accessible à <a href="https://www.earlypanel.fr">earlypanel.fr</a>, pendant sa <strong>phase de pré-lancement</strong>. earlypanel a vocation, à terme, à mettre en relation des entreprises souhaitant tester leurs produits numériques avec des testeurs rémunérés.
       </p>
       <p>
         À la date de publication des présentes, aucune mission rémunérée n&apos;est encore active. Le panel est en cours de constitution.

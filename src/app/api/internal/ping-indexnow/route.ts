@@ -17,7 +17,7 @@ import { NextResponse, type NextRequest } from "next/server";
  *
  *   POST /api/internal/ping-indexnow
  *   Headers: Authorization: Bearer ${INDEXNOW_TRIGGER_SECRET}
- *   Body:    { "urls": ["https://earlypanel.fr/blog/tests-utilisateurs-prix"] }
+ *   Body:    { "urls": ["https://www.earlypanel.fr/blog/tests-utilisateurs-prix"] }
  *
  *   Reponse: { ok: true, submitted: 1, status: 200 }
  *
@@ -30,7 +30,7 @@ import { NextResponse, type NextRequest } from "next/server";
  * Pre-requis (a faire une fois) :
  *   1. Generer une cle aleatoire 32+ caracteres alphanumeric
  *   2. La poser comme env var INDEXNOW_KEY (cote serveur)
- *   3. Servir cette cle a https://earlypanel.fr/{KEY}.txt (contenu = la cle)
+ *   3. Servir cette cle a https://www.earlypanel.fr/{KEY}.txt (contenu = la cle)
  *      → fichier statique dans public/{KEY}.txt
  *   4. Generer un secret distinct pour proteger la route : INDEXNOW_TRIGGER_SECRET
  */

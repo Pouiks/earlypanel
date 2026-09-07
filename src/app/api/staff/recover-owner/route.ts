@@ -18,7 +18,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // ensuite. Garder la cle longue, secrete, et la rotater apres usage reel.
 //
 // Utilisation :
-//   curl -X POST https://earlypanel.fr/api/staff/recover-owner \
+//   curl -X POST https://www.earlypanel.fr/api/staff/recover-owner \
 //     -H "Content-Type: application/json" \
 //     -d '{"email":"virgilejoinville@gmail.com","recovery_key":"<STAFF_SETUP_KEY>"}'
 

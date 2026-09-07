@@ -14,31 +14,21 @@ import BreadcrumbJsonLd from "@/components/ui/BreadcrumbJsonLd";
 import ServiceJsonLd from "@/components/ui/ServiceJsonLd";
 import CtaFinal from "@/components/b2b/CtaFinal";
 import Footer from "@/components/layout/Footer";
+import { BOOKING_DURATION_MIN, PRICE_RANGE_LABEL } from "@/lib/cta-links";
 
 export const metadata: Metadata = {
   // Title B2B optimise : intention "tests utilisateurs" + qualifier "B2B"
   // + benefice "clés en main". Description riche en mots-cles longue traine.
   title: "Tests utilisateurs B2B clés en main · 5 jours · NDA inclus",
+  // Description <= 155 caracteres pour ne pas etre tronquee dans la SERP.
   description:
-    "Service de tests utilisateurs pour startups, scale-ups et agences. Panel de 75+ testeurs sélectionnés manuellement (SaaS, fintech, healthtech, e-commerce). NDA contractualisé, atelier de cadrage offert, rapport actionnable livré en 5 jours. Devis sur mesure.",
-  keywords: [
-    "tests utilisateurs B2B",
-    "user testing France",
-    "test SaaS",
-    "test MVP",
-    "audit UX",
-    "panel testeurs qualifiés",
-    "tests produit clés en main",
-    "test maquette Figma",
-    "test prototype",
-    "test recette staging",
-  ],
-  alternates: { canonical: "https://earlypanel.fr/entreprises" },
+    "Tests utilisateurs pour startups et agences : testeurs choisis à la main, NDA inclus, rapport rédigé en 5 jours. Forfait fixe sur devis.",
+  alternates: { canonical: "/entreprises" },
   openGraph: {
     title: "Tests utilisateurs B2B clés en main · earlypanel",
     description:
-      "75+ testeurs qualifiés. NDA contractualisé. Rapport en 5 jours. Devis sur mesure.",
-    url: "https://earlypanel.fr/entreprises",
+      "Testeurs choisis à la main. NDA inclus. Rapport rédigé en 5 jours. Forfait fixe sur devis.",
+    url: "/entreprises",
     type: "website",
     images: [
       {
@@ -63,7 +53,7 @@ export const metadata: Metadata = {
 const faqB2B = [
   {
     q: "Combien coûte un test utilisateur en B2B ?",
-    a: "Le tarif d'un test utilisateur B2B varie en fonction du profil recherché et de la complexité du parcours testé. Chez earlypanel, on construit un devis sur mesure après l'atelier de cadrage : nombre de testeurs, niveau de niche du profil (un DAF coûte plus qu'un grand public), durée du test, livrable attendu. Comptez généralement entre 1500 et 6000 € HT pour un projet complet livré en 5 jours, NDA et restitution inclus. Pour un budget précis, prenez 30 minutes avec nous : on chiffre sur le call.",
+    a: `Le tarif d'un test utilisateur B2B varie en fonction du profil recherché et de la complexité du parcours testé. Chez earlypanel, c'est un forfait fixe par mission, chiffré après l'atelier de cadrage : nombre de testeurs, niveau de niche du profil (un DAF coûte plus qu'un grand public), durée du test, livrable attendu. Comptez généralement ${PRICE_RANGE_LABEL} pour un projet complet livré en 5 jours, NDA et restitution inclus. Pas d'abonnement, pas de facturation au temps passé. Pour un chiffre précis, prenez ${BOOKING_DURATION_MIN} minutes avec nous : on chiffre sur le call.`,
   },
   {
     q: "Combien de testeurs faut-il pour un test utilisateur ?",
@@ -87,11 +77,11 @@ const faqB2B = [
   },
   {
     q: "Comment sélectionnez-vous les testeurs B2B ?",
-    a: "Sélection humaine, mission par mission. Vous décrivez votre cible (métier, secteur d'activité, ancienneté, taille d'entreprise, équipement, niveau digital) lors de l'atelier de cadrage. On pioche manuellement dans notre panel de 75+ profils français qualifiés les personnes qui correspondent. Pas d'algorithme de matching qui simule une cible : un humain regarde chaque profil et valide. Ça change tout pour les niches (santé, juridique, finance, IT).",
+    a: "Sélection humaine, mission par mission. Vous décrivez votre cible (métier, secteur d'activité, ancienneté, taille d'entreprise, équipement, niveau digital) lors de l'atelier de cadrage. On pioche manuellement dans notre panel de profils français qualifiés les personnes qui correspondent. Pas d'algorithme de matching qui simule une cible : un humain regarde chaque profil et valide. Ça change tout pour les niches (santé, juridique, finance, IT).",
   },
   {
     q: "Quel est le délai pour obtenir un rapport de test utilisateur ?",
-    a: "5 jours ouvrés à partir du lancement effectif des tests (donc une fois le questionnaire validé et les testeurs sélectionnés). Sur des scopes serrés (5 testeurs, parcours simple), c'est parfois 3-4 jours. Sur des scopes complexes (10+ testeurs, parcours en plusieurs étapes, profils niches difficiles à recruter), comptez 7-10 jours. Si vous avez une deadline ferme, on en discute dès le premier appel : on dimensionne la mission pour tenir l'échéance.",
+    a: "5 jours ouvrés à partir du lancement effectif des tests (donc une fois le questionnaire validé et les testeurs sélectionnés). Ce délai est plus long que les 24-48 h des plateformes self-service parce qu'il inclut la relecture de chaque réponse et la rédaction du rapport : vous recevez une analyse, pas des enregistrements bruts. Sur des scopes serrés (5 testeurs, parcours simple), c'est parfois 3-4 jours. Sur des scopes complexes (10+ testeurs, parcours en plusieurs étapes, profils niches difficiles à recruter), comptez 7-10 jours. Si vous avez une deadline ferme, on en discute dès le premier appel : on dimensionne la mission pour tenir l'échéance.",
   },
   {
     q: "Tests utilisateurs et RGPD : où sont stockées les données collectées ?",
@@ -111,8 +101,8 @@ export default function EntreprisesPage() {
       <FaqJsonLd items={faqB2B} />
       <BreadcrumbJsonLd
         items={[
-          { name: "Accueil", url: "https://earlypanel.fr" },
-          { name: "Entreprises", url: "https://earlypanel.fr/entreprises" },
+          { name: "Accueil", url: "https://www.earlypanel.fr" },
+          { name: "Entreprises", url: "https://www.earlypanel.fr/entreprises" },
         ]}
       />
       {/* JSON-LD : 3 packs Service pour rich results commerciaux + citations LLM. */}

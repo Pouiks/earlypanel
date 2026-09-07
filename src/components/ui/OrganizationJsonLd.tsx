@@ -19,8 +19,8 @@ const ORG_JSON = {
   "@type": "Organization",
   name: "earlypanel",
   legalName: "earlypanel",
-  url: "https://earlypanel.fr",
-  logo: "https://earlypanel.fr/og-image.png",
+  url: "https://www.earlypanel.fr",
+  logo: "https://www.earlypanel.fr/og-image.png",
   description:
     "Service français de tests utilisateurs B2B clés en main. Panel humain qualifié, NDA contractualisé, rapport livré en 5 jours.",
   foundingDate: "2026",
@@ -53,7 +53,7 @@ const WEBSITE_JSON = {
   "@type": "WebSite",
   name: "earlypanel",
   alternateName: "earlypanel.fr",
-  url: "https://earlypanel.fr",
+  url: "https://www.earlypanel.fr",
   inLanguage: "fr-FR",
   publisher: {
     "@type": "Organization",

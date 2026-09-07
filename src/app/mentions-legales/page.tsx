@@ -2,10 +2,15 @@ import type { Metadata } from "next";
 import LegalLayout from "@/components/layout/LegalLayout";
 
 export const metadata: Metadata = {
-  title: "Mentions légales · earlypanel",
+  // Le template du layout ajoute " · earlypanel" : titre unique sans doublon.
+  title: "Mentions légales",
   description: "Mentions légales d'earlypanel : éditeur, hébergeur, contact.",
-  alternates: { canonical: "https://earlypanel.fr/mentions-legales" },
-  robots: { index: true, follow: true },
+  alternates: { canonical: "/mentions-legales" },
+  // noindex tant que le document est marque "temporaire / pre-lancement" :
+  // on ne veut pas que Google ou un LLM cite un texte qui dit qu'aucune
+  // activite commerciale n'est exercee. Repasser a index: true quand la
+  // structure juridique et les CGV definitives seront publiees.
+  robots: { index: false, follow: true },
 };
 
 export default function MentionsLegalesPage() {

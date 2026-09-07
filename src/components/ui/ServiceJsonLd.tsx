@@ -2,22 +2,36 @@
  * JSON-LD `Service` pour la page B2B.
  *
  * Permet a Google et aux LLM de comprendre la nature du service (tests
- * utilisateurs, France) sans afficher de prix. Les forfaits sont definis
- * en atelier de cadrage avec chaque client : pas de tarification publique
- * (les "prix transparents" ont ete retires car non representatifs).
+ * utilisateurs, France). Le prix est un forfait fixe sur devis ; on expose la
+ * fourchette publique (identique a la FAQ) via PriceSpecification pour que
+ * les LLM ne citent pas d'anciens packs.
  */
+import { PRICE_RANGE_LABEL } from "@/lib/cta-links";
 
 const SERVICE_JSON = {
   "@context": "https://schema.org",
   "@type": "Service",
-  "@id": "https://earlypanel.fr/entreprises#service",
-  name: "Tests utilisateurs B2B sur mesure",
+  "@id": "https://www.earlypanel.fr/entreprises#service",
+  name: "Tests utilisateurs B2B clés en main",
   description:
-    "Tests utilisateurs cles en main pour startups, scale-ups et agences. Panel humain de 75+ testeurs selectionnes manuellement (SaaS, fintech, healthtech, e-commerce). NDA contractualise, atelier de cadrage offert, rapport actionnable livre en 5 jours ouvres. Forfait defini sur devis a chaque mission.",
-  provider: { "@type": "Organization", name: "earlypanel", url: "https://earlypanel.fr" },
+    `Tests utilisateurs clés en main pour équipes produit, startups et agences. Testeurs sélectionnés manuellement selon la cible (SaaS, santé, finance, e-commerce), questionnaire co-construit, relecture humaine de chaque réponse, NDA signé avant tout échange, rapport rédigé et restitution en visio sous 5 jours ouvrés. Forfait fixé sur devis après un atelier de cadrage offert, généralement ${PRICE_RANGE_LABEL}.`,
+  provider: { "@type": "Organization", name: "earlypanel", url: "https://www.earlypanel.fr" },
   areaServed: { "@type": "Country", name: "France" },
   serviceType: "User Testing",
-  url: "https://earlypanel.fr/entreprises",
+  url: "https://www.earlypanel.fr/entreprises",
+  offers: {
+    "@type": "Offer",
+    priceCurrency: "EUR",
+    priceSpecification: {
+      "@type": "PriceSpecification",
+      minPrice: 1500,
+      maxPrice: 6000,
+      priceCurrency: "EUR",
+      valueAddedTaxIncluded: false,
+    },
+    availability: "https://schema.org/LimitedAvailability",
+    url: "https://www.earlypanel.fr/entreprises#brief",
+  },
 };
 
 export default function ServiceJsonLd() {
