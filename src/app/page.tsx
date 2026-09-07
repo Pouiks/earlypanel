@@ -7,7 +7,6 @@ import StatementSection from "@/components/landing/StatementSection";
 import ProcessSection from "@/components/landing/ProcessSection";
 import DifferentiatorsSection from "@/components/landing/DifferentiatorsSection";
 import LeadMagnetSection from "@/components/landing/LeadMagnetSection";
-import AboutSection from "@/components/landing/AboutSection";
 import FaqAccordion from "@/components/ui/FaqAccordion";
 import FaqJsonLd from "@/components/ui/FaqJsonLd";
 import ServiceJsonLd from "@/components/ui/ServiceJsonLd";
@@ -88,8 +87,6 @@ export default function HomePage() {
         <ProcessSection />
         <Separator />
         <DifferentiatorsSection />
-        <Separator />
-        <AboutSection />
         <Separator />
         <FaqAccordion
           eyebrow="Questions fréquentes"
