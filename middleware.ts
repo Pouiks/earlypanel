@@ -1,5 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { getSupabaseJwks } from "@/lib/supabase-jwks";
+import { STAFF_COOKIE_NAME, STAFF_COOKIE_TTL_S, signStaffCookie } from "@/lib/staff-session-cookie";
 
 const PUBLIC_PATHS = [
   "/",
@@ -67,7 +69,8 @@ export async function middleware(request: NextRequest) {
   // ne peut pas verifier localement (cle HS256, jeton expire a rafraichir).
   let user: { id: string; app_metadata?: Record<string, unknown> } | null = null;
   try {
-    const { data: claimsData, error: claimsErr } = await supabase.auth.getClaims();
+    const keys = getSupabaseJwks();
+    const { data: claimsData, error: claimsErr } = await supabase.auth.getClaims(undefined, keys ? { keys } : undefined);
     if (!claimsErr && claimsData?.claims?.sub) {
       const c = claimsData.claims as { sub: string; app_metadata?: Record<string, unknown> };
       user = { id: c.sub, app_metadata: c.app_metadata ?? {} };
@@ -105,11 +108,23 @@ export async function middleware(request: NextRequest) {
       if (staffCookie !== "true") {
         const { data: member } = await supabase
           .from("staff_members")
-          .select("id")
+          .select("id, email")
           .eq("auth_user_id", user.id)
           .maybeSingle();
         if (!member) {
           return NextResponse.redirect(new URL("/staff/login", request.url));
+        }
+        // Cookie signe lu par getStaffMember() : evite une lecture DB par
+        // requete API (Edge n'a pas de cache memoire fiable). Meme TTL.
+        const signed = await signStaffCookie({ sid: member.id, email: member.email ?? "", uid: user.id });
+        if (signed) {
+          response.cookies.set(STAFF_COOKIE_NAME, signed, {
+            path: "/",
+            httpOnly: true,
+            sameSite: "lax",
+            secure: process.env.NODE_ENV === "production",
+            maxAge: STAFF_COOKIE_TTL_S,
+          });
         }
         response.cookies.set("tp-staff-ok", "true", {
           path: "/",
