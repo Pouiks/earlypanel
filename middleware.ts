@@ -46,7 +46,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  let response = NextResponse.next({ request });
+  const response = NextResponse.next({ request });
 
   const supabase = createServerClient(supabaseUrl, supabaseKey, {
     cookies: {
@@ -62,9 +62,23 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // Verification locale du JWT (JWKS en cache) : evite un aller-retour vers
+  // Supabase Auth a chaque navigation. Fallback getUser() (reseau) si le SDK
+  // ne peut pas verifier localement (cle HS256, jeton expire a rafraichir).
+  let user: { id: string; app_metadata?: Record<string, unknown> } | null = null;
+  try {
+    const { data: claimsData, error: claimsErr } = await supabase.auth.getClaims();
+    if (!claimsErr && claimsData?.claims?.sub) {
+      const c = claimsData.claims as { sub: string; app_metadata?: Record<string, unknown> };
+      user = { id: c.sub, app_metadata: c.app_metadata ?? {} };
+    }
+  } catch {
+    /* fallback */
+  }
+  if (!user) {
+    const { data: { user: full } } = await supabase.auth.getUser();
+    user = full ? { id: full.id, app_metadata: full.app_metadata ?? {} } : null;
+  }
 
   if (!user) {
     if (pathname.startsWith("/staff")) {

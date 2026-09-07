@@ -1156,6 +1156,8 @@ if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
 
 > **RÈGLE** : Aucune nouvelle route `/api/*` sans le bon pattern. Pas d'exception "temporaire".
 
+**Latence (2026-09-07)** : fonctions Vercel epinglees en `arn1` (Stockholm, meme region que Supabase `eu-north-1`) via `vercel.json`. `getStaffUser` et le middleware verifient le JWT localement (`auth.getClaims()`, JWKS en cache module) avec fallback `getUser()` ; `getStaffMember` met la ligne `staff_members` en cache memoire 2 min par instance (meme fenetre que le cookie `tp-staff-ok`). Un staff revoque garde l'acces au plus 2 min sur une instance chaude : compromis accepte (M6).
+
 ### 13.2 Rate-limiting
 
 Toute route qui prend un email ou un identifiant utilisateur doit rate-limiter par **IP** ET par **email** :
