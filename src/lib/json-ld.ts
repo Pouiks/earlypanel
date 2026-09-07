@@ -126,5 +126,5 @@ export function breadcrumbJsonLd(items: BreadcrumbItem[]) {
 
 /** Serialisation sure pour <script type="application/ld+json"> (anti </script>). */
 export function serializeJsonLd(data: unknown): string {
-  return JSON.stringify(data).replace(/</g, "\u003c");
+  return JSON.stringify(data).replace(/</g, "\\u003c");
 }
