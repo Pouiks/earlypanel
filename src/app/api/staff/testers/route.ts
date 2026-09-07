@@ -27,7 +27,11 @@ const SELECT_COLUMNS =
  * `count=1` : renvoie { total } sans les lignes (compteur live des filtres).
  */
 export async function GET(request: NextRequest) {
+  // Server-Timing : visible dans DevTools > Timing > Server Timing. Sert a
+  // attribuer la latence (auth / base / total) sans deviner.
+  const t0 = Date.now();
   const staff = await getStaffMember();
+  const tAuth = Date.now() - t0;
   if (!staff) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
@@ -144,12 +148,18 @@ export async function GET(request: NextRequest) {
 
   // Les deux lectures sont independantes : en parallele plutot qu'en serie
   // (tester_payment_info ne contient que des ids, table petite).
+  const tDb0 = Date.now();
   const [{ data, error }, { data: paymentRows }] = await Promise.all([
     applyFilters(
       admin.from("testers").select(SELECT_COLUMNS).order("created_at", { ascending: false }).range(offset, offset + limit - 1),
     ),
     admin.from("tester_payment_info").select("tester_id"),
   ]);
+
+  const tDb = Date.now() - tDb0;
+  const serverTiming = () => ({
+    "Server-Timing": `auth;dur=${tAuth}, db;dur=${tDb}, total;dur=${Date.now() - t0}`,
+  });
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -169,8 +179,8 @@ export async function GET(request: NextRequest) {
         age: ageFromBirthDate(row.birth_date),
       };
     });
-    return NextResponse.json(annotated);
+    return NextResponse.json(annotated, { headers: serverTiming() });
   }
 
-  return NextResponse.json(rows);
+  return NextResponse.json(rows, { headers: serverTiming() });
 }
