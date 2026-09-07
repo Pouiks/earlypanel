@@ -13,17 +13,24 @@ export const runtime = "nodejs";
 // Cron : relance les testeurs inscrits (status='pending') dont le profil
 // n'est pas complet, avec un magic link vers l'onboarding.
 //
-// Cadence : 1re relance PROFILE_REMINDER_AFTER_DAYS apres l'inscription,
-// puis une tous les PROFILE_REMINDER_COOLDOWN_DAYS, PROFILE_REMINDER_MAX
-// relances au total. Ensuite on arrete : un profil jamais complete apres
-// 3 rappels ne le sera pas, et on ne veut pas finir en spam.
+// Cadence anti-spam (reputation du domaine) :
+//   - 1re relance PROFILE_REMINDER_AFTER_DAYS apres l'inscription
+//   - puis une relance tous les PROFILE_REMINDER_COOLDOWN_DAYS, jamais plus
+//   - PROFILE_REMINDER_MAX relances au total ; la derniere annonce la pause
+//   - PROFILE_REMINDER_COOLDOWN_DAYS apres la derniere relance sans reponse,
+//     le testeur passe en status='inactive' (pas dispo). Reversible : s'il
+//     complete son onboarding plus tard, il repasse pending puis active.
 //
 // Idempotence : `profile_reminder_sent_at` (cooldown) + `profile_reminder_count`
-// (plafond), mis a jour APRES l'envoi reussi. Un testeur passe en 'inactive'
-// (opt-out) ou 'active' (profil complete) sort du filtre tout seul.
+// (plafond), mis a jour APRES l'envoi reussi ; la mise en pause est une
+// transition mono-directionnelle pending -> inactive.
+//
+// Parametres de test :
+//   ?dry_run=1  : aucune ecriture, aucun email ; renvoie la liste des cibles
+//   ?limit=N    : borne le nombre d'emails de ce passage (max BATCH_LIMIT)
 
 const PROFILE_REMINDER_AFTER_DAYS = 2;
-const PROFILE_REMINDER_COOLDOWN_DAYS = 7;
+const PROFILE_REMINDER_COOLDOWN_DAYS = 5;
 const PROFILE_REMINDER_MAX = 3;
 const BATCH_LIMIT = 200;
 
@@ -38,6 +45,11 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const url = new URL(request.url);
+  const dryRun = ["1", "true"].includes(url.searchParams.get("dry_run") ?? "");
+  const limitParam = Number.parseInt(url.searchParams.get("limit") ?? "", 10);
+  const limit = Number.isFinite(limitParam) && limitParam > 0 ? Math.min(limitParam, BATCH_LIMIT) : BATCH_LIMIT;
+
   const admin = createAdminClient();
   if (!admin) return NextResponse.json({ error: "Config manquante" }, { status: 500 });
 
@@ -48,9 +60,11 @@ export async function GET(request: Request) {
   }
 
   const now = new Date();
+  const nowIso = now.toISOString();
   const createdBefore = new Date(now.getTime() - PROFILE_REMINDER_AFTER_DAYS * 86_400_000).toISOString();
   const reminderBefore = new Date(now.getTime() - PROFILE_REMINDER_COOLDOWN_DAYS * 86_400_000).toISOString();
 
+  // ---- Passe 1 : relances ------------------------------------------------
   const { data: candidates, error } = await admin
     .from("testers")
     .select("*")
@@ -60,31 +74,52 @@ export async function GET(request: Request) {
     .lt("profile_reminder_count", PROFILE_REMINDER_MAX)
     .or(`profile_reminder_sent_at.is.null,profile_reminder_sent_at.lt.${reminderBefore}`)
     .order("created_at", { ascending: true })
-    .limit(BATCH_LIMIT);
+    .limit(limit);
 
   if (error) {
     console.error("[cron/profile-reminders] select failed", error.message);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  if (!candidates || candidates.length === 0) {
-    return NextResponse.json({ reminded: 0, skipped: 0, errors: [] });
+  // ---- Passe 2 : mise en pause apres la derniere relance sans reponse ----
+  const { data: toPause, error: pauseSelErr } = await admin
+    .from("testers")
+    .select("id, email, profile_reminder_sent_at")
+    .eq("status", "pending")
+    .eq("profile_completed", false)
+    .gte("profile_reminder_count", PROFILE_REMINDER_MAX)
+    .lt("profile_reminder_sent_at", reminderBefore)
+    .limit(BATCH_LIMIT);
+
+  if (pauseSelErr) {
+    console.error("[cron/profile-reminders] pause select failed", pauseSelErr.message);
+    return NextResponse.json({ error: pauseSelErr.message }, { status: 500 });
   }
 
-  const nowIso = now.toISOString();
+  const targets = (candidates ?? []).map((t) => {
+    const c = computeProfileCompleteness(t);
+    return { tester: t, completeness: c, reminderNumber: (t.profile_reminder_count ?? 0) + 1 };
+  }).filter((x) => !x.completeness.isComplete && !!x.tester.email);
+
+  if (dryRun) {
+    return NextResponse.json({
+      dry_run: true,
+      would_remind: targets.map((x) => ({
+        email: x.tester.email,
+        created_at: x.tester.created_at,
+        reminder_number: x.reminderNumber,
+        missing_count: x.completeness.count,
+      })),
+      would_pause: (toPause ?? []).map((t) => ({ email: t.email, last_reminder_at: t.profile_reminder_sent_at })),
+      config: { after_days: PROFILE_REMINDER_AFTER_DAYS, cooldown_days: PROFILE_REMINDER_COOLDOWN_DAYS, max: PROFILE_REMINDER_MAX, limit },
+    });
+  }
+
   let reminded = 0;
-  let skipped = 0;
+  const skipped = (candidates?.length ?? 0) - targets.length;
   const errors: { tester_id: string; reason: string }[] = [];
 
-  for (const tester of candidates) {
-    // Defense en profondeur : si le trigger DB n'a pas encore active le
-    // profil mais qu'il est complet cote app, pas de relance.
-    const completeness = computeProfileCompleteness(tester);
-    if (completeness.isComplete || !tester.email) {
-      skipped++;
-      continue;
-    }
-
+  for (const { tester, completeness, reminderNumber } of targets) {
     try {
       const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
         type: "magiclink",
@@ -100,11 +135,11 @@ export async function GET(request: Request) {
       callback.searchParams.set("type", "magiclink");
       callback.searchParams.set("next", "/app/onboarding");
 
-      const reminderNumber = (tester.profile_reminder_count ?? 0) + 1;
+      const isLast = reminderNumber >= PROFILE_REMINDER_MAX;
       await sendEmail({
         to: tester.email,
         toName: `${tester.first_name ?? ""} ${tester.last_name ?? ""}`.trim() || undefined,
-        subject: reminderNumber >= PROFILE_REMINDER_MAX
+        subject: isLast
           ? "Dernier rappel : votre profil earlypanel est incomplet"
           : `Il manque ${completeness.count} information${completeness.count > 1 ? "s" : ""} à votre profil earlypanel`,
         html: buildProfileReminderEmail({
@@ -113,14 +148,15 @@ export async function GET(request: Request) {
           missingLabels: completeness.missing.map((m) => m.label),
           magicLink: callback.toString(),
           reminderNumber,
-          isLast: reminderNumber >= PROFILE_REMINDER_MAX,
+          isLast,
+          pauseAfterDays: PROFILE_REMINDER_COOLDOWN_DAYS,
         }),
       });
 
       // Idempotence : APRES l'envoi reussi.
       const { error: updErr } = await admin
         .from("testers")
-        .update({ profile_reminder_sent_at: nowIso, profile_reminder_count: reminderNumber })
+        .update({ profile_reminder_sent_at: nowIso, profile_reminder_count: reminderNumber, updated_at: nowIso })
         .eq("id", tester.id);
       if (updErr) {
         console.error("[cron/profile-reminders] update failed", tester.id, updErr.message);
@@ -133,7 +169,25 @@ export async function GET(request: Request) {
     }
   }
 
-  log.info("profile reminders sent", { reminded, skipped, errors: errors.length });
+  // Mise en pause : transition mono-directionnelle, filtre atomique sur le
+  // statut precedent (anti-race si le testeur complete pile a ce moment).
+  let paused = 0;
+  for (const t of toPause ?? []) {
+    const { data: upd, error: pauseErr } = await admin
+      .from("testers")
+      .update({ status: "inactive", updated_at: nowIso })
+      .eq("id", t.id)
+      .eq("status", "pending")
+      .eq("profile_completed", false)
+      .select("id");
+    if (pauseErr) {
+      errors.push({ tester_id: t.id, reason: "pause_failed" });
+      continue;
+    }
+    if (upd && upd.length > 0) paused++;
+  }
+
+  log.info("profile reminders", { reminded, skipped, paused, errors: errors.length });
 
   await logStaffAction({
     staff_id: null,
@@ -143,12 +197,14 @@ export async function GET(request: Request) {
     metadata: {
       reminded,
       skipped,
+      paused,
       errors,
       after_days: PROFILE_REMINDER_AFTER_DAYS,
       cooldown_days: PROFILE_REMINDER_COOLDOWN_DAYS,
       max: PROFILE_REMINDER_MAX,
+      limit,
     },
   });
 
-  return NextResponse.json({ reminded, skipped, errors });
+  return NextResponse.json({ reminded, skipped, paused, errors });
 }

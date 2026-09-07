@@ -6,8 +6,9 @@
 --
 -- Idempotence :
 --   - profile_reminder_sent_at : cooldown (pas plus d'une relance tous les
---     7 jours), mis a jour APRES envoi reussi.
---   - profile_reminder_count   : plafond (3 relances max, puis on arrete).
+--     5 jours), mis a jour APRES envoi reussi.
+--   - profile_reminder_count   : plafond (3 relances max), puis 5 jours
+--     apres la derniere sans reponse : status pending -> inactive.
 -- =====================================================================
 
 ALTER TABLE public.testers

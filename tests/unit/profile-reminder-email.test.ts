@@ -34,8 +34,15 @@ describe("buildProfileReminderEmail", () => {
     expect(html).toContain("Bonjour,");
   });
 
-  it("le dernier rappel le dit explicitement", () => {
-    const html = buildProfileReminderEmail({ ...base, reminderNumber: 3, isLast: true });
+  it("le dernier rappel annonce la mise en pause avec le délai", () => {
+    const html = buildProfileReminderEmail({ ...base, reminderNumber: 3, isLast: true, pauseAfterDays: 5 });
     expect(html).toContain("dernier rappel");
+    expect(html).toContain("Sans réponse sous 5 jours");
+    expect(html).toContain("mise en pause");
+  });
+
+  it("les rappels intermédiaires ne parlent pas de pause", () => {
+    const html = buildProfileReminderEmail(base);
+    expect(html).not.toContain("mise en pause");
   });
 });

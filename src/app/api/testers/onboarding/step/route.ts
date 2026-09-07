@@ -144,6 +144,21 @@ export async function PATCH(request: NextRequest) {
     // Ne PAS forcer profile_completed=true ici : le trigger `auto_activate_tester` (DB)
     // est le seul a poser profile_completed=true ET status='active' atomiquement,
     // et uniquement quand tous les champs requis sont presents.
+    //
+    // Cas 'inactive' (mis en pause par le cron profile-reminders, ou opt-out
+    // avant completion) : le trigger n'agit que sur status='pending'. On
+    // repasse donc en pending dans le MEME update pour qu'il puisse activer
+    // le profil si tout est rempli. Le testeur qui finit son onboarding
+    // redevient disponible, c'est le comportement voulu.
+    const { data: current } = await supabase
+      .from("testers")
+      .select("status")
+      .eq("auth_user_id", user.id)
+      .maybeSingle();
+    if (current?.status === "inactive") {
+      updatePayload.status = "pending";
+    }
+
     const { error: updateError } = await supabase
       .from("testers")
       .update(updatePayload)

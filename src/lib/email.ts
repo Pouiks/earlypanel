@@ -395,6 +395,8 @@ export function buildProfileReminderEmail(opts: {
   magicLink: string;
   reminderNumber: number;
   isLast: boolean;
+  /** Delai avant mise en pause de l'inscription apres le dernier rappel. */
+  pauseAfterDays?: number;
 }): string {
   const greeting = opts.firstName ? `Bonjour ${escapeHtml(opts.firstName)},` : "Bonjour,";
   const labels = opts.missingLabels.slice(0, 5).map((l) => `<li style="margin:0 0 4px;">${escapeHtml(l)}</li>`).join("");
@@ -402,8 +404,9 @@ export function buildProfileReminderEmail(opts: {
   const intro = opts.reminderNumber <= 1
     ? "Vous vous êtes inscrit(e) au panel earlypanel, mais votre profil n'est pas encore complet. Tant qu'il ne l'est pas, on ne peut pas vous proposer de mission : la sélection se fait sur le métier, l'équipement et les disponibilités."
     : "Votre profil earlypanel est toujours incomplet. Sans ces informations, votre inscription reste en attente et aucune mission ne peut vous être proposée.";
+  const pauseDays = opts.pauseAfterDays ?? 5;
   const outro = opts.isLast
-    ? "C'est notre dernier rappel : on ne vous écrira plus à ce sujet. Votre inscription reste enregistrée, vous pouvez la compléter quand vous voulez depuis votre espace."
+    ? `C'est notre dernier rappel : on ne vous écrira plus à ce sujet. Sans réponse sous ${pauseDays} jours, votre inscription sera mise en pause et vous ne serez plus considéré(e) comme disponible. Vous pourrez la réactiver à tout moment en complétant votre profil depuis votre espace.`
     : "Ça prend 5 minutes, et vous pouvez vous arrêter et reprendre plus tard : tout est sauvegardé.";
   return `
 <!DOCTYPE html>
