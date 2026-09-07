@@ -40,7 +40,9 @@ body { font-family: var(--font); background: #fff; color: var(--black); overflow
 .nav { position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 clamp(1.25rem,5vw,4rem); height: 52px; background: rgba(255,255,255,0.92); border-bottom: 0.5px solid var(--border); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); max-width: 100%; }
 .logo { font-size: 17px; font-weight: 700; letter-spacing: -0.5px; color: var(--black); text-decoration: none; }
 .logo em { font-style: normal; color: var(--green); }
-.nav-links { display: flex; gap: 2rem; }
+.nav-links { display: flex; align-items: center; gap: 2rem; }
+/* Le lien texte dans la barre de liens (« Vous êtes une entreprise ? ») garde la même ligne de base que les autres liens : pas de padding vertical ici. */
+.nav-links .nav-textlink { padding: 0; }
 .nav-links a { font-size: 13px; color: var(--gray); text-decoration: none; transition: color .15s; }
 .nav-links a:hover { color: var(--black); }
 .nav-links a.active { color: var(--black); font-weight: 600; }
