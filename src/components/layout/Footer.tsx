@@ -4,7 +4,37 @@ interface FooterProps {
   variant?: "index" | "b2b" | "b2c";
 }
 
+/**
+ * Footer commun. C'est ici (et sur /testeurs) que vivent les liens testeurs :
+ * la nav des pages entreprise leur est fermee pour ne pas diluer le message
+ * B2B, donc le footer doit toujours offrir inscription + connexion testeur.
+ */
 export default function Footer({ variant = "index" }: FooterProps) {
+  const testerColumn = (
+    <div className="footer-col">
+      <h3>Testeurs</h3>
+      <ul>
+        <li><Link href="/testeurs">Devenir testeur rémunéré</Link></li>
+        <li><Link href="/testeurs#how">Comment ça marche</Link></li>
+        <li><Link href="/testeurs#faq">FAQ testeurs</Link></li>
+        <li><Link href="/app/login">Connexion à mon espace</Link></li>
+        <li><Link href="/cgu">CGU testeurs</Link></li>
+      </ul>
+    </div>
+  );
+
+  const useCaseColumn = (
+    <div className="footer-col">
+      <h3>Cas d&apos;usage</h3>
+      <ul>
+        <li><Link href="/test-maquette-figma">Tester une maquette Figma</Link></li>
+        <li><Link href="/test-pre-lancement-staging">Tester avant le lancement</Link></li>
+        <li><Link href="/test-conversion-funnel">Comprendre un funnel qui ne convertit pas</Link></li>
+        <li><Link href="/agences">Agences et studios</Link></li>
+      </ul>
+    </div>
+  );
+
   return (
     <footer className="footer">
       <div className="footer-inner">
@@ -22,6 +52,11 @@ export default function Footer({ variant = "index" }: FooterProps) {
               <span className="footer-badge">RGPD</span>
               <span className="footer-badge">NDA inclus</span>
             </div>
+            {variant !== "b2c" && (
+              <p className="footer-tester-hint">
+                Vous voulez devenir testeur ? <Link href="/testeurs">Rejoignez le panel</Link> ou <Link href="/app/login">connectez-vous à votre espace</Link>.
+              </p>
+            )}
           </div>
 
           {variant === "index" && (
@@ -30,20 +65,14 @@ export default function Footer({ variant = "index" }: FooterProps) {
                 <h3>Service</h3>
                 <ul>
                   <li><a href="#process">Comment ça marche</a></li>
+                  <li><a href="#rapport">Rapport d&apos;exemple</a></li>
                   <li><Link href="/entreprises#brief">Démarrer un projet</Link></li>
                   <li><Link href="/entreprises">Page entreprises</Link></li>
                   <li><Link href="/entreprises#faq">FAQ clients</Link></li>
                 </ul>
               </div>
-              <div className="footer-col">
-                <h3>Testeurs</h3>
-                <ul>
-                  <li><Link href="/testeurs">Rejoindre le panel</Link></li>
-                  <li><Link href="/testeurs#how">Comment ça marche</Link></li>
-                  <li><Link href="/testeurs#faq">FAQ testeurs</Link></li>
-                  <li><Link href="/cgu">CGU testeurs</Link></li>
-                </ul>
-              </div>
+              {useCaseColumn}
+              {testerColumn}
               <div className="footer-col">
                 <h3>Légal</h3>
                 <ul>
@@ -63,18 +92,13 @@ export default function Footer({ variant = "index" }: FooterProps) {
                 <h3>Service</h3>
                 <ul>
                   <li><Link href="/#process">Comment ça marche</Link></li>
+                  <li><Link href="/#rapport">Rapport d&apos;exemple</Link></li>
                   <li><Link href="/entreprises#brief">Démarrer un projet</Link></li>
                   <li><Link href="/entreprises#faq">FAQ</Link></li>
                 </ul>
               </div>
-              <div className="footer-col">
-                <h3>Testeurs</h3>
-                <ul>
-                  <li><Link href="/testeurs">Rejoindre le panel</Link></li>
-                  <li><Link href="/testeurs#how">Comment ça marche</Link></li>
-                  <li><Link href="/cgu">CGU testeurs</Link></li>
-                </ul>
-              </div>
+              {useCaseColumn}
+              {testerColumn}
               <div className="footer-col">
                 <h3>Légal</h3>
                 <ul>
@@ -95,6 +119,7 @@ export default function Footer({ variant = "index" }: FooterProps) {
                   <li><a href="#register">Rejoindre le panel</a></li>
                   <li><a href="#how">Comment ça marche</a></li>
                   <li><a href="#faq">FAQ testeurs</a></li>
+                  <li><Link href="/app/login">Connexion à mon espace</Link></li>
                   <li><Link href="/cgu">CGU testeurs</Link></li>
                 </ul>
               </div>

@@ -1,10 +1,30 @@
+/**
+ * Differenciation home.
+ *
+ * Le vrai concurrent d'une startup a 1 500-6 000 EUR n'est pas UserTesting :
+ * c'est le fondateur qui envoie un Typeform a dix clients, ou le freelance
+ * UX research sur Malt. Le tableau compare donc ces trois options, en HTML
+ * semantique (<table>) pour etre lisible par Google et les LLM.
+ */
+
+const ROWS: { label: string; diy: string; freelance: string; us: string }[] = [
+  { label: "Qui recrute les testeurs", diy: "Vous, dans votre réseau", freelance: "Le freelance, ou vous", us: "Nous, dans notre panel" },
+  { label: "Profil des testeurs", diy: "Vos clients, déjà convaincus", freelance: "Selon son réseau", us: "Sélection manuelle selon votre cible" },
+  { label: "Questionnaire", diy: "Écrit seul, souvent biaisé", freelance: "Écrit par le freelance", us: "Co-construit et validé avec vous" },
+  { label: "Lecture des réponses", diy: "Vous, le soir", freelance: "Le freelance", us: "Chaque réponse relue, les bâclées refusées" },
+  { label: "Livrable", diy: "Un tableur de verbatims", freelance: "Un rapport, selon le profil", us: "Rapport rédigé et restitution en visio" },
+  { label: "Délai", diy: "Quand vous trouvez le temps", freelance: "2 à 4 semaines", us: "5 jours ouvrés après lancement" },
+  { label: "Confidentialité", diy: "Aucune", freelance: "À négocier", us: "NDA signé avant tout échange" },
+  { label: "Profils niches", diy: "Rarement accessibles", freelance: "Selon son réseau", us: "Santé, juridique, finance, IT" },
+];
+
 export default function DifferentiatorsSection() {
   return (
     <section className="diff-section">
       <div className="diff-inner">
         <div className="diff-left">
           <div className="sec-eye">Pourquoi earlypanel</div>
-          <h2 className="sec-title">Ce qu&apos;un outil self-service ne fera jamais à votre place.</h2>
+          <h2 className="sec-title">Ce qu&apos;un sondage maison ne fera jamais à votre place.</h2>
           <div className="diff-list">
             <div className="diff-item">
               <div className="diff-icon">
@@ -13,8 +33,8 @@ export default function DifferentiatorsSection() {
                 </svg>
               </div>
               <div>
-                <h3>Des vrais profils, pas un panel ouvert à tous</h3>
-                <p>Quand vous nous dites que vous testez un outil de gestion de planning pour kinés, on ne vous envoie pas 15 freelances digitaux qui n&apos;ont jamais mis les pieds dans un cabinet médical. On va vraiment chercher dans notre panel ceux qui correspondent.</p>
+                <h3>Des vrais profils, pas vos dix clients les plus sympas</h3>
+                <p>Quand vous nous dites que vous testez un outil de gestion de planning pour kinés, on ne vous envoie pas 15 freelances digitaux qui n&apos;ont jamais mis les pieds dans un cabinet médical. On va vraiment chercher dans notre panel ceux qui correspondent, et qui ne vous connaissent pas.</p>
               </div>
             </div>
             <div className="diff-item">
@@ -25,7 +45,7 @@ export default function DifferentiatorsSection() {
               </div>
               <div>
                 <h3>Le questionnaire est écrit avec vous</h3>
-                <p>On part de votre brief, on propose une première version, et on itère ensemble jusqu&apos;à ce que chaque question serve un objectif clair. Pas de copier-coller depuis un projet précédent.</p>
+                <p>On part de votre brief, on propose une première version, et on itère ensemble jusqu&apos;à ce que chaque question serve un objectif clair. Pas de copier-coller depuis un projet précédent, pas de question orientée qui confirme ce que vous espériez.</p>
               </div>
             </div>
             <div className="diff-item">
@@ -53,22 +73,27 @@ export default function DifferentiatorsSection() {
           </div>
         </div>
         <div className="diff-right">
-          <p style={{ fontSize: "12px", fontWeight: 700, color: "var(--gray-light)", letterSpacing: ".08em", textTransform: "uppercase" as const, marginBottom: "1.5rem" }}>
-            earlypanel vs. outils self-service
-          </p>
-          <div className="compare-header">
-            <span>Critère</span>
-            <span>Outils classiques</span>
-            <span>earlypanel</span>
-          </div>
-          <div className="diff-compare">
-            <div className="compare-row"><div className="compare-label">Profil testeur</div><div className="compare-them">Panel ouvert</div><div className="compare-us">Sélection manuelle</div></div>
-            <div className="compare-row"><div className="compare-label">Questionnaire</div><div className="compare-them">Template générique</div><div className="compare-us">Co-construit</div></div>
-            <div className="compare-row"><div className="compare-label">Validation</div><div className="compare-them">Automatique</div><div className="compare-us">Manuelle</div></div>
-            <div className="compare-row"><div className="compare-label">Analyse</div><div className="compare-them">Données brutes</div><div className="compare-us">Rapport + restitution</div></div>
-            <div className="compare-row"><div className="compare-label">Profils niches</div><div className="compare-them">Indisponibles</div><div className="compare-us">Santé, juridique, finance, IT</div></div>
-            <div className="compare-row"><div className="compare-label">Restitution équipe</div><div className="compare-them">Aucune</div><div className="compare-us">Réunion incluse</div></div>
-          </div>
+          <p className="compare-caption">Faire soi-même, freelance UX ou earlypanel</p>
+          <table className="compare-table">
+            <thead>
+              <tr>
+                <th scope="col">Critère</th>
+                <th scope="col">Faire soi-même</th>
+                <th scope="col">Freelance UX</th>
+                <th scope="col" className="compare-th-us">earlypanel</th>
+              </tr>
+            </thead>
+            <tbody>
+              {ROWS.map((r) => (
+                <tr key={r.label}>
+                  <th scope="row">{r.label}</th>
+                  <td>{r.diy}</td>
+                  <td>{r.freelance}</td>
+                  <td className="compare-td-us">{r.us}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </section>

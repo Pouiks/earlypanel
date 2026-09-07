@@ -4,6 +4,11 @@ import { useState, type FormEvent } from "react";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
+/**
+ * Lead magnet "rapport d'exemple". C'est le seul CTA a friction basse du
+ * site : il est place juste sous le hero (pas en bas de page) et cible par
+ * l'ancre #rapport depuis la nav, le hero et le footer.
+ */
 export default function LeadMagnetSection() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("idle");
@@ -27,10 +32,10 @@ export default function LeadMagnetSection() {
   }
 
   return (
-    <section className="leadmag">
+    <section className="leadmag" id="rapport">
       <div className="leadmag-inner">
-        <h2>Voyez à quoi ressemble<br /><em>un vrai rapport earlypanel.</em></h2>
-        <p>Téléchargez un exemple complet : KPIs, verbatims, carte des frictions et recommandations.</p>
+        <h2>Voyez à quoi ressemble<br /><em>un rapport earlypanel.</em></h2>
+        <p>Avant de réserver un appel, recevez un exemple complet de livrable : synthèse, carte des frictions, verbatims, priorisation et recommandations.</p>
 
         {status === "sent" ? (
           <p className="lead-success">Le rapport a été envoyé à <strong>{email}</strong>. Pensez à vérifier vos spams.</p>
