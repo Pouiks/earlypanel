@@ -49,7 +49,7 @@ const STATUS_LABELS: Record<ProjectStatus, string> = {
 const STATUS_COLORS: Record<ProjectStatus, { bg: string; text: string }> = {
   draft: { bg: "#f5f5f7", text: "#86868B" },
   active: { bg: "#f0faf5", text: "#0A7A5A" },
-  closed: { bg: "#fef2f2", text: "#e53e3e" },
+  closed: { bg: "#f5f5f7", text: "#1d1d1f" },
   archived: { bg: "#f5f5f7", text: "#6e6e73" },
 };
 
@@ -115,7 +115,7 @@ function StateIcon({ state }: { state: State }) {
   const dot: React.CSSProperties = state === "progress"
     ? { background: "#0A7A5A" }
     : state === "warn"
-      ? { border: "1.5px solid #b45309" }
+      ? { border: "1.5px solid #1d1d1f" }
       : { border: "1.5px solid #c7c7cc" };
   return (
     <span style={{ width: 16, height: 16, display: "flex", alignItems: "center", justifyContent: "center" }} aria-hidden>
@@ -157,7 +157,7 @@ export default function ProjectSommaire({ project, summary, active, onSelect }: 
           {g.sections.map((id) => {
             const line = lines[id];
             const isActive = id === active;
-            const metaColor = line.state === "warn" ? "#b45309" : "#86868B";
+            const metaColor = line.state === "warn" ? "#1d1d1f" : "#86868B";
             return (
               <button
                 key={id}

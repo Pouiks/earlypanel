@@ -14,7 +14,7 @@ const STATUS_LABELS: Record<ProjectStatus, string> = {
 const STATUS_COLORS: Record<ProjectStatus, { bg: string; text: string }> = {
   draft: { bg: "#f5f5f7", text: "#86868B" },
   active: { bg: "#f0faf5", text: "#0A7A5A" },
-  closed: { bg: "#fef2f2", text: "#e53e3e" },
+  closed: { bg: "#f5f5f7", text: "#1d1d1f" },
   archived: { bg: "#f5f5f7", text: "#6e6e73" },
 };
 

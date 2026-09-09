@@ -31,7 +31,7 @@ interface ProjectTestersTabProps {
 
 const NDA_LABELS: Record<string, { label: string; color: string; bg: string }> = {
   selected: { label: "Sélectionné (sans NDA envoyé)", color: "#86868B", bg: "#f5f5f7" },
-  nda_sent: { label: "NDA envoyé", color: "#b45309", bg: "#fef3c7" },
+  nda_sent: { label: "NDA envoyé", color: "#1d1d1f", bg: "#f5f5f7" },
   nda_signed: { label: "NDA signé", color: "#0A7A5A", bg: "#f0faf5" },
   invited: { label: "Invité", color: "#1d4ed8", bg: "#eff6ff" },
   in_progress: { label: "En cours", color: "#7c3aed", bg: "#f5f3ff" },
@@ -482,7 +482,7 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
                           <span style={{
                             marginLeft: 6, fontSize: 10, fontWeight: 600,
                             padding: "1px 6px", borderRadius: 980,
-                            background: "#fef3c7", color: "#92400e",
+                            background: "#f5f5f7", color: "#1d1d1f",
                           }}>incomplet</span>
                         )}
                       </div>

@@ -44,7 +44,7 @@ const STATUS_LABELS: Record<string, string> = {
   inactive: "Désactivé",
 };
 const STATUS_COLORS: Record<string, { bg: string; fg: string }> = {
-  pending: { bg: "#fff7e6", fg: "#b45309" },
+  pending: { bg: "#f5f5f7", fg: "#1d1d1f" },
   active: { bg: "#f0faf5", fg: "#0A7A5A" },
   suspended: { bg: "#fef2f2", fg: "#b91c1c" },
   rejected: { bg: "#f5f5f7", fg: "#6e6e73" },
@@ -222,8 +222,8 @@ export default function StaffTestersPage() {
           title="Ne montrer que les testeurs dont la disponibilité est confirmée (non expirée)"
           style={{
             padding: "7px 16px", fontSize: 13, fontWeight: 600,
-            color: availableOnly ? "#065F46" : "#6e6e73",
-            background: availableOnly ? "#D1FAE5" : "transparent",
+            color: availableOnly ? "#0A7A5A" : "#6e6e73",
+            background: availableOnly ? "#f0faf5" : "transparent",
             border: availableOnly ? "1.5px solid #0A7A5A" : "1px solid rgba(0,0,0,0.1)",
             borderRadius: 980, cursor: "pointer", fontFamily: "inherit",
           }}
@@ -310,8 +310,8 @@ export default function StaffTestersPage() {
                           width: 18,
                           height: 18,
                           borderRadius: "50%",
-                          background: "#fef3c7",
-                          color: "#b45309",
+                          background: "#f5f5f7",
+                          color: "#1d1d1f",
                           fontSize: 11,
                           fontWeight: 700,
                           flexShrink: 0,

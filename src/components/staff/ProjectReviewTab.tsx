@@ -493,7 +493,7 @@ function AnswerCard({
           {meta && <div style={{ fontSize: 12, color: "#86868B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{meta}</div>}
         </div>
         {qType === "text" && (
-          <span style={{ fontSize: 12, fontWeight: short ? 600 : 400, color: short ? "#b45309" : "#86868B", whiteSpace: "nowrap" }}>
+          <span style={{ fontSize: 12, fontWeight: short ? 600 : 400, color: short ? "#1d1d1f" : "#86868B", whiteSpace: "nowrap" }}>
             {c.chars} caractères{short && minHint ? ` (suggéré : ${minHint})` : ""}
           </span>
         )}

@@ -37,7 +37,7 @@ interface Payload {
 }
 
 const STATE_META: Record<StateKind, { label: string; hint: string; bg: string; fg: string }> = {
-  due: { label: "À relancer", hint: "Partira au prochain passage du cron (9h)", bg: "#fff7e6", fg: "#b45309" },
+  due: { label: "À relancer", hint: "Partira au prochain passage du cron (9h)", bg: "#f5f5f7", fg: "#1d1d1f" },
   too_recent: { label: "Trop récent", hint: "Inscrit depuis moins de 2 jours", bg: "#f5f5f7", fg: "#6e6e73" },
   cooldown: { label: "Relancé", hint: "Prochaine relance après 5 jours", bg: "#eef4ff", fg: "#1d4ed8" },
   exhausted: { label: "3 relances envoyées", hint: "Sera mis en pause 5 jours après la dernière", bg: "#fef2f2", fg: "#b91c1c" },
@@ -206,7 +206,7 @@ export default function StaffRelancesPage() {
                     </td>
                     <td style={{ padding: "12px 14px", whiteSpace: "nowrap", color: "#6e6e73" }}>{fmtDate(r.created_at)}<div style={{ fontSize: 11, color: "#86868B" }}>il y a {daysAgo(r.created_at)} j</div></td>
                     <td style={{ padding: "12px 14px", minWidth: 200 }}>
-                      <div style={{ fontWeight: 600, color: r.missing_count > 8 ? "#b45309" : "#1d1d1f" }}>{r.missing_count} champ{r.missing_count > 1 ? "s" : ""} manquant{r.missing_count > 1 ? "s" : ""}</div>
+                      <div style={{ fontWeight: 600, color: r.missing_count > 8 ? "#1d1d1f" : "#1d1d1f" }}>{r.missing_count} champ{r.missing_count > 1 ? "s" : ""} manquant{r.missing_count > 1 ? "s" : ""}</div>
                       <div style={{ fontSize: 11, color: "#86868B", lineHeight: 1.4 }} title={r.missing_labels.join(", ")}>
                         {r.missing_labels.slice(0, 3).join(", ")}{r.missing_labels.length > 3 ? `, +${r.missing_labels.length - 3}` : ""}
                       </div>

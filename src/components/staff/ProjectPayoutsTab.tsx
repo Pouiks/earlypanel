@@ -251,7 +251,7 @@ export default function ProjectPayoutsTab({ projectId }: ProjectPayoutsTabProps)
                   {p.tester.first_name} {p.tester.last_name}
                   <div style={{ fontSize: 11, color: "#86868b" }}>{p.tester.email}</div>
                   {!p.tester.stripe_account_id && p.final_amount_cents > 0 && p.status !== "paid" && (
-                    <div style={{ fontSize: 11, color: "#d97706" }}>Coordonnées de paiement manquantes</div>
+                    <div style={{ fontSize: 11, color: "#1d1d1f" }}>Coordonnées de paiement manquantes</div>
                   )}
                 </td>
                 <td style={{ padding: 10 }}>{centsToEuros(p.calculated_amount_cents)} €</td>

@@ -37,7 +37,7 @@ const STATUS_LABELS: Record<string, string> = {
   failed: "Echec",
 };
 const STATUS_COLORS: Record<string, { bg: string; fg: string }> = {
-  pending: { bg: "#fff7e6", fg: "#b45309" },
+  pending: { bg: "#f5f5f7", fg: "#1d1d1f" },
   approved: { bg: "#eff6ff", fg: "#1d4ed8" },
   paid: { bg: "#f0faf5", fg: "#0A7A5A" },
   failed: { bg: "#fef2f2", fg: "#b91c1c" },
@@ -223,15 +223,15 @@ export default function StaffPayoutsPage() {
 
       {batchesWaiting.length > 0 && (
         <div style={{
-          background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 16, padding: "16px 20px", marginBottom: 20,
+          background: "#fff", border: "1px solid rgba(0,0,0,0.12)", borderRadius: 16, padding: "16px 20px", marginBottom: 20,
         }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "#92400e", marginBottom: 10 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#1d1d1f", marginBottom: 10 }}>
             Lots exportes en attente de confirmation de paiement
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {batchesWaiting.map((b) => (
               <div key={b.ref} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-                <div style={{ fontSize: 13, color: "#92400e" }}>
+                <div style={{ fontSize: 13, color: "#1d1d1f" }}>
                   <strong>{b.ref}</strong> · {b.count} virement(s), total {fmtAmount(b.total)}
                 </div>
                 <button
@@ -415,7 +415,7 @@ export default function StaffPayoutsPage() {
                   <div style={{ fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 6 }}>
                     {fullName}
                     {!p.payment_info_configured && (
-                      <span title="IBAN non configure" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 16, height: 16, borderRadius: "50%", background: "#fef3c7", color: "#b45309", fontSize: 10, fontWeight: 700 }}>!</span>
+                      <span title="IBAN non configure" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 16, height: 16, borderRadius: "50%", background: "#f5f5f7", color: "#1d1d1f", fontSize: 10, fontWeight: 700 }}>!</span>
                     )}
                   </div>
                   <div style={{ fontSize: 11, color: "#86868B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>

@@ -145,7 +145,7 @@ export default function ProjectInfoTab({ project }: ProjectInfoTabProps) {
                     <div key={item.label} style={{ textAlign: "center", padding: "10px", background: "#f5f5f7", borderRadius: 10 }}>
                       <div style={{
                         fontSize: 22, fontWeight: 700, marginBottom: 4,
-                        color: item.score == null ? "#86868B" : item.score >= 90 ? "#0A7A5A" : item.score >= 50 ? "#d97706" : "#dc2626",
+                        color: item.score == null ? "#86868B" : item.score >= 90 ? "#0A7A5A" : item.score >= 50 ? "#1d1d1f" : "#dc2626",
                       }}>
                         {item.score ?? "Non renseigné"}
                       </div>

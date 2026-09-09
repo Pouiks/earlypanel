@@ -57,7 +57,7 @@ const h2: React.CSSProperties = {
 };
 
 function Kpi({ label, value, hint, tone }: { label: string; value: string; hint?: string; tone?: "green" | "amber" | "red" | "neutral" }) {
-  const color = tone === "green" ? "#0A7A5A" : tone === "amber" ? "#b45309" : tone === "red" ? "#b91c1c" : "#1d1d1f";
+  const color = tone === "green" ? "#0A7A5A" : tone === "amber" ? "#1d1d1f" : tone === "red" ? "#b91c1c" : "#1d1d1f";
   return (
     <div style={{ ...card, padding: "18px 20px" }}>
       <div style={{ fontSize: 12, color: "#86868B", marginBottom: 6 }}>{label}</div>
@@ -232,7 +232,7 @@ export default function ProjectFinancesTab({ project }: Props) {
                 const t = Array.isArray(p.tester) ? p.tester[0] : p.tester;
                 const name = [t?.first_name, t?.last_name].filter(Boolean).join(" ") || "Testeur inconnu";
                 const st = p.status === "paid" ? "Payé" : p.status === "failed" ? "Échec" : p.status === "approved" ? "Approuvé" : "En attente";
-                const stColor = p.status === "paid" ? "#0A7A5A" : p.status === "failed" ? "#b91c1c" : "#b45309";
+                const stColor = p.status === "paid" ? "#0A7A5A" : p.status === "failed" ? "#b91c1c" : "#1d1d1f";
                 return (
                   <tr key={p.id} style={{ borderTop: "0.5px solid rgba(0,0,0,0.06)" }}>
                     <td style={{ padding: "8px" }}>{name}</td>

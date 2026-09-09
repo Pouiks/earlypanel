@@ -26,7 +26,7 @@ const STATUS_LABELS: Record<string, string> = {
 const STATUS_COLORS: Record<string, { bg: string; fg: string }> = {
   draft: { bg: "#f5f5f7", fg: "#86868B" },
   active: { bg: "#f0faf5", fg: "#0A7A5A" },
-  closed: { bg: "#fef2f2", fg: "#e53e3e" },
+  closed: { bg: "#f5f5f7", fg: "#1d1d1f" },
   archived: { bg: "#f5f5f7", fg: "#6e6e73" },
 };
 

@@ -29,7 +29,7 @@ const STATUS_LABELS: Record<ProjectStatus, string> = {
 const STATUS_COLORS: Record<ProjectStatus, { bg: string; text: string }> = {
   draft: { bg: "#f5f5f7", text: "#86868B" },
   active: { bg: "#f0faf5", text: "#0A7A5A" },
-  closed: { bg: "#fef2f2", text: "#e53e3e" },
+  closed: { bg: "#f5f5f7", text: "#1d1d1f" },
   archived: { bg: "#f5f5f7", text: "#6e6e73" },
 };
 
@@ -316,24 +316,22 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
           </div>
         </div>
 
-        {/* Prochaine etape */}
+        {/* A faire : ce qui manque, en une ligne par action, sans couleur d'alerte */}
         {nextSteps.length > 0 && (
           <div style={{
-            background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 12,
+            background: "#fff", border: "0.5px solid rgba(0,0,0,0.08)", borderRadius: 16,
             padding: "12px 16px", marginBottom: 16, display: "flex", flexDirection: "column", gap: 8,
           }}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: "#86868B", textTransform: "uppercase", letterSpacing: "0.06em" }}>À faire</div>
             {nextSteps.map((n) => (
               <div key={n.text} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
-                <div style={{ fontSize: 13, color: "#92400e" }}>
-                  <strong>Prochaine étape.</strong> {n.text}
-                </div>
+                <div style={{ fontSize: 13, color: "#1d1d1f" }}>{n.text}</div>
                 <button
                   type="button"
                   onClick={() => selectSection(n.section)}
                   style={{
-                    padding: "7px 14px", fontSize: 12, fontWeight: 600, color: "#92400e",
-                    background: "#fff", border: "1px solid #fde68a", borderRadius: 980,
-                    cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap",
+                    fontSize: 13, fontWeight: 600, color: "#0A7A5A", background: "none",
+                    border: "none", padding: 0, cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap",
                   }}
                 >
                   {n.label} &rarr;
@@ -363,12 +361,12 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
             </button>
           ))}
           {status === "draft" && (
-            <span style={{ fontSize: 12, color: "#92400e", marginLeft: "auto" }}>
+            <span style={{ fontSize: 12, color: "#1d1d1f", marginLeft: "auto" }}>
               Le premier envoi de NDA passe le projet en Actif.
             </span>
           )}
           {(status === "closed" || status === "archived") && (
-            <span style={{ fontSize: 12, color: "#b91c1c", marginLeft: "auto" }}>
+            <span style={{ fontSize: 12, color: "#6e6e73", marginLeft: "auto" }}>
               Plus d&apos;envoi de NDA ni d&apos;assignation de testeurs.
             </span>
           )}
