@@ -44,6 +44,7 @@ interface MissionDetail {
   malus_applied: boolean;
   malus_nda_unsigned_applied?: boolean;
   project_read_only?: boolean;
+  payment_info_missing?: boolean;
   project: {
     id: string;
     title: string;
@@ -243,7 +244,8 @@ export default function MissionDetailPage() {
   const notStarted = isNotStartedYet(project.start_date);
   const status = mission.tester_status;
   const readOnlyMission = mission.project_read_only === true;
-  const canStart = !readOnlyMission && !expired && !notStarted && (status === "nda_signed" || status === "invited");
+  const ibanMissing = mission.payment_info_missing === true;
+  const canStart = !readOnlyMission && !expired && !notStarted && !ibanMissing && (status === "nda_signed" || status === "invited");
   const inProgress = !readOnlyMission && status === "in_progress" && !expired;
   const completed = status === "completed";
 
@@ -418,7 +420,7 @@ export default function MissionDetailPage() {
       {!inProgress && !completed && (() => {
         // Calcule la raison de blocage la plus pertinente. Priorite :
         // expire > non actif > pas encore demarre > NDA non signe > NDA en
-        // attente d'envoi > etat inattendu.
+        // attente d'envoi > IBAN manquant > etat inattendu.
         let disabledReason: { short: string; help: string; cta?: { label: string; href: string } } | null = null;
         if (expired) {
           disabledReason = { short: "Délai dépassé", help: "La date de fin de la mission est passée. Vous ne pouvez plus la démarrer." };
@@ -441,6 +443,12 @@ export default function MissionDetailPage() {
           disabledReason = {
             short: "En attente d'envoi du NDA",
             help: "L'équipe earlypanel doit encore vous envoyer l'accord de confidentialité. Vous pourrez démarrer dès qu'il sera signé.",
+          };
+        } else if (ibanMissing) {
+          disabledReason = {
+            short: "Renseignez votre IBAN pour commencer",
+            help: "Votre rémunération est versée par virement après validation de la mission. Sans IBAN, elle ne pourrait pas être payée : ajoutez-le dans votre profil (2 minutes), puis revenez démarrer le test.",
+            cta: { label: "Renseigner mon IBAN →", href: "/app/dashboard/profil#informations-bancaires" },
           };
         } else if (!canStart) {
           disabledReason = {

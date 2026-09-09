@@ -33,6 +33,24 @@ export async function POST(
       );
     }
 
+    // IBAN requis pour demarrer (decision fondateur 2026-09-09) : sans
+    // coordonnees bancaires, une mission validee reste une dette impayable.
+    // On bloque ici plutot qu'a l'invitation : le testeur a deja accepte et
+    // signe le NDA, il est motive, et aucune invitation n'est perdue.
+    const { count: paymentInfoCount } = await admin
+      .from("tester_payment_info")
+      .select("*", { count: "exact", head: true })
+      .eq("tester_id", authed.testerId);
+    if ((paymentInfoCount ?? 0) === 0) {
+      return NextResponse.json(
+        {
+          error: "Renseignez votre IBAN dans votre profil avant de démarrer la mission.",
+          code: "payment_info_missing",
+        },
+        { status: 409 }
+      );
+    }
+
     const { data: project } = await admin
       .from("projects")
       .select("start_date, end_date, status")

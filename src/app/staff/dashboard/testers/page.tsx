@@ -326,7 +326,7 @@ export default function StaffTestersPage() {
                     <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{fullName}</span>
                     {t.status === "active" && t.payment_info_configured === false && (
                       <span
-                        title="Coordonnees bancaires non renseignees : ne peut pas etre paye, donc pas eligible aux invitations projet."
+                        title="Coordonnees bancaires non renseignees : peut etre invite et signer le NDA, mais ne pourra pas demarrer de mission tant que l'IBAN manque."
                         style={{
                           display: "inline-flex",
                           alignItems: "center",

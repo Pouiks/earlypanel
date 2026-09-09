@@ -128,6 +128,13 @@ export async function GET(
       })
     );
 
+    // Coordonnees bancaires : requises pour demarrer (cf. start/route.ts).
+    // Simple count, la ligne (IBAN chiffre) n'est jamais lue ici.
+    const { count: paymentInfoCount } = await admin
+      .from("tester_payment_info")
+      .select("*", { count: "exact", head: true })
+      .eq("tester_id", tester.id);
+
     const closure = await applyMissionClosureMalus(
       admin,
       { end_date: project.end_date as string | null },
@@ -157,6 +164,7 @@ export async function GET(
       malus_applied: closure.malus_applied,
       malus_nda_unsigned_applied: closure.malus_nda_unsigned_applied,
       project_read_only: !projectActive,
+      payment_info_missing: (paymentInfoCount ?? 0) === 0,
       project: {
         id: project.id,
         title: project.title,
