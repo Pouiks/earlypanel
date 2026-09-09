@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import SituationLanding from "@/components/b2b/SituationLanding";
+import SectorLanding from "@/components/b2b/SectorLanding";
 
 export const metadata: Metadata = {
   title: "Test utilisateur fintech, assurance et juridique",
@@ -40,42 +40,68 @@ const faq = [
 
 export default function TestUtilisateurFintechPage() {
   return (
-    <SituationLanding
+    <SectorLanding
       path="/test-utilisateur-fintech"
       breadcrumbName="Test utilisateur fintech"
-      eyebrow="Fintech · Facturation · Assurance · Juridique et réglementé"
+      badge="Fintech · Facturation · Assurance · Juridique et réglementé"
       h1={<>Test utilisateur fintech : des utilisateurs qui vivent <em>KYC, TVA et conformité</em> au quotidien.</>}
-      lede="Un test utilisateur fintech réussi tient à ses testeurs : un DAF qui a déjà migré trois outils, un expert-comptable qui sait ce qu'un export doit contenir, un gérant qui fait ses factures le dimanche soir. Pour tester votre application bancaire, votre plateforme de facturation ou votre service réglementé, on recrute ces profils à la main."
-      problem={{
-        title: "Le problème d'un test utilisateur fintech avec les mauvais testeurs.",
-        paragraphs: [
-          "Sur un produit financier, les utilisateurs ne pardonnent rien : une mention ambiguë sur des frais, une étape de vérification d'identité mal expliquée, un export qui ne rentre pas dans le logiciel du comptable, et ils partent. Un panel grand public ne voit pas ces frictions, parce qu'il ne sait pas ce qu'il devrait trouver.",
-          "Vos utilisateurs existants, eux, ont déjà passé les obstacles et ne s'en souviennent plus. Et votre équipe conformité, qui connaît chaque règle, ne sait plus lire un écran comme un nouveau client.",
-          "Il faut des professionnels du chiffre et des gérants qui découvrent votre produit avec une vraie tâche à accomplir. On les sélectionne selon le rôle, la taille de structure, les outils déjà utilisés et l'équipement, sous NDA, sur un environnement sans argent réel.",
+      sub="Un test utilisateur fintech réussi tient à ses testeurs : un DAF qui a déjà migré trois outils, un expert-comptable qui sait ce qu'un export doit contenir, un gérant qui fait ses factures le dimanche soir. On recrute ces profils à la main, sur un environnement sans argent réel, et vous recevez un rapport UX rédigé."
+      profiles={{
+        eyebrow: "Qui teste votre produit financier",
+        title: "Des professionnels du chiffre et des gérants, qui découvrent votre produit.",
+        sub: "Des utilisateurs qui savent ce qu'ils devraient trouver, et qui ne pardonnent ni une mention de frais ambiguë ni un export incomplet.",
+        cards: [
+          { title: "DAF et contrôleurs de gestion", desc: "Ils ont déjà migré des outils, comparent aux standards du marché et jugent une trésorerie à la clarté de ses statuts.", example: "Trésorerie · Reporting" },
+          { title: "Experts-comptables et collaborateurs", desc: "Ils savent exactement ce qu'un export doit contenir et repèrent une TVA mal expliquée en quelques secondes.", example: "Export · TVA · Justificatifs" },
+          { title: "Gérants de PME et indépendants", desc: "Facturation, virements, notes de frais, souvent le soir et sur mobile. Des profils pressés qui abandonnent vite.", example: "Facture · Virement · Mobile" },
+          { title: "Courtiers et conseillers", desc: "Souscription, comparaison, signature : des parcours où chaque étape doit rassurer un client qui n'est pas dans la pièce.", example: "Assurance · Souscription" },
+          { title: "Juristes d'entreprise", desc: "Contrats, signatures, conformité : des lecteurs attentifs qui testent la précision des mentions autant que l'ergonomie.", example: "Contrat · Signature · Mentions" },
+          { title: "Sur leur vrai équipement", desc: "Poste d'entreprise, navigateur imposé, téléphone personnel : le contexte réel d'usage, pas un poste de démo.", example: "Windows · Mac · Mobile" },
         ],
       }}
-      method={{
-        title: "Comment on teste un produit fintech ou réglementé.",
-        intro: "Même déroulé que toutes nos missions, avec un cadrage précis des environnements de test.",
-        steps: [
-          { title: "Cadrage des rôles et de l'environnement", body: "Une heure de visio pour définir les profils (DAF, comptable, courtier, gérant), les parcours critiques et l'environnement de démonstration : identités fictives, comptes de test, aucun mouvement réel. NDA signé avant tout échange." },
-          { title: "Recrutement et scénarios en situation", body: "On sélectionne huit à douze professionnels correspondant à votre cible, on écrit avec vous des scénarios ancrés dans leur réalité (« vous devez justifier un virement de 12 000 € à votre expert-comptable »), et ils les exécutent seuls, sur leur propre équipement." },
-          { title: "Relecture et rapport", body: "Chaque réponse est relue par un humain, les réponses bâclées sont refusées et non comptabilisées. Vous recevez un rapport rédigé : résultats par scénario, frictions priorisées, verbatims, captures d'écran, puis une restitution en visio." },
+      parcours={{
+        eyebrow: "Ce qu'on teste sur un produit fintech",
+        title: "Les parcours où une erreur coûte de l'argent ou de la conformité.",
+        sub: "Deux à quatre scénarios cadrés ensemble, sur un environnement de démonstration, chacun avec un critère de réussite observable.",
+        cards: [
+          { title: "Ouverture de compte et KYC", desc: "Vérification d'identité, pièces justificatives, délais annoncés : là où les nouveaux clients abandonnent sans dire pourquoi.", example: "Identité · Justificatifs" },
+          { title: "Première facture, premier virement", desc: "La première action qui engage de l'argent. Compréhension des frais, des statuts, des confirmations.", example: "Facturation · Paiement" },
+          { title: "Tableau de bord de trésorerie", desc: "Retrouver le chiffre qui compte, comprendre un statut, anticiper. La hiérarchie de l'écran testée par des inconnus.", example: "Trésorerie · Statuts" },
+          { title: "Export et clôture comptable", desc: "Ce que le comptable doit recevoir, dans le format qu'il attend, sans rien retaper.", example: "Export · Rapprochement" },
+          { title: "Souscription et signature", desc: "Assurance, contrat, mandat : un parcours qui doit rassurer à chaque étape et se terminer par une preuve.", example: "Souscription · Signature" },
+          { title: "Maquette ou préversion", desc: "Le même test se fait avant le code, sur un prototype Figma, ou avant le lancement, sur votre environnement de test.", example: "Figma · Staging" },
+        ],
+      }}
+      steps={{
+        eyebrow: "Déroulé d'un test utilisateur fintech",
+        title: "Du cadrage au rapport, en trois étapes.",
+        sub: "Même déroulé que toutes nos missions, avec un cadrage précis des environnements de test.",
+        items: [
+          { title: "Cadrage des rôles et de l'environnement", body: "Une heure de visio pour définir les profils (DAF, comptable, courtier, gérant), les parcours critiques et l'environnement de démonstration : identités fictives, comptes de test, aucun mouvement réel. NDA signé avant tout échange.", pill: "1h de visio · NDA" },
+          { title: "Recrutement et scénarios en situation", body: "On sélectionne huit à douze professionnels correspondant à votre cible, on écrit avec vous des scénarios ancrés dans leur réalité (« vous devez justifier un virement de 12 000 € à votre expert-comptable »), et ils les exécutent seuls, sur leur propre équipement.", pill: "Sélection manuelle" },
+          { title: "Relecture et rapport", body: "Chaque réponse est relue par un humain, les réponses bâclées sont refusées et non comptabilisées. Vous recevez un rapport rédigé : résultats par scénario, frictions priorisées, verbatims, captures d'écran, puis une restitution en visio.", pill: "Rapport sous 5 jours ouvrés" },
         ],
       }}
       deliverable={{
-        title: "Ce que vous recevez.",
-        intro: "Un livrable lisible par l'équipe produit, la direction et la conformité.",
-        bullets: [
-          "Un panel décrit par rôle, taille de structure et outils utilisés, anonymisé.",
-          "Les résultats par scénario : qui a atteint l'objectif, où les autres se sont arrêtés.",
-          "Les frictions de compréhension (frais, statuts, vérifications) distinguées des bugs, avec captures d'écran.",
-          "Les verbatims rattachés à la question posée, dans les mots d'un comptable ou d'un gérant.",
-          "Des recommandations priorisées par impact et effort, et une restitution en visio.",
+        title: "Un rapport lisible par l'équipe produit, la direction et la conformité.",
+        items: [
+          { title: "Le panel par rôle", body: "Rôle, taille de structure, outils utilisés, équipement. Anonymisé : le client voit T01, T02, jamais un nom." },
+          { title: "Les résultats par scénario", body: "Combien ont atteint l'objectif, où les autres se sont arrêtés, et les réponses fermées agrégées." },
+          { title: "Les frictions de compréhension", body: "Frais, statuts, vérifications : distinguées des bugs, priorisées, avec captures d'écran." },
+          { title: "Des verbatims dans les mots d'un comptable", body: "Chaque citation est rattachée à la question qui l'a provoquée." },
+          { title: "Des recommandations arbitrables", body: "Classées par impact et effort technique, présentées en visio pour décider." },
+        ],
+      }}
+      guarantees={{
+        title: "Ce que vous pouvez exiger",
+        items: [
+          { title: "Aucun argent réel, aucune identité réelle", body: "Environnement de démonstration, comptes de test, documents fictifs fournis par vous ou construits avec nous." },
+          { title: "Accès distribués sous NDA, puis révoqués", body: "Seuls les testeurs retenus reçoivent un accès, après signature. Vous coupez les accès à la fin." },
+          { title: "Réponses refusées, non facturées", body: "Une réponse bâclée n'est ni payée au testeur, ni comptée dans votre rapport, ni facturée." },
+          { title: "Pas un audit de conformité", body: "Le test mesure l'utilisabilité. Il complète vos audits, il ne les remplace pas." },
         ],
       }}
       faq={faq}
-      ctaTitle="Vos utilisateurs abandonnent au KYC et vous ne savez pas pourquoi ?"
     />
   );
 }

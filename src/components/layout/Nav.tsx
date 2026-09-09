@@ -86,10 +86,15 @@ export default function Nav({ audience }: { audience?: NavAudience }) {
     <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="nav-cta" onClick={close}>Réserver un appel</a>
   );
 
+  // Cote entreprise, un testeur potentiel doit comprendre en un coup d'oeil
+  // qu'il peut s'inscrire : lien texte discret avant « Connexion ».
   const secondaryCta = isTester ? (
     <Link href="/app/login" className="nav-secondary" onClick={close}>Accéder à mon espace</Link>
   ) : (
-    <Link href="/app/login" className="nav-textlink" onClick={close}>Connexion</Link>
+    <>
+      <Link href="/testeurs" className="nav-textlink" onClick={close}>Devenir testeur</Link>
+      <Link href="/app/login" className="nav-textlink" onClick={close}>Connexion</Link>
+    </>
   );
 
   return (
@@ -131,7 +136,10 @@ export default function Nav({ audience }: { audience?: NavAudience }) {
             ))}
             {isTester
               ? <Link href="/entreprises" onClick={close}>Vous êtes une entreprise ?</Link>
-              : <Link href="/entreprises" onClick={close}>Page entreprises</Link>}
+              : <>
+                  <Link href="/entreprises" onClick={close}>Page entreprises</Link>
+                  <Link href="/testeurs" onClick={close}>Devenir testeur rémunéré</Link>
+                </>}
             <div className="mobile-menu-cta">
               {isAuthed ? authedCta : (
                 <>
