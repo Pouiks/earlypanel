@@ -25,19 +25,33 @@ export default function GlossaryTerm({ slug, term, definition, children }: Props
   const [alignRight, setAlignRight] = useState(false);
   const id = useId();
   const ref = useRef<HTMLSpanElement>(null);
+  const closeTimer = useRef<number | null>(null);
 
+  const cancelClose = () => {
+    if (closeTimer.current !== null) {
+      window.clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+  };
   const show = () => {
+    cancelClose();
     const r = ref.current?.getBoundingClientRect();
     if (r) setAlignRight(r.left + TIP_WIDTH > window.innerWidth - 16);
     setOpen(true);
   };
-  const hide = () => setOpen(false);
+  // Fermeture differee : laisse le temps d'amener la souris du mot a la carte.
+  const hideSoon = () => {
+    cancelClose();
+    closeTimer.current = window.setTimeout(() => setOpen(false), 220);
+  };
+
+  useEffect(() => cancelClose, []);
 
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") hide(); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
     const onPointer = (e: PointerEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) hide();
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
     document.addEventListener("keydown", onKey);
     document.addEventListener("pointerdown", onPointer);
@@ -56,12 +70,12 @@ export default function GlossaryTerm({ slug, term, definition, children }: Props
   };
 
   return (
-    <span className="gl-wrap" ref={ref} onMouseEnter={show} onMouseLeave={hide}>
+    <span className="gl-wrap" ref={ref} onMouseEnter={show} onMouseLeave={hideSoon}>
       <a
         href={`/glossaire#${slug}`}
         className="gl-term"
         onFocus={show}
-        onBlur={hide}
+        onBlur={hideSoon}
         onClick={onClick}
         aria-describedby={open ? id : undefined}
       >
@@ -71,7 +85,9 @@ export default function GlossaryTerm({ slug, term, definition, children }: Props
         <span role="tooltip" id={id} className={`gl-tip${alignRight ? " gl-tip-right" : ""}`}>
           <strong>{term}</strong>
           {definition}
-          <span className="gl-tip-more">Voir dans le glossaire →</span>
+          <a href={`/glossaire#${slug}`} className="gl-tip-more" onFocus={show} onBlur={hideSoon}>
+            Voir dans le glossaire →
+          </a>
         </span>
       )}
     </span>
