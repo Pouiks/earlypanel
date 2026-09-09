@@ -231,10 +231,10 @@ function SubmissionViewer({
           const a = answersByQ.get(q.id);
           return (
             <div key={q.id} style={{ padding: 14, background: "#f5f5f7", borderRadius: 12 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "#1d1d1f", marginBottom: 6 }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#0A7A5A", marginBottom: 8 }}>
                 {i + 1}. {q.question_text}
               </div>
-              <div style={{ fontSize: 13, color: "#1d1d1f", whiteSpace: "pre-wrap", lineHeight: 1.5 }}>
+              <div style={{ fontSize: 14, color: "#1d1d1f", whiteSpace: "pre-wrap", lineHeight: 1.6 }}>
                 {a?.answer_text || <em style={{ color: "#86868b" }}>Pas de réponse</em>}
               </div>
               {a?.images && a.images.length > 0 && (

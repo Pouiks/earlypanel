@@ -317,7 +317,7 @@ export default function ProjectReviewTab({ projectId }: { projectId: string }) {
               <div style={{ fontSize: 12, fontWeight: 600, color: "#0A7A5A" }}>
                 {active.block.title} · Question {currentIdx + 1} sur {flat.length}
               </div>
-              <h2 style={{ fontSize: 20, fontWeight: 700, color: "#1d1d1f", letterSpacing: "-0.03em", margin: "4px 0 0", lineHeight: 1.25 }}>
+              <h2 style={{ fontSize: 20, fontWeight: 700, color: "#0A7A5A", letterSpacing: "-0.03em", margin: "4px 0 0", lineHeight: 1.25 }}>
                 {active.q.question_text}
               </h2>
               {active.q.question_hint && (

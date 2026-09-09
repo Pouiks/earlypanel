@@ -141,6 +141,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   }, [fetchProject]);
 
   function selectSection(next: SectionId) {
+    setEditing(false);
     setSection(next);
     if (typeof window !== "undefined") {
       window.history.replaceState(null, "", `#${next}`);
@@ -251,31 +252,6 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
     );
   }
 
-  if (editing) {
-    return (
-      <div>
-        <div style={{ marginBottom: 24 }}>
-          <button
-            onClick={() => setEditing(false)}
-            style={{
-              fontSize: 13, color: "#86868B", background: "none",
-              border: "none", cursor: "pointer", fontFamily: "inherit", padding: 0,
-            }}
-          >
-            &larr; Annuler la modification
-          </button>
-        </div>
-        <h1 style={{
-          fontSize: 26, fontWeight: 700, color: "#1d1d1f",
-          letterSpacing: "-0.04em", marginBottom: 28,
-        }}>
-          Modifier le projet
-        </h1>
-        <ProjectForm initialData={project} onSubmit={handleUpdate} submitLabel="Enregistrer les modifications" />
-      </div>
-    );
-  }
-
   const status = project.status as ProjectStatus;
   const nextSteps = computeNextSteps(project, summary);
 
@@ -289,6 +265,21 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
       </div>
 
       <div className="project-content">
+        {editing ? (
+          <div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, gap: 12, flexWrap: "wrap" }}>
+              <h1 style={{ fontSize: 26, fontWeight: 700, color: "#1d1d1f", letterSpacing: "-0.04em", margin: 0 }}>Modifier le projet</h1>
+              <button
+                onClick={() => setEditing(false)}
+                style={{ fontSize: 13, color: "#6e6e73", background: "#fff", border: "1px solid rgba(0,0,0,0.12)", borderRadius: 980, padding: "10px 20px", cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}
+              >
+                Annuler
+              </button>
+            </div>
+            <ProjectForm initialData={project} onSubmit={handleUpdate} submitLabel="Enregistrer les modifications" />
+          </div>
+        ) : (
+        <>
         {/* En-tete de section */}
         <div style={{
           display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -389,6 +380,8 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         {section === "review" && <ProjectReviewTab projectId={id} />}
         {section === "payouts" && <ProjectPayoutsTab projectId={id} />}
         {section === "report" && <ProjectReportTab projectId={id} />}
+        </>
+        )}
       </div>
 
       {reactivateModal && (
