@@ -26,6 +26,17 @@ export default function ArticleBody({ children }: { children: string }) {
         components={{
           h2: ({ children: c }) => <h2 id={headingId(textOf(c))}>{c}</h2>,
           h3: ({ children: c }) => <h3 id={headingId(textOf(c))}>{c}</h3>,
+          img: ({ src, alt, title }) => {
+            const s = typeof src === "string" ? src : "";
+            const caption = title || "";
+            return (
+              <span className="blog-figure">
+                {/* eslint-disable-next-line @next/next/no-img-element -- image d'article, dimensions inconnues au build */}
+                <img src={s} alt={alt ?? ""} loading="lazy" decoding="async" />
+                {caption && <span className="blog-caption">{caption}</span>}
+              </span>
+            );
+          },
           a: ({ href, children: c }) => {
             const h = href ?? "#";
             if (h.startsWith("/")) return <Link href={h}>{c}</Link>;

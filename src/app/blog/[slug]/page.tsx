@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import Nav from "@/components/layout/Nav";
 import Footer from "@/components/layout/Footer";
@@ -40,6 +41,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       modifiedTime: `${post.updated ?? post.date}T09:00:00+02:00`,
       authors: ["earlypanel"],
       tags: post.tags,
+      ...(post.cover ? { images: [{ url: post.cover, alt: post.cover_alt ?? post.title }] } : {}),
     },
   };
 }
@@ -61,6 +63,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         datePublished: post.date,
         dateModified: post.updated ?? post.date,
         tags: post.tags,
+        image: post.cover ? `${SITE_URL}${post.cover}` : undefined,
       })} />
       <BreadcrumbJsonLd items={[
         { name: "Accueil", url: SITE_URL },
@@ -86,6 +89,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               <span>par earlypanel</span>
             </div>
           </header>
+
+          {post.cover && (
+            <figure className="blog-cover">
+              <Image src={post.cover} alt={post.cover_alt ?? post.title} fill sizes="(max-width: 760px) 100vw, 760px" priority />
+            </figure>
+          )}
 
           {post.headings.length >= 3 && (
             <nav className="blog-toc" aria-label="Sommaire">

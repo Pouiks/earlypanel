@@ -41,6 +41,13 @@ describe("parseFrontmatter", () => {
     expect(p.frontmatter.tags).toEqual([]);
     expect(p.body).toBe("Corps");
   });
+  it("cover : chemin public sous /blog/ et cover_alt obligatoire", () => {
+    const ok = parseFrontmatter("---\ntitle: A\ndescription: B\ndate: 2026-01-02\ncover: /blog/a/cover.webp\ncover_alt: Schéma\n---\nx");
+    expect(ok.frontmatter.cover).toBe("/blog/a/cover.webp");
+    expect(ok.frontmatter.cover_alt).toBe("Schéma");
+    expect(() => parseFrontmatter("---\ntitle: A\ndescription: B\ndate: 2026-01-02\ncover: /images/x.png\ncover_alt: y\n---\nx")).toThrow(/\/blog\//);
+    expect(() => parseFrontmatter("---\ntitle: A\ndescription: B\ndate: 2026-01-02\ncover: /blog/a/c.webp\n---\nx")).toThrow(/cover_alt/);
+  });
   it("refuse un fichier sans frontmatter ou une date invalide", () => {
     expect(() => parseFrontmatter("# Pas de frontmatter")).toThrow();
     expect(() => parseFrontmatter("---\ntitle: A\ndescription: B\ndate: 09/09/2026\n---\n")).toThrow(/date/);

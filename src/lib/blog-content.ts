@@ -14,6 +14,10 @@ export interface PostFrontmatter {
   tags: string[];
   /** Brouillon : exclu de la liste, du sitemap et du RSS (mais l'URL existe). */
   draft: boolean;
+  /** Image de couverture, chemin public absolu (ex. /blog/mon-slug/cover.webp), 16:9. */
+  cover?: string;
+  /** Texte alternatif de la couverture (obligatoire si cover). */
+  cover_alt?: string;
 }
 
 export interface ParsedPost {
@@ -67,6 +71,10 @@ export function parseFrontmatter(raw: string): ParsedPost {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error("Frontmatter : date au format YYYY-MM-DD requise");
   const updated = fields.updated ? stripQuotes(fields.updated) : undefined;
   if (updated && !/^\d{4}-\d{2}-\d{2}$/.test(updated)) throw new Error("Frontmatter : updated au format YYYY-MM-DD");
+  const cover = fields.cover ? stripQuotes(fields.cover) : undefined;
+  if (cover && !cover.startsWith("/blog/")) throw new Error("Frontmatter : cover doit etre un chemin public sous /blog/ (fichier dans public/blog/)");
+  const cover_alt = fields.cover_alt ? stripQuotes(fields.cover_alt) : undefined;
+  if (cover && !cover_alt) throw new Error("Frontmatter : cover_alt requis quand cover est defini");
   return {
     frontmatter: {
       title,
@@ -75,6 +83,8 @@ export function parseFrontmatter(raw: string): ParsedPost {
       updated,
       tags: fields.tags ? parseList(fields.tags) : [],
       draft: stripQuotes(fields.draft ?? "false") === "true",
+      cover,
+      cover_alt,
     },
     body: m[2].trim(),
   };

@@ -132,6 +132,8 @@ export interface ArticleJsonLdInput {
   datePublished: string;
   dateModified: string;
   tags?: string[];
+  /** URL absolue de l'image de couverture ; sinon l'image OG du site. */
+  image?: string;
 }
 
 /** Article de blog : auteur et editeur = l'organisation, image OG par defaut. */
@@ -149,7 +151,7 @@ export function articleJsonLd(a: ArticleJsonLdInput) {
     dateModified: a.dateModified,
     author: { "@id": ORGANIZATION_ID },
     publisher: { "@id": ORGANIZATION_ID },
-    image: `${SITE_URL}/og-image.png`,
+    image: a.image ?? `${SITE_URL}/og-image.png`,
     ...(a.tags && a.tags.length > 0 ? { keywords: a.tags.join(", ") } : {}),
     isPartOf: { "@type": "Blog", "@id": `${SITE_URL}/blog#blog`, name: "Blog earlypanel", url: `${SITE_URL}/blog` },
   };

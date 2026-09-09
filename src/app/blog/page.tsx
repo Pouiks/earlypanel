@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import Nav from "@/components/layout/Nav";
 import Footer from "@/components/layout/Footer";
 import BreadcrumbJsonLd from "@/components/ui/BreadcrumbJsonLd";
@@ -41,7 +42,13 @@ export default async function BlogIndexPage() {
         ) : (
           <ul className="blog-list">
             {posts.map((p) => (
-              <li key={p.slug} className="blog-card">
+              <li key={p.slug} className={p.cover ? "blog-card has-cover" : "blog-card"}>
+                {p.cover && (
+                  <Link href={`/blog/${p.slug}`} className="blog-card-thumb" aria-hidden tabIndex={-1}>
+                    <Image src={p.cover} alt="" fill sizes="(max-width: 640px) 100vw, 220px" />
+                  </Link>
+                )}
+                <div className="blog-card-body">
                 <div className="blog-card-meta">
                   <time dateTime={p.date}>{formatPostDate(p.date)}</time>
                   <span aria-hidden>·</span>
@@ -54,6 +61,7 @@ export default async function BlogIndexPage() {
                     {p.tags.map((t) => <span key={t} className="blog-tag">{t}</span>)}
                   </div>
                 )}
+                </div>
               </li>
             ))}
           </ul>
