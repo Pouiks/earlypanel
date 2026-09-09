@@ -53,6 +53,11 @@ export interface ProjectFormData {
   audit_seo_score?: number | null;
   audit_best_practices_score?: number | null;
   audit_findings?: string[];
+
+  /** Facturation : devis HT en centimes ; dates YYYY-MM-DD ou null. */
+  quote_amount_cents?: number | null;
+  deposit_paid_at?: string | null;
+  balance_paid_at?: string | null;
 }
 
 interface ClientLite {
@@ -220,6 +225,16 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
   const [auditFindings, setAuditFindings] = useState<string[]>(initialData?.audit_findings?.length ? initialData.audit_findings : [""]);
   const [reportSectionOpen, setReportSectionOpen] = useState(false);
 
+  // Facturation : le devis est saisi en euros, envoye en centimes.
+  const [quoteEuros, setQuoteEuros] = useState<string>(
+    initialData?.quote_amount_cents != null ? String(initialData.quote_amount_cents / 100) : ""
+  );
+  const [depositPaidAt, setDepositPaidAt] = useState<string>(initialData?.deposit_paid_at?.slice(0, 10) ?? "");
+  const [balancePaidAt, setBalancePaidAt] = useState<string>(initialData?.balance_paid_at?.slice(0, 10) ?? "");
+  const [billingSectionOpen, setBillingSectionOpen] = useState(
+    !!(initialData?.quote_amount_cents || initialData?.deposit_paid_at || initialData?.balance_paid_at)
+  );
+
   const [urls, setUrls] = useState<string[]>(initialData?.urls?.length ? initialData.urls : [""]);
 
   // Les questions sont composees dans l'onglet "Scenarios" du projet
@@ -325,6 +340,12 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
         audit_seo_score: auditEnabled && auditSeo ? parseInt(auditSeo) : null,
         audit_best_practices_score: auditEnabled && auditBestPractices ? parseInt(auditBestPractices) : null,
         audit_findings: auditEnabled ? auditFindings.filter((f) => f.trim()) : [],
+        quote_amount_cents: (() => {
+          const v = parseFloat(quoteEuros.replace(",", "."));
+          return Number.isFinite(v) && v >= 0 ? Math.round(v * 100) : null;
+        })(),
+        deposit_paid_at: depositPaidAt || null,
+        balance_paid_at: balancePaidAt || null,
       });
     } finally {
       setSaving(false);
@@ -572,6 +593,70 @@ export default function ProjectForm({ initialData, initialClientId, onSubmit, su
         de question, conditionnelles, prevue testeur). Apres creation, accedez
         a cet onglet pour rediger le contenu du test.
       */}
+
+      {/* SECTION: Facturation (repliable) : seules donnees saisies du suivi
+          financier ; le reste est calcule dans l'onglet Finances (lecture seule). */}
+      <div style={sectionStyle}>
+        <button
+          type="button"
+          onClick={() => setBillingSectionOpen(!billingSectionOpen)}
+          style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            width: "100%", background: "none", border: "none", padding: 0,
+            cursor: "pointer", fontFamily: "inherit",
+          }}
+        >
+          <h2 style={{ ...sectionTitleStyle, marginBottom: 0 }}>Facturation</h2>
+          <span style={{ fontSize: 14, color: "#86868B", transition: "transform 200ms", transform: billingSectionOpen ? "rotate(180deg)" : "rotate(0)" }}>▼</span>
+        </button>
+        <p style={{ fontSize: 12, color: "#86868B", margin: "6px 0 0" }}>
+          Devis HT et dates d&apos;encaissement. 50 % à la commande, 50 % à la remise du rapport : l&apos;onglet Finances calcule le reste.
+        </p>
+
+        {billingSectionOpen && (
+          <div style={{ marginTop: 20, display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 14 }}>
+            <div>
+              <label style={labelStyle}>Devis HT (€)</label>
+              <input
+                type="number"
+                min={0}
+                step="0.01"
+                inputMode="decimal"
+                value={quoteEuros}
+                onChange={(e) => setQuoteEuros(e.target.value)}
+                placeholder="Ex : 3500"
+                style={inputStyle}
+                onFocus={(e) => e.currentTarget.style.borderColor = "#0A7A5A"}
+                onBlur={(e) => e.currentTarget.style.borderColor = "rgba(0,0,0,0.12)"}
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>Acompte encaissé le</label>
+              <input
+                type="date"
+                value={depositPaidAt}
+                onChange={(e) => setDepositPaidAt(e.target.value)}
+                style={inputStyle}
+                onFocus={(e) => e.currentTarget.style.borderColor = "#0A7A5A"}
+                onBlur={(e) => e.currentTarget.style.borderColor = "rgba(0,0,0,0.12)"}
+              />
+              <p style={{ fontSize: 11, color: "#86868b", margin: "6px 0 0" }}>Vide = non encaissé.</p>
+            </div>
+            <div>
+              <label style={labelStyle}>Solde encaissé le</label>
+              <input
+                type="date"
+                value={balancePaidAt}
+                onChange={(e) => setBalancePaidAt(e.target.value)}
+                style={inputStyle}
+                onFocus={(e) => e.currentTarget.style.borderColor = "#0A7A5A"}
+                onBlur={(e) => e.currentTarget.style.borderColor = "rgba(0,0,0,0.12)"}
+              />
+              <p style={{ fontSize: 11, color: "#86868b", margin: "6px 0 0" }}>Vide = non encaissé.</p>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* SECTION: Contexte du rapport (repliable) */}
       <div style={sectionStyle}>

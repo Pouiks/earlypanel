@@ -834,6 +834,8 @@ profil = 1 si (address OR city OR postal_code OR birth_date) manquant, sinon 0
 | audit_enabled | BOOLEAN | DEFAULT FALSE |
 | audit_*_score | INTEGER | CHECK 0-100 |
 | audit_findings | TEXT[] | DEFAULT '{}' |
+| quote_amount_cents | INTEGER | Nullable, centimes, CHECK >= 0 (migration 040). Devis HT accepte |
+| deposit_paid_at, balance_paid_at | DATE | Nullable (migration 040). Encaissement acompte / solde (50 % / 50 %). L'onglet Finances (lecture seule) calcule encaisse, reste a encaisser, cout testeurs engage/paye/a payer depuis `tester_payouts`, marge |
 
 #### `project_testers`
 | Colonne | Type | Contraintes |
@@ -1186,6 +1188,7 @@ if (!rlEmail.ok) return NextResponse.json({ success: true }); // anti-énumérat
 **Cible client et score (2026-09-07, livraison 2)** :
 - `projects.target_criteria` JSONB + `target_headcount` (migration 039). Forme `TargetCriteria` dans `src/lib/target-criteria.ts` : persona, métier (mots-clés OR), taille, niveau digital, appareils, navigateurs, OS mobile, connexion, outils, intérêts, disponibilité, expérience UX, et `required[]` (critères obligatoires, y compris les historiques genre/âge/CSP/secteur/villes).
 - `src/lib/target-match.ts` : `buildTarget(project)`, `evaluateTester(tester, target)` → `{ score, total, requiredOk, details[] }`, `requiredServerParams` (pré-filtre API sur les obligatoires filtrables ; les autres obligatoires sont filtrés côté client). Valeur testeur absente = non satisfait mais `unknown` (pastille grise).
+- Fiche projet (`/staff/dashboard/projects/[id]`, 2026-09-09) : plus d'onglets, un **sommaire** a gauche (`ProjectSommaire`), une section a l'ecran (hash `#testers`, `#review`...). Compteurs et etats par section depuis `GET /api/staff/projects/[id]/summary` (une requete : project_testers, use-cases, questions, NDA, rapport, versements). Bandeau « prochaine etape » calcule cote client (`computeNextSteps`), au plus 2 actions, rien de stocke.
 - Onglet Testeurs projet : catalogue trié par score, pastilles par critère, bandeau « N remplissent les obligatoires · M cochent tout · effectif voulu ». Éditeur : `TargetCriteriaEditor` dans ProjectForm. Principe acté : on classe, on n'exclut que l'impossible.
 
 ### 13.3 Anti-énumération (auth/recovery)

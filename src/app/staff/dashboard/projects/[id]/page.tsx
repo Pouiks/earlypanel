@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, useCallback, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import ProjectForm from "@/components/staff/ProjectForm";
@@ -12,8 +12,10 @@ import ProjectAnswersTab from "@/components/staff/ProjectAnswersTab";
 import ProjectPayoutsTab from "@/components/staff/ProjectPayoutsTab";
 import ProjectReviewTab from "@/components/staff/ProjectReviewTab";
 import ProjectReportTab from "@/components/staff/ProjectReportTab";
+import ProjectFinancesTab from "@/components/staff/ProjectFinancesTab";
+import ProjectSommaire, { ALL_SECTIONS, SECTION_LABELS, type SectionId } from "@/components/staff/ProjectSommaire";
 import type { ProjectFormData } from "@/components/staff/ProjectForm";
-import type { Project, ProjectStatus } from "@/types/staff";
+import type { Project, ProjectStatus, ProjectSummary } from "@/types/staff";
 import { useConfirm } from "@/components/ui/ConfirmModal";
 
 const STATUS_LABELS: Record<ProjectStatus, string> = {
@@ -32,38 +34,84 @@ const STATUS_COLORS: Record<ProjectStatus, { bg: string; text: string }> = {
 
 const ALL_STATUSES: ProjectStatus[] = ["draft", "active", "closed", "archived"];
 
-type TabId = "info" | "testers" | "nda" | "questionnaire" | "answers" | "review" | "payouts" | "report";
+// La section ouverte vit dans le hash (#testers) : un lien profond ou un
+// retour navigateur retombe au bon endroit, sans rechargement.
+function sectionFromHash(): SectionId {
+  if (typeof window === "undefined") return "info";
+  const h = window.location.hash.replace(/^#/, "");
+  return (ALL_SECTIONS as string[]).includes(h) ? (h as SectionId) : "info";
+}
 
-const TABS: { id: TabId; label: string }[] = [
-  { id: "info", label: "Informations" },
-  { id: "testers", label: "Testeurs" },
-  { id: "nda", label: "NDA" },
-  { id: "questionnaire", label: "Scénarios" },
-  { id: "answers", label: "Réponses" },
-  { id: "review", label: "Dépouillement" },
-  { id: "payouts", label: "Versements" },
-  { id: "report", label: "Rapport" },
-];
+interface NextStep { text: string; section: SectionId; label: string }
+
+/**
+ * Bandeau « prochaine etape » : au plus deux actions, dans l'ordre du
+ * parcours. Tout est derive du projet et du resume, rien n'est stocke.
+ */
+function computeNextSteps(project: Project, s: ProjectSummary | null): NextStep[] {
+  if (!s) return [];
+  const t = s.testers;
+  const status = project.status as ProjectStatus;
+  const out: NextStep[] = [];
+
+  if (s.questions === 0 && (status === "draft" || status === "active")) {
+    out.push({ text: "Aucune question : le questionnaire est à écrire.", section: "questionnaire", label: "Écrire les scénarios" });
+  }
+  if (s.questions > 0 && t.total === 0 && (status === "draft" || status === "active")) {
+    out.push({ text: "Aucun testeur invité.", section: "testers", label: "Inviter des testeurs" });
+  }
+  if (t.nda_sent_stale > 0) {
+    out.push({ text: `${t.nda_sent_stale} NDA en attente de signature depuis plus de 3 jours.`, section: "testers", label: "Voir les testeurs" });
+  }
+  const toRate = t.completed - t.rated;
+  if (toRate > 0) {
+    out.push({ text: `${toRate} réponse${toRate > 1 ? "s" : ""} soumise${toRate > 1 ? "s" : ""} à relire et noter.`, section: "answers", label: "Relire" });
+  }
+  if ((project.quote_amount_cents ?? null) === null && status !== "draft") {
+    out.push({ text: "Le devis n'est pas renseigné.", section: "finances", label: "Voir les finances" });
+  }
+  if (s.payouts.failed > 0) {
+    out.push({ text: `${s.payouts.failed} versement${s.payouts.failed > 1 ? "s" : ""} en échec.`, section: "payouts", label: "Voir les versements" });
+  } else if (s.payouts.pending > 0 && status === "closed") {
+    out.push({ text: `${s.payouts.pending} versement${s.payouts.pending > 1 ? "s" : ""} à payer.`, section: "payouts", label: "Payer" });
+  }
+  if (status === "closed" && t.completed > 0 && toRate === 0 && s.report !== "published") {
+    out.push({ text: s.report === "draft" ? "Le rapport est en brouillon." : "Le rapport est à rédiger.", section: "report", label: s.report === "draft" ? "Livrer le rapport" : "Rédiger le rapport" });
+  }
+  if (s.report === "published" && project.quote_amount_cents != null && !project.balance_paid_at) {
+    out.push({ text: "Rapport livré : le solde est à encaisser.", section: "finances", label: "Voir les finances" });
+  }
+  return out.slice(0, 2);
+}
 
 export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
   const [project, setProject] = useState<Project | null>(null);
+  const [summary, setSummary] = useState<ProjectSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabId>("info");
+  // Lecture du hash a l'initialisation : sans risque d'hydratation, le
+  // rendu serveur affiche « Chargement… » et n'utilise pas encore `section`.
+  const [section, setSection] = useState<SectionId>(sectionFromHash);
   const { confirm, notify, ConfirmModal } = useConfirm();
 
-  useEffect(() => {
-    fetchProject();
+  const fetchSummary = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/staff/projects/${id}/summary`);
+      if (res.ok) setSummary(await res.json());
+    } catch {
+      // le sommaire s'affiche sans compteurs
+    }
   }, [id]);
 
-  async function fetchProject(opts: { silent?: boolean } = {}) {
-    // silent=true : refresh sans flag loading global, pour eviter de
-    // demonter les onglets enfants (canvas Scenarios) pendant qu'ils
-    // travaillent. Utilise apres un autosave reussi.
-    if (!opts.silent) setLoading(true);
+  const fetchProject = useCallback(async (opts: { silent?: boolean } = {}) => {
+    // `loading` demarre a true et n'est jamais remis a true : un refresh
+    // (statut, autosave) ne demonte pas les sections enfants (canvas
+    // Scenarios) et ne fait pas clignoter la page. `silent` est conserve
+    // pour les appelants existants.
+    void opts.silent;
     try {
       const res = await fetch(`/api/staff/projects/${id}`);
       if (res.ok) {
@@ -76,8 +124,28 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
     } catch {
       // retry
     } finally {
-      if (!opts.silent) setLoading(false);
+      setLoading(false);
     }
+    fetchSummary();
+  }, [id, fetchSummary]);
+
+  useEffect(() => {
+    // Chargement initial : tous les setState de fetchProject sont apres un
+    // await (pas de rendu en cascade), la regle ne voit pas l'asynchronisme.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchProject();
+    const onHash = () => setSection(sectionFromHash());
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, [fetchProject]);
+
+  function selectSection(next: SectionId) {
+    setSection(next);
+    if (typeof window !== "undefined") {
+      window.history.replaceState(null, "", `#${next}`);
+    }
+    // Les compteurs peuvent avoir bouge dans la section qu'on quitte.
+    fetchSummary();
   }
 
   async function handleUpdate(data: ProjectFormData) {
@@ -208,132 +276,120 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
   }
 
   const status = project.status as ProjectStatus;
-  const statusColors = STATUS_COLORS[status] || STATUS_COLORS.draft;
+  const nextSteps = computeNextSteps(project, summary);
 
   return (
-    <div>
-      {/* Breadcrumb */}
-      <div style={{ marginBottom: 24 }}>
-        <Link href="/staff/dashboard" style={{ fontSize: 13, color: "#86868B", textDecoration: "none" }}>
-          &larr; Retour aux projets
+    <div className="project-shell">
+      <div className="project-sommaire-col">
+        <Link href="/staff/dashboard" style={{ display: "block", fontSize: 12, color: "#86868B", textDecoration: "none", padding: "0 12px 6px" }}>
+          &larr; Tous les projets
         </Link>
+        <ProjectSommaire project={project} summary={summary} active={section} onSelect={selectSection} />
       </div>
 
-      {/* Header */}
-      <div style={{
-        display: "flex", alignItems: "flex-start", justifyContent: "space-between",
-        marginBottom: 20, flexWrap: "wrap", gap: 16,
-      }}>
-        <div>
-          <h1 style={{
-            fontSize: 26, fontWeight: 700, color: "#1d1d1f",
-            letterSpacing: "-0.04em", margin: "0 0 8px",
-          }}>
-            {project.title}
+      <div className="project-content">
+        {/* En-tete de section */}
+        <div style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          marginBottom: 16, flexWrap: "wrap", gap: 12,
+        }}>
+          <h1 style={{ fontSize: 26, fontWeight: 700, color: "#1d1d1f", letterSpacing: "-0.04em", margin: 0 }}>
+            {SECTION_LABELS[section]}
           </h1>
-          <span style={{
-            display: "inline-block", padding: "5px 14px", fontSize: 12,
-            fontWeight: 600, color: statusColors.text, background: statusColors.bg, borderRadius: 980,
-          }}>
-            {STATUS_LABELS[status]}
-          </span>
-        </div>
-        <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={() => setEditing(true)} style={{
-            padding: "10px 20px", fontSize: 13, fontWeight: 600, color: "#1d1d1f",
-            background: "#fff", border: "1px solid rgba(0,0,0,0.12)", borderRadius: 980,
-            cursor: "pointer", fontFamily: "inherit", transition: "all 200ms",
-          }}>
-            Modifier
-          </button>
-          <button onClick={handleDelete} disabled={deleting} style={{
-            padding: "10px 20px", fontSize: 13, fontWeight: 600, color: "#e53e3e",
-            background: "#fef2f2", border: "none", borderRadius: 980,
-            cursor: "pointer", fontFamily: "inherit", transition: "all 200ms",
-            opacity: deleting ? 0.5 : 1,
-          }}>
-            Supprimer
-          </button>
-        </div>
-      </div>
-
-      {/* Status bar */}
-      <div style={{
-        background: "#fff", borderRadius: 16,
-        border: "0.5px solid rgba(0,0,0,0.08)", padding: "12px 20px",
-        marginBottom: 20, display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap",
-      }}>
-        <span style={{ fontSize: 13, fontWeight: 600, color: "#1d1d1f" }}>Statut :</span>
-        {ALL_STATUSES.map((s) => (
-          <button key={s} onClick={() => handleStatusChange(s)} style={{
-            padding: "6px 14px", fontSize: 12,
-            fontWeight: s === status ? 700 : 500,
-            color: s === status ? STATUS_COLORS[s].text : "#6e6e73",
-            background: s === status ? STATUS_COLORS[s].bg : "transparent",
-            border: s === status ? `1.5px solid ${STATUS_COLORS[s].text}` : "1px solid rgba(0,0,0,0.08)",
-            borderRadius: 980, cursor: "pointer", fontFamily: "inherit", transition: "all 200ms",
-          }}>
-            {STATUS_LABELS[s]}
-          </button>
-        ))}
-      </div>
-
-      {status === "draft" && (
-        <div style={{
-          background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 12,
-          padding: "12px 16px", marginBottom: 16, fontSize: 13, color: "#92400e",
-        }}>
-          <strong>Brouillon.</strong> Vous pouvez préparer testeurs et NDA. Le premier envoi de NDA passe le projet en <strong>Actif</strong> et ouvre les missions côté testeurs.
-        </div>
-      )}
-      {(status === "closed" || status === "archived") && (
-        <div style={{
-          background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 12,
-          padding: "12px 16px", marginBottom: 16, fontSize: 13, color: "#b91c1c",
-        }}>
-          Projet terminé ou archivé : plus d&apos;envoi de NDA ni d&apos;assignation de testeurs.
-        </div>
-      )}
-
-      {/* Tabs */}
-      <div style={{
-        display: "flex", gap: 0, marginBottom: 24,
-        borderBottom: "1px solid rgba(0,0,0,0.08)",
-      }}>
-        {TABS.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            style={{
-              padding: "12px 24px", fontSize: 14,
-              fontWeight: activeTab === tab.id ? 700 : 400,
-              color: activeTab === tab.id ? "#0A7A5A" : "#6e6e73",
-              background: "none", border: "none",
-              borderBottom: activeTab === tab.id ? "2px solid #0A7A5A" : "2px solid transparent",
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={() => setEditing(true)} style={{
+              padding: "10px 20px", fontSize: 13, fontWeight: 600, color: "#1d1d1f",
+              background: "#fff", border: "1px solid rgba(0,0,0,0.12)", borderRadius: 980,
               cursor: "pointer", fontFamily: "inherit", transition: "all 200ms",
-              marginBottom: -1,
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+            }}>
+              Modifier
+            </button>
+            <button onClick={handleDelete} disabled={deleting} style={{
+              padding: "10px 20px", fontSize: 13, fontWeight: 600, color: "#e53e3e",
+              background: "#fef2f2", border: "none", borderRadius: 980,
+              cursor: "pointer", fontFamily: "inherit", transition: "all 200ms",
+              opacity: deleting ? 0.5 : 1,
+            }}>
+              Supprimer
+            </button>
+          </div>
+        </div>
 
-      {/* Tab content */}
-      {activeTab === "info" && <ProjectInfoTab project={project} />}
-      {activeTab === "testers" && <ProjectTestersTab projectId={id} />}
-      {activeTab === "nda" && <ProjectNdaTab projectId={id} companyName={project.company_name || ""} />}
-      {activeTab === "questionnaire" && (
-        <ProjectQuestionsTab
-          projectId={id}
-          questions={project.questions ?? []}
-          onUpdate={() => fetchProject({ silent: true })}
-        />
-      )}
-      {activeTab === "answers" && <ProjectAnswersTab projectId={id} />}
-      {activeTab === "review" && <ProjectReviewTab projectId={id} />}
-      {activeTab === "payouts" && <ProjectPayoutsTab projectId={id} />}
-      {activeTab === "report" && <ProjectReportTab projectId={id} />}
+        {/* Prochaine etape */}
+        {nextSteps.length > 0 && (
+          <div style={{
+            background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 12,
+            padding: "12px 16px", marginBottom: 16, display: "flex", flexDirection: "column", gap: 8,
+          }}>
+            {nextSteps.map((n) => (
+              <div key={n.text} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, flexWrap: "wrap" }}>
+                <div style={{ fontSize: 13, color: "#92400e" }}>
+                  <strong>Prochaine étape.</strong> {n.text}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => selectSection(n.section)}
+                  style={{
+                    padding: "7px 14px", fontSize: 12, fontWeight: 600, color: "#92400e",
+                    background: "#fff", border: "1px solid #fde68a", borderRadius: 980,
+                    cursor: "pointer", fontFamily: "inherit", whiteSpace: "nowrap",
+                  }}
+                >
+                  {n.label} &rarr;
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Statut : inchange, replie sous la forme d'une ligne */}
+        <div style={{
+          background: "#fff", borderRadius: 16,
+          border: "0.5px solid rgba(0,0,0,0.08)", padding: "10px 16px",
+          marginBottom: 16, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap",
+        }}>
+          <span style={{ fontSize: 12, fontWeight: 600, color: "#1d1d1f", marginRight: 4 }}>Statut</span>
+          {ALL_STATUSES.map((s) => (
+            <button key={s} onClick={() => handleStatusChange(s)} style={{
+              padding: "5px 12px", fontSize: 12,
+              fontWeight: s === status ? 700 : 500,
+              color: s === status ? STATUS_COLORS[s].text : "#6e6e73",
+              background: s === status ? STATUS_COLORS[s].bg : "transparent",
+              border: s === status ? `1.5px solid ${STATUS_COLORS[s].text}` : "1px solid rgba(0,0,0,0.08)",
+              borderRadius: 980, cursor: "pointer", fontFamily: "inherit", transition: "all 200ms",
+            }}>
+              {STATUS_LABELS[s]}
+            </button>
+          ))}
+          {status === "draft" && (
+            <span style={{ fontSize: 12, color: "#92400e", marginLeft: "auto" }}>
+              Le premier envoi de NDA passe le projet en Actif.
+            </span>
+          )}
+          {(status === "closed" || status === "archived") && (
+            <span style={{ fontSize: 12, color: "#b91c1c", marginLeft: "auto" }}>
+              Plus d&apos;envoi de NDA ni d&apos;assignation de testeurs.
+            </span>
+          )}
+        </div>
+
+        {/* Section ouverte */}
+        {section === "info" && <ProjectInfoTab project={project} />}
+        {section === "finances" && <ProjectFinancesTab project={project} />}
+        {section === "questionnaire" && (
+          <ProjectQuestionsTab
+            projectId={id}
+            questions={project.questions ?? []}
+            onUpdate={() => fetchProject({ silent: true })}
+          />
+        )}
+        {section === "nda" && <ProjectNdaTab projectId={id} companyName={project.company_name || ""} />}
+        {section === "testers" && <ProjectTestersTab projectId={id} />}
+        {section === "answers" && <ProjectAnswersTab projectId={id} />}
+        {section === "review" && <ProjectReviewTab projectId={id} />}
+        {section === "payouts" && <ProjectPayoutsTab projectId={id} />}
+        {section === "report" && <ProjectReportTab projectId={id} />}
+      </div>
 
       {reactivateModal && (
         <div style={{
@@ -388,6 +444,54 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
         </div>
       )}
       <ConfirmModal />
+
+      <style jsx>{`
+        /* Le layout staff pose un padding horizontal de 40px : la colonne
+           sommaire le compense pour toucher la sidebar, comme la maquette. */
+        .project-shell {
+          display: flex;
+          align-items: flex-start;
+          margin-left: -40px;
+          margin-top: -8px;
+          min-height: calc(100vh - 76px);
+        }
+        .project-sommaire-col {
+          width: 248px;
+          flex-shrink: 0;
+          background: #fff;
+          border-right: 0.5px solid rgba(0,0,0,0.08);
+          padding: 20px 12px 24px;
+          position: sticky;
+          top: 0;
+          max-height: 100vh;
+          overflow-y: auto;
+          box-sizing: border-box;
+        }
+        .project-content {
+          flex: 1;
+          min-width: 0;
+          padding: 20px 0 0 32px;
+        }
+        @media (max-width: 768px) {
+          .project-shell {
+            flex-direction: column;
+            margin-left: -20px;
+            margin-right: -20px;
+          }
+          .project-sommaire-col {
+            width: 100%;
+            position: static;
+            max-height: none;
+            border-right: none;
+            border-bottom: 0.5px solid rgba(0,0,0,0.08);
+          }
+          .project-content {
+            padding: 16px 20px 0;
+            width: 100%;
+            box-sizing: border-box;
+          }
+        }
+      `}</style>
     </div>
   );
 }

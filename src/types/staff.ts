@@ -59,6 +59,11 @@ export interface Project {
   audit_best_practices_score?: number | null;
   audit_findings?: string[];
 
+  /** Finances (migration 040) : devis HT en centimes, dates d'encaissement (DATE). */
+  quote_amount_cents?: number | null;
+  deposit_paid_at?: string | null;
+  balance_paid_at?: string | null;
+
   questions?: ProjectQuestion[];
 }
 
@@ -246,4 +251,24 @@ export interface ProjectNda {
   project_id: string;
   title: string;
   content_html: string;
+}
+
+/** Compteurs du sommaire projet (GET /api/staff/projects/[id]/summary). */
+export interface ProjectSummary {
+  testers: {
+    total: number;
+    selected: number;
+    nda_sent: number;
+    /** NDA envoye depuis plus de 3 jours et toujours pas signe. */
+    nda_sent_stale: number;
+    nda_signed: number;
+    in_progress: number;
+    completed: number;
+    rated: number;
+  };
+  use_cases: number;
+  questions: number;
+  nda_exists: boolean;
+  report: "draft" | "published" | null;
+  payouts: { total: number; paid: number; pending: number; failed: number };
 }
