@@ -9,6 +9,7 @@ import {
   appendTesterFiltersToParams,
   type TesterAdvancedFilterState,
 } from "@/lib/tester-filters";
+import { ACTIVITY_FILTERS, formatLastSeen, isPastRgpdRetention } from "@/lib/tester-activity";
 
 interface TesterRow {
   id: string;
@@ -34,6 +35,8 @@ interface TesterRow {
   persona: { id: string; slug: string; name: string } | null;
   payment_info_configured?: boolean;
   available_until?: string | null;
+  last_login_at?: string | null;
+  last_seen_at?: string | null;
 }
 
 const STATUS_LABELS: Record<string, string> = {
@@ -70,6 +73,7 @@ export default function StaffTestersPage() {
   const [filters, setFilters] = useState<TesterAdvancedFilterState>(() => emptyTesterFilters());
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [availableOnly, setAvailableOnly] = useState(false);
+  const [activity, setActivity] = useState("");
   const [campaignOpen, setCampaignOpen] = useState(false);
   const [campaignBusy, setCampaignBusy] = useState(false);
   const [campaignMsg, setCampaignMsg] = useState<string | null>(null);
@@ -82,6 +86,7 @@ export default function StaffTestersPage() {
       const params = new URLSearchParams();
       params.set("status", filter);
       if (availableOnly) params.set("available", "confirmed");
+      if (activity) params.set("activity", activity);
       appendTesterFiltersToParams(params, filters);
       const res = await fetch(
         `/api/staff/testers?${params.toString()}`,
@@ -102,7 +107,7 @@ export default function StaffTestersPage() {
     } finally {
       if (!signal?.aborted) setLoading(false);
     }
-  }, [filter, filters, availableOnly]);
+  }, [filter, filters, availableOnly, activity]);
 
   async function sendCampaign(testEmailArg?: string) {
     const isTest = typeof testEmailArg === "string" && testEmailArg.includes("@");
@@ -230,6 +235,22 @@ export default function StaffTestersPage() {
         >
           ✓ Dispo confirmée
         </button>
+        <select
+          value={activity}
+          onChange={(e) => setActivity(e.target.value)}
+          title="Dernière activité sur l'espace testeur (connexion ou requête authentifiée)"
+          style={{
+            padding: "7px 14px", fontSize: 13, fontWeight: activity ? 600 : 400,
+            color: activity ? "#0A7A5A" : "#6e6e73",
+            background: activity ? "#f0faf5" : "#fff",
+            border: activity ? "1.5px solid #0A7A5A" : "1px solid rgba(0,0,0,0.1)",
+            borderRadius: 980, cursor: "pointer", fontFamily: "inherit",
+          }}
+        >
+          {ACTIVITY_FILTERS.map((opt) => (
+            <option key={opt.value} value={opt.value}>{opt.label}</option>
+          ))}
+        </select>
         <input
           type="search"
           placeholder="Rechercher par nom, email, métier…"
@@ -270,25 +291,28 @@ export default function StaffTestersPage() {
         </div>
       ) : (
         <div style={{ background: "#fff", borderRadius: 16, border: "0.5px solid rgba(0,0,0,0.08)", overflow: "hidden" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1.2fr 0.8fr 0.7fr 0.6fr 0.8fr 0.7fr", gap: 12, padding: "12px 20px", background: "#fafafa", borderBottom: "0.5px solid rgba(0,0,0,0.06)", fontSize: 11, fontWeight: 700, color: "#86868B", letterSpacing: 0.4, textTransform: "uppercase" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1.5fr 1.2fr 0.8fr 0.7fr 0.6fr 0.8fr 0.8fr 0.7fr", gap: 12, padding: "12px 20px", background: "#fafafa", borderBottom: "0.5px solid rgba(0,0,0,0.06)", fontSize: 11, fontWeight: 700, color: "#86868B", letterSpacing: 0.4, textTransform: "uppercase" }}>
             <div>Testeur</div>
             <div>Métier / Secteur</div>
             <div>Persona</div>
             <div>Tier</div>
             <div>Missions</div>
             <div>Inscription</div>
+            <div>Activité</div>
             <div>Statut</div>
           </div>
           {filtered.map((t) => {
             const sc = STATUS_COLORS[t.status] ?? STATUS_COLORS.pending;
             const fullName = `${t.first_name ?? ""} ${t.last_name ?? ""}`.trim() || "Non renseigné";
             const availConfirmed = !!t.available_until && new Date(t.available_until).getTime() >= Date.now();
+            const lastSeen = t.last_seen_at ?? t.last_login_at ?? null;
+            const rgpdDue = isPastRgpdRetention({ last_seen_at: t.last_seen_at, last_login_at: t.last_login_at, created_at: t.created_at });
             return (
               <div
                 key={t.id}
                 onClick={() => setDrawerId(t.id)}
                 style={{
-                  display: "grid", gridTemplateColumns: "1.5fr 1.2fr 0.8fr 0.7fr 0.6fr 0.8fr 0.7fr",
+                  display: "grid", gridTemplateColumns: "1.5fr 1.2fr 0.8fr 0.7fr 0.6fr 0.8fr 0.8fr 0.7fr",
                   gap: 12, padding: "14px 20px",
                   borderBottom: "0.5px solid rgba(0,0,0,0.04)",
                   alignItems: "center", fontSize: 13, color: "#1d1d1f",
@@ -356,6 +380,19 @@ export default function StaffTestersPage() {
                   {new Date(t.created_at).toLocaleDateString("fr-FR", {
                     day: "2-digit", month: "2-digit", year: "2-digit",
                   })}
+                </div>
+                <div
+                  style={{ fontSize: 12, color: lastSeen ? "#1d1d1f" : "#86868B", fontVariantNumeric: "tabular-nums" }}
+                  title={lastSeen
+                    ? `Dernière activité : ${new Date(lastSeen).toLocaleString("fr-FR")}${t.last_login_at ? ` · dernière connexion : ${new Date(t.last_login_at).toLocaleString("fr-FR")}` : ""}`
+                    : "Aucune session connue"}
+                >
+                  {formatLastSeen(lastSeen)}
+                  {rgpdDue && (
+                    <div style={{ fontSize: 10, color: "#b91c1c", marginTop: 3, fontWeight: 600 }} title="Plus de 3 ans sans activité : durée de conservation dépassée (politique de confidentialité).">
+                      RGPD : à purger
+                    </div>
+                  )}
                 </div>
                 <div>
                   <span style={{ padding: "3px 10px", fontSize: 11, fontWeight: 600, borderRadius: 980, background: sc.bg, color: sc.fg }}>

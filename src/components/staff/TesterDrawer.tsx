@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { Tester, TesterGender, TesterPersona } from "@/types/tester";
+import { formatLastSeen } from "@/lib/tester-activity";
 
 const GENDER_LABELS: Record<string, string> = {
   female: "Femme",
@@ -150,6 +151,12 @@ export default function TesterDrawer({ testerId, onClose }: TesterDrawerProps) {
                   {tester.first_name} {tester.last_name}
                 </div>
                 <div style={{ fontSize: 13, color: "#86868B", marginTop: 2 }}>{tester.email}</div>
+                <div
+                  style={{ fontSize: 12, color: "#86868B", marginTop: 4 }}
+                  title={tester.last_login_at ? `Dernière connexion : ${new Date(tester.last_login_at).toLocaleString("fr-FR")}` : "Aucune session connue"}
+                >
+                  Inscrit le {new Date(tester.created_at).toLocaleDateString("fr-FR")} · dernière activité {formatLastSeen(tester.last_seen_at ?? tester.last_login_at ?? null)}
+                </div>
                 <div style={{ marginTop: 8 }}>
                   <Badge
                     color={tester.status === "active" ? "#0A7A5A" : "#86868B"}

@@ -72,6 +72,10 @@ export interface Tester {
   available_until: string | null;
   availability_responded_at: string | null;
   availability_check_sent_at: string | null;
+  // Activite (migration 043) : ouverture de session / derniere requete
+  // authentifiee (granularite 1 h). NULL = jamais connecte.
+  last_login_at: string | null;
+  last_seen_at: string | null;
 }
 
 export type TesterInsert = Pick<Tester, "email" | "auth_user_id"> &

@@ -1,7 +1,9 @@
 import { cache } from "react";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { after } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { shouldStampSeen } from "@/lib/tester-activity";
 
 export async function getSupabaseServerClient() {
   const cookieStore = await cookies();
@@ -51,10 +53,29 @@ export const getAuthedTester = cache(async (): Promise<AuthedTester | null> => {
 
   const { data: tester } = await admin
     .from("testers")
-    .select("id")
+    .select("id, last_seen_at")
     .eq("auth_user_id", user.id)
     .maybeSingle();
 
   if (!tester) return null;
+
+  // Derniere activite (migration 043) : au plus une ecriture par heure,
+  // apres l'envoi de la reponse. Jamais bloquant, jamais fatal : une
+  // trace d'activite manquee ne doit pas casser une requete metier.
+  if (shouldStampSeen(tester.last_seen_at)) {
+    const stamp = async () => {
+      await admin
+        .from("testers")
+        .update({ last_seen_at: new Date().toISOString() })
+        .eq("id", tester.id);
+    };
+    try {
+      after(stamp);
+    } catch {
+      // Hors contexte de requete (ex. script) : on tente quand meme, sans attendre.
+      void stamp().catch(() => {});
+    }
+  }
+
   return { authUserId: user.id, testerId: tester.id };
 });

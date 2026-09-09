@@ -1,5 +1,5 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
-import { NextResponse, type NextRequest } from "next/server";
+import { NextResponse, after, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { backfillConnectionIfStuck } from "@/lib/tester-activation-repair";
 
@@ -123,6 +123,17 @@ export async function GET(request: NextRequest) {
       .maybeSingle();
 
     if (tester) {
+      // Derniere connexion (migration 043) : une session vient d'etre ouverte
+      // par un magic link valide. Hors chemin de la redirection.
+      const testerId = tester.id;
+      after(async () => {
+        const nowIso = new Date().toISOString();
+        await admin
+          .from("testers")
+          .update({ last_login_at: nowIso, last_seen_at: nowIso })
+          .eq("id", testerId);
+      });
+
       const { applied, profile_completed_after } = await backfillConnectionIfStuck(admin, {
         id: tester.id,
         status: tester.status,

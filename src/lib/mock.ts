@@ -66,6 +66,8 @@ export const MOCK_TESTER: Tester = {
   available_until: null,
   availability_responded_at: null,
   availability_check_sent_at: null,
+  last_login_at: null,
+  last_seen_at: null,
 };
 
 const MOCK_TESTER_BLANK: Tester = {

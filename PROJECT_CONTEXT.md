@@ -137,6 +137,7 @@ NEXT_PUBLIC_CONTACT_EMAIL         # Email contact (défaut: contact@earlypanel.f
 
 - `getAuthedTester()` : session + lookup `testers.id` par `auth_user_id`.
 - Retourne `{ authUserId, testerId }` ou `null`.
+- Effet de bord (migration 043) : si `last_seen_at` a plus d'1 h, planifie via `after()` un UPDATE de `last_seen_at` après la réponse. Ne bloque jamais, n'échoue jamais la requête.
 - Utilisé par : missions start/answers/submit/images, documents/sign.
 
 ### `src/lib/project-lifecycle.ts` — Règles cycle de vie projet (CRITIQUE)
@@ -799,6 +800,8 @@ profil = 1 si (address OR city OR postal_code OR birth_date) manquant, sinon 0
 | persona_locked | BOOLEAN | NOT NULL DEFAULT false |
 | profile_reminder_sent_at | TIMESTAMPTZ | migration 037, idempotence cron profile-reminders |
 | profile_reminder_count | INTEGER | NOT NULL DEFAULT 0, plafond 3 relances |
+| last_login_at | TIMESTAMPTZ | migration 043, ouverture de session (callback magic link). NULL = jamais connecté |
+| last_seen_at | TIMESTAMPTZ | migration 043, dernière requête authentifiée, écrit au plus 1×/h par `getAuthedTester` via `after()`. Base du filtre `activity` staff et de la rétention RGPD 3 ans (`src/lib/tester-activity.ts`) |
 
 #### `staff_members`
 | Colonne | Type | Contraintes |

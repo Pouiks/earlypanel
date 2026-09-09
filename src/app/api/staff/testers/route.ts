@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getStaffMember } from "@/lib/staff-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ageFromBirthDate } from "@/lib/taxonomy";
+import { activityFilterToOr } from "@/lib/tester-activity";
 
 // Edge Runtime : route appelee a chaque ouverture de l'onglet Testeurs et
 // pour le pre-filtrage du catalogue projet. Cold start Node = ~1-2s, Edge = ~50ms.
@@ -11,7 +12,7 @@ export const runtime = "edge";
 export const preferredRegion = "arn1";
 
 const SELECT_COLUMNS =
-  "id, email, first_name, last_name, phone, gender, city, postal_code, job_title, sector, company_size, digital_level, csp, birth_date, tools, browsers, devices, phone_model, mobile_os, connection, availability, interests, ux_experience, status, profile_completed, created_at, tier, quality_score, missions_completed, total_earned, available_until, availability_responded_at, availability_check_sent_at, persona_id, persona_locked, persona:tester_personas(id, slug, name)";
+  "id, email, first_name, last_name, phone, gender, city, postal_code, job_title, sector, company_size, digital_level, csp, birth_date, tools, browsers, devices, phone_model, mobile_os, connection, availability, interests, ux_experience, status, profile_completed, created_at, tier, quality_score, missions_completed, total_earned, available_until, availability_responded_at, availability_check_sent_at, last_login_at, last_seen_at, persona_id, persona_locked, persona:tester_personas(id, slug, name)";
 
 /**
  * GET /api/staff/testers
@@ -25,6 +26,9 @@ const SELECT_COLUMNS =
  *
  * `location` accepte plusieurs valeurs (OR) : ville ou prefixe de code postal.
  * `count=1` : renvoie { total } sans les lignes (compteur live des filtres).
+ *
+ * `activity` : inactive_30 | inactive_90 | inactive_180 | inactive_365 | rgpd | never
+ * (derniere requete authentifiee, cf. src/lib/tester-activity.ts, migration 043).
  */
 export async function GET(request: NextRequest) {
   // Server-Timing : visible dans DevTools > Timing > Server Timing. Sert a
@@ -49,6 +53,7 @@ export async function GET(request: NextRequest) {
   const status = searchParams.get("status");
   const includeUnknown = ["1", "true"].includes(searchParams.get("include_unknown") ?? "");
   const countOnly = ["1", "true"].includes(searchParams.get("count") ?? "");
+  const activityOr = activityFilterToOr(searchParams.get("activity") ?? "");
   const locationList = multi("location");
   const sectorList = multi("sector");
   const cspList = multi("csp");
@@ -93,6 +98,7 @@ export async function GET(request: NextRequest) {
     if (searchParams.get("available") === "confirmed") {
       q = q.gte("available_until", new Date().toISOString());
     }
+    if (activityOr) q = q.or(activityOr);
     if (digitalLevelList.length > 0) q = q.in("digital_level", digitalLevelList);
     if (sectorList.length > 0) q = q.in("sector", sectorList);
     if (cspList.length > 0) { const o = inOrNull("csp", cspList); q = o ? q.or(o) : q.in("csp", cspList); }
