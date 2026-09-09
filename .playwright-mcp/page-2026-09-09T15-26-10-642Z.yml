@@ -1,0 +1,184 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link [ref=e3] [cursor=pointer]:
+      - /url: /
+      - text: early
+      - emphasis [ref=e4]: panel
+    - generic [ref=e5]:
+      - link "Comment ça marche" [ref=e6] [cursor=pointer]:
+        - /url: /#process
+      - link "Quand nous appeler" [ref=e7] [cursor=pointer]:
+        - /url: /entreprises#situations
+      - link "Tarifs & FAQ" [ref=e8] [cursor=pointer]:
+        - /url: /entreprises#faq
+      - link "Blog" [ref=e9] [cursor=pointer]:
+        - /url: /blog
+      - link "Démarrer un projet" [ref=e10] [cursor=pointer]:
+        - /url: /entreprises#brief
+    - generic [ref=e11]:
+      - link "Connexion" [ref=e12] [cursor=pointer]:
+        - /url: /app/login
+      - link "Réserver un appel" [ref=e13] [cursor=pointer]:
+        - /url: https://calendly.com/virgilejoinville/30min
+  - main [ref=e14]:
+    - generic [ref=e15]:
+      - generic [ref=e16]: Blog
+      - heading [level=1] [ref=e17]:
+        - text: "Tests utilisateurs :"
+        - emphasis [ref=e18]: la méthode
+        - text: ", sans jargon."
+      - paragraph [ref=e19]: Ce qu'on apprend en recrutant des panels, en relisant des centaines de réponses et en rédigeant des rapports que des équipes produit utilisent vraiment. Des guides courts, applicables tout de suite.
+    - list [ref=e20]:
+      - listitem [ref=e21]:
+        - link [aria-hidden] [ref=e22] [cursor=pointer]:
+          - /url: /blog/combien-de-testeurs-test-utilisateur
+        - generic [ref=e23]:
+          - generic [ref=e24]:
+            - time [ref=e25]: 9 septembre 2026
+            - generic [aria-hidden] [ref=e26]: ·
+            - generic [ref=e27]: 5 min de lecture
+          - heading [level=2] [ref=e28]:
+            - link "Combien de testeurs pour un test utilisateur ? La réponse dépend de la question posée" [ref=e29] [cursor=pointer]:
+              - /url: /blog/combien-de-testeurs-test-utilisateur
+          - paragraph [ref=e30]: "5, 8, 12, 30 testeurs ? Le bon nombre de participants dépend de ce que vous cherchez : des frictions, une comparaison ou une mesure. Repères concrets pour dimensionner un panel."
+          - generic [ref=e31]:
+            - generic [ref=e32]: panel
+            - generic [ref=e33]: méthode
+      - listitem [ref=e34]:
+        - generic [ref=e35]:
+          - generic [ref=e36]:
+            - time [ref=e37]: 9 septembre 2026
+            - generic [aria-hidden] [ref=e38]: ·
+            - generic [ref=e39]: 6 min de lecture
+          - heading [level=2] [ref=e40]:
+            - 'link "Test utilisateur à distance : la méthode complète, de l''objectif au rapport" [ref=e41] [cursor=pointer]':
+              - /url: /blog/test-utilisateur-a-distance-methode
+          - paragraph [ref=e42]: "Comment organiser un test utilisateur à distance qui produit des décisions : cadrer l'objectif, recruter les bons profils, écrire les scénarios, relire les réponses et restituer."
+          - generic [ref=e43]:
+            - generic [ref=e44]: méthode
+            - generic [ref=e45]: test utilisateur à distance
+      - listitem [ref=e46]:
+        - generic [ref=e47]:
+          - generic [ref=e48]:
+            - time [ref=e49]: 9 septembre 2026
+            - generic [aria-hidden] [ref=e50]: ·
+            - generic [ref=e51]: 5 min de lecture
+          - heading [level=2] [ref=e52]:
+            - 'link "Tester une maquette Figma avec de vrais utilisateurs : préparer le prototype pour qu''il tienne" [ref=e53] [cursor=pointer]':
+              - /url: /blog/tester-maquette-figma-preparer-prototype
+          - paragraph [ref=e54]: "Un prototype Figma soumis à des inconnus casse vite. Ce qu'il faut préparer avant le test : parcours fermés, états, données réalistes, écran de secours, et ce qu'on ne peut pas tester sur une maquette."
+          - generic [ref=e55]:
+            - generic [ref=e56]: figma
+            - generic [ref=e57]: prototype
+            - generic [ref=e58]: méthode
+  - contentinfo [ref=e59]:
+    - generic [ref=e60]:
+      - generic [ref=e61]:
+        - generic [ref=e62]:
+          - link [ref=e63] [cursor=pointer]:
+            - /url: /
+            - text: early
+            - emphasis [ref=e64]: panel
+          - paragraph [ref=e65]: Tests utilisateurs clés en main pour équipes produit, startups et agences digitales.
+          - generic [ref=e66]:
+            - generic [ref=e67]: RGPD
+            - generic [ref=e68]: NDA inclus
+          - paragraph [ref=e69]:
+            - text: Vous voulez devenir testeur ?
+            - link "Rejoignez le panel" [ref=e70] [cursor=pointer]:
+              - /url: /testeurs
+            - text: ou
+            - link "connectez-vous à votre espace" [ref=e71] [cursor=pointer]:
+              - /url: /app/login
+            - text: .
+        - generic [ref=e72]:
+          - heading "Service" [level=3] [ref=e73]
+          - list [ref=e74]:
+            - listitem [ref=e75]:
+              - link "Comment ça marche" [ref=e76] [cursor=pointer]:
+                - /url: /#process
+            - listitem [ref=e77]:
+              - link "Rapport d'exemple" [ref=e78] [cursor=pointer]:
+                - /url: /#rapport
+            - listitem [ref=e79]:
+              - link "Démarrer un projet" [ref=e80] [cursor=pointer]:
+                - /url: /entreprises#brief
+            - listitem [ref=e81]:
+              - link "FAQ" [ref=e82] [cursor=pointer]:
+                - /url: /entreprises#faq
+            - listitem [ref=e83]:
+              - link "Blog" [ref=e84] [cursor=pointer]:
+                - /url: /blog
+        - generic [ref=e85]:
+          - heading "Cas d'usage" [level=3] [ref=e86]
+          - list [ref=e87]:
+            - listitem [ref=e88]:
+              - link "Tester une maquette Figma" [ref=e89] [cursor=pointer]:
+                - /url: /test-maquette-figma
+            - listitem [ref=e90]:
+              - link "Tester avant le lancement" [ref=e91] [cursor=pointer]:
+                - /url: /test-pre-lancement-staging
+            - listitem [ref=e92]:
+              - link "Comprendre un funnel qui ne convertit pas" [ref=e93] [cursor=pointer]:
+                - /url: /test-conversion-funnel
+            - listitem [ref=e94]:
+              - link "Agences et studios" [ref=e95] [cursor=pointer]:
+                - /url: /agences
+        - generic [ref=e96]:
+          - heading "Testeurs" [level=3] [ref=e97]
+          - list [ref=e98]:
+            - listitem [ref=e99]:
+              - link "Devenir testeur rémunéré" [ref=e100] [cursor=pointer]:
+                - /url: /testeurs
+            - listitem [ref=e101]:
+              - link "Comment ça marche" [ref=e102] [cursor=pointer]:
+                - /url: /testeurs#how
+            - listitem [ref=e103]:
+              - link "FAQ testeurs" [ref=e104] [cursor=pointer]:
+                - /url: /testeurs#faq
+            - listitem [ref=e105]:
+              - link "Connexion à mon espace" [ref=e106] [cursor=pointer]:
+                - /url: /app/login
+            - listitem [ref=e107]:
+              - link "CGU testeurs" [ref=e108] [cursor=pointer]:
+                - /url: /cgu
+        - generic [ref=e109]:
+          - heading "Légal" [level=3] [ref=e110]
+          - list [ref=e111]:
+            - listitem [ref=e112]:
+              - link "Mentions légales" [ref=e113] [cursor=pointer]:
+                - /url: /mentions-legales
+            - listitem [ref=e114]:
+              - link "Confidentialité" [ref=e115] [cursor=pointer]:
+                - /url: /confidentialite
+            - listitem [ref=e116]:
+              - link "Sécurité et données" [ref=e117] [cursor=pointer]:
+                - /url: /securite
+            - listitem [ref=e118]:
+              - link "CGV" [ref=e119] [cursor=pointer]:
+                - /url: /cgv
+            - listitem [ref=e120]:
+              - link "contact@earlypanel.fr" [ref=e121] [cursor=pointer]:
+                - /url: mailto:contact@earlypanel.fr
+      - generic [ref=e122]:
+        - paragraph [ref=e123]: © 2026 earlypanel · Tous droits réservés
+        - generic [ref=e124]:
+          - link "earlypanel sur LinkedIn" [ref=e125] [cursor=pointer]:
+            - /url: https://www.linkedin.com/company/earlypanel/
+            - text: LinkedIn
+          - link "Mentions légales" [ref=e126] [cursor=pointer]:
+            - /url: /mentions-legales
+          - link "Confidentialité" [ref=e127] [cursor=pointer]:
+            - /url: /confidentialite
+          - link "CGV" [ref=e128] [cursor=pointer]:
+            - /url: /cgv
+  - alert [ref=e129]
+  - region "Information sur les cookies" [ref=e130]:
+    - paragraph [ref=e131]: 🍪 Site sans cookies de pistage
+    - paragraph [ref=e132]:
+      - text: earlypanel utilise uniquement des cookies
+      - strong [ref=e133]: strictement nécessaires
+      - text: (session, sécurité). Les statistiques sont collectées de manière agrégée et anonyme, sans cookie de tracking.
+      - link "En savoir plus" [ref=e134] [cursor=pointer]:
+        - /url: /confidentialite
+    - button "Compris" [ref=e135] [cursor=pointer]

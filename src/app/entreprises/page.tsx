@@ -19,13 +19,13 @@ import { BOOKING_DURATION_MIN, PRICE_RANGE_LABEL } from "@/lib/cta-links";
 export const metadata: Metadata = {
   // Page pilier "service de tests utilisateurs a distance". Title et OG
   // volontairement differents de la home (marque) pour ne pas se cannibaliser.
-  title: "Service de tests utilisateurs à distance pour startups et agences",
+  title: "Test utilisateur à distance : rapport UX en 5 jours",
   // Description <= 155 caracteres pour ne pas etre tronquee dans la SERP.
   description:
-    "Test UX à distance sur maquette Figma, staging ou produit live : recrutement de testeurs à la main, NDA, rapport rédigé en 5 jours. Devis sous 48h.",
+    "Test utilisateur à distance sur maquette Figma, staging ou produit live. Testeurs B2B recrutés à la main, NDA, rapport rédigé en 5 jours. Devis sous 48h.",
   alternates: { canonical: "/entreprises" },
   openGraph: {
-    title: "Service de tests utilisateurs à distance pour startups et agences",
+    title: "Test utilisateur à distance : rapport UX en 5 jours · earlypanel",
     description:
       "Maquette Figma, staging, app mobile, e-commerce. Testeurs recrutés à la main, NDA inclus, rapport UX rédigé en 5 jours. Devis sous 48h.",
     url: "/entreprises",

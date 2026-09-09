@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import SituationLanding from "@/components/b2b/SituationLanding";
 
 export const metadata: Metadata = {
-  title: "Pourquoi mon funnel ne convertit pas · Test utilisateur post-lancement",
+  title: "Pourquoi votre funnel ne convertit pas : test utilisateur",
   description:
-    "Vos analytics disent où les utilisateurs partent, pas pourquoi. Des testeurs proches de votre base utilisateur refont le parcours et expliquent ce qui bloque. Rapport en 5 jours.",
+    "Vos analytics disent où les utilisateurs partent, pas pourquoi. Test utilisateur sur checkout, onboarding ou dashboard : frictions priorisées en 5 jours.",
   alternates: { canonical: "/test-conversion-funnel" },
   openGraph: {
-    title: "Comprendre pourquoi un funnel ne convertit pas · earlypanel",
+    title: "Pourquoi votre funnel ne convertit pas : test utilisateur · earlypanel",
     description: "Test utilisateur ciblé sur la zone qui décroche : checkout, onboarding, dashboard. Rapport rédigé en 5 jours.",
     url: "/test-conversion-funnel",
     type: "website",
@@ -44,10 +44,10 @@ export default function TestConversionFunnelPage() {
       path="/test-conversion-funnel"
       breadcrumbName="Comprendre un funnel qui ne convertit pas"
       eyebrow="Optimisation post-lancement · Produit en production"
-      h1={<>Votre funnel ne convertit pas. <em>Demandez pourquoi</em> à des utilisateurs, pas à vos analytics.</>}
-      lede="Vous savez à quelle étape les utilisateurs partent. Vous ne savez pas ce qu'ils ont vécu à ce moment-là. Huit à quinze testeurs proches de votre base refont le parcours et vous l'expliquent, verbatims à l'appui, en cinq jours."
+      h1={<>Votre funnel ne convertit pas ? <em>Demandez à vos utilisateurs pourquoi</em>, arrêtez de deviner.</>}
+      lede="Pour améliorer le taux de conversion, vos analytics ne suffisent pas : ils disent à quelle étape les utilisateurs partent, jamais ce qu'ils ont vécu à ce moment-là. Un test utilisateur sur votre tunnel de conversion, avec huit à quinze testeurs proches de votre base, vous l'explique, verbatims à l'appui, en cinq jours."
       problem={{
-        title: "Le problème : les chiffres montrent le où, jamais le pourquoi.",
+        title: "Le problème pour améliorer le taux de conversion : les chiffres montrent le où, jamais le pourquoi.",
         paragraphs: [
           "Le funnel décroche à l'étape 3. Vous avez regardé les heatmaps, les enregistrements de session, les taux de rebond. Vous avez cinq hypothèses en réunion, et chacun défend la sienne. La roadmap du trimestre se construit sur une supposition.",
           "Un A/B test tranchera entre deux variantes, mais il ne vous dira pas laquelle des cinq hypothèses est la bonne, et il exige un trafic que vous n'avez peut-être pas.",

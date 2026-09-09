@@ -31,6 +31,9 @@ export default function Footer({ variant = "index" }: FooterProps) {
         <li><Link href="/test-pre-lancement-staging">Tester avant le lancement</Link></li>
         <li><Link href="/test-conversion-funnel">Comprendre un funnel qui ne convertit pas</Link></li>
         <li><Link href="/agences">Agences et studios</Link></li>
+        <li><Link href="/test-utilisateur-saas-b2b">Test utilisateur SaaS B2B</Link></li>
+        <li><Link href="/test-utilisateur-sante">Test utilisateur santé</Link></li>
+        <li><Link href="/test-utilisateur-fintech">Test utilisateur fintech</Link></li>
       </ul>
     </div>
   );

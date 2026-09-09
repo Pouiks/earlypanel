@@ -57,7 +57,7 @@ export default function ThreeMoments() {
     <section className="moments" id="situations">
       <div className="moments-inner">
         <div className="sec-eye">Quand faire un test utilisateur : 3 moments</div>
-        <h2 className="sec-title">Trois situations où l&apos;on fait appel à un test utilisateur.</h2>
+        <h2 className="sec-title">Trois situations où un test utilisateur à distance change la décision.</h2>
         <p className="sec-sub">
           Ce ne sont pas des phases que vous traversez forcément toutes. Identifiez celle où vous êtes aujourd&apos;hui, c&apos;est à ce moment-là qu&apos;un test apporte le plus de valeur.
         </p>

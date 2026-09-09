@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import SituationLanding from "@/components/b2b/SituationLanding";
 
 export const metadata: Metadata = {
-  title: "Tester son produit avant le lancement · Test utilisateur sur staging",
+  title: "Test utilisateur avant lancement sur staging",
   description:
-    "10 à 20 testeurs sélectionnés à la main parcourent votre URL de staging avant le go-live. Frictions documentées, priorisées, rapport rédigé en 5 jours. NDA inclus.",
+    "Faites tester votre préproduction par des utilisateurs extérieurs avant le go-live. Frictions invisibles en interne, rapport UX en 5 jours, NDA inclus.",
   alternates: { canonical: "/test-pre-lancement-staging" },
   openGraph: {
-    title: "Tester son produit avant le lancement · earlypanel",
+    title: "Test utilisateur avant lancement sur staging · earlypanel",
     description: "Test utilisateur sur staging avant le go-live. Rapport rédigé en 5 jours, NDA inclus.",
     url: "/test-pre-lancement-staging",
     type: "website",
@@ -44,10 +44,10 @@ export default function TestPreLancementPage() {
       path="/test-pre-lancement-staging"
       breadcrumbName="Tester avant le lancement"
       eyebrow="Validation avant lancement · Sur votre URL de staging"
-      h1={<>Tester votre produit <em>avant le lancement</em>, avec des gens qui ne le connaissent pas.</>}
-      lede="Le code marche, l'équipe est confiante, et personne d'extérieur n'a encore mis les mains dedans. Dix à vingt testeurs sélectionnés à la main parcourent votre staging, et vous savez ce qui bloque avant que vos premiers clients ne le découvrent."
+      h1={<>Test utilisateur avant lancement : ce que vos utilisateurs verront <em>et que votre équipe ne voit plus</em>.</>}
+      lede="Un test avant lancement, c'est le dernier moment où une friction coûte une correction plutôt qu'un client. Le code marche, l'équipe est confiante, et personne d'extérieur n'a encore mis les mains dedans : dix à vingt testeurs sélectionnés à la main font ce bêta test produit sur votre staging, et vous savez ce qui bloque avant le go-live."
       problem={{
-        title: "Le problème : votre équipe connaît le produit par cœur.",
+        title: "Le problème d'un test avant lancement fait en interne : votre équipe connaît le produit par cœur.",
         paragraphs: [
           "À quelques semaines du go-live, tout le monde en interne sait où cliquer, quel champ remplir, ce que veut dire chaque libellé. Ce savoir invisible cache les frictions qu'un nouvel utilisateur rencontrera dans les trente premières secondes.",
           "Les tests QA vérifient que les fonctionnalités marchent. Ils ne vérifient pas qu'un utilisateur les trouve, les comprend et va jusqu'au bout. Le premier retour honnête arrive souvent sous forme de désinscription, sans explication.",

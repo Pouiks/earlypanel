@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import SituationLanding from "@/components/b2b/SituationLanding";
 
 export const metadata: Metadata = {
-  title: "Tests utilisateurs pour agences et studios produit · Marque blanche",
+  title: "Tests utilisateurs en marque blanche pour agences",
   description:
-    "Agences digitales, studios produit, freelances : ajoutez un test utilisateur clés en main à vos devis. Panel, questionnaire, relecture et rapport pris en charge, livrable à votre marque ou à la nôtre.",
+    "Sous-traitez la recherche utilisateur de vos clients : recrutement, questionnaire, rapport UX en 5 jours, en marque blanche. NDA, devis sous 48h.",
   alternates: { canonical: "/agences" },
   openGraph: {
-    title: "Tests utilisateurs pour agences et studios · earlypanel",
+    title: "Tests utilisateurs en marque blanche pour agences · earlypanel",
     description: "Revendez un test utilisateur clés en main dans vos devis. Marque blanche ou apport d'affaires.",
     url: "/agences",
     type: "website",
@@ -44,10 +44,10 @@ export default function AgencesPage() {
       path="/agences"
       breadcrumbName="Agences et studios"
       eyebrow="Agences digitales · Studios produit · Freelances"
-      h1={<>Ajoutez un test utilisateur <em>clés en main</em> à vos devis.</>}
-      lede="Vous concevez et développez pour des clients finaux. Vous savez qu'un test utilisateur avant le développement ou avant la mise en production éviterait des allers-retours coûteux. Mais recruter des testeurs, écrire le questionnaire, lire les retours et rédiger un rapport n'est pas votre métier. C'est le nôtre."
+      h1={<>Tests utilisateurs en marque blanche : livrez de la recherche UX à vos clients <em>sans monter une équipe</em>.</>}
+      lede="Un test utilisateur en marque blanche, c'est un prestataire UX research pour agence qui produit le test, le rapport et la restitution sous votre identité. Vous concevez et développez pour des clients finaux. Vous savez qu'un test utilisateur avant le développement ou avant la mise en production éviterait des allers-retours coûteux. Mais recruter des testeurs, écrire le questionnaire, lire les retours et rédiger un rapport n'est pas votre métier. C'est le nôtre."
       problem={{
-        title: "Le problème : le test utilisateur est dans vos recommandations, jamais dans vos devis.",
+        title: "Le problème sans test utilisateur en marque blanche : il est dans vos recommandations, jamais dans vos devis.",
         paragraphs: [
           "Vous le proposez, le client trouve ça intéressant, puis la ligne saute au premier arbitrage budgétaire parce que personne ne sait exactement ce qu'elle contient ni combien de temps elle mobilise votre équipe.",
           "Quand le test se fait quand même, c'est un chef de projet qui envoie un lien Figma à cinq connaissances et compile des retours dans un Notion. Le client n'y voit pas de valeur, et vous non plus.",

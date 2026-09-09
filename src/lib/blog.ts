@@ -5,8 +5,16 @@ import {
   slugFromFileName,
   estimateReadingMinutes,
   extractHeadings,
+  applyContentTokens,
   type PostFrontmatter,
 } from "@/lib/blog-content";
+import { PRICE_RANGE_LABEL, BOOKING_DURATION_MIN } from "@/lib/cta-links";
+
+/** Valeurs du site injectables dans un article via {{NOM}}. */
+const CONTENT_TOKENS: Record<string, string> = {
+  PRICE_RANGE_LABEL,
+  BOOKING_DURATION_MIN: String(BOOKING_DURATION_MIN),
+};
 
 /**
  * Acces aux articles du blog (content/blog/*.md). Lu au build uniquement :
@@ -35,7 +43,9 @@ export async function getAllPosts(opts: { includeDrafts?: boolean } = {}): Promi
     const slug = slugFromFileName(file);
     if (!slug) continue;
     const raw = await readFile(path.join(BLOG_DIR, file), "utf8");
-    const { frontmatter, body } = parseFrontmatter(raw);
+    const parsed = parseFrontmatter(raw);
+    const frontmatter = parsed.frontmatter;
+    const body = applyContentTokens(parsed.body, CONTENT_TOKENS);
     if (frontmatter.draft && !opts.includeDrafts) continue;
     posts.push({
       ...frontmatter,

@@ -4,7 +4,7 @@ import SituationLanding from "@/components/b2b/SituationLanding";
 export const metadata: Metadata = {
   title: "Tester une maquette Figma avec de vrais utilisateurs",
   description:
-    "Faites tester votre maquette Figma ou prototype cliquable par 5 à 10 utilisateurs qui ressemblent à votre cible, avant d'écrire une ligne de code. Rapport en 5 jours.",
+    "Test utilisateur sur maquette Figma ou prototype cliquable, avant la moindre ligne de code. 5 à 10 profils ciblés, rapport UX en 5 jours. Devis sous 48h.",
   alternates: { canonical: "/test-maquette-figma" },
   openGraph: {
     title: "Tester une maquette Figma avec de vrais utilisateurs · earlypanel",
@@ -44,10 +44,10 @@ export default function TestMaquetteFigmaPage() {
       path="/test-maquette-figma"
       breadcrumbName="Tester une maquette Figma"
       eyebrow="Validation early-stage · Avant la première ligne de code"
-      h1={<>Tester une maquette Figma avec <em>de vrais utilisateurs</em>, avant de développer.</>}
-      lede="Vous avez un prototype cliquable et une question qui brûle : est-ce qu'on construit le bon produit, ou est-ce qu'on s'apprête à payer six mois de développement pour rien ? Cinq à dix utilisateurs qui ressemblent à votre cible vous le disent en cinq jours."
+      h1={<>Tester une maquette Figma avant de développer : validez <em>le parcours</em>, pas seulement le design.</>}
+      lede="Tester une maquette Figma avec de vrais utilisateurs, c'est répondre à la question qui brûle avant de payer six mois de développement : est-ce qu'on construit le bon produit ? Un test utilisateur sur prototype cliquable, avec cinq à dix profils qui ressemblent à votre cible, vous le dit en cinq jours."
       problem={{
-        title: "Le problème : tout le monde autour de vous connaît déjà le produit.",
+        title: "Le problème quand vous voulez tester une maquette Figma : tout le monde autour de vous connaît déjà le produit.",
         paragraphs: [
           "Votre équipe a passé des semaines sur la maquette. Vos associés l'ont vue dix fois. Vos amis trouvent ça « super clair ». Aucun d'eux ne peut plus vous dire si un utilisateur qui découvre l'écran comprend ce qu'il doit faire.",
           "Envoyer le lien Figma à dix clients est tentant, mais ils sont déjà convaincus par vous, ils veulent vous faire plaisir, et ils ne prennent pas le temps d'écrire ce qui les a perdus. Vous récupérez trois « c'est bien » et un tableur vide.",

@@ -1,14 +1,14 @@
 ---
-title: "Combien de testeurs pour un test utilisateur ? La réponse dépend de la question posée"
-description: "5, 8, 12, 30 testeurs ? Le bon nombre de participants dépend de ce que vous cherchez : des frictions, une comparaison ou une mesure. Repères concrets pour dimensionner un panel."
+title: "Combien de testeurs pour un test utilisateur ? La règle des 5"
+description: "Cinq testeurs révèlent la plupart des problèmes d'un parcours (Nielsen Norman Group), 8 à 12 à distance, 20 et plus pour comparer deux versions. Le guide."
 date: 2026-09-09
 tags: [panel, méthode]
 draft: false
 ---
 
-C'est la première question que posent les équipes qui préparent un test utilisateur, et c'est celle à laquelle on répond le plus mal, parce qu'on y répond avec un chiffre. Le bon nombre de testeurs dépend de ce que vous voulez apprendre. Une fois la question posée correctement, le chiffre vient tout seul.
+Combien de testeurs pour un test utilisateur ? C'est la première question que posent les équipes qui préparent un test, et c'est celle à laquelle on répond le plus mal, parce qu'on y répond avec un chiffre. Le bon nombre de testeurs dépend de ce que vous voulez apprendre. Une fois la question posée correctement, le chiffre vient tout seul.
 
-## Trois types de questions, trois tailles de panel
+## Combien de testeurs selon la question posée : trois cas
 
 ### « Où est-ce que ça coince ? » : un test qualitatif
 

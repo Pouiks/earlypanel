@@ -120,6 +120,15 @@ export function headingId(text: string): string {
     .replace(/(^-|-$)/g, "");
 }
 
+/**
+ * Jetons de contenu : `{{NOM}}` remplace par une valeur du site (ex. la
+ * fourchette de prix, source unique dans src/lib/cta-links.ts). Un jeton
+ * inconnu est laisse tel quel pour etre repere a la relecture.
+ */
+export function applyContentTokens(markdown: string, tokens: Record<string, string>): string {
+  return markdown.replace(/\{\{\s*([A-Z0-9_]+)\s*\}\}/g, (m, key: string) => (key in tokens ? tokens[key] : m));
+}
+
 export function formatPostDate(iso: string): string {
   const d = new Date(`${iso}T00:00:00Z`);
   return d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });

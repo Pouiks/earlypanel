@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
+  applyContentTokens,
   parseFrontmatter,
   slugFromFileName,
   estimateReadingMinutes,
@@ -52,6 +53,13 @@ describe("parseFrontmatter", () => {
     expect(() => parseFrontmatter("# Pas de frontmatter")).toThrow();
     expect(() => parseFrontmatter("---\ntitle: A\ndescription: B\ndate: 09/09/2026\n---\n")).toThrow(/date/);
     expect(() => parseFrontmatter("---\ndescription: B\ndate: 2026-09-09\n---\n")).toThrow(/title/);
+  });
+});
+
+describe("applyContentTokens", () => {
+  it("remplace les jetons connus, laisse les inconnus visibles", () => {
+    expect(applyContentTokens("généralement {{PRICE_RANGE_LABEL}}, appel de {{ BOOKING_DURATION_MIN }} min, {{INCONNU}}", { PRICE_RANGE_LABEL: "1 500 à 6 000 € HT", BOOKING_DURATION_MIN: "15" }))
+      .toBe("généralement 1 500 à 6 000 € HT, appel de 15 min, {{INCONNU}}");
   });
 });
 

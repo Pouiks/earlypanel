@@ -48,7 +48,7 @@ cover_alt: "Ce que montre l'image, en une phrase."
 
 - Aucun chiffre inventé, aucune étude citée sans source vérifiable, aucun client nommé sans accord écrit.
 - Le stade produit se dit « avant lancement », jamais « pré-lancement ».
-- Une seule ligne de prix sur tout le site : ne pas écrire de tarif dans un article.
+- Une seule ligne de prix sur tout le site : ne jamais écrire de tarif en dur. Écrire `{{PRICE_RANGE_LABEL}}` (remplacé au build par la fourchette officielle) et `{{BOOKING_DURATION_MIN}}` pour la durée de l'appel.
 - Écrire pour une équipe produit ou une direction qui décide, pas pour un designer entre pairs : concret, décisionnel, sans jargon.
 
 ## Brief à coller dans Claude pour rédiger un article

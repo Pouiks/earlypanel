@@ -35,6 +35,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/test-conversion-funnel`, lastModified: CONTENT_UPDATED, changeFrequency: "monthly", priority: 0.8 },
     { url: `${BASE_URL}/agences`, lastModified: CONTENT_UPDATED, changeFrequency: "monthly", priority: 0.7 },
 
+    // Landings par secteur
+    { url: `${BASE_URL}/test-utilisateur-saas-b2b`, lastModified: new Date("2026-09-10"), changeFrequency: "monthly", priority: 0.8 },
+    { url: `${BASE_URL}/test-utilisateur-sante`, lastModified: new Date("2026-09-10"), changeFrequency: "monthly", priority: 0.7 },
+    { url: `${BASE_URL}/test-utilisateur-fintech`, lastModified: new Date("2026-09-10"), changeFrequency: "monthly", priority: 0.7 },
+
     // Reassurance (indexable, contrairement aux pages legales)
     { url: `${BASE_URL}/securite`, lastModified: new Date("2026-09-09"), changeFrequency: "yearly", priority: 0.5 },
 
