@@ -21,6 +21,9 @@ interface AssignedTester {
   status: string;
   nda_sent_at: string | null;
   nda_signed_at: string | null;
+  nda_document_url?: string | null;
+  nda_document_hash?: string | null;
+  nda_signer_ip?: string | null;
   completed_at: string | null;
   tester: Pick<Tester, "id" | "email" | "first_name" | "last_name" | "phone" | "job_title" | "sector" | "devices" | "digital_level" | "browsers" | "connection" | "status" | "profile_completed">;
 }
@@ -615,6 +618,25 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
                             <div style={{ fontSize: 11, color: "#86868B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                               {t?.email}{dateText && ` · ${dateText}`}
                             </div>
+                            {a.nda_signed_at && a.nda_document_url && (
+                              <div style={{ fontSize: 11, marginTop: 3, display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+                                <a
+                                  href={`/api/staff/projects/${projectId}/testers/${a.tester_id}/nda`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  title={`Signé le ${new Date(a.nda_signed_at).toLocaleString("fr-FR")}${a.nda_signer_ip ? ` · IP ${a.nda_signer_ip}` : ""}${a.nda_document_hash ? ` · SHA-256 ${a.nda_document_hash}` : ""}`}
+                                  style={{ color: "#0A7A5A", fontWeight: 600, textDecoration: "none" }}
+                                >
+                                  Voir le NDA signé
+                                </a>
+                                <span style={{ color: "#86868B" }}>
+                                  {new Date(a.nda_signed_at).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" })}
+                                  {a.nda_signer_ip ? ` · IP ${a.nda_signer_ip}` : ""}
+                                  {a.nda_document_hash ? ` · empreinte ${a.nda_document_hash.slice(0, 12)}…` : ""}
+                                </span>
+                              </div>
+                            )}
                           </div>
                           <span style={{
                             padding: "3px 10px", fontSize: 10, fontWeight: 600, borderRadius: 980,
