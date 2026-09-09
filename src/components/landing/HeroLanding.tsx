@@ -1,5 +1,6 @@
 import QuestionnaireWidget from "./QuestionnaireWidget";
 import { BOOKING_URL } from "@/lib/cta-links";
+import { glossify } from "@/components/ui/glossify";
 
 /**
  * Hero home : cible unique = equipe produit / fondateur qui doit decider.
@@ -14,12 +15,8 @@ export default function HeroLanding() {
         <div>
           <div className="h-eyebrow">Tests utilisateurs à distance · Pour équipes produit</div>
           <h1>Tests utilisateurs clés en main pour équipes produit&nbsp;: <em>le rapport, pas le tableur.</em></h1>
-          <p className="hero-category">
-            Un service de tests utilisateurs à distance&nbsp;: panel sélectionné à la main, questionnaire écrit avec vous, rapport rédigé en 5 jours.
-          </p>
-          <p className="hero-sub-index">
-            On recrute des testeurs qui ressemblent à vos vrais utilisateurs, on écrit le questionnaire avec vous, on lit chaque réponse, et vous recevez un rapport rédigé avec les frictions d&apos;expérience utilisateur à corriger. Vous décidez, on fait le reste.
-          </p>
+          <p className="hero-category">{"Un service de tests utilisateurs à distance\u00a0: panel sélectionné à la main, questionnaire écrit avec vous, rapport rédigé en 5 jours."}</p>
+          <p className="hero-sub-index">{glossify("On recrute des testeurs qui ressemblent à vos vrais utilisateurs, on écrit le questionnaire avec vous, on lit chaque réponse, et vous recevez un rapport rédigé avec les frictions d'expérience utilisateur à corriger. Vous décidez, on fait le reste.")}</p>
           <div className="hero-btns">
             <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn-dark">Réserver un appel gratuit →</a>
             <a href="#rapport" className="btn-outline">Voir un rapport d&apos;exemple</a>

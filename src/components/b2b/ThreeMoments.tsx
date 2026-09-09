@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { glossify } from "@/components/ui/glossify";
 
 /**
  * Section "3 moments metier" : structure la page B2B autour du cycle de
@@ -58,9 +59,7 @@ export default function ThreeMoments() {
       <div className="moments-inner">
         <div className="sec-eye">Quand faire un test utilisateur : 3 moments</div>
         <h2 className="sec-title">Trois situations où un test utilisateur à distance change la décision.</h2>
-        <p className="sec-sub">
-          Ce ne sont pas des phases que vous traversez forcément toutes. Identifiez celle où vous êtes aujourd&apos;hui, c&apos;est à ce moment-là qu&apos;un test apporte le plus de valeur.
-        </p>
+        <p className="sec-sub">{glossify("Ce ne sont pas des phases que vous traversez forcément toutes. Identifiez celle où vous êtes aujourd'hui, c'est à ce moment-là qu'un test apporte le plus de valeur.")}</p>
 
         <div className="moments-grid">
           {MOMENTS.map((m, i) => (
@@ -68,7 +67,7 @@ export default function ThreeMoments() {
               <div className="moment-num">{String(i + 1).padStart(2, "0")}</div>
               <div className="moment-eye">{m.eyebrow}</div>
               <h3 className="moment-title">{m.title}</h3>
-              <p className="moment-body">{m.body}</p>
+              <p className="moment-body">{glossify(m.body)}</p>
               <ul className="moment-actions">
                 {m.actions.map((a) => (
                   <li key={a}>{a}</li>

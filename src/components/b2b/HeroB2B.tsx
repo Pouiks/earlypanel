@@ -17,9 +17,7 @@ export default function HeroB2B() {
         Tests utilisateurs à distance · Équipes produit &amp; agences
       </div>
       <h1><span className="h1-kicker">Test utilisateur à distance clés en main.</span> On recrute vos vrais utilisateurs, on les fait tester, on vous remet ce qu&apos;ils ont <em>vraiment</em> pensé.</h1>
-      <p className="hero-sub">
-        Un test utilisateur à distance sur votre maquette Figma, votre staging ou votre produit en production : on recrute les testeurs à la main, ils font le parcours depuis chez eux, et vous recevez un rapport UX rédigé, pas des données brutes.
-      </p>
+      <p className="hero-sub">{"Un test utilisateur à distance sur votre maquette Figma, votre staging ou votre produit en production : on recrute les testeurs à la main, ils font le parcours depuis chez eux, et vous recevez un rapport UX rédigé, pas des données brutes."}</p>
       <div className="hero-ctas">
         <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn-dark-b2b">Réserver un appel gratuit →</a>
         <Link href="/#rapport" className="btn-outline-b2b">Voir un rapport d&apos;exemple</Link>

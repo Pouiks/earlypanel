@@ -1,4 +1,5 @@
 import { PRICE_RANGE_LABEL } from "@/lib/cta-links";
+import { glossify } from "@/components/ui/glossify";
 
 /**
  * Section differenciation : pourquoi un service plutot qu'un outil.
@@ -17,7 +18,7 @@ export default function Comparison() {
           Pourquoi un <em>service</em>&nbsp;plutôt qu&apos;un outil
         </h2>
         <p className="comparison-sub">
-          Vos équipes savent ce qu&apos;elles veulent valider. Elles n&apos;ont juste pas le temps de faire le recrutement des testeurs, écrire les questions, lire les retours et en tirer un rapport d&apos;expérience utilisateur exploitable. earlypanel prend en charge ces étapes, en 5 jours ouvrés, sur devis (devis sous 48h, généralement {PRICE_RANGE_LABEL} selon le nombre et la rareté des profils), pour que vos équipes gardent leur temps pour ce qu&apos;elles font de mieux.
+          {glossify(`Vos équipes savent ce qu'elles veulent valider. Elles n'ont juste pas le temps de faire le recrutement des testeurs, écrire les questions, lire les retours et en tirer un rapport d'expérience utilisateur exploitable. earlypanel prend en charge ces étapes, en 5 jours ouvrés, sur devis (devis sous 48h, généralement ${PRICE_RANGE_LABEL} selon le nombre et la rareté des profils), pour que vos équipes gardent leur temps pour ce qu'elles font de mieux.`)}
         </p>
       </div>
 

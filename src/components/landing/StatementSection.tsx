@@ -1,3 +1,4 @@
+import { glossify } from "@/components/ui/glossify";
 export default function StatementSection() {
   return (
     <section className="statement">
@@ -6,9 +7,7 @@ export default function StatementSection() {
         <p className="statement-lead">
           Avec <em>earlypanel</em>, vous n&apos;avez rien à configurer, rien à analyser, rien à rédiger.
         </p>
-        <p className="statement-sub">
-          Vous nous expliquez ce que vous voulez valider, on s&apos;occupe du reste&nbsp;: recrutement des testeurs dans un panel humain, scénarios, collecte à distance, analyse, rapport rédigé.
-        </p>
+        <p className="statement-sub">{glossify("Vous nous expliquez ce que vous voulez valider, on s'occupe du reste\u00a0: recrutement des testeurs dans un panel humain, scénarios, collecte à distance, analyse, rapport rédigé.")}</p>
       </div>
     </section>
   );

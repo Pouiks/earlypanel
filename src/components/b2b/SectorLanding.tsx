@@ -11,6 +11,7 @@ import BriefSection from "@/components/b2b/BriefSection";
 import CtaFinal from "@/components/b2b/CtaFinal";
 import { BOOKING_URL, PRICE_RANGE_LABEL } from "@/lib/cta-links";
 import { SITE_URL } from "@/lib/site";
+import { glossify } from "@/components/ui/glossify";
 
 export interface FaqItem { q: string; a: string }
 export interface Card { title: string; desc: string; example?: string }
@@ -99,13 +100,13 @@ export default function SectorLanding(p: SectorLandingProps) {
           <div className="uc-inner">
             <div className="sec-eye">{p.profiles.eyebrow}</div>
             <h2 className="sec-title">{p.profiles.title}</h2>
-            <p className="sec-sub">{p.profiles.sub}</p>
+            <p className="sec-sub">{glossify(p.profiles.sub)}</p>
             <div className="uc-grid">
               {p.profiles.cards.map((c) => (
                 <div className="uc-card" key={c.title}>
                   <div className="uc-icon">{PersonIcon}</div>
                   <h3>{c.title}</h3>
-                  <p>{c.desc}</p>
+                  <p>{glossify(c.desc)}</p>
                   {c.example && <span className="uc-example">{c.example}</span>}
                 </div>
               ))}
@@ -119,13 +120,13 @@ export default function SectorLanding(p: SectorLandingProps) {
           <div className="uc-inner">
             <div className="sec-eye">{p.parcours.eyebrow}</div>
             <h2 className="sec-title">{p.parcours.title}</h2>
-            <p className="sec-sub">{p.parcours.sub}</p>
+            <p className="sec-sub">{glossify(p.parcours.sub)}</p>
             <div className="uc-grid">
               {p.parcours.cards.map((c) => (
                 <div className="uc-card" key={c.title}>
                   <div className="uc-icon">{FlowIcon}</div>
                   <h3>{c.title}</h3>
-                  <p>{c.desc}</p>
+                  <p>{glossify(c.desc)}</p>
                   {c.example && <span className="uc-example">{c.example}</span>}
                 </div>
               ))}
@@ -139,13 +140,13 @@ export default function SectorLanding(p: SectorLandingProps) {
           <div className="process-inner">
             <div className="sec-eye">{p.steps.eyebrow}</div>
             <h2 className="sec-title">{p.steps.title}</h2>
-            <p className="sec-sub">{p.steps.sub}</p>
+            <p className="sec-sub">{glossify(p.steps.sub)}</p>
             <div className="steps-grid">
               {p.steps.items.map((s, i) => (
                 <div className="step-card" key={s.title} style={i === p.steps.items.length - 1 && p.steps.items.length % 2 === 1 ? { gridColumn: "1 / -1", borderTop: "0.5px solid var(--border)" } : undefined}>
                   <div className="step-num">Étape {String(i + 1).padStart(2, "0")}</div>
                   <h3>{s.title}</h3>
-                  <p>{s.body}</p>
+                  <p>{glossify(s.body)}</p>
                   <span className="step-pill">{s.pill}</span>
                 </div>
               ))}
@@ -166,7 +167,7 @@ export default function SectorLanding(p: SectorLandingProps) {
                     <div className="diff-icon">{CheckIcon}</div>
                     <div>
                       <h3>{d.title}</h3>
-                      <p>{d.body}</p>
+                      <p>{glossify(d.body)}</p>
                     </div>
                   </div>
                 ))}
@@ -178,12 +179,12 @@ export default function SectorLanding(p: SectorLandingProps) {
                 {p.guarantees.items.map((g) => (
                   <div className="sector-guarantee" key={g.title}>
                     <strong>{g.title}</strong>
-                    <p>{g.body}</p>
+                    <p>{glossify(g.body)}</p>
                   </div>
                 ))}
               </div>
               <p className="sector-price">
-                Forfait fixe par mission, chiffré après un atelier de cadrage offert, généralement {PRICE_RANGE_LABEL} selon le nombre et la rareté des profils. Rapport rédigé et restitution en visio sous 5 jours ouvrés après lancement.
+                {glossify(`Forfait fixe par mission, chiffré après un atelier de cadrage offert, généralement ${PRICE_RANGE_LABEL} selon le nombre et la rareté des profils. Rapport rédigé et restitution en visio sous 5 jours ouvrés après lancement.`)}
               </p>
             </div>
           </div>

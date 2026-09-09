@@ -5,6 +5,7 @@ import BreadcrumbJsonLd from "@/components/ui/BreadcrumbJsonLd";
 import PostList from "@/components/blog/PostList";
 import { getAllPosts } from "@/lib/blog";
 import { SITE_URL } from "@/lib/site";
+import { glossify } from "@/components/ui/glossify";
 
 export const metadata: Metadata = {
   title: "Blog · Méthode et pratique des tests utilisateurs",
@@ -30,9 +31,7 @@ export default async function BlogIndexPage() {
         <header className="blog-header">
           <div className="sec-eye">Blog</div>
           <h1>Tests utilisateurs : <em>la méthode</em>, sans jargon.</h1>
-          <p className="blog-lede">
-            Ce qu&apos;on apprend en recrutant des panels, en relisant des centaines de réponses et en rédigeant des rapports que des équipes produit utilisent vraiment. Des guides courts, applicables tout de suite.
-          </p>
+          <p className="blog-lede">{glossify("Ce qu'on apprend en recrutant des panels, en relisant des centaines de réponses et en rédigeant des rapports que des équipes produit utilisent vraiment. Des guides courts, applicables tout de suite.")}</p>
         </header>
 
         {posts.length === 0 ? (

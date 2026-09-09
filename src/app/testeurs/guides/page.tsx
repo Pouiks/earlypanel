@@ -6,6 +6,7 @@ import BreadcrumbJsonLd from "@/components/ui/BreadcrumbJsonLd";
 import PostList from "@/components/blog/PostList";
 import { getAllPosts } from "@/lib/blog";
 import { SITE_URL } from "@/lib/site";
+import { glossify } from "@/components/ui/glossify";
 
 export const metadata: Metadata = {
   title: "Guides pour testeurs rémunérés · Missions, rémunération, conseils",
@@ -35,9 +36,7 @@ export default async function TesterGuidesIndexPage() {
         <header className="blog-header">
           <div className="sec-eye">Guides testeurs</div>
           <h1>Tester des produits, <em>être payé</em> pour son avis : le mode d&apos;emploi.</h1>
-          <p className="blog-lede">
-            Ce qu&apos;on attend d&apos;un testeur, ce qu&apos;on gagne vraiment, comment répondre pour que chaque mission soit validée. Des guides courts, honnêtes, sans promesse de revenu miracle.
-          </p>
+          <p className="blog-lede">{glossify("Ce qu'on attend d'un testeur, ce qu'on gagne vraiment, comment répondre pour que chaque mission soit validée. Des guides courts, honnêtes, sans promesse de revenu miracle.")}</p>
           <p className="blog-lede">
             Pas encore inscrit ? <Link href="/testeurs#register">Rejoindre le panel</Link> prend cinq minutes.
           </p>

@@ -8,7 +8,7 @@ import { GLOSSARY } from "@/data/glossaire";
 import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Glossaire des tests utilisateurs · 20 termes définis simplement",
+  title: `Glossaire des tests utilisateurs · ${GLOSSARY.length} termes définis simplement`,
   description:
     "Test utilisateur, test non modéré, scénario, critère de réussite, friction, verbatim, panel, NDA, rapport, matrice impact / effort : les termes des tests utilisateurs définis en une phrase.",
   alternates: { canonical: "/glossaire" },
@@ -40,6 +40,8 @@ function definedTermSetJsonLd() {
   };
 }
 
+const SORTED = [...GLOSSARY].sort((a, b) => a.term.localeCompare(b.term, "fr", { sensitivity: "base" }));
+
 export default function GlossairePage() {
   return (
     <>
@@ -51,11 +53,11 @@ export default function GlossairePage() {
           <div className="sec-eye">Glossaire</div>
           <h1>Les mots des tests utilisateurs, <em>définis en une phrase</em>.</h1>
           <p className="blog-lede">
-            Vingt termes que vous rencontrerez dans un brief, un questionnaire ou un rapport. Chaque définition tient seule ; le lien renvoie vers la page qui développe le sujet.
+            {GLOSSARY.length} termes que vous rencontrerez dans un brief, un questionnaire ou un rapport, classés par ordre alphabétique. Chaque définition tient seule ; le lien renvoie vers la page qui développe le sujet. Sur le site, ces termes sont soulignés en pointillé : leur définition apparaît au survol.
           </p>
         </header>
         <dl className="glossary">
-          {GLOSSARY.map((t) => (
+          {SORTED.map((t) => (
             <div key={t.slug} id={t.slug} className="glossary-item">
               <dt>{t.term}</dt>
               <dd>

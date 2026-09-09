@@ -7,6 +7,7 @@ import FaqAccordion from "@/components/ui/FaqAccordion";
 import FaqJsonLd from "@/components/ui/FaqJsonLd";
 import BreadcrumbJsonLd from "@/components/ui/BreadcrumbJsonLd";
 import { BOOKING_URL, BOOKING_DURATION_MIN, PRICE_RANGE_LABEL } from "@/lib/cta-links";
+import { glossify } from "@/components/ui/glossify";
 
 export interface FaqItem { q: string; a: string }
 
@@ -51,7 +52,7 @@ export default function SituationLanding(p: SituationLandingProps) {
         <section className="situation-hero">
           <div className="sec-eye">{p.eyebrow}</div>
           <h1>{p.h1}</h1>
-          <p className="situation-lede">{p.lede}</p>
+          <p className="situation-lede">{glossify(p.lede)}</p>
           <div className="hero-btns" style={{ opacity: 1, animation: "none" }}>
             <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn-dark">Réserver un appel gratuit →</a>
             <Link href="/#rapport" className="btn-outline">Voir un rapport d&apos;exemple</Link>
@@ -63,20 +64,20 @@ export default function SituationLanding(p: SituationLandingProps) {
         <section className="situation-section">
           <div className="situation-inner">
             <h2>{p.problem.title}</h2>
-            {p.problem.paragraphs.map((t) => <p key={t}>{t}</p>)}
+            {p.problem.paragraphs.map((t) => <p key={t}>{glossify(t)}</p>)}
           </div>
         </section>
 
         <section className="situation-section alt">
           <div className="situation-inner">
             <h2>{p.method.title}</h2>
-            {p.method.intro && <p>{p.method.intro}</p>}
+            {p.method.intro && <p>{glossify(p.method.intro)}</p>}
             <div className="situation-steps">
               {p.method.steps.map((s, i) => (
                 <div className="situation-step" key={s.title}>
                   <div className="step-num">Étape {String(i + 1).padStart(2, "0")}</div>
                   <h3>{s.title}</h3>
-                  <p>{s.body}</p>
+                  <p>{glossify(s.body)}</p>
                 </div>
               ))}
             </div>
@@ -86,12 +87,12 @@ export default function SituationLanding(p: SituationLandingProps) {
         <section className="situation-section">
           <div className="situation-inner">
             <h2>{p.deliverable.title}</h2>
-            {p.deliverable.intro && <p>{p.deliverable.intro}</p>}
+            {p.deliverable.intro && <p>{glossify(p.deliverable.intro)}</p>}
             <ul>
-              {p.deliverable.bullets.map((b) => <li key={b}>{b}</li>)}
+              {p.deliverable.bullets.map((b) => <li key={b}>{glossify(b)}</li>)}
             </ul>
             <p>
-              Forfait fixe par mission, chiffré après un atelier de cadrage offert, généralement {PRICE_RANGE_LABEL} selon le nombre et la rareté des profils. Rapport rédigé et restitution en visio sous 5 jours ouvrés après lancement. NDA signé avant tout échange.
+              {glossify(`Forfait fixe par mission, chiffré après un atelier de cadrage offert, généralement ${PRICE_RANGE_LABEL} selon le nombre et la rareté des profils. Rapport rédigé et restitution en visio sous 5 jours ouvrés après lancement. NDA signé avant tout échange.`)}
             </p>
             <div className="situation-cta">
               <Link href="/entreprises#brief" className="btn-dark">Décrire mon projet →</Link>

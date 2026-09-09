@@ -12,6 +12,7 @@ import { formatPostDate } from "@/lib/blog-content";
 import { articleJsonLd } from "@/lib/json-ld";
 import { SITE_URL } from "@/lib/site";
 import { BOOKING_URL, BOOKING_DURATION_MIN } from "@/lib/cta-links";
+import { glossify } from "@/components/ui/glossify";
 
 /**
  * Page article, commune au blog entreprise (/blog/<slug>) et aux guides
@@ -28,6 +29,13 @@ export default function PostArticle({ post, others }: { post: BlogPost; others: 
   const crumbs = tester
     ? [{ name: "Accueil", url: SITE_URL }, { name: "Devenir testeur", url: `${SITE_URL}/testeurs` }, { name: section.name, url: section.url }, { name: post.title, url }]
     : [{ name: "Accueil", url: SITE_URL }, { name: section.name, url: section.url }, { name: post.title, url }];
+
+  // Termes du glossaire : une seule annotation par page, dans l'ordre de
+  // lecture (lede, En bref, puis le corps qui recoit les slugs deja vus).
+  const seen = new Set<string>();
+  const lede = glossify(post.description, seen);
+  const keyPoints = post.keyPoints.map((k) => ({ key: k, node: glossify(k, seen) }));
+  const skip = Array.from(seen);
 
   return (
     <>
@@ -52,7 +60,7 @@ export default function PostArticle({ post, others }: { post: BlogPost; others: 
               {post.tags[0] && <><span aria-hidden>·</span><span>{post.tags[0]}</span></>}
             </nav>
             <h1>{post.title}</h1>
-            <p className="blog-lede">{post.description}</p>
+            <p className="blog-lede">{lede}</p>
             <div className="blog-card-meta">
               <time dateTime={post.date}>{formatPostDate(post.date)}</time>
               {post.updated && post.updated !== post.date && <><span aria-hidden>·</span><span>mis à jour le {formatPostDate(post.updated)}</span></>}
@@ -73,7 +81,7 @@ export default function PostArticle({ post, others }: { post: BlogPost; others: 
             <section className="blog-keypoints" aria-label="En bref">
               <div className="blog-toc-title">En bref</div>
               <ul>
-                {post.keyPoints.map((k) => <li key={k}>{k}</li>)}
+                {keyPoints.map((k) => <li key={k.key}>{k.node}</li>)}
               </ul>
             </section>
           )}
@@ -87,7 +95,7 @@ export default function PostArticle({ post, others }: { post: BlogPost; others: 
             </nav>
           )}
 
-          <ArticleBody>{post.body}</ArticleBody>
+          <ArticleBody skip={skip}>{post.body}</ArticleBody>
 
           {tester ? (
             <aside className="blog-cta">

@@ -1,3 +1,4 @@
+import { glossify } from "@/components/ui/glossify";
 /**
  * Differenciation home.
  *
@@ -34,7 +35,7 @@ export default function DifferentiatorsSection() {
               </div>
               <div>
                 <h3>Des vrais profils, pas vos dix clients les plus sympas</h3>
-                <p>Quand vous nous dites que vous testez un outil de gestion de planning pour kinés, on ne vous envoie pas 15 freelances digitaux qui n&apos;ont jamais mis les pieds dans un cabinet médical. Le recrutement des testeurs se fait à la main dans notre panel qualifié, parmi ceux qui correspondent, et qui ne vous connaissent pas.</p>
+                <p>{glossify("Quand vous nous dites que vous testez un outil de gestion de planning pour kinés, on ne vous envoie pas 15 freelances digitaux qui n'ont jamais mis les pieds dans un cabinet médical. Le recrutement des testeurs se fait à la main dans notre panel qualifié, parmi ceux qui correspondent, et qui ne vous connaissent pas.")}</p>
               </div>
             </div>
             <div className="diff-item">
@@ -45,7 +46,7 @@ export default function DifferentiatorsSection() {
               </div>
               <div>
                 <h3>Le questionnaire est écrit avec vous</h3>
-                <p>On part de votre brief, on propose une première version, et on itère ensemble jusqu&apos;à ce que chaque question serve un objectif clair. Pas de copier-coller depuis un projet précédent, pas de question orientée qui confirme ce que vous espériez.</p>
+                <p>{glossify("On part de votre brief, on propose une première version, et on itère ensemble jusqu'à ce que chaque question serve un objectif clair. Pas de copier-coller depuis un projet précédent, pas de question orientée qui confirme ce que vous espériez.")}</p>
               </div>
             </div>
             <div className="diff-item">
@@ -56,7 +57,7 @@ export default function DifferentiatorsSection() {
               </div>
               <div>
                 <h3>Chaque test est lu par un humain</h3>
-                <p>Pas d&apos;auto-validation, pas de score algorithmique. On lit les réponses une par une. Si quelque chose cloche (incohérence, réponse trop courte, sujet mal compris), on refuse le test et on en lance un autre, sans vous le facturer.</p>
+                <p>{glossify("Pas d'auto-validation, pas de score algorithmique. On lit les réponses une par une. Si quelque chose cloche (incohérence, réponse trop courte, sujet mal compris), on refuse le test et on en lance un autre, sans vous le facturer.")}</p>
               </div>
             </div>
             <div className="diff-item">
@@ -67,7 +68,7 @@ export default function DifferentiatorsSection() {
               </div>
               <div>
                 <h3>L&apos;analyse fait partie du livrable</h3>
-                <p>Vous n&apos;avez pas à éplucher 200 verbatims pour en tirer un sens. On le fait pour vous, on priorise, et on vient présenter les résultats à votre équipe en visio. Vous repartez avec ce qu&apos;il faut décider, pas avec un tableur.</p>
+                <p>{glossify("Vous n'avez pas à éplucher 200 verbatims pour en tirer un sens. On le fait pour vous, on priorise, et on vient présenter les résultats à votre équipe en visio. Vous repartez avec ce qu'il faut décider, pas avec un tableur.")}</p>
               </div>
             </div>
           </div>

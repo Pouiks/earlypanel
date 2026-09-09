@@ -44,6 +44,7 @@ cover_alt: "Ce que montre l'image, en une phrase."
 - Longueur utile : 900 à 1 500 mots. Au-delà, couper en deux articles qui se lient.
 - Liens internes en chemin relatif : `/entreprises`, `/test-maquette-figma`, `/test-pre-lancement-staging`, `/test-conversion-funnel`, `/agences`, `/blog/<autre-slug>`. Côté testeur : `/testeurs`, `/testeurs#register`, `/securite`, `/testeurs/guides/<autre-slug>`.
 - Le bouton « Réserver un appel » et les articles suivants sont ajoutés automatiquement en fin d'article : ne pas les écrire dans le corps.
+- Les termes du glossaire (`src/data/glossaire.ts`) sont reconnus automatiquement : la première occurrence de chaque terme dans l'article devient un lien vers `/glossaire` avec sa définition en infobulle. Écrire les mots normalement (« panel », « scénario », « staging »), sans les mettre en lien soi-même. Un mot technique qui n'a pas de définition : l'ajouter au glossaire avec ses `aliases`, pas dans l'article.
 
 ## Deux sections spéciales, fortement recommandées
 

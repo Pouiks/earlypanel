@@ -972,19 +972,6 @@ a.announce { display: block; text-decoration: none; }
 .landing-related li a { display: block; padding: 14px 16px; border: 0.5px solid var(--border); border-radius: 12px; color: var(--black); text-decoration: none; font-size: 14px; font-weight: 600; line-height: 1.4; }
 .landing-related li a:hover { border-color: rgba(10,122,90,.35); color: var(--green); }
 @media (max-width: 768px) { .landing-related ul { grid-template-columns: 1fr; } }
-.glossary { margin: 2.5rem 0 0; }
-.glossary-item { padding: 1.1rem 0; border-top: 0.5px solid var(--border); scroll-margin-top: 90px; }
-.glossary-item:last-child { border-bottom: 0.5px solid var(--border); }
-.glossary dt { font-size: 18px; font-weight: 700; letter-spacing: -.02em; color: var(--black); margin: 0 0 .35rem; }
-.glossary dd { margin: 0; font-size: 15.5px; line-height: 1.65; color: var(--gray); }
-.glossary dd a { color: var(--green); font-weight: 600; text-decoration: none; white-space: nowrap; }
-.landing-related { padding: clamp(2.5rem,6vh,4rem) clamp(1.5rem,5vw,3rem); }
-.landing-related-inner { max-width: var(--content-wide); margin: 0 auto; }
-.landing-related h2 { font-size: 20px; font-weight: 700; letter-spacing: -.02em; margin: 0 0 1rem; color: var(--black); }
-.landing-related ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-.landing-related li a { display: block; padding: 14px 16px; border: 0.5px solid var(--border); border-radius: 12px; color: var(--black); text-decoration: none; font-size: 14px; font-weight: 600; line-height: 1.4; }
-.landing-related li a:hover { border-color: rgba(10,122,90,.35); color: var(--green); }
-@media (max-width: 768px) { .landing-related ul { grid-template-columns: 1fr; } }
 .blog-toc { background: var(--bg-secondary); border-radius: 14px; padding: 1rem 1.4rem; margin: 0 0 2rem; }
 .blog-toc-title { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--gray-light); margin-bottom: .5rem; }
 .blog-toc ol { margin: 0; padding-left: 1.2rem; font-size: 14px; line-height: 1.7; }
@@ -1044,3 +1031,14 @@ a.announce { display: block; text-decoration: none; }
 .tester-hint { background: var(--bg-secondary); border-top: 0.5px solid var(--border); text-align: center; padding: 14px 1.5rem; font-size: 13px; color: var(--gray); }
 .tester-hint a { color: var(--green); font-weight: 600; text-decoration: none; }
 .tester-hint a:hover { text-decoration: underline; }
+
+/* --- Termes du glossaire annotes dans les textes (GlossaryTerm) --- */
+.gl-wrap { position: relative; display: inline; }
+.gl-term, .blog-prose a.gl-term { color: inherit; text-decoration: underline dotted; text-decoration-color: rgba(10,122,90,.6); text-decoration-thickness: 1px; text-underline-offset: 3px; cursor: help; transition: color .15s, text-decoration-color .15s; }
+.gl-term:hover, .gl-term:focus-visible, .blog-prose a.gl-term:hover, .blog-prose a.gl-term:focus-visible { color: var(--green); text-decoration-style: solid; text-decoration-color: var(--green); outline: none; }
+.gl-tip { position: absolute; top: calc(100% + 8px); left: 0; z-index: 60; width: min(320px, calc(100vw - 2rem)); padding: 12px 14px 11px; background: var(--black); color: rgba(255,255,255,.88); font-size: 13.5px; font-weight: 400; font-style: normal; line-height: 1.5; letter-spacing: 0; text-align: left; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.18); animation: gl-tip-in .14s ease; }
+.gl-tip-right { left: auto; right: 0; }
+.gl-tip strong { display: block; color: #fff; font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.gl-tip-more { display: block; margin-top: 8px; font-size: 12px; font-weight: 600; color: #7fd6bb; }
+@keyframes gl-tip-in { from { opacity: 0; transform: translateY(-3px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .gl-tip { animation: none; } }
