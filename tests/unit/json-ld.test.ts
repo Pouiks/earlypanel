@@ -5,6 +5,7 @@ import {
   serviceJsonLd,
   faqJsonLd,
   breadcrumbJsonLd,
+  articleJsonLd,
   serializeJsonLd,
   ORGANIZATION_ID,
 } from "@/lib/json-ld";
@@ -82,6 +83,26 @@ describe("json-ld builders", () => {
     expect(b["@type"]).toBe("BreadcrumbList");
     expect(b.itemListElement.map((i: { position: number }) => i.position)).toEqual([1, 2]);
     for (const i of b.itemListElement) expect(i.item.startsWith("https://www.earlypanel.fr")).toBe(true);
+  });
+
+  it("Article : auteur et editeur = organisation, dates, blog parent, URL www", () => {
+    const a = roundTrip(articleJsonLd({
+      title: "Combien de testeurs ?",
+      description: "Repères.",
+      url: `${SITE_URL}/blog/combien-de-testeurs`,
+      datePublished: "2026-09-09",
+      dateModified: "2026-09-10",
+      tags: ["panel", "méthode"],
+    }));
+    expect(a["@type"]).toBe("Article");
+    expect(a.headline).toBe("Combien de testeurs ?");
+    expect(a.author["@id"]).toBe(ORGANIZATION_ID);
+    expect(a.publisher["@id"]).toBe(ORGANIZATION_ID);
+    expect(a.datePublished).toBe("2026-09-09");
+    expect(a.dateModified).toBe("2026-09-10");
+    expect(a.keywords).toBe("panel, méthode");
+    expect(a.isPartOf.url).toBe(`${SITE_URL}/blog`);
+    expect(a.mainEntityOfPage["@id"].startsWith("https://www.earlypanel.fr/blog/")).toBe(true);
   });
 
   it("serializeJsonLd echappe </script> pour ne pas casser le HTML", () => {

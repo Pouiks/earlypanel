@@ -903,6 +903,8 @@ profil = 1 si (address OR city OR postal_code OR birth_date) manquant, sinon 0
 
 > **Panel du rapport (migration 045, `src/lib/report-panel.ts`)** : seules les participations VALIDÉES (`status='completed'`, `staff_rating >= 3`, `staff_sloppy=false`) entrent dans le panel, les résultats par scénario, les verbatims proposés et l'annexe CSV. `staff_sloppy` est écrit à chaque `PATCH .../answers`. IDs T01… attribués parmi les validées par ordre de soumission. L'export JSON (`/export?format=json`, format 1.1) ajoute `panel_stats.excluded_note`, `panel_stats.completion_rate`, `use_cases[].results` (critères passés / questions fermées agrégées) et, par verbatim, `question_text` + `images` (URLs signées 1 h du bucket `mission-images`). Un verbatim stocke `question_id`, `question_text`, `image_paths` (`ReportFrictionVerbatim`).
 
+> **Blog** (2026-09-09) : articles Markdown dans `content/blog/<slug>.md` (frontmatter title / description / date / updated / tags / draft), lus au build par `src/lib/blog.ts` (`getAllPosts`, `getPostBySlug`), parsing pur dans `src/lib/blog-content.ts` (tests). Pages `/blog` et `/blog/[slug]` statiques (`dynamicParams = false`), JSON-LD Article + BreadcrumbList (`articleJsonLd`), `/blog/rss.xml` statique, entrées sitemap automatiques, lien « Blog » dans la nav entreprise et le footer. Un brouillon (`draft: true`) a une URL noindex mais sort de la liste, du sitemap et du RSS. Pas de CMS ni de table : le fondateur est le seul auteur.
+
 #### `project_reports` (1 par projet)
 | Colonne | Type |
 |---------|------|

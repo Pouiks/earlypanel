@@ -66,6 +66,7 @@ export default function Nav({ audience }: { audience?: NavAudience }) {
         { href: "/#process", label: "Comment ça marche" },
         { href: "/entreprises#situations", label: "Quand nous appeler" },
         { href: "/entreprises#faq", label: "Tarifs & FAQ" },
+        { href: "/blog", label: "Blog" },
         { href: "/entreprises#brief", label: "Démarrer un projet" },
       ];
 

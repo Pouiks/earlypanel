@@ -1,0 +1,76 @@
+import { describe, it, expect } from "vitest";
+import {
+  parseFrontmatter,
+  slugFromFileName,
+  estimateReadingMinutes,
+  extractHeadings,
+  headingId,
+  formatPostDate,
+} from "@/lib/blog-content";
+
+const SAMPLE = `---
+title: "Combien de testeurs : ce que dit la pratique"
+description: Un guide court.
+date: 2026-09-09
+tags: [méthode, panel]
+draft: false
+---
+
+## Première partie
+
+Texte.
+
+## Deuxième partie : détails
+
+Encore du texte.
+`;
+
+describe("parseFrontmatter", () => {
+  it("lit titre, description, date, tags, draft et le corps", () => {
+    const p = parseFrontmatter(SAMPLE);
+    expect(p.frontmatter.title).toBe("Combien de testeurs : ce que dit la pratique");
+    expect(p.frontmatter.description).toBe("Un guide court.");
+    expect(p.frontmatter.date).toBe("2026-09-09");
+    expect(p.frontmatter.tags).toEqual(["méthode", "panel"]);
+    expect(p.frontmatter.draft).toBe(false);
+    expect(p.body.startsWith("## Première partie")).toBe(true);
+  });
+  it("tolère CRLF et BOM, draft par défaut false", () => {
+    const p = parseFrontmatter("﻿---\r\ntitle: A\r\ndescription: B\r\ndate: 2026-01-02\r\n---\r\nCorps");
+    expect(p.frontmatter.draft).toBe(false);
+    expect(p.frontmatter.tags).toEqual([]);
+    expect(p.body).toBe("Corps");
+  });
+  it("refuse un fichier sans frontmatter ou une date invalide", () => {
+    expect(() => parseFrontmatter("# Pas de frontmatter")).toThrow();
+    expect(() => parseFrontmatter("---\ntitle: A\ndescription: B\ndate: 09/09/2026\n---\n")).toThrow(/date/);
+    expect(() => parseFrontmatter("---\ndescription: B\ndate: 2026-09-09\n---\n")).toThrow(/title/);
+  });
+});
+
+describe("slugFromFileName", () => {
+  it("n'accepte que des slugs kebab-case .md", () => {
+    expect(slugFromFileName("test-utilisateur-a-distance.md")).toBe("test-utilisateur-a-distance");
+    expect(slugFromFileName("Brouillon.md")).toBeNull();
+    expect(slugFromFileName("notes.txt")).toBeNull();
+    expect(slugFromFileName("avec espace.md")).toBeNull();
+  });
+});
+
+describe("lecture, titres, dates", () => {
+  it("temps de lecture : 200 mots/min, minimum 1", () => {
+    expect(estimateReadingMinutes("un deux trois")).toBe(1);
+    expect(estimateReadingMinutes(Array(1000).fill("mot").join(" "))).toBe(5);
+  });
+  it("extrait les titres de niveau 2 avec des ancres sans accents", () => {
+    const h = extractHeadings(parseFrontmatter(SAMPLE).body);
+    expect(h).toEqual([
+      { text: "Première partie", id: "premiere-partie" },
+      { text: "Deuxième partie : détails", id: "deuxieme-partie-details" },
+    ]);
+    expect(headingId("Étape 1 : l'objectif")).toBe("etape-1-l-objectif");
+  });
+  it("date en français, indépendante du fuseau", () => {
+    expect(formatPostDate("2026-09-09")).toBe("9 septembre 2026");
+  });
+});

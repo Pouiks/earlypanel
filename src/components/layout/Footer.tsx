@@ -69,6 +69,7 @@ export default function Footer({ variant = "index" }: FooterProps) {
                   <li><Link href="/entreprises#brief">Démarrer un projet</Link></li>
                   <li><Link href="/entreprises">Page entreprises</Link></li>
                   <li><Link href="/entreprises#faq">FAQ clients</Link></li>
+                  <li><Link href="/blog">Blog</Link></li>
                 </ul>
               </div>
               {useCaseColumn}
@@ -96,6 +97,7 @@ export default function Footer({ variant = "index" }: FooterProps) {
                   <li><Link href="/#rapport">Rapport d&apos;exemple</Link></li>
                   <li><Link href="/entreprises#brief">Démarrer un projet</Link></li>
                   <li><Link href="/entreprises#faq">FAQ</Link></li>
+                  <li><Link href="/blog">Blog</Link></li>
                 </ul>
               </div>
               {useCaseColumn}
@@ -131,6 +133,7 @@ export default function Footer({ variant = "index" }: FooterProps) {
                   <li><Link href="/entreprises">Page entreprises</Link></li>
                   <li><Link href="/entreprises#brief">Démarrer un projet</Link></li>
                   <li><Link href="/entreprises#faq">FAQ clients</Link></li>
+                  <li><Link href="/blog">Blog</Link></li>
                 </ul>
               </div>
               <div className="footer-col">

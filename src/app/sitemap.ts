@@ -16,11 +16,14 @@ import type { MetadataRoute } from "next";
  */
 
 import { SITE_URL } from "@/lib/site";
+import { getAllPosts } from "@/lib/blog";
 
 const BASE_URL = SITE_URL;
 const CONTENT_UPDATED = new Date("2026-09-07");
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const posts = await getAllPosts();
+  const latest = posts[0]?.date ? new Date(posts[0].date) : CONTENT_UPDATED;
   return [
     { url: BASE_URL, lastModified: CONTENT_UPDATED, changeFrequency: "weekly", priority: 1.0 },
     { url: `${BASE_URL}/entreprises`, lastModified: CONTENT_UPDATED, changeFrequency: "weekly", priority: 0.9 },
@@ -34,5 +37,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
     // Reassurance (indexable, contrairement aux pages legales)
     { url: `${BASE_URL}/securite`, lastModified: new Date("2026-09-09"), changeFrequency: "yearly", priority: 0.5 },
+
+    // Blog : index + articles (content/blog/*.md, brouillons exclus)
+    { url: `${BASE_URL}/blog`, lastModified: latest, changeFrequency: "weekly", priority: 0.7 },
+    ...posts.map((p) => ({
+      url: `${BASE_URL}/blog/${p.slug}`,
+      lastModified: new Date(p.updated ?? p.date),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })),
   ];
 }

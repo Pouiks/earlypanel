@@ -19,6 +19,16 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Blog : les articles Markdown (content/blog) sont lus au build par
+  // /blog, /blog/[slug], /blog/rss.xml et le sitemap. On les inclut dans
+  // la trace des fonctions par securite (revalidation, regeneration).
+  outputFileTracingIncludes: {
+    "/blog": ["./content/blog/**/*"],
+    "/blog/[slug]": ["./content/blog/**/*"],
+    "/blog/rss.xml": ["./content/blog/**/*"],
+    "/sitemap.xml": ["./content/blog/**/*"],
+  },
+
   // Cache stale CSS chunks plus longtemps + dont leak la version Next dans
   // les headers. Micro-polish qui evite un fingerprinting pour rien.
   poweredByHeader: false,

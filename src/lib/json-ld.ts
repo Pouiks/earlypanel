@@ -124,6 +124,37 @@ export function breadcrumbJsonLd(items: BreadcrumbItem[]) {
   };
 }
 
+export interface ArticleJsonLdInput {
+  title: string;
+  description: string;
+  url: string;
+  /** YYYY-MM-DD */
+  datePublished: string;
+  dateModified: string;
+  tags?: string[];
+}
+
+/** Article de blog : auteur et editeur = l'organisation, image OG par defaut. */
+export function articleJsonLd(a: ArticleJsonLdInput) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "@id": `${a.url}#article`,
+    headline: a.title,
+    description: a.description,
+    url: a.url,
+    mainEntityOfPage: { "@type": "WebPage", "@id": a.url },
+    inLanguage: "fr-FR",
+    datePublished: a.datePublished,
+    dateModified: a.dateModified,
+    author: { "@id": ORGANIZATION_ID },
+    publisher: { "@id": ORGANIZATION_ID },
+    image: `${SITE_URL}/og-image.png`,
+    ...(a.tags && a.tags.length > 0 ? { keywords: a.tags.join(", ") } : {}),
+    isPartOf: { "@type": "Blog", "@id": `${SITE_URL}/blog#blog`, name: "Blog earlypanel", url: `${SITE_URL}/blog` },
+  };
+}
+
 /** Serialisation sure pour <script type="application/ld+json"> (anti </script>). */
 export function serializeJsonLd(data: unknown): string {
   return JSON.stringify(data).replace(/</g, "\\u003c");
