@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       modifiedTime: `${post.updated ?? post.date}T09:00:00+02:00`,
       authors: ["earlypanel"],
       tags: post.tags,
-      ...(post.cover ? { images: [{ url: post.cover, alt: post.cover_alt ?? post.title }] } : {}),
+      // og:image : fournie par opengraph-image.tsx (couverture generee, ou le fichier `cover` du frontmatter).
     },
   };
 }

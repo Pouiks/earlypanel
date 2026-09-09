@@ -26,6 +26,8 @@ cover_alt: "Ce que montre l'image, en une phrase."
 
 ## Images
 
+- Chaque article a une image de partage (OpenGraph) générée automatiquement au build : le titre sur fond blanc, aux couleurs du site. Rien à fournir. Un `cover` dans l'en-tête remplace cette image générée, pour le partage comme dans la page.
+
 - Dossier : `public/blog/<slug>/`. Formats : `webp` de préférence, sinon `png` ou `jpg`.
 - Couverture : 1600 × 900 px (16:9), 200 Ko max.
 - Images dans le corps : 1400 px de large max, 200 Ko max chacune, jamais de texte illisible sur mobile.

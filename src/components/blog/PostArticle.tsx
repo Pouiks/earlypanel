@@ -46,7 +46,7 @@ export default function PostArticle({ post, others }: { post: BlogPost; others: 
         datePublished: post.date,
         dateModified: post.updated ?? post.date,
         tags: post.tags,
-        image: post.cover ? `${SITE_URL}${post.cover}` : undefined,
+        image: post.cover ? `${SITE_URL}${post.cover}` : `${url}/opengraph-image`,
         section: { name: section.name, url: section.url },
       })} />
       <BreadcrumbJsonLd items={crumbs} />
