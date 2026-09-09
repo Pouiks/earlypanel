@@ -268,7 +268,23 @@ export interface ProjectSummary {
   };
   use_cases: number;
   questions: number;
+  /** Documents deposes (brief client). */
+  documents: number;
   nda_exists: boolean;
   report: "draft" | "published" | null;
   payouts: { total: number; paid: number; pending: number; failed: number };
+}
+
+/** Document de projet (migration 041), servi avec une URL signee 1 h. */
+export interface ProjectDocument {
+  id: string;
+  project_id: string;
+  kind: "brief";
+  file_name: string;
+  storage_path: string;
+  mime_type: string;
+  size_bytes: number;
+  created_at: string;
+  url: string | null;
+  uploaded_by_name: string | null;
 }

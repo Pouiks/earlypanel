@@ -12,13 +12,14 @@ import type { Project, ProjectStatus, ProjectSummary } from "@/types/staff";
  */
 
 export type SectionId =
-  | "info" | "finances"
+  | "info" | "brief" | "finances"
   | "questionnaire" | "nda"
   | "testers" | "answers" | "review"
   | "payouts" | "report";
 
 export const SECTION_LABELS: Record<SectionId, string> = {
   info: "Informations",
+  brief: "Brief client",
   finances: "Finances",
   questionnaire: "Scénarios",
   nda: "NDA",
@@ -32,7 +33,7 @@ export const SECTION_LABELS: Record<SectionId, string> = {
 export const ALL_SECTIONS = Object.keys(SECTION_LABELS) as SectionId[];
 
 const GROUPS: { title: string; sections: SectionId[] }[] = [
-  { title: "Cadrage", sections: ["info", "finances"] },
+  { title: "Cadrage", sections: ["info", "brief", "finances"] },
   { title: "Test", sections: ["questionnaire", "nda"] },
   { title: "Terrain", sections: ["testers", "answers", "review"] },
   { title: "Clôture", sections: ["payouts", "report"] },
@@ -63,6 +64,9 @@ export function sectionLines(project: Project, s: ProjectSummary | null): Record
 
   return {
     info: { state: "done", meta: null },
+    brief: !s || s.documents === 0
+      ? { state: "todo", meta: "Aucun fichier" }
+      : { state: "done", meta: s.documents === 1 ? "1 fichier" : `${s.documents} fichiers` },
     finances: quote === null
       ? { state: project.status === "draft" ? "todo" : "warn", meta: "Devis à saisir" }
       : project.balance_paid_at

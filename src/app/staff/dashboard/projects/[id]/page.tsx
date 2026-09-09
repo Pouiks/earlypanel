@@ -13,6 +13,7 @@ import ProjectPayoutsTab from "@/components/staff/ProjectPayoutsTab";
 import ProjectReviewTab from "@/components/staff/ProjectReviewTab";
 import ProjectReportTab from "@/components/staff/ProjectReportTab";
 import ProjectFinancesTab from "@/components/staff/ProjectFinancesTab";
+import ProjectBriefTab from "@/components/staff/ProjectBriefTab";
 import ProjectSommaire, { ALL_SECTIONS, SECTION_LABELS, type SectionId } from "@/components/staff/ProjectSommaire";
 import type { ProjectFormData } from "@/components/staff/ProjectForm";
 import type { Project, ProjectStatus, ProjectSummary } from "@/types/staff";
@@ -375,6 +376,7 @@ export default function ProjectDetailPage({ params }: { params: Promise<{ id: st
 
         {/* Section ouverte */}
         {section === "info" && <ProjectInfoTab project={project} />}
+        {section === "brief" && <ProjectBriefTab projectId={id} onChange={fetchSummary} />}
         {section === "finances" && <ProjectFinancesTab project={project} />}
         {section === "questionnaire" && (
           <ProjectQuestionsTab

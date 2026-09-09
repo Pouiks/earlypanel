@@ -837,6 +837,18 @@ profil = 1 si (address OR city OR postal_code OR birth_date) manquant, sinon 0
 | quote_amount_cents | INTEGER | Nullable, centimes, CHECK >= 0 (migration 040). Devis HT accepte |
 | deposit_paid_at, balance_paid_at | DATE | Nullable (migration 040). Encaissement acompte / solde (50 % / 50 %). L'onglet Finances (lecture seule) calcule encaisse, reste a encaisser, cout testeurs engage/paye/a payer depuis `tester_payouts`, marge |
 
+#### `project_documents` (migration 041)
+| Colonne | Type | Contraintes |
+|---------|------|-------------|
+| id | UUID | PK |
+| project_id | UUID | FK → projects ON DELETE CASCADE |
+| kind | TEXT | DEFAULT 'brief', CHECK ∈ (brief) |
+| file_name, storage_path (UNIQUE), mime_type | TEXT | Bucket prive `documents`, chemin `briefs/<project>/<uuid>.<ext>`, URL signee 1 h a la volee |
+| size_bytes | INTEGER | CHECK >= 0, 10 Mo max cote API |
+| uploaded_by | UUID | FK → staff_members ON DELETE SET NULL |
+
+> Brief client depose par le staff (`/api/staff/projects/[id]/documents` GET/POST, `.../documents/[docId]` DELETE). Type detecte sur les octets (`src/lib/document-validation.ts` : PDF, txt, md). RLS fermee, jamais expose cote testeur. Audit `project.document_uploaded` / `project.document_deleted`.
+
 #### `project_testers`
 | Colonne | Type | Contraintes |
 |---------|------|-------------|

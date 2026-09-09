@@ -26,16 +26,17 @@ export async function GET(
 
   const { id } = await params;
 
-  const [pts, ucs, qs, nda, report, payouts] = await Promise.all([
+  const [pts, ucs, qs, nda, report, payouts, docs] = await Promise.all([
     admin.from("project_testers").select("status, staff_rating, nda_sent_at").eq("project_id", id),
     admin.from("project_use_cases").select("id", { count: "exact", head: true }).eq("project_id", id),
     admin.from("project_questions").select("id", { count: "exact", head: true }).eq("project_id", id),
     admin.from("project_ndas").select("id").eq("project_id", id).maybeSingle(),
     admin.from("project_reports").select("status").eq("project_id", id).maybeSingle(),
     admin.from("tester_payouts").select("status").eq("project_id", id),
+    admin.from("project_documents").select("id", { count: "exact", head: true }).eq("project_id", id),
   ]);
 
-  const firstError = pts.error ?? ucs.error ?? qs.error ?? nda.error ?? report.error ?? payouts.error;
+  const firstError = pts.error ?? ucs.error ?? qs.error ?? nda.error ?? report.error ?? payouts.error ?? docs.error;
   if (firstError) return NextResponse.json({ error: firstError.message }, { status: 500 });
 
   const now = Date.now();
@@ -73,6 +74,7 @@ export async function GET(
     testers: t,
     use_cases: ucs.count ?? 0,
     questions: qs.count ?? 0,
+    documents: docs.count ?? 0,
     nda_exists: !!nda.data,
     report: reportStatus === "published" ? "published" : reportStatus === "draft" ? "draft" : null,
     payouts: p,
