@@ -15,7 +15,7 @@ type Bug = {
   id: string; description: string; device?: string; step?: string;
   severity: "blocking" | "major" | "minor"; affected_testers_readable?: string[];
 };
-type Verbatim = { text: string; tester_readable?: string };
+type Verbatim = { text: string; tester_readable?: string | null; question_text?: string | null; images?: string[] };
 type Friction = {
   id: string; title: string; step?: string; impact: "blocking" | "slow" | "minor";
   affected_count?: number; panel_percentage?: number; analysis?: string; verbatims?: Verbatim[];
@@ -25,6 +25,17 @@ type Reco = {
   solves?: string; impact?: string; tech_effort: "low" | "medium" | "high";
 };
 type Matrix = { quick_wins?: string[]; strategic?: string[]; plan?: string[]; backlog?: string[] };
+type ClosedQuestion = {
+  question_text: string; question_type: "binary" | "scale_1_5"; answered: number;
+  yes?: number; no?: number; partial?: number; average?: number | null; distribution?: Record<string, number>;
+};
+type ScenarioResults = {
+  testers: number;
+  primary: { label: string; passed: number; recorded: number } | null;
+  primary_rate: number | null;
+  criteria: { label: string; is_primary: boolean; passed: number; recorded: number }[];
+  closed_questions: ClosedQuestion[];
+};
 type PanelRow = {
   readable_id: string; gender: string; age: number | null; city: string | null;
   digital_level: string | null; device_summary: string; job_title: string | null; sector: string | null;
@@ -39,8 +50,15 @@ interface ReportExport {
     audit_findings?: string[];
   };
   panel: PanelRow[];
-  panel_stats: { total: number; avg_age: number | null; gender_distribution: Record<string, number>; digital_level_distribution: Record<string, number> };
-  use_cases: { title: string; task_wording: string | null; expected_testers_count: number | null; criteria: { label: string; is_primary: boolean }[]; questions: { question_text: string }[] }[];
+  panel_stats: {
+    total: number; assigned?: number; excluded_note?: string | null; completion_rate?: number | null;
+    avg_age: number | null; gender_distribution: Record<string, number>; digital_level_distribution: Record<string, number>;
+  };
+  use_cases: {
+    title: string; task_wording: string | null; expected_testers_count: number | null;
+    criteria: { label: string; is_primary: boolean }[]; questions: { question_text: string; question_type?: string }[];
+    results?: ScenarioResults;
+  }[];
   report: {
     delivery_date: string | null;
     summary: { verdict?: string; key_figures?: KeyFigure[]; top_actions?: string[] } | null;
@@ -171,6 +189,9 @@ export default function ReportViewPage({ params }: { params: Promise<{ id: strin
               <span><strong style={{ color: "#1d1d1f" }}>Méthodologie :</strong> {data.project.test_type === "moderated" ? "Test modéré" : "Test non modéré"}</span>
               <span><strong style={{ color: "#1d1d1f" }}>Panel :</strong> {data.panel_stats.total} testeur{data.panel_stats.total > 1 ? "s" : ""}</span>
               <span><strong style={{ color: "#1d1d1f" }}>Période :</strong> {fmtDate(data.project.start_date)} → {fmtDate(data.project.end_date)}</span>
+              {data.panel_stats.completion_rate != null && (
+                <span><strong style={{ color: "#1d1d1f" }}>Complétion :</strong> {data.panel_stats.completion_rate} % sur le critère principal</span>
+              )}
               <span><strong style={{ color: "#1d1d1f" }}>Livré le :</strong> {fmtDate(r.delivery_date ?? publishedAt)}</span>
             </div>
           </section>
@@ -226,6 +247,10 @@ export default function ReportViewPage({ params }: { params: Promise<{ id: strin
 
           {/* ===== Panel ===== */}
           <Section title={`Panel de test (${data.panel_stats.total})`}>
+            <p style={{ fontSize: 13, color: "#6e6e73", margin: "0 0 10px", lineHeight: 1.6 }}>
+              {data.panel_stats.total} testeur{data.panel_stats.total > 1 ? "s ont" : " a"} réalisé le test dans son intégralité ; chaque réponse a été relue et validée par l&apos;équipe earlypanel avant d&apos;être comptabilisée.
+              {data.panel_stats.excluded_note && <> {data.panel_stats.excluded_note}</>}
+            </p>
             <div style={{ display: "flex", gap: 16, flexWrap: "wrap", fontSize: 13, color: "#6e6e73", marginBottom: 14 }}>
               {data.panel_stats.avg_age != null && <span>Âge moyen : <strong style={{ color: "#1d1d1f" }}>{data.panel_stats.avg_age} ans</strong></span>}
               {Object.entries(data.panel_stats.digital_level_distribution).map(([k, v]) => <span key={k}>{k} : <strong style={{ color: "#1d1d1f" }}>{v}</strong></span>)}
@@ -268,6 +293,7 @@ export default function ReportViewPage({ params }: { params: Promise<{ id: strin
                       {uc.criteria.map((c, j) => <li key={j} style={{ fontWeight: c.is_primary ? 700 : 400 }}>{c.label}{c.is_primary ? " (critère principal)" : ""}</li>)}
                     </ul>
                   )}
+                  {uc.results && <ScenarioResultsBlock r={uc.results} />}
                 </div>
               ))}
             </Section>
@@ -310,8 +336,24 @@ export default function ReportViewPage({ params }: { params: Promise<{ id: strin
                   {(f.verbatims?.length ?? 0) > 0 && (
                     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                       {f.verbatims!.filter((v) => v.text).map((v, i) => (
-                        <div key={i} style={{ borderLeft: "3px solid #0A7A5A", paddingLeft: 12, fontSize: 13.5, fontStyle: "italic", color: "#3f3f46" }}>
-                          « {v.text} » {v.tester_readable && <span style={{ fontStyle: "normal", color: "#86868B" }}>— {v.tester_readable}</span>}
+                        <div key={i} style={{ borderLeft: "3px solid #0A7A5A", paddingLeft: 12, breakInside: "avoid" }}>
+                          <div style={{ fontSize: 13.5, fontStyle: "italic", color: "#3f3f46" }}>
+                            « {v.text} »
+                            {(v.tester_readable || v.question_text) && (
+                              <span style={{ fontStyle: "normal", color: "#86868B" }}>
+                                {" "}— {v.tester_readable ?? "Testeur"}{v.question_text ? `, à propos de : ${v.question_text}` : ""}
+                              </span>
+                            )}
+                          </div>
+                          {(v.images?.length ?? 0) > 0 && (
+                            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 8 }}>
+                              {v.images!.map((src, k) => (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img key={k} src={src} alt={`Capture d'écran ${v.tester_readable ?? ""} ${k + 1}`}
+                                  style={{ maxHeight: 220, maxWidth: "100%", borderRadius: 8, border: "0.5px solid rgba(0,0,0,0.1)", objectFit: "contain", background: "#fff" }} />
+                              ))}
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -417,6 +459,57 @@ function Block({ label, children }: { label: string; children: React.ReactNode }
     <div style={{ marginBottom: 12 }}>
       <div style={{ fontSize: 12, fontWeight: 700, color: "#86868B", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 4 }}>{label}</div>
       <p style={{ fontSize: 14, lineHeight: 1.7, margin: 0 }}>{children}</p>
+    </div>
+  );
+}
+
+function Bar({ pct, color = "#0A7A5A" }: { pct: number; color?: string }) {
+  return (
+    <div style={{ height: 6, borderRadius: 3, background: "#f0f0f2", overflow: "hidden", flex: 1, minWidth: 80 }}>
+      <div style={{ width: `${Math.max(0, Math.min(100, pct))}%`, height: "100%", background: color }} />
+    </div>
+  );
+}
+
+/** Résultats mesurés d'un scénario : critères de succès puis questions fermées. */
+function ScenarioResultsBlock({ r }: { r: ScenarioResults }) {
+  const hasCriteria = r.criteria.some((c) => c.recorded > 0);
+  if (r.testers === 0 || (!hasCriteria && r.closed_questions.length === 0)) return null;
+  return (
+    <div style={{ marginTop: 10, background: "#fafafa", border: "0.5px solid rgba(0,0,0,0.06)", borderRadius: 10, padding: "10px 14px", breakInside: "avoid" }}>
+      {r.primary && r.primary_rate != null && (
+        <div style={{ fontSize: 14, fontWeight: 700, color: "#1d1d1f", marginBottom: 6 }}>
+          {r.primary.passed} sur {r.testers} testeur{r.testers > 1 ? "s" : ""} {r.primary.passed > 1 ? "ont" : "a"} atteint le critère principal
+          <span style={{ color: "#0A7A5A" }}> ({r.primary_rate} %)</span>
+        </div>
+      )}
+      {r.criteria.filter((c) => c.recorded > 0).map((c, i) => (
+        <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12.5, color: "#3f3f46", margin: "3px 0" }}>
+          <span style={{ flex: "0 0 45%", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.label}</span>
+          <Bar pct={(100 * c.passed) / r.testers} />
+          <span style={{ flex: "0 0 60px", textAlign: "right", fontVariantNumeric: "tabular-nums" }}>{c.passed} / {r.testers}</span>
+        </div>
+      ))}
+      {r.closed_questions.map((q, i) => (
+        <div key={i} style={{ marginTop: 8, fontSize: 12.5, color: "#3f3f46" }}>
+          <div style={{ marginBottom: 3 }}>{q.question_text}</div>
+          {q.question_type === "binary" ? (
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <Bar pct={(100 * (q.yes ?? 0)) / q.answered} />
+              <span style={{ flex: "0 0 auto", fontVariantNumeric: "tabular-nums", color: "#6e6e73" }}>
+                Oui {q.yes ?? 0} · Non {q.no ?? 0}{(q.partial ?? 0) > 0 ? ` · Partiellement ${q.partial}` : ""}
+              </span>
+            </div>
+          ) : (
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <Bar pct={q.average != null ? (100 * q.average) / 5 : 0} />
+              <span style={{ flex: "0 0 auto", fontVariantNumeric: "tabular-nums", color: "#6e6e73" }}>
+                moyenne {q.average != null ? q.average.toLocaleString("fr-FR") : "n.d."} / 5 sur {q.answered} réponse{q.answered > 1 ? "s" : ""}
+              </span>
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }

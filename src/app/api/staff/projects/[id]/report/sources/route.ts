@@ -1,18 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStaffMember } from "@/lib/staff-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { computeReadableTesterId, computeAge } from "@/lib/report-config";
+import { computeAge } from "@/lib/report-config";
+import { selectReportPanel, scenarioResults, type SubmissionLike } from "@/lib/report-panel";
 
 /**
  * GET /api/staff/projects/[id]/report/sources
  *
  * "Matière première" du rapport, pour ASSISTER le staff sans rédiger à sa
  * place (principe : le staff rédige, le système propose/calcule) :
- *   - verbatims : les vraies réponses TEXTE collectées, avec l'ID lisible du
- *     testeur (T01…) et la question — pour les insérer en un clic dans une
- *     friction au lieu de les retaper.
- *   - figures : chiffres clés CALCULÉS (taille du panel, âge moyen, taux de
- *     complétion sur le critère principal) proposés en un clic.
+ *   - verbatims : les vraies réponses TEXTE des participations VALIDÉES
+ *     (src/lib/report-panel.ts), avec l'ID lisible du testeur (T01…), la
+ *     question d'origine et les chemins des captures jointes — pour les
+ *     insérer en un clic dans une friction sans perdre le contexte.
+ *   - figures : chiffres clés CALCULÉS sur le panel validé (taille, âge
+ *     moyen, taux de complétion sur le critère principal).
+ *   - panel : comptage validés / exclus, pour l'affichage dans l'éditeur.
  */
 export async function GET(
   _request: NextRequest,
@@ -29,70 +32,69 @@ export async function GET(
   const [{ data: pts }, { data: questions }, { data: answers }, { data: useCases }] = await Promise.all([
     admin
       .from("project_testers")
-      .select("id, tester_id, tester:testers(birth_date)")
-      .eq("project_id", projectId)
-      .order("created_at", { ascending: true }),
+      .select("id, tester_id, status, staff_rating, staff_sloppy, submitted_at, created_at, tester:testers(birth_date)")
+      .eq("project_id", projectId),
     admin
       .from("project_questions")
       .select("id, question_text, question_type, use_case_id")
-      .eq("project_id", projectId),
+      .eq("project_id", projectId)
+      .order("position"),
     admin
       .from("project_tester_answers")
-      .select("tester_id, question_id, answer_text")
+      .select("tester_id, question_id, answer_text, image_urls")
       .eq("project_id", projectId),
     admin
       .from("project_use_cases")
-      .select("id, title, expected_testers_count, use_case_success_criteria(id, is_primary)")
+      .select("id, title, use_case_success_criteria(id, label, is_primary)")
       .eq("project_id", projectId)
       .order("order", { ascending: true }),
   ]);
 
-  const testerList = pts ?? [];
-  // Mapping tester_id (interne) → ID lisible T01, T02… (ordre d'affectation).
-  const readableByTester = new Map<string, string>();
-  testerList.forEach((pt, i) => readableByTester.set(pt.tester_id as string, computeReadableTesterId(i)));
+  const panel = selectReportPanel((pts ?? []) as (SubmissionLike & { tester: unknown })[]);
 
-  // Métadonnées question : uniquement les questions TEXTE peuvent produire un
-  // verbatim (binary/scale stockent 'yes'/'4'… — pas des verbatims).
   const ucTitleById = new Map<string, string>();
   (useCases ?? []).forEach((uc) => ucTitleById.set(uc.id as string, uc.title as string));
+  const qList = (questions ?? []) as { id: string; question_text: string; question_type: string | null; use_case_id: string | null }[];
   const questionMeta = new Map<string, { text: string; isText: boolean; ucTitle: string }>();
-  (questions ?? []).forEach((q) => {
-    const type = (q.question_type as string | null) ?? "text";
-    questionMeta.set(q.id as string, {
-      text: q.question_text as string,
+  qList.forEach((q) => {
+    const type = q.question_type ?? "text";
+    questionMeta.set(q.id, {
+      text: q.question_text,
       isText: type === "text",
-      ucTitle: q.use_case_id ? ucTitleById.get(q.use_case_id as string) ?? "" : "",
+      ucTitle: q.use_case_id ? ucTitleById.get(q.use_case_id) ?? "" : "",
     });
   });
 
-  const verbatims = (answers ?? [])
+  const aList = (answers ?? []) as { tester_id: string; question_id: string; answer_text: string | null; image_urls: string[] | null }[];
+
+  const verbatims = aList
     .map((a) => {
-      const meta = questionMeta.get(a.question_id as string);
+      const meta = questionMeta.get(a.question_id);
       const text = String(a.answer_text ?? "").trim();
       if (!meta || !meta.isText || !text) return null;
-      const readable = readableByTester.get(a.tester_id as string);
+      const readable = panel.readableByTester.get(a.tester_id);
       if (!readable) return null;
       return {
-        tester_id: a.tester_id as string,
+        tester_id: a.tester_id,
         tester_readable: readable,
+        question_id: a.question_id,
         question_text: meta.text,
         use_case_title: meta.ucTitle,
         answer_text: text,
+        image_paths: Array.isArray(a.image_urls) ? a.image_urls : [],
       };
     })
-    .filter(Boolean)
-    // Ordre stable : par ID testeur lisible.
-    .sort((a, b) => (a!.tester_readable < b!.tester_readable ? -1 : 1));
+    .filter((v): v is NonNullable<typeof v> => v !== null)
+    .sort((a, b) => (a.tester_readable < b.tester_readable ? -1 : 1));
 
-  // ---- Chiffres clés calculés -----------------------------------------
-  const panelSize = testerList.length;
+  // ---- Chiffres clés calculés (panel validé) ---------------------------
+  const panelSize = panel.validated.length;
   const figures: { value: string; label: string }[] = [];
   if (panelSize > 0) {
     figures.push({ value: String(panelSize), label: panelSize > 1 ? "testeurs" : "testeur" });
   }
 
-  const ages = testerList
+  const ages = panel.validated
     .map((pt) => {
       const t = Array.isArray(pt.tester) ? pt.tester[0] : pt.tester;
       return computeAge((t as { birth_date?: string | null } | null)?.birth_date ?? null);
@@ -102,40 +104,22 @@ export async function GET(
     figures.push({ value: `${Math.round(ages.reduce((s, a) => s + a, 0) / ages.length)} ans`, label: "âge moyen du panel" });
   }
 
-  // Taux de complétion : % de testeurs ayant validé le critère PRINCIPAL de
-  // chaque cas d'usage. Nécessite des use_case_completions enregistrées.
-  const primaryCriterionIds: string[] = [];
-  const ucByPrimary = new Map<string, { expected: number | null }>();
-  (useCases ?? []).forEach((uc) => {
-    const crits = (uc.use_case_success_criteria as { id: string; is_primary: boolean }[] | null) ?? [];
-    const primary = crits.find((c) => c.is_primary);
-    if (primary) {
-      primaryCriterionIds.push(primary.id);
-      ucByPrimary.set(primary.id, { expected: (uc.expected_testers_count as number | null) ?? null });
-    }
-  });
-
-  if (primaryCriterionIds.length > 0 && testerList.length > 0) {
-    const ptIds = testerList.map((pt) => pt.id as string);
+  if (panelSize > 0 && (useCases ?? []).length > 0) {
     const { data: completions } = await admin
       .from("use_case_completions")
       .select("project_tester_id, criterion_id, passed")
-      .in("project_tester_id", ptIds)
-      .in("criterion_id", primaryCriterionIds);
-
-    if (completions && completions.length > 0) {
-      const rates: number[] = [];
-      for (const critId of primaryCriterionIds) {
-        const passed = completions.filter((c) => c.criterion_id === critId && c.passed === true).length;
-        const denom = ucByPrimary.get(critId)?.expected || panelSize;
-        if (denom > 0) rates.push((100 * passed) / denom);
-      }
-      if (rates.length > 0) {
-        const global = Math.round(rates.reduce((s, r) => s + r, 0) / rates.length);
-        figures.push({ value: `${global}%`, label: "de complétion sur le critère principal" });
-      }
+      .in("project_tester_id", panel.validated.map((p) => p.id));
+    const rates = (useCases ?? [])
+      .map((uc) => {
+        const criteria = ((uc.use_case_success_criteria as { id: string; label: string; is_primary: boolean }[] | null) ?? []);
+        return scenarioResults({ id: uc.id as string, criteria }, qList.map((q) => ({ ...q, question_type: q.question_type ?? "text" })), aList, completions ?? [], panel).primary_rate;
+      })
+      .filter((r): r is number => r !== null);
+    if (rates.length > 0) {
+      const global = Math.round(rates.reduce((s, r) => s + r, 0) / rates.length);
+      figures.push({ value: `${global}%`, label: "de complétion sur le critère principal" });
     }
   }
 
-  return NextResponse.json({ verbatims, figures });
+  return NextResponse.json({ verbatims, figures, panel: panel.counts });
 }

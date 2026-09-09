@@ -8,6 +8,7 @@ import type {
   Severity, Impact, Priority, TechEffort,
 } from "@/types/staff";
 import { useConfirm } from "@/components/ui/ConfirmModal";
+import { selectReportPanel, describePanelSelection, type SubmissionLike } from "@/lib/report-panel";
 
 interface Props {
   projectId: string;
@@ -94,13 +95,16 @@ interface CheckItem {
 interface SourceVerbatim {
   tester_id: string;
   tester_readable: string;
+  question_id: string;
   question_text: string;
   use_case_title: string;
   answer_text: string;
+  image_paths: string[];
 }
 interface ReportSources {
   verbatims: SourceVerbatim[];
   figures: { value: string; label: string }[];
+  panel?: { assigned: number; validated: number; not_submitted: number; not_rated: number; rejected: number };
 }
 
 export default function ProjectReportTab({ projectId }: Props) {
@@ -172,13 +176,15 @@ export default function ProjectReportTab({ projectId }: Props) {
       }
 
       if (testersRes.ok) {
-        const ptData: Array<{
-          id: string; tester_id: string;
+        const ptData: Array<SubmissionLike & {
           tester: { id: string; first_name: string | null; last_name: string | null } | null;
         }> = await testersRes.json();
-        setPanel(ptData.map((pt) => ({
+        // Meme regle que l'export : seules les participations validees
+        // (soumises, notees >= 3, non baclees) sont citables dans le rapport.
+        const sel = selectReportPanel(ptData);
+        setPanel(sel.validated.map((pt) => ({
           id: pt.tester?.id ?? pt.tester_id,
-          name: [pt.tester?.first_name, pt.tester?.last_name].filter(Boolean).join(" ") || "Testeur",
+          name: `${sel.readableByTester.get(pt.tester_id) ?? "?"} · ${[pt.tester?.first_name, pt.tester?.last_name].filter(Boolean).join(" ") || "Testeur"}`,
           pt_id: pt.id,
         })));
       }
@@ -242,7 +248,11 @@ export default function ProjectReportTab({ projectId }: Props) {
     const n = [...frictions];
     n[fIdx] = {
       ...n[fIdx],
-      verbatims: [...n[fIdx].verbatims, { _key: nk(), text: src.answer_text, tester_id: src.tester_id }],
+      verbatims: [...n[fIdx].verbatims, {
+        _key: nk(), text: src.answer_text, tester_id: src.tester_id,
+        question_id: src.question_id, question_text: src.question_text,
+        image_paths: src.image_paths ?? [],
+      }],
     };
     setFrictions(n);
     setVerbatimPickerIdx(null);
@@ -274,6 +284,14 @@ export default function ProjectReportTab({ projectId }: Props) {
     const n = [...frictions];
     const verbs = [...n[fIdx].verbatims];
     verbs[vIdx] = { ...verbs[vIdx], [field]: val };
+    n[fIdx] = { ...n[fIdx], verbatims: verbs };
+    setFrictions(n); dirty();
+  }
+  // Retire les captures jointes a un verbatim (le texte reste).
+  function dropVerbatimImages(fIdx: number, vIdx: number) {
+    const n = [...frictions];
+    const verbs = [...n[fIdx].verbatims];
+    verbs[vIdx] = { ...verbs[vIdx], image_paths: [] };
     n[fIdx] = { ...n[fIdx], verbatims: verbs };
     setFrictions(n); dirty();
   }
@@ -331,7 +349,12 @@ export default function ProjectReportTab({ projectId }: Props) {
       .filter((f) => f.title.trim())
       .map(({ _key, verbatims, ...f }) => ({
         ...f, title: f.title.trim(),
-        verbatims: verbatims.filter((v) => v.text.trim()).map((v) => ({ text: v.text, tester_id: v.tester_id })),
+        verbatims: verbatims.filter((v) => v.text.trim()).map((v) => ({
+          text: v.text, tester_id: v.tester_id,
+          ...(v.question_id ? { question_id: v.question_id } : {}),
+          ...(v.question_text ? { question_text: v.question_text } : {}),
+          ...(v.image_paths && v.image_paths.length > 0 ? { image_paths: v.image_paths } : {}),
+        })),
       }));
     const cleanRecos: ReportRecommendation[] = recos
       .filter((r) => r.title.trim())
@@ -701,15 +724,30 @@ export default function ProjectReportTab({ projectId }: Props) {
                 </div>
               </div>
               {fr.verbatims.map((v, vIdx) => (
-                <div key={v._key} style={{ display: "flex", gap: 8, marginBottom: 8 }}>
-                  <select value={v.tester_id} onChange={(e) => updateVerbatim(fIdx, vIdx, "tester_id", e.target.value)}
-                    style={{ ...inputStyle, width: 160, flex: "0 0 160px", cursor: "pointer", fontSize: 12 }} onFocus={focus} onBlur={blur}>
-                    <option value="">Sélectionner un testeur…</option>
-                    {panel.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
-                  </select>
-                  <input type="text" value={v.text} onChange={(e) => updateVerbatim(fIdx, vIdx, "text", e.target.value)}
-                    placeholder="« Je ne comprenais pas où cliquer… »" style={{ ...inputStyle, flex: 1, fontSize: 13, fontStyle: "italic" }} onFocus={focus} onBlur={blur} />
-                  {fr.verbatims.length > 1 && <button type="button" onClick={() => removeVerbatim(fIdx, vIdx)} style={removeBtnSmall}>&times;</button>}
+                <div key={v._key} style={{ marginBottom: 8 }}>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <select value={v.tester_id} onChange={(e) => updateVerbatim(fIdx, vIdx, "tester_id", e.target.value)}
+                      style={{ ...inputStyle, width: 200, flex: "0 0 200px", cursor: "pointer", fontSize: 12 }} onFocus={focus} onBlur={blur}>
+                      <option value="">Sélectionner un testeur…</option>
+                      {panel.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+                    </select>
+                    <input type="text" value={v.text} onChange={(e) => updateVerbatim(fIdx, vIdx, "text", e.target.value)}
+                      placeholder="« Je ne comprenais pas où cliquer… »" style={{ ...inputStyle, flex: 1, fontSize: 13, fontStyle: "italic" }} onFocus={focus} onBlur={blur} />
+                    {fr.verbatims.length > 1 && <button type="button" onClick={() => removeVerbatim(fIdx, vIdx)} style={removeBtnSmall}>&times;</button>}
+                  </div>
+                  {(v.question_text || (v.image_paths?.length ?? 0) > 0) && (
+                    <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", fontSize: 11, color: "#86868B", margin: "4px 0 0 4px" }}>
+                      {v.question_text && <span>À propos de : {v.question_text}</span>}
+                      {(v.image_paths?.length ?? 0) > 0 && (
+                        <span>
+                          {v.image_paths!.length} capture{v.image_paths!.length > 1 ? "s" : ""} jointe{v.image_paths!.length > 1 ? "s" : ""} dans le rapport ·{" "}
+                          <button type="button" onClick={() => dropVerbatimImages(fIdx, vIdx)} style={{ background: "none", border: "none", padding: 0, color: "#0A7A5A", cursor: "pointer", fontFamily: "inherit", fontSize: 11, fontWeight: 600 }}>
+                            retirer
+                          </button>
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -855,6 +893,18 @@ export default function ProjectReportTab({ projectId }: Props) {
         )}
       </div>
 
+      {/* ========== PANEL DU RAPPORT ========== */}
+      {sources.panel && (
+        <div style={{ background: "#f5f5f7", borderRadius: 12, padding: "12px 16px", marginBottom: 20, fontSize: 13, color: "#1d1d1f", lineHeight: 1.6 }}>
+          <strong>Panel du rapport : {sources.panel.validated} participation{sources.panel.validated > 1 ? "s" : ""} validée{sources.panel.validated > 1 ? "s" : ""}</strong>
+          {" "}sur {sources.panel.assigned} assignée{sources.panel.assigned > 1 ? "s" : ""}.
+          {describePanelSelection(sources.panel) && <span style={{ color: "#6e6e73" }}> {describePanelSelection(sources.panel)}</span>}
+          <div style={{ fontSize: 12, color: "#86868B", marginTop: 4 }}>
+            Seules les missions soumises, notées 3 ou plus et non bâclées entrent dans le panel, les verbatims, les résultats par scénario et l&apos;annexe. Identifiants T01, T02… attribués dans l&apos;ordre de soumission.
+          </div>
+        </div>
+      )}
+
       {/* ========== EXPORT ========== */}
       {(() => {
         const checks: CheckItem[] = [
@@ -999,7 +1049,12 @@ export default function ProjectReportTab({ projectId }: Props) {
                   >
                     <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 4 }}>
                       <span style={{ fontSize: 11, fontWeight: 700, color: "#0A7A5A", background: "#f0faf5", padding: "2px 8px", borderRadius: 980 }}>{v.tester_readable}</span>
-                      <span style={{ fontSize: 11, color: "#86868B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{v.use_case_title ? `${v.use_case_title} · ` : ""}{v.question_text}</span>
+                      <span style={{ fontSize: 11, color: "#86868B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", flex: 1 }}>{v.use_case_title ? `${v.use_case_title} · ` : ""}{v.question_text}</span>
+                      {(v.image_paths?.length ?? 0) > 0 && (
+                        <span style={{ fontSize: 11, color: "#6e6e73", whiteSpace: "nowrap" }} title="Captures d'écran jointes, incluses dans le rapport">
+                          {v.image_paths.length} capture{v.image_paths.length > 1 ? "s" : ""}
+                        </span>
+                      )}
                     </div>
                     <div style={{ fontSize: 13.5, color: "#1d1d1f", fontStyle: "italic", lineHeight: 1.5 }}>« {v.answer_text} »</div>
                   </button>

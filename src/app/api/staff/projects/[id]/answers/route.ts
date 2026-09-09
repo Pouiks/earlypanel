@@ -129,7 +129,7 @@ export async function PATCH(
   // du delta de score / increment missions_completed.
   const { data: claimedRows, error: claimErr } = await admin
     .from("project_testers")
-    .update({ staff_rating: rating, staff_note: note })
+    .update({ staff_rating: rating, staff_note: note, staff_sloppy: sloppy })
     .eq("id", ptId)
     .eq("status", "completed")
     .is("staff_rating", null)
@@ -147,7 +147,7 @@ export async function PATCH(
     // a jour rating/note sans relancer le scoring.
     const { error: updErr } = await admin
       .from("project_testers")
-      .update({ staff_rating: rating, staff_note: note })
+      .update({ staff_rating: rating, staff_note: note, staff_sloppy: sloppy })
       .eq("id", ptId);
     if (updErr) {
       console.error("[answers/PATCH] update error:", updErr.message);

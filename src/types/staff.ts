@@ -150,6 +150,11 @@ export interface ReportBug {
 export interface ReportFrictionVerbatim {
   text: string;
   tester_id: string;
+  /** Question d'origine (insere depuis les reponses) : le client sait a quoi repond la citation. */
+  question_id?: string;
+  question_text?: string;
+  /** Captures d'ecran jointes a la reponse (chemins bucket mission-images), signees a l'export. */
+  image_paths?: string[];
 }
 
 export interface ReportFriction {
@@ -230,6 +235,8 @@ export interface ProjectTester {
   submitted_at: string | null;
   staff_rating: number | null;
   staff_note: string | null;
+  /** Travail bacle selon le staff (migration 045). Exclut du rapport client. */
+  staff_sloppy?: boolean;
   malus_applied: boolean;
 }
 

@@ -901,6 +901,8 @@ profil = 1 si (address OR city OR postal_code OR birth_date) manquant, sinon 0
 | idempotency_key | TEXT | **UNIQUE** |
 | paid_at | TIMESTAMPTZ | |
 
+> **Panel du rapport (migration 045, `src/lib/report-panel.ts`)** : seules les participations VALIDÉES (`status='completed'`, `staff_rating >= 3`, `staff_sloppy=false`) entrent dans le panel, les résultats par scénario, les verbatims proposés et l'annexe CSV. `staff_sloppy` est écrit à chaque `PATCH .../answers`. IDs T01… attribués parmi les validées par ordre de soumission. L'export JSON (`/export?format=json`, format 1.1) ajoute `panel_stats.excluded_note`, `panel_stats.completion_rate`, `use_cases[].results` (critères passés / questions fermées agrégées) et, par verbatim, `question_text` + `images` (URLs signées 1 h du bucket `mission-images`). Un verbatim stocke `question_id`, `question_text`, `image_paths` (`ReportFrictionVerbatim`).
+
 #### `project_reports` (1 par projet)
 | Colonne | Type |
 |---------|------|
