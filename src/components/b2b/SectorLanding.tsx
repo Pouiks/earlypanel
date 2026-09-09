@@ -30,6 +30,8 @@ export interface SectorLandingProps {
   deliverable: { title: string; items: { title: string; body: string }[] };
   guarantees: { title: string; items: { title: string; body: string }[] };
   faq: FaqItem[];
+  /** Articles et pages a lire ensuite (maillage interne). */
+  related?: { href: string; label: string }[];
 }
 
 const DEFAULT_STATS = [
@@ -192,6 +194,14 @@ export default function SectorLanding(p: SectorLandingProps) {
         <Separator />
 
         <FaqAccordion eyebrow="Questions fréquentes" title="Vos questions sur ce secteur." items={p.faq} />
+        {p.related && p.related.length > 0 && (
+          <section className="landing-related">
+            <div className="landing-related-inner">
+              <h2>Pour aller plus loin</h2>
+              <ul>{p.related.map((r) => <li key={r.href}><Link href={r.href}>{r.label} →</Link></li>)}</ul>
+            </div>
+          </section>
+        )}
         <CtaFinal />
       </main>
       <Footer variant="b2b" />

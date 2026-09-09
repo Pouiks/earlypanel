@@ -9,6 +9,14 @@ draft: false
 
 Bien répondre à un test utilisateur n'a rien à voir avec bien écrire. Les meilleures réponses qu'on relit sont souvent maladroites, avec des fautes, mais elles racontent exactement ce qui s'est passé. Les pires sont propres, polies et vides : « c'était clair », « bonne expérience », « rien à signaler ». Ce guide explique ce que cherche la personne qui relit votre mission, et donne une méthode en trois temps pour ne plus jamais voir une mission refusée.
 
+## En bref
+
+- Bien répondre n'est pas bien écrire : c'est raconter exactement ce qui s'est passé, hésitations comprises.
+- La méthode en trois temps pour chaque question ouverte : ce que j'ai fait, ce qui s'est passé, ce que j'en pense à cet endroit précis.
+- Une note ou un oui/non doit être suivi d'un pourquoi concret pour être validé.
+- Une capture d'écran à chaque hésitation vaut mieux qu'un paragraphe, surtout sur mobile.
+- Trop court, hors sujet, répétitif, faux ou en retard : les cinq motifs de refus.
+
 ## Ce que cherche la personne qui vous relit
 
 L'entreprise qui a commandé le test ne veut pas savoir si vous avez aimé son produit. Elle veut savoir si quelqu'un qui le découvre arrive à faire ce qu'il doit faire, et où ça coince. La personne qui relit vos réponses cherche donc trois choses :
@@ -56,3 +64,21 @@ Une mission refusée n'est pas payée et fait baisser votre score. Ce n'est pas 
 3. **Relisez une fois avant d'envoyer**, en vous demandant pour chaque réponse : quelqu'un qui ne connaît pas ce produit comprendrait-il ce qui m'est arrivé ?
 
 Si vous appliquez la méthode en trois temps, vos missions seront validées, bien évaluées, et vous serez sélectionné plus souvent. C'est aussi simple que ça, et c'est aussi exigeant que ça.
+
+## Questions fréquentes
+
+### Comment bien répondre à une question ouverte dans un test utilisateur ?
+
+En au moins trois phrases : ce que vous avez fait, ce que le produit a fait, ce que vous attendiez à cet endroit précis. Décrivez les hésitations plutôt que de donner un avis général.
+
+### Pourquoi ma mission a-t-elle été refusée ?
+
+Le plus souvent parce que les réponses étaient trop courtes, hors sujet ou copiées d'une question à l'autre. Une mission visiblement pas faite, faite sur un autre appareil que celui déclaré ou soumise après la date limite est aussi refusée.
+
+### Faut-il joindre des captures d'écran ?
+
+Oui, quand la mission le permet, à chaque hésitation ou problème, prise au moment du problème et non après l'avoir résolu. Sur mobile, une capture montre en une image ce qu'un paragraphe peine à décrire.
+
+### Une mission bien répondue rapporte-t-elle plus ?
+
+Oui. Chaque mission validée est évaluée après relecture ; une mission jugée de bonne qualité est mieux rémunérée, et des missions régulièrement bien évaluées font passer le testeur dans des niveaux supérieurs, sélectionnés en priorité.

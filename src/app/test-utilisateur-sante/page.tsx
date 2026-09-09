@@ -102,6 +102,11 @@ export default function TestUtilisateurSantePage() {
         ],
       }}
       faq={faq}
+      related={[
+        { href: "/securite", label: "Sécurité et protection des données" },
+        { href: "/blog/definir-sa-cible-test-utilisateur", label: "Définir la cible d'un test utilisateur" },
+        { href: "/blog/recette-application-mobile", label: "Réussir la recette d'une application mobile" },
+      ]}
     />
   );
 }

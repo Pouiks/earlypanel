@@ -45,6 +45,11 @@ cover_alt: "Ce que montre l'image, en une phrase."
 - Liens internes en chemin relatif : `/entreprises`, `/test-maquette-figma`, `/test-pre-lancement-staging`, `/test-conversion-funnel`, `/agences`, `/blog/<autre-slug>`. Côté testeur : `/testeurs`, `/testeurs#register`, `/securite`, `/testeurs/guides/<autre-slug>`.
 - Le bouton « Réserver un appel » et les articles suivants sont ajoutés automatiquement en fin d'article : ne pas les écrire dans le corps.
 
+## Deux sections spéciales, fortement recommandées
+
+- `## En bref` en tête d'article : 3 à 5 puces qui répondent directement à la question du titre. Elles sont retirées du corps et affichées dans un encart en haut de page, et reprises telles quelles dans `/llms-full.txt`. C'est ce que les moteurs génératifs citent en priorité.
+- `## Questions fréquentes` en fin d'article : 3 à 5 questions en `###`, chacune suivie d'une réponse courte (2 à 4 phrases, autoportante). Elles restent dans le corps et sont balisées FAQPage automatiquement.
+
 ## Règles de fond
 
 - Aucun chiffre inventé, aucune étude citée sans source vérifiable, aucun client nommé sans accord écrit.

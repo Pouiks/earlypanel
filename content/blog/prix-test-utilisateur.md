@@ -8,6 +8,14 @@ draft: false
 
 Combien coûte un test utilisateur ? La réponse honnête tient en une phrase : cela dépend de qui fait le travail. Le même test, sur le même produit, avec le même nombre de participants, peut coûter le prix d'un abonnement mensuel ou celui d'une semaine de consultant, selon que vous recrutez, écrivez, relisez et rédigez vous-même, ou que quelqu'un le fait pour vous. Cet article décrit les trois façons de payer un test utilisateur, ce qui fait bouger le prix dans chacune, et comment construire un budget qui tient.
 
+## En bref
+
+- Le prix d'un test utilisateur dépend surtout de qui fait le travail : outil en libre-service, agence au temps passé, ou service clé en main au forfait.
+- Cinq variables font varier le tarif : rareté des profils, nombre de participants, nombre de scénarios, test modéré ou non, niveau de livrable.
+- Un forfait fixe annoncé avant de commencer évite les discussions sur les jours supplémentaires.
+- Une mission earlypanel est chiffrée après un atelier de cadrage offert, généralement {{PRICE_RANGE_LABEL}}.
+- Le vrai coût caché est la relecture : un test dont les réponses bâclées sont comptées ne vaut rien, quel que soit son prix.
+
 ## Trois façons de payer un test utilisateur
 
 ### L'outil en libre-service : vous payez la plateforme, vous faites le reste
@@ -56,3 +64,21 @@ Demandez à tout prestataire, plateforme comprise, ce qui arrive à une réponse
 Le prix d'un test utilisateur va de quelques dizaines d'euros par mois pour un outil que vous pilotez seul, à plusieurs milliers d'euros pour un service ou une agence qui livre un rapport prêt à décider. La bonne question n'est pas « combien ça coûte », mais « combien coûte une décision prise sans test ». Sur un onboarding, un checkout ou un lancement, elle est rarement inférieure.
 
 Pour situer votre projet, décrivez-le en quelques lignes sur la page [entreprises](/entreprises#brief) : vous recevez un devis sous 48 heures, après un atelier de cadrage offert.
+
+## Questions fréquentes
+
+### Combien coûte un test utilisateur avec earlypanel ?
+
+Un forfait fixe par mission, chiffré après un atelier de cadrage offert, généralement {{PRICE_RANGE_LABEL}} selon le nombre et la rareté des profils. Devis sous 48 heures, rapport rédigé et restitution en visio inclus, sans abonnement.
+
+### Pourquoi les prix varient-ils autant entre prestataires ?
+
+Parce qu'ils ne vendent pas la même chose : un accès à un outil, des jours de consultant, ou un résultat livré. La rareté des profils à recruter et le niveau du livrable (données brutes ou rapport rédigé) expliquent l'essentiel des écarts.
+
+### Un outil en libre-service est-il moins cher ?
+
+Sur la facture, souvent. En coût complet, rarement pour une équipe qui teste deux ou trois fois par an : il faut ajouter les journées passées à recruter, écrire les scénarios et relire les réponses, et le rapport reste à écrire.
+
+### Comment budgéter un test utilisateur ?
+
+Partez de la décision en jeu, prévoyez deux vagues courtes plutôt qu'une grosse, comptez votre propre temps dans le coût, et fixez le prix avant de commencer.

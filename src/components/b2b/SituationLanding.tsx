@@ -22,6 +22,8 @@ export interface SituationLandingProps {
   deliverable: { title: string; intro?: string; bullets: string[] };
   faq: FaqItem[];
   ctaTitle: string;
+  /** Articles et pages a lire ensuite (maillage interne). */
+  related?: { href: string; label: string }[];
 }
 
 /**
@@ -101,6 +103,14 @@ export default function SituationLanding(p: SituationLandingProps) {
         <Separator />
 
         <FaqAccordion eyebrow="Questions fréquentes" title="Vos questions sur ce cas précis." items={p.faq} />
+        {p.related && p.related.length > 0 && (
+          <section className="landing-related">
+            <div className="landing-related-inner">
+              <h2>Pour aller plus loin</h2>
+              <ul>{p.related.map((r) => <li key={r.href}><Link href={r.href}>{r.label} →</Link></li>)}</ul>
+            </div>
+          </section>
+        )}
 
         <section className="cta-final">
           <h2>{p.ctaTitle}</h2>

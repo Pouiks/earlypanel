@@ -8,6 +8,14 @@ draft: false
 
 Quand faire un test utilisateur ? La question mérite mieux que « le plus tôt possible », parce qu'un test coûte du temps et de l'argent et qu'il ne rapporte pas la même chose à chaque étape d'un projet produit. Il y a trois moments où il change vraiment une décision, et plusieurs où il arrive trop tard pour peser. Cet article les décrit, avec ce qu'on teste, ce qu'on apprend et ce qu'on décide à chacun.
 
+## En bref
+
+- Trois moments où un test utilisateur change une décision : sur maquette avant de coder, sur préversion avant le lancement, en production quand le funnel décroche.
+- Sur maquette, la correction coûte quelques heures de design ; en production, elle coûte des clients.
+- Avant le lancement, le test révèle ce que l'équipe ne peut plus voir parce qu'elle connaît le produit par cœur.
+- Un test dont on connaît la conclusion avant de le lancer, ou qui sert à « avoir des retours », ne rapporte rien.
+- Posez trois questions : quelle décision dans six semaines, que coûte une erreur maintenant, que ne pouvons-nous plus voir.
+
 ## Moment 1 : sur maquette, avant d'écrire du code
 
 C'est le moment où un test utilisateur rapporte le plus par euro dépensé, pour une raison simple : la correction coûte encore quelques heures de design, pas quelques sprints de développement.
@@ -60,3 +68,21 @@ Posez trois questions dans l'ordre :
 3. **Qu'est-ce que l'équipe ne peut plus voir ?** Ce que vous ne pouvez pas mesurer en interne est ce qu'un regard extérieur apporte.
 
 Si la réponse pointe vers l'un des trois moments décrits, un test de huit à douze participants, cadré sur cette décision, est presque toujours le meilleur investissement du trimestre. Pour situer votre cas, la page [entreprises](/entreprises) décrit ce qu'on teste et comment.
+
+## Questions fréquentes
+
+### Quand faire un test utilisateur dans un projet ?
+
+Aux moments où une décision est en jeu et où une erreur coûte cher : sur la maquette avant de développer, sur la préversion avant le lancement, et en production quand une étape du funnel décroche sans que l'équipe sache pourquoi.
+
+### Est-il trop tard pour tester après le lancement ?
+
+Non. En production, le test utilisateur explique le pourquoi derrière les chiffres des analytics et permet de choisir la correction à tenter en premier. Il est trop tard seulement quand la décision est déjà prise.
+
+### Faut-il tester à chaque sprint ?
+
+Pas nécessairement. Un test cadré sur une décision importante rapporte plus qu'un test systématique sans objectif. Deux vagues courtes autour d'une décision, avant et après correctifs, sont souvent le bon rythme.
+
+### Peut-on tester trop tôt ?
+
+Oui, quand la maquette ne permet pas encore de dérouler un scénario complet. Tester des écrans isolés produit des avis sur le design, pas des comportements.

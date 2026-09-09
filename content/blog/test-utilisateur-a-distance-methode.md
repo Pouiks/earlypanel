@@ -10,6 +10,14 @@ Un test utilisateur à distance consiste à faire réaliser des tâches précise
 
 Mal mené, c'est un lien Figma envoyé à cinq connaissances et un tableau de retours contradictoires. La différence tient à la méthode, pas à l'outil. Voici les cinq étapes qui font qu'un test produit des décisions.
 
+## En bref
+
+- Un test utilisateur à distance fait réaliser des tâches précises par des personnes représentatives de la cible, chacune depuis chez elle, sans animateur.
+- Cinq étapes : cadrer une décision, recruter des profils qui ressemblent aux clients, écrire des scénarios qui ne guident pas, relire chaque réponse à la main, restituer pour décider.
+- Huit à douze participants bien choisis suffisent dans la grande majorité des cas qualitatifs.
+- Les réponses bâclées doivent être écartées avant l'analyse, sinon les chiffres du test ne veulent rien dire.
+- Comptez une demi-journée de relecture pour dix testeurs et une vingtaine de questions : c'est le vrai coût du test.
+
 ## 1. Cadrer un objectif, pas une curiosité
 
 Un test utile répond à une question que l'équipe se pose vraiment et dont la réponse change quelque chose. « Est-ce que notre onboarding est clair ? » n'est pas une question de test. « Un indépendant qui découvre l'outil arrive-t-il à émettre son premier devis sans aide, et où s'arrête-t-il sinon ? » en est une.
@@ -79,3 +87,21 @@ La restitution orale compte autant que le document : trente minutes avec l'équi
 Tout ce qui précède peut se faire en interne. Ce qui manque le plus souvent, ce n'est pas la compétence, c'est le temps et la distance : recruter des inconnus qui correspondent à la cible, relire des dizaines de réponses sans chercher à se rassurer, écrire des recommandations que l'équipe acceptera parce qu'elles viennent de l'extérieur.
 
 C'est exactement le périmètre d'un [test utilisateur clés en main](/entreprises) : vous apportez l'objectif et le produit, le reste est pris en charge, du recrutement à la restitution.
+
+## Questions fréquentes
+
+### Qu'est-ce qu'un test utilisateur à distance ?
+
+C'est un test où chaque participant réalise des scénarios sur le produit depuis son propre environnement et son propre appareil, sans se déplacer. En version non modérée, il suit le scénario seul et répond par écrit ; l'équipe relit ensuite chaque réponse.
+
+### Combien de temps dure un test utilisateur à distance ?
+
+Pour le participant, quinze à quarante minutes selon le nombre de scénarios. Pour l'équipe, comptez une heure de cadrage, quelques jours de recrutement et de collecte, puis une demi-journée de relecture pour dix testeurs. Chez earlypanel, le rapport est livré cinq jours ouvrés après le lancement.
+
+### Test modéré ou non modéré : lequel choisir ?
+
+Le test non modéré, sans animateur, coûte moins cher et se fait au rythme du participant ; il convient à la plupart des parcours. Le test modéré, en visio avec un animateur, sert à explorer un sujet complexe ou un public difficile, au prix d'une organisation plus lourde.
+
+### Que faire des réponses de mauvaise qualité ?
+
+Les écarter avant l'analyse. Une réponse trop courte, hors sujet ou copiée d'un autre champ ne doit ni compter dans les résultats ni être payée au testeur. C'est cette discipline qui donne du sens à un « 9 testeurs sur 12 ».

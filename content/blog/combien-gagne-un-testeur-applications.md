@@ -9,6 +9,14 @@ draft: false
 
 Combien gagne un testeur d'applications ? La réponse honnête tient en deux parties. Par mission, la rémunération est correcte pour quinze à quarante minutes de travail sérieux. Par mois, elle dépend entièrement du nombre de missions pour lesquelles votre profil est sélectionné, et ce nombre ne dépend pas de vous. Ce guide explique ce qui fait varier le montant, ce qui fait qu'une mission est payée ou refusée, et comment se situent les ordres de grandeur, sans promesse.
 
+## En bref
+
+- Par mission validée, la rémunération va de quelques dizaines d'euros à une centaine pour les missions longues sur profils rares.
+- Par mois, tout dépend du nombre de missions pour lesquelles le profil est sélectionné, et ce nombre n'est jamais garanti.
+- Trois variables : la mission elle-même, la rareté du profil, la qualité des réponses après relecture.
+- Une mission bâclée n'est pas payée ; une mission bien évaluée est mieux rémunérée et ouvre des niveaux supérieurs.
+- Le paiement se fait par virement sur l'IBAN renseigné, après validation ; ces revenus se déclarent.
+
 ## Ce qui est payé
 
 Une mission est payée quand elle est **validée**, c'est-à-dire soumise complète avant la date limite, puis relue et acceptée par l'équipe. Ce qui est rémunéré, c'est votre temps et la qualité de vos réponses, pas le fait d'avoir cliqué sur « envoyer ».
@@ -46,3 +54,21 @@ Oui. Les rémunérations de tests utilisateurs sont des revenus et doivent être
 Pour vous situer : une mission validée rapporte de l'ordre de quelques dizaines d'euros, jusqu'à une centaine pour les missions longues sur des profils rares, comme indiqué sur la page [devenir testeur](/testeurs). Sur un mois, le total va de zéro, quand aucun projet ne correspond à votre profil, à plusieurs missions pour les profils recherchés. Personne ne vit de tests utilisateurs. Beaucoup en font un complément agréable, à condition de prendre chaque mission au sérieux.
 
 Le déroulé complet d'une mission, de l'invitation au paiement, est décrit dans [devenir testeur rémunéré : comment ça marche](/testeurs/guides/devenir-testeur-remunere-comment-ca-marche).
+
+## Questions fréquentes
+
+### Combien gagne un testeur d'applications par mission ?
+
+De quelques dizaines d'euros à une centaine selon la durée de la mission, la rareté du profil et la qualité des réponses, comme indiqué sur la page d'inscription. Une mission refusée après relecture n'est pas payée.
+
+### Combien de missions par mois peut-on espérer ?
+
+Cela dépend des projets des entreprises et de la correspondance avec votre profil : de zéro certains mois à plusieurs pour les profils recherchés. Aucun volume n'est garanti, c'est un complément de revenu.
+
+### Quand et comment est-on payé ?
+
+Par virement bancaire sur l'IBAN renseigné dans l'espace testeur, après validation de la mission, généralement sous quelques jours ouvrés. Sans IBAN, une mission ne peut pas être démarrée.
+
+### Faut-il déclarer les revenus de tests utilisateurs ?
+
+Oui. Ce sont des revenus à déclarer selon votre situation, revenus non commerciaux pour un particulier occasionnel ou revenus d'activité pour un indépendant. En cas de doute, demandez à votre centre des impôts ou à votre comptable.

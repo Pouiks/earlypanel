@@ -102,6 +102,11 @@ export default function TestUtilisateurFintechPage() {
         ],
       }}
       faq={faq}
+      related={[
+        { href: "/test-conversion-funnel", label: "Pourquoi votre funnel ne convertit pas" },
+        { href: "/blog/test-utilisateur-vs-ab-testing", label: "Test utilisateur ou A/B testing ?" },
+        { href: "/securite", label: "Sécurité et protection des données" },
+      ]}
     />
   );
 }

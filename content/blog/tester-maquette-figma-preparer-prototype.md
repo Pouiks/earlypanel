@@ -10,6 +10,14 @@ Tester une maquette avant d'écrire une ligne de code est la meilleure économie
 
 Voici ce qu'il faut préparer, et ce qu'il faut accepter de ne pas pouvoir tester.
 
+## En bref
+
+- Un prototype de démo n'est pas un prototype de test : un inconnu clique partout où il s'attend à pouvoir cliquer.
+- Fermez les parcours : au moins deux chemins vers l'objectif, un retour possible depuis chaque écran, des sorties pour annuler et fermer.
+- Dessinez les états : erreur de saisie, chargement, état vide, confirmation de fin.
+- Remplacez le faux texte par des données plausibles, sans donner la réponse du scénario.
+- Une maquette ne teste ni la performance, ni les données réelles, ni les cas limites : dites-le dans le scénario.
+
 ## Fermer les parcours, pas seulement le chemin idéal
 
 Un prototype de démo relie les écrans dans l'ordre prévu. Un prototype de test doit aussi prévoir les écarts raisonnables :
@@ -67,3 +75,21 @@ Ce qu'une maquette teste très bien, en revanche, c'est l'essentiel : la compré
 Le meilleur moment pour tester une maquette est celui où elle est assez complète pour qu'un inconnu puisse dérouler un scénario de bout en bout, et encore assez légère pour que vous acceptiez de la changer. Si l'équipe de développement a déjà commencé, vous testerez quand même, mais vous écouterez moins.
 
 Pour le déroulé complet d'une mission sur maquette, du cadrage au rapport, voir [tester une maquette Figma avec earlypanel](/test-maquette-figma).
+
+## Questions fréquentes
+
+### Peut-on tester une maquette Figma avec de vrais utilisateurs ?
+
+Oui, à condition que le prototype permette de dérouler un scénario de bout en bout : parcours fermés, retours en arrière, états d'erreur et de confirmation. Un lien de prototype (pas le fichier), accessible sans compte Figma, testé sur téléphone si le parcours est mobile.
+
+### Quel est le bon moment pour tester une maquette ?
+
+Quand elle est assez complète pour qu'un inconnu atteigne l'objectif d'un scénario sans aide, et encore assez légère pour que l'équipe accepte de la changer. Avant que le développement commence, idéalement.
+
+### Que ne peut pas mesurer un test sur maquette ?
+
+La rapidité perçue, le comportement avec de vraies données, les cas limites non dessinés et l'apprentissage à l'usage. Il mesure très bien la compréhension des libellés, la logique de navigation, l'ordre des étapes et la hiérarchie visuelle.
+
+### Combien de testeurs pour une maquette Figma ?
+
+Cinq à dix participants proches de la cible suffisent pour voir les gros problèmes d'un parcours avant le développement, avec trois ou quatre par profil si la cible en compte plusieurs.

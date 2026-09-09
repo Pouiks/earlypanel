@@ -4,6 +4,7 @@ import Nav from "@/components/layout/Nav";
 import Footer from "@/components/layout/Footer";
 import JsonLd from "@/components/ui/JsonLd";
 import BreadcrumbJsonLd from "@/components/ui/BreadcrumbJsonLd";
+import FaqJsonLd from "@/components/ui/FaqJsonLd";
 import ArticleBody from "@/components/blog/ArticleBody";
 import PostList from "@/components/blog/PostList";
 import { postHref, type BlogPost } from "@/lib/blog";
@@ -41,6 +42,7 @@ export default function PostArticle({ post, others }: { post: BlogPost; others: 
         section: { name: section.name, url: section.url },
       })} />
       <BreadcrumbJsonLd items={crumbs} />
+      {post.faq.length > 0 && <FaqJsonLd items={post.faq} />}
       <Nav audience={tester ? "tester" : "business"} />
       <main className="blog-main">
         <article className="blog-article">
@@ -65,6 +67,15 @@ export default function PostArticle({ post, others }: { post: BlogPost; others: 
             <figure className="blog-cover">
               <Image src={post.cover} alt={post.cover_alt ?? post.title} fill sizes="(max-width: 760px) 100vw, 760px" priority />
             </figure>
+          )}
+
+          {post.keyPoints.length > 0 && (
+            <section className="blog-keypoints" aria-label="En bref">
+              <div className="blog-toc-title">En bref</div>
+              <ul>
+                {post.keyPoints.map((k) => <li key={k}>{k}</li>)}
+              </ul>
+            </section>
           )}
 
           {post.headings.length >= 3 && (

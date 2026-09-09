@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
 import {
   applyContentTokens,
+  splitKeyPoints,
+  extractFaq,
   parseFrontmatter,
   slugFromFileName,
   estimateReadingMinutes,
@@ -65,6 +67,48 @@ describe("applyContentTokens", () => {
   it("remplace les jetons connus, laisse les inconnus visibles", () => {
     expect(applyContentTokens("généralement {{PRICE_RANGE_LABEL}}, appel de {{ BOOKING_DURATION_MIN }} min, {{INCONNU}}", { PRICE_RANGE_LABEL: "1 500 à 6 000 € HT", BOOKING_DURATION_MIN: "15" }))
       .toBe("généralement 1 500 à 6 000 € HT, appel de 15 min, {{INCONNU}}");
+  });
+});
+
+describe("splitKeyPoints / extractFaq — encart En bref et FAQ balisée", () => {
+  const md = `Intro.
+
+## En bref
+
+- Premier point.
+- Deuxième point.
+
+## Section
+
+Texte.
+
+## Questions fréquentes
+
+### Combien ça coûte ?
+
+Un forfait **fixe**, voir [prix](/blog/prix).
+
+### Quel délai ?
+
+Cinq jours.
+Ouvrés.
+`;
+  it("retire la section En bref du corps et renvoie les puces", () => {
+    const r = splitKeyPoints(md);
+    expect(r.keyPoints).toEqual(["Premier point.", "Deuxième point."]);
+    expect(r.body).not.toContain("## En bref");
+    expect(r.body).toContain("## Section");
+  });
+  it("extrait les questions ### et leurs réponses en texte brut", () => {
+    const faq = extractFaq(md);
+    expect(faq).toEqual([
+      { q: "Combien ça coûte ?", a: "Un forfait fixe, voir prix." },
+      { q: "Quel délai ?", a: "Cinq jours. Ouvrés." },
+    ]);
+  });
+  it("sans sections, rien ne change", () => {
+    expect(splitKeyPoints("## A\n\nx").keyPoints).toEqual([]);
+    expect(extractFaq("## A\n\nx")).toEqual([]);
   });
 });
 

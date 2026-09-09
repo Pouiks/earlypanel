@@ -102,6 +102,11 @@ export default function TestUtilisateurSaasB2BPage() {
         ],
       }}
       faq={faq}
+      related={[
+        { href: "/blog/definir-sa-cible-test-utilisateur", label: "Définir la cible d'un test utilisateur" },
+        { href: "/blog/quand-faire-un-test-utilisateur", label: "Quand faire un test utilisateur ?" },
+        { href: "/blog/prix-test-utilisateur", label: "Combien coûte un test utilisateur ?" },
+      ]}
     />
   );
 }

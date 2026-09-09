@@ -8,6 +8,14 @@ draft: false
 
 La recette d'une application mobile est l'étape où l'on vérifie, avant de publier sur les stores, que l'application fait ce qu'elle doit faire et qu'un utilisateur normal s'en sort. Beaucoup d'équipes la réduisent à « on a testé sur nos téléphones, ça marche ». Puis les premiers avis à une étoile arrivent, sur un modèle que personne dans l'équipe ne possède, pour un parcours que personne n'avait refait depuis un mois. Voici comment organiser une recette qui évite ça, en séparant clairement ce qui relève de la vérification technique et ce qui relève du test utilisateur.
 
+## En bref
+
+- Une bonne recette d'application mobile est deux exercices : la recette technique par l'équipe, puis le test utilisateur par des inconnus.
+- La recette technique se fait avec une liste écrite : parcours complets, états intermédiaires, permissions refusées, entrées inattendues, mise à jour, suppression de compte.
+- Testez sur un appareil ancien ou d'entrée de gamme, un petit et un grand écran, les deux systèmes, une connexion dégradée.
+- Le test utilisateur se fait sur le vrai téléphone du testeur, avec des scénarios et non des instructions, et des captures d'écran.
+- Comptez au moins deux semaines entre la fin du développement et la soumission aux stores.
+
 ## Deux recettes, pas une
 
 Une bonne recette d'application mobile est en fait deux exercices différents, faits par des personnes différentes.
@@ -75,3 +83,21 @@ Une recette qui ne produit que la première liste vous dira que l'application ma
 Comptez au moins deux semaines entre la fin du développement et la soumission aux stores : quelques jours de recette technique et de corrections, une semaine de test utilisateur sur une version stabilisée, quelques jours pour corriger ce qui bloque. Ajoutez le délai de validation des stores, qui n'est pas sous votre contrôle.
 
 Si le calendrier ne laisse pas cette place, ce n'est pas la recette qu'il faut raccourcir, c'est la publication qu'il faut décaler. Une application publiée avec un parcours que personne ne comprend coûte plus cher en avis négatifs et en support qu'une semaine de retard.
+
+## Questions fréquentes
+
+### Qu'est-ce que la recette d'une application mobile ?
+
+C'est la vérification, avant publication, que l'application fait ce qui a été spécifié (recette technique) et qu'un utilisateur qui la découvre arrive à s'en servir (test utilisateur). Les deux sont nécessaires, dans cet ordre.
+
+### Sur quels appareils tester une application mobile ?
+
+Sur la répartition réelle de votre cible si vous avez des analytics, sinon au minimum un appareil ancien ou d'entrée de gamme sur la version de système la plus basse supportée, un petit et un grand écran, les deux systèmes, et une connexion dégradée. Les simulateurs ne remplacent pas la recette finale.
+
+### Combien de testeurs pour tester une application mobile avant publication ?
+
+Huit à douze personnes proches de votre cible, sur leur propre téléphone, suffisent pour voir les frictions principales. Prévoyez des profils sur les deux systèmes et sur des appareils de gammes différentes.
+
+### Combien de temps prévoir pour la recette ?
+
+Au moins deux semaines entre la fin du développement et la soumission : quelques jours de recette technique et de corrections, une semaine de test utilisateur sur une version stabilisée, quelques jours pour corriger ce qui bloque, plus le délai de validation des stores.

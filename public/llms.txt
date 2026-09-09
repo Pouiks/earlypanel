@@ -18,6 +18,8 @@ Différence vs alternatives : un sondage maison envoyé à dix clients donne des
 - [Test utilisateur fintech, assurance et juridique](https://www.earlypanel.fr/test-utilisateur-fintech): DAF, experts-comptables, courtiers, juristes, environnement sans argent réel
 - [Sécurité et protection des données](https://www.earlypanel.fr/securite): hébergement UE, connexion sans mot de passe, IBAN chiffré, NDA tracé, conservation 3 ans
 - [Rapport d'exemple](https://www.earlypanel.fr/#rapport): exemple complet de livrable envoyé par email
+- [Glossaire des tests utilisateurs](https://www.earlypanel.fr/glossaire): 20 termes définis en une phrase (test non modéré, scénario, critère de réussite, friction, verbatim, panel, NDA, rapport, matrice impact/effort)
+- [Contenu complet en Markdown](https://www.earlypanel.fr/llms-full.txt): tous les articles, guides et définitions d'un bloc
 
 ### Blog : méthode et pratique des tests utilisateurs
 - [Index du blog](https://www.earlypanel.fr/blog)

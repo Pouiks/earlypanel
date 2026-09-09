@@ -8,6 +8,14 @@ draft: false
 
 Comment définir qui est ma cible ? C'est la question qui décide de la valeur d'un test utilisateur avant même qu'il commence. Des scénarios parfaits, lus par les mauvaises personnes, produisent des conclusions fausses avec une grande assurance. Cet article donne une méthode simple pour passer de « nos utilisateurs » à un profil de testeur précis, recrutable, et suffisamment proche de vos vrais clients pour que leurs réactions vous apprennent quelque chose.
 
+## En bref
+
+- Définissez la décision que le test doit éclairer avant de décrire la cible : le même produit appelle des cibles différentes selon la question.
+- Les critères qui comptent, dans l'ordre : la tâche vécue ou le métier, la fraîcheur (ne pas connaître le produit), l'aisance numérique décrite par des faits, l'équipement réel, le contexte d'usage.
+- L'âge, le genre, le secteur au sens large et l'intérêt déclaré pour le produit ne servent presque jamais.
+- Un profil de testeur utile tient en quelques lignes et chaque phrase est vérifiable au recrutement.
+- Trois ou quatre testeurs par profil, deux ou trois profils : huit à douze participants.
+
 ## Commencer par la décision, pas par le persona
 
 Avant de décrire une cible, écrivez la décision que le test doit éclairer. « Faut-il simplifier l'inscription ? » appelle des testeurs qui n'ont jamais eu de compte. « Pourquoi les clients n'utilisent-ils pas le module d'export ? » appelle des testeurs qui ont déjà un usage régulier de ce type d'outil. Le même produit, deux cibles différentes.
@@ -73,3 +81,21 @@ Le meilleur profil ne sert à rien si le recrutement ne le respecte pas. Deux pr
 - **Un tableau du panel** avant le lancement, avec chaque testeur et ses critères, pour voir d'un coup d'œil si les proportions décidées sont respectées. Si le panel ne ressemble pas au profil, on ne lance pas.
 
 C'est ce travail de sélection, un par un, qui prend le plus de temps dans un test utilisateur et qui en fait la valeur. Quand vous passez par un service qui recrute pour vous, exigez de voir ce tableau avant le lancement, sans noms mais avec les critères. Ce que nous recrutons, et comment, est décrit sur la page [entreprises](/entreprises).
+
+## Questions fréquentes
+
+### Comment définir la cible d'un test utilisateur ?
+
+En partant de la décision que le test doit éclairer, puis en décrivant la tâche que les participants vivent déjà, leur fraîcheur vis-à-vis du produit, leur aisance numérique par des faits, leur équipement réel et leur contexte d'usage. Le persona marketing ne suffit pas.
+
+### Faut-il tester avec ses propres clients ?
+
+Seulement quand la décision porte sur des utilisateurs existants, par exemple un module qu'ils n'utilisent pas. Pour un parcours de découverte, il faut des personnes qui n'ont jamais vu le produit : la première utilisation est irremplaçable.
+
+### Quels critères de recrutement ne servent à rien ?
+
+L'âge et le genre hors cas spécifique, le secteur au sens large, l'intérêt déclaré pour le produit et la capacité à donner un avis. Ils remplacent les vrais critères par une apparence de rigueur.
+
+### Comment vérifier que le panel respecte le profil ?
+
+Par des questions de qualification factuelles avant d'accepter un testeur, et par un tableau du panel avant le lancement, sans noms mais avec les critères. Si le panel ne ressemble pas au profil, on ne lance pas.

@@ -46,6 +46,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Reassurance (indexable, contrairement aux pages legales)
     { url: `${BASE_URL}/securite`, lastModified: new Date("2026-09-09"), changeFrequency: "yearly", priority: 0.5 },
 
+    // Glossaire : definitions citables (DefinedTermSet)
+    { url: `${BASE_URL}/glossaire`, lastModified: new Date("2026-09-11"), changeFrequency: "monthly", priority: 0.6 },
+
+    // Glossaire : definitions citables (DefinedTermSet)
+    { url: `${BASE_URL}/glossaire`, lastModified: new Date("2026-09-11"), changeFrequency: "monthly", priority: 0.6 },
+
     // Blog : index + articles (content/blog/*.md, brouillons exclus)
     { url: `${BASE_URL}/blog`, lastModified: latest, changeFrequency: "weekly", priority: 0.7 },
     ...posts.map((p) => ({

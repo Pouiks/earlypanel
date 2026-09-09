@@ -8,6 +8,14 @@ draft: false
 
 Combien de testeurs pour un test utilisateur ? C'est la première question que posent les équipes qui préparent un test, et c'est celle à laquelle on répond le plus mal, parce qu'on y répond avec un chiffre. Le bon nombre de testeurs dépend de ce que vous voulez apprendre. Une fois la question posée correctement, le chiffre vient tout seul.
 
+## En bref
+
+- Pour trouver les frictions d'un parcours, cinq participants révèlent la plupart des problèmes (règle du Nielsen Norman Group) ; à distance, huit à douze est le bon format.
+- Pour comparer deux versions, doublez le panel : une vingtaine de participants au minimum.
+- Pour mesurer un pourcentage fiable, un test utilisateur n'est pas l'outil : il faut des centaines de réponses, donc des analytics.
+- Comptez trois à quatre testeurs par segment de cible que vous voulez vraiment observer.
+- La qualité du recrutement et la discipline de relecture pèsent plus que le nombre.
+
 ## Combien de testeurs selon la question posée : trois cas
 
 ### « Où est-ce que ça coince ? » : un test qualitatif
@@ -52,3 +60,21 @@ Le nombre de participants est la variable la plus visible et la moins détermina
 3. **La discipline de relecture.** Écarter les réponses insuffisantes et ne garder que les participations complètes est ce qui donne du sens au « 9 sur 12 ». Un chiffre qui compte tout le monde, y compris ceux qui n'ont pas fini, ne veut rien dire.
 
 C'est pour cette raison que nos missions partent sur huit à douze profils recrutés à la main, avec une relecture de chaque réponse avant qu'elle n'entre dans le rapport. Pour savoir si c'est le bon format pour votre cas, le plus simple est d'en [parler quinze minutes](/entreprises#brief).
+
+## Questions fréquentes
+
+### Combien de testeurs pour un test utilisateur qualitatif ?
+
+Huit à douze participants proches de la cible. Cinq suffisent en théorie pour un public homogène, mais à distance il faut de la marge pour les réponses inutilisables et pour couvrir plusieurs sous-groupes.
+
+### Pourquoi pas trente testeurs ?
+
+Au-delà de quinze, chaque participant supplémentaire apporte peu de problèmes nouveaux et double le temps de relecture. Avec le budget de trente testeurs, deux tests de douze à un mois d'intervalle, avant et après correctifs, apprennent davantage.
+
+### Cinq testeurs suffisent-ils vraiment ?
+
+Pour un parcours donné et un public homogène, cinq participants révèlent la majorité des problèmes d'utilisabilité, selon l'observation popularisée par le Nielsen Norman Group. Dès que la cible mélange plusieurs profils, chaque profil a besoin de ses trois ou quatre participants.
+
+### Un test utilisateur peut-il donner un taux de conversion ?
+
+Non. « 9 sur 12 ont réussi » décrit un panel, pas une base d'utilisateurs, et n'a pas de marge d'erreur exploitable. Le test utilisateur explique pourquoi un chiffre est ce qu'il est ; les analytics ou un A/B test mesurent combien.

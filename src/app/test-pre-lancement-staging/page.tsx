@@ -74,6 +74,11 @@ export default function TestPreLancementPage() {
         ],
       }}
       faq={faq}
+      related={[
+        { href: "/blog/recette-application-mobile", label: "Réussir la recette d'une application mobile" },
+        { href: "/blog/test-utilisateur-a-distance-methode", label: "Test utilisateur à distance : la méthode" },
+        { href: "/securite", label: "Sécurité et protection des données" },
+      ]}
       ctaTitle="Vous lancez dans quelques semaines ?"
     />
   );

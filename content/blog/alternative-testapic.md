@@ -8,6 +8,14 @@ draft: false
 
 Chercher une alternative à Testapic, c'est le plus souvent chercher autre chose qu'une plateforme : non pas un meilleur outil pour faire soi-même, mais quelqu'un qui fasse le travail. Cet article ne classe pas les outils entre eux. Il décrit la différence entre une plateforme de tests utilisateurs à distance et un service clé en main comme earlypanel, ce que chacun demande de votre côté, et comment choisir selon votre situation. Les offres évoluent : vérifiez toujours les conditions en vigueur sur le site de chaque acteur.
 
+## En bref
+
+- Chercher une alternative à Testapic, c'est souvent chercher un service qui fait le travail plutôt qu'un outil pour le faire soi-même.
+- Une plateforme fournit un panel et un outil de collecte ; le cadrage, les scénarios, la relecture et le rapport restent à votre charge.
+- Un service clé en main livre le résultat : recrutement à la main, questionnaire co-construit, relecture humaine, rapport rédigé, restitution.
+- Le choix dépend de trois choses : avez-vous un UX researcher, votre cible est-elle précise, avez-vous besoin d'un rapport ou d'un outil.
+- Les deux peuvent coexister : l'outil pour le quotidien, le service pour les tests qui engagent une décision.
+
 ## Deux façons de faire un test utilisateur à distance
 
 Testapic est une plateforme française de tests utilisateurs à distance, connue pour son panel et ses outils de collecte. Comme toute plateforme, elle vous donne les moyens de tester. Un service clé en main vous donne le résultat du test.
@@ -68,3 +76,21 @@ Les deux peuvent coexister : une plateforme pour les vérifications rapides du q
 ## En résumé
 
 L'alternative à Testapic n'est pas forcément une autre plateforme. Si votre difficulté n'est pas l'outil mais le temps, le recrutement de profils précis et la relecture, un service clé en main répond à un besoin différent : vous recevez le résultat, pas les moyens de le produire. La page [entreprises](/entreprises) décrit ce qu'earlypanel fait exactement et comment obtenir un devis sous 48 heures.
+
+## Questions fréquentes
+
+### Quelle est la différence entre une plateforme de tests et un service clé en main ?
+
+La plateforme vous donne les moyens de tester : un panel, un outil de collecte, parfois des analyses assistées. Le service vous donne le résultat : le test est cadré, recruté, relu et rédigé pour vous, pour un forfait fixé avant de commencer.
+
+### Pour qui une plateforme reste-t-elle le bon choix ?
+
+Pour une équipe qui a une personne dont c'est le métier, un rythme de tests régulier, une cible large et le temps de relire elle-même. L'outil amplifie une compétence interne.
+
+### Pour qui un service clé en main est-il plus adapté ?
+
+Pour une équipe produit sans UX researcher, une cible précise ou professionnelle, un test ponctuel autour d'une décision importante, et un besoin de rapport plutôt que d'outil.
+
+### Comment se compare le prix ?
+
+Une plateforme se paie à l'usage ou à l'abonnement, indépendamment du résultat ; un service se paie au forfait par mission, résultat compris. Le coût complet inclut, dans le premier cas, le temps interne de recrutement, de relecture et de rédaction.

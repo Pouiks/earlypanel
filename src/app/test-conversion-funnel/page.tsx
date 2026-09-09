@@ -74,6 +74,11 @@ export default function TestConversionFunnelPage() {
         ],
       }}
       faq={faq}
+      related={[
+        { href: "/blog/test-utilisateur-vs-ab-testing", label: "Test utilisateur ou A/B testing ?" },
+        { href: "/blog/quand-faire-un-test-utilisateur", label: "Quand faire un test utilisateur ?" },
+        { href: "/blog/combien-de-testeurs-test-utilisateur", label: "Combien de testeurs pour un test utilisateur ?" },
+      ]}
       ctaTitle="Vous voulez arrêter de spéculer en réunion ?"
     />
   );

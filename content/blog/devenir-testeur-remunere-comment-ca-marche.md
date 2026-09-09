@@ -9,6 +9,14 @@ draft: false
 
 Devenir testeur rémunéré, c'est accepter de temps en temps une mission de quinze à quarante minutes : utiliser un site ou une application qu'on ne connaît pas, accomplir quelques tâches précises, et raconter par écrit ce qu'on a fait, ce qu'on a compris et où on a hésité. En échange, on est payé par virement une fois la mission validée. Ce guide décrit ce que ça implique concrètement, sans enjoliver : ce n'est pas un revenu principal, c'est un complément qui récompense la précision.
 
+## En bref
+
+- Devenir testeur rémunéré, c'est accepter de temps en temps une mission de quinze à quarante minutes sur un site ou une application inconnue, et être payé par virement une fois la mission validée.
+- On attend trois choses : faire les tâches pour de vrai, décrire ce qui s'est passé avec ses mots, être honnête y compris en cas d'échec.
+- Tout le monde ou presque peut s'inscrire ; ce qui compte, c'est un profil complet et précis, pas un profil type.
+- Une mission suit six étapes : inscription, sélection, NDA, test, relecture, paiement.
+- C'est un complément de revenu sans volume garanti, pas un travail.
+
 ## Ce qu'on attend d'un testeur
 
 Un test utilisateur sert à une entreprise qui veut savoir si son produit est compréhensible par quelqu'un qui le découvre. Ce qu'elle achète, c'est votre regard de première fois et la précision de vos réponses. On ne vous demande donc pas d'être un expert, ni d'aimer le produit. On vous demande trois choses :
@@ -53,3 +61,21 @@ Une mission refusée n'est pas payée. Plusieurs missions refusées font baisser
 Votre profil sert à vous sélectionner pour des missions, rien d'autre. Les entreprises ne voient jamais votre nom ni vos coordonnées : dans le rapport, vous êtes « T04 ». Votre IBAN est chiffré. Vous pouvez supprimer votre compte à tout moment depuis votre espace. Le détail est sur la page [Sécurité et données](/securite).
 
 Si tout cela vous convient, l'inscription prend cinq minutes : [rejoindre le panel](/testeurs#register).
+
+## Questions fréquentes
+
+### Comment devenir testeur rémunéré ?
+
+En créant un compte sur la page dédiée, en complétant son profil (métier, situation, équipement, aisance numérique) et en renseignant un IBAN pour recevoir les virements. Les missions arrivent ensuite par invitation, selon la correspondance entre le profil et la cible de chaque entreprise.
+
+### Faut-il des compétences particulières ?
+
+Non. Un test utilisateur cherche le regard de quelqu'un qui découvre un produit, pas celui d'un expert. Ce qui compte, c'est de faire les tâches pour de vrai et de décrire précisément ce qui s'est passé.
+
+### Combien de temps prend une mission ?
+
+Entre quinze et quarante minutes selon le nombre de scénarios, à faire d'une traite, depuis chez soi, sur son propre appareil, avant la date limite indiquée.
+
+### Pourquoi une mission peut-elle être refusée ?
+
+Réponses trop courtes, hors sujet ou copiées, test visiblement pas fait ou fait sur un autre appareil que celui déclaré, date limite dépassée. Une mission refusée n'est pas payée et fait baisser le score de qualité du compte.

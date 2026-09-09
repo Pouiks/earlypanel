@@ -136,6 +136,58 @@ export function applyContentTokens(markdown: string, tokens: Record<string, stri
   return markdown.replace(/\{\{\s*([A-Z0-9_]+)\s*\}\}/g, (m, key: string) => (key in tokens ? tokens[key] : m));
 }
 
+/**
+ * « En bref » : section `## En bref` (puces) en tete d'article, retiree du
+ * corps et rendue comme encart de reponses directes. C'est ce que les
+ * moteurs generatifs citent en priorite : 3 a 5 faits nets, en tete.
+ */
+export function splitKeyPoints(markdown: string): { keyPoints: string[]; body: string } {
+  const lines = markdown.split("\n");
+  const start = lines.findIndex((l) => /^##\s+En bref\s*$/i.test(l));
+  if (start === -1) return { keyPoints: [], body: markdown };
+  let end = lines.length;
+  for (let i = start + 1; i < lines.length; i++) {
+    if (/^##\s+/.test(lines[i])) { end = i; break; }
+  }
+  const keyPoints = lines.slice(start + 1, end)
+    .map((l) => l.match(/^\s*[-*]\s+(.+?)\s*$/)?.[1])
+    .filter((x): x is string => !!x);
+  const body = [...lines.slice(0, start), ...lines.slice(end)].join("\n").trim();
+  return { keyPoints, body };
+}
+
+export interface PostFaqItem { q: string; a: string }
+
+/**
+ * FAQ d'article : section `## Questions fréquentes` contenant des `###`
+ * (question) suivis de paragraphes (reponse). Restee dans le corps, et
+ * balisee FAQPage (JSON-LD) pour les extraits enrichis et les citations.
+ */
+export function extractFaq(markdown: string): PostFaqItem[] {
+  const lines = markdown.split("\n");
+  const start = lines.findIndex((l) => /^##\s+Questions fr[eé]quentes\s*$/i.test(l));
+  if (start === -1) return [];
+  const out: PostFaqItem[] = [];
+  let q: string | null = null;
+  let buf: string[] = [];
+  const flush = () => {
+    if (q) {
+      const a = buf.join(" ").replace(/\s+/g, " ").replace(/\*\*/g, "").replace(/\[([^\]]+)\]\([^)]+\)/g, "$1").trim();
+      if (a) out.push({ q, a });
+    }
+    q = null; buf = [];
+  };
+  for (let i = start + 1; i < lines.length; i++) {
+    const l = lines[i];
+    if (/^##\s+/.test(l)) break;
+    const h = l.match(/^###\s+(.+?)\s*$/);
+    if (h) { flush(); q = h[1]; continue; }
+    if (q && l.trim()) buf.push(l.trim());
+  }
+  flush();
+  return out;
+}
+
 export function formatPostDate(iso: string): string {
   const d = new Date(`${iso}T00:00:00Z`);
   return d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });

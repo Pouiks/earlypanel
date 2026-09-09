@@ -6,6 +6,9 @@ import {
   estimateReadingMinutes,
   extractHeadings,
   applyContentTokens,
+  splitKeyPoints,
+  extractFaq,
+  type PostFaqItem,
   type PostFrontmatter,
   type PostAudience,
 } from "@/lib/blog-content";
@@ -28,6 +31,10 @@ export interface BlogPost extends PostFrontmatter {
   body: string;
   readingMinutes: number;
   headings: { text: string; id: string }[];
+  /** Encart « En bref » (section ## En bref, retiree du corps). */
+  keyPoints: string[];
+  /** FAQ de l'article (section ## Questions fréquentes), balisee FAQPage. */
+  faq: PostFaqItem[];
 }
 
 const BLOG_DIR = path.join(process.cwd(), "content", "blog");
@@ -51,15 +58,18 @@ export async function getAllPosts(opts: { includeDrafts?: boolean; audience?: Po
     const raw = await readFile(path.join(BLOG_DIR, file), "utf8");
     const parsed = parseFrontmatter(raw);
     const frontmatter = parsed.frontmatter;
-    const body = applyContentTokens(parsed.body, CONTENT_TOKENS);
+    const full = applyContentTokens(parsed.body, CONTENT_TOKENS);
+    const { keyPoints, body } = splitKeyPoints(full);
     if (frontmatter.draft && !opts.includeDrafts) continue;
     if (opts.audience && frontmatter.audience !== opts.audience) continue;
     posts.push({
       ...frontmatter,
       slug,
       body,
-      readingMinutes: estimateReadingMinutes(body),
+      readingMinutes: estimateReadingMinutes(full),
       headings: extractHeadings(body),
+      keyPoints,
+      faq: extractFaq(body),
     });
   }
   posts.sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : a.slug.localeCompare(b.slug)));

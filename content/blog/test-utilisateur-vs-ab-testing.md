@@ -8,6 +8,14 @@ draft: false
 
 Test utilisateur vs A/B testing : la question revient dans toutes les équipes produit qui ont un funnel à améliorer et un budget limité. Elle est mal posée, parce que les deux méthodes ne répondent pas à la même question. L'A/B test dit **combien** : quelle variante convertit le mieux, avec quelle confiance. Le test utilisateur dit **pourquoi** : ce que les gens ont compris, cherché, raté. Choisir entre les deux, c'est choisir entre mesurer et comprendre. La plupart du temps, vous avez besoin des deux, dans un certain ordre.
 
+## En bref
+
+- L'A/B test mesure quelle variante convertit le mieux ; le test utilisateur explique pourquoi les gens réussissent ou échouent.
+- Sans trafic, sans hypothèses ou avant la production, seul le test utilisateur est utilisable.
+- Avec du trafic et des variantes crédibles, l'A/B test tranche avec une marge d'erreur connue.
+- La bonne séquence : test utilisateur pour trouver les frictions, A/B test pour départager les corrections, test utilisateur court quand le résultat surprend.
+- Douze testeurs ne donnent jamais un pourcentage ; des milliers de visiteurs ne disent jamais pourquoi.
+
 ## Ce que fait vraiment un A/B test
 
 Un A/B test expose deux versions d'une page ou d'un parcours à des utilisateurs réels, en production, et compare un indicateur : taux de clic, taux d'inscription, panier validé. Sa force est la mesure : avec assez de trafic, il tranche entre deux options avec une marge d'erreur connue, sans que personne n'ait à interpréter quoi que ce soit.
@@ -62,3 +70,21 @@ Cette boucle coûte moins cher qu'une série d'A/B tests à l'aveugle, parce qu'
 ## En résumé
 
 L'A/B testing mesure, le test utilisateur explique. Sans trafic, sans hypothèses ou avant la production, le test utilisateur est la seule méthode utilisable. Avec du trafic et des variantes crédibles, l'A/B test tranche. Le meilleur programme produit fait précéder chaque A/B test important d'un test utilisateur court, et le fait suivre d'un autre quand le résultat surprend.
+
+## Questions fréquentes
+
+### Quelle est la différence entre test utilisateur et A/B testing ?
+
+L'A/B test compare deux versions sur du trafic réel et mesure laquelle convertit le mieux. Le test utilisateur observe un petit nombre de personnes représentatives en situation et explique où et pourquoi elles bloquent. L'un mesure, l'autre comprend.
+
+### Quand faire un A/B test plutôt qu'un test utilisateur ?
+
+Quand le produit est en production, que le trafic est suffisant pour détecter une différence, et que les variantes sont déjà définies et crédibles. Pour de petites différences entre deux versions proches, c'est le seul outil pertinent.
+
+### Peut-on combiner les deux ?
+
+Oui, et c'est la meilleure pratique : un test utilisateur court avant pour identifier les frictions et formuler des hypothèses, un A/B test pour départager les corrections, puis un second test utilisateur si le résultat n'est pas compris.
+
+### Combien de trafic faut-il pour un A/B test ?
+
+Assez pour détecter la différence attendue avec une confiance raisonnable : quelques milliers de visiteurs par variante pour des écarts de quelques points. Sur un produit B2B à faible trafic, le test dure des mois ou ne conclut jamais.

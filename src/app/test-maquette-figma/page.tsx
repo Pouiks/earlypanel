@@ -74,6 +74,11 @@ export default function TestMaquetteFigmaPage() {
         ],
       }}
       faq={faq}
+      related={[
+        { href: "/blog/tester-maquette-figma-preparer-prototype", label: "Préparer une maquette Figma pour un test" },
+        { href: "/blog/combien-de-testeurs-test-utilisateur", label: "Combien de testeurs pour un test utilisateur ?" },
+        { href: "/blog/quand-faire-un-test-utilisateur", label: "Quand faire un test utilisateur ?" },
+      ]}
       ctaTitle="Vous voulez savoir si votre maquette est comprise avant de la coder ?"
     />
   );
