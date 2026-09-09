@@ -985,7 +985,18 @@ a.announce { display: block; text-decoration: none; }
 .blog-cta-btns a { text-decoration: none; display: inline-block; }
 .blog-more { margin-top: 3.5rem; padding-top: 2rem; border-top: 0.5px solid var(--border); }
 .blog-more h2 { font-size: 20px; font-weight: 700; letter-spacing: -.02em; margin: 0; }
-@media (max-width: 640px) { .blog-prose { font-size: 16px; } .blog-card { padding: 1.1rem 1.2rem; } .blog-card.has-cover { grid-template-columns: 1fr; } }
+/* Index (blog, guides) : pleine largeur comme la home, cartes en grille */
+.blog-main.blog-index { max-width: var(--content-wide); }
+.blog-index .blog-header { max-width: 760px; }
+.blog-list.blog-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-top: 2.5rem; }
+.blog-list.blog-grid .blog-card { display: flex; flex-direction: column; }
+.blog-list.blog-grid .blog-card.has-cover { display: flex; grid-template-columns: none; }
+.blog-list.blog-grid .blog-card-thumb { aspect-ratio: 16 / 9; margin-bottom: 1rem; }
+.blog-list.blog-grid .blog-card h2, .blog-list.blog-grid .blog-card h3 { font-size: 18px; }
+.blog-list.blog-grid .blog-card-body { display: flex; flex-direction: column; flex: 1; }
+.blog-list.blog-grid .blog-tags { margin-top: auto; padding-top: .9rem; }
+@media (max-width: 1024px) { .blog-list.blog-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .blog-prose { font-size: 16px; } .blog-card { padding: 1.1rem 1.2rem; } .blog-card.has-cover { grid-template-columns: 1fr; } .blog-list.blog-grid { grid-template-columns: 1fr; } }
 .situation-inner p { margin-bottom: 1rem; max-width: 70ch; }
 .situation-inner ul { padding-left: 1.25rem; margin: 0 0 1rem; max-width: 70ch; }
 .situation-inner li { margin-bottom: .5rem; }

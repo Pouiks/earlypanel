@@ -5,10 +5,11 @@ import { postHref } from "@/lib/blog";
 import { formatPostDate } from "@/lib/blog-content";
 
 /** Liste de cartes d'articles (blog entreprise et guides testeurs). */
-export default function PostList({ posts, headingLevel = "h2" }: { posts: BlogPost[]; headingLevel?: "h2" | "h3" }) {
+/** `grid` : cartes en grille pleine largeur (index) ; `list` : colonne (fin d'article). */
+export default function PostList({ posts, headingLevel = "h2", layout = "list" }: { posts: BlogPost[]; headingLevel?: "h2" | "h3"; layout?: "grid" | "list" }) {
   const H = headingLevel;
   return (
-    <ul className="blog-list">
+    <ul className={layout === "grid" ? "blog-list blog-grid" : "blog-list"}>
       {posts.map((p) => (
         <li key={p.slug} className={p.cover ? "blog-card has-cover" : "blog-card"}>
           {p.cover && (

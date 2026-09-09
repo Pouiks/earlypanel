@@ -26,7 +26,7 @@ export default async function BlogIndexPage() {
     <>
       <BreadcrumbJsonLd items={[{ name: "Accueil", url: SITE_URL }, { name: "Blog", url: `${SITE_URL}/blog` }]} />
       <Nav />
-      <main className="blog-main">
+      <main className="blog-main blog-index">
         <header className="blog-header">
           <div className="sec-eye">Blog</div>
           <h1>Tests utilisateurs : <em>la méthode</em>, sans jargon.</h1>
@@ -38,7 +38,7 @@ export default async function BlogIndexPage() {
         {posts.length === 0 ? (
           <p className="blog-empty">Premiers articles en préparation.</p>
         ) : (
-          <PostList posts={posts} />
+          <PostList posts={posts} layout="grid" />
         )}
       </main>
       <Footer variant="b2b" />

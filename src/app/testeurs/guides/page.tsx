@@ -31,7 +31,7 @@ export default async function TesterGuidesIndexPage() {
         { name: "Guides testeurs", url: `${SITE_URL}/testeurs/guides` },
       ]} />
       <Nav audience="tester" />
-      <main className="blog-main">
+      <main className="blog-main blog-index">
         <header className="blog-header">
           <div className="sec-eye">Guides testeurs</div>
           <h1>Tester des produits, <em>être payé</em> pour son avis : le mode d&apos;emploi.</h1>
@@ -45,7 +45,7 @@ export default async function TesterGuidesIndexPage() {
         {posts.length === 0 ? (
           <p className="blog-empty">Premiers guides en préparation.</p>
         ) : (
-          <PostList posts={posts} />
+          <PostList posts={posts} layout="grid" />
         )}
       </main>
       <Footer variant="b2c" />
