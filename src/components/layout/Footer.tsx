@@ -17,6 +17,7 @@ export default function Footer({ variant = "index" }: FooterProps) {
         <li><Link href="/testeurs">Devenir testeur rémunéré</Link></li>
         <li><Link href="/testeurs#how">Comment ça marche</Link></li>
         <li><Link href="/testeurs#faq">FAQ testeurs</Link></li>
+        <li><Link href="/testeurs/guides">Guides testeurs</Link></li>
         <li><Link href="/app/login">Connexion à mon espace</Link></li>
         <li><Link href="/cgu">CGU testeurs</Link></li>
       </ul>
@@ -126,6 +127,7 @@ export default function Footer({ variant = "index" }: FooterProps) {
                   <li><a href="#register">Rejoindre le panel</a></li>
                   <li><a href="#how">Comment ça marche</a></li>
                   <li><a href="#faq">FAQ testeurs</a></li>
+                  <li><Link href="/testeurs/guides">Guides testeurs</Link></li>
                   <li><Link href="/app/login">Connexion à mon espace</Link></li>
                   <li><Link href="/cgu">CGU testeurs</Link></li>
                 </ul>

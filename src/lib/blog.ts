@@ -7,6 +7,7 @@ import {
   extractHeadings,
   applyContentTokens,
   type PostFrontmatter,
+  type PostAudience,
 } from "@/lib/blog-content";
 import { PRICE_RANGE_LABEL, BOOKING_DURATION_MIN } from "@/lib/cta-links";
 
@@ -31,7 +32,12 @@ export interface BlogPost extends PostFrontmatter {
 
 const BLOG_DIR = path.join(process.cwd(), "content", "blog");
 
-export async function getAllPosts(opts: { includeDrafts?: boolean } = {}): Promise<BlogPost[]> {
+/** URL publique d'un article selon son univers. */
+export function postHref(post: Pick<BlogPost, "slug" | "audience">): string {
+  return post.audience === "testeur" ? `/testeurs/guides/${post.slug}` : `/blog/${post.slug}`;
+}
+
+export async function getAllPosts(opts: { includeDrafts?: boolean; audience?: PostAudience } = {}): Promise<BlogPost[]> {
   let files: string[] = [];
   try {
     files = await readdir(BLOG_DIR);
@@ -47,6 +53,7 @@ export async function getAllPosts(opts: { includeDrafts?: boolean } = {}): Promi
     const frontmatter = parsed.frontmatter;
     const body = applyContentTokens(parsed.body, CONTENT_TOKENS);
     if (frontmatter.draft && !opts.includeDrafts) continue;
+    if (opts.audience && frontmatter.audience !== opts.audience) continue;
     posts.push({
       ...frontmatter,
       slug,

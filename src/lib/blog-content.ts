@@ -4,7 +4,11 @@
  * tests/unit/blog-content.test.ts. L'acces fichiers est dans src/lib/blog.ts.
  */
 
+export type PostAudience = "entreprise" | "testeur";
+
 export interface PostFrontmatter {
+  /** Univers de l'article : blog entreprise (/blog) ou guides testeurs (/testeurs/guides). */
+  audience: PostAudience;
   title: string;
   description: string;
   /** ISO date (YYYY-MM-DD) */
@@ -71,12 +75,15 @@ export function parseFrontmatter(raw: string): ParsedPost {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error("Frontmatter : date au format YYYY-MM-DD requise");
   const updated = fields.updated ? stripQuotes(fields.updated) : undefined;
   if (updated && !/^\d{4}-\d{2}-\d{2}$/.test(updated)) throw new Error("Frontmatter : updated au format YYYY-MM-DD");
+  const audienceRaw = stripQuotes(fields.audience ?? "entreprise");
+  if (audienceRaw !== "entreprise" && audienceRaw !== "testeur") throw new Error("Frontmatter : audience doit valoir entreprise ou testeur");
   const cover = fields.cover ? stripQuotes(fields.cover) : undefined;
   if (cover && !cover.startsWith("/blog/")) throw new Error("Frontmatter : cover doit etre un chemin public sous /blog/ (fichier dans public/blog/)");
   const cover_alt = fields.cover_alt ? stripQuotes(fields.cover_alt) : undefined;
   if (cover && !cover_alt) throw new Error("Frontmatter : cover_alt requis quand cover est defini");
   return {
     frontmatter: {
+      audience: audienceRaw,
       title,
       description,
       date,

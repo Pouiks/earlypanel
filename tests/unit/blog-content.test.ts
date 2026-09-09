@@ -42,6 +42,11 @@ describe("parseFrontmatter", () => {
     expect(p.frontmatter.tags).toEqual([]);
     expect(p.body).toBe("Corps");
   });
+  it("audience : entreprise par défaut, testeur accepté, autre refusé", () => {
+    expect(parseFrontmatter(SAMPLE).frontmatter.audience).toBe("entreprise");
+    expect(parseFrontmatter("---\ntitle: A\ndescription: B\ndate: 2026-01-02\naudience: testeur\n---\nx").frontmatter.audience).toBe("testeur");
+    expect(() => parseFrontmatter("---\ntitle: A\ndescription: B\ndate: 2026-01-02\naudience: client\n---\nx")).toThrow(/audience/);
+  });
   it("cover : chemin public sous /blog/ et cover_alt obligatoire", () => {
     const ok = parseFrontmatter("---\ntitle: A\ndescription: B\ndate: 2026-01-02\ncover: /blog/a/cover.webp\ncover_alt: Schéma\n---\nx");
     expect(ok.frontmatter.cover).toBe("/blog/a/cover.webp");

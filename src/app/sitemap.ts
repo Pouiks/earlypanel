@@ -16,14 +16,17 @@ import type { MetadataRoute } from "next";
  */
 
 import { SITE_URL } from "@/lib/site";
-import { getAllPosts } from "@/lib/blog";
+import { getAllPosts, postHref } from "@/lib/blog";
 
 const BASE_URL = SITE_URL;
 const CONTENT_UPDATED = new Date("2026-09-07");
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const posts = await getAllPosts();
+  const allPosts = await getAllPosts();
+  const posts = allPosts.filter((p) => p.audience === "entreprise");
+  const guides = allPosts.filter((p) => p.audience === "testeur");
   const latest = posts[0]?.date ? new Date(posts[0].date) : CONTENT_UPDATED;
+  const latestGuide = guides[0]?.date ? new Date(guides[0].date) : CONTENT_UPDATED;
   return [
     { url: BASE_URL, lastModified: CONTENT_UPDATED, changeFrequency: "weekly", priority: 1.0 },
     { url: `${BASE_URL}/entreprises`, lastModified: CONTENT_UPDATED, changeFrequency: "weekly", priority: 0.9 },
@@ -46,7 +49,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Blog : index + articles (content/blog/*.md, brouillons exclus)
     { url: `${BASE_URL}/blog`, lastModified: latest, changeFrequency: "weekly", priority: 0.7 },
     ...posts.map((p) => ({
-      url: `${BASE_URL}/blog/${p.slug}`,
+      url: `${BASE_URL}${postHref(p)}`,
+      lastModified: new Date(p.updated ?? p.date),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })),
+
+    // Guides testeurs : second univers, sous /testeurs
+    { url: `${BASE_URL}/testeurs/guides`, lastModified: latestGuide, changeFrequency: "weekly" as const, priority: 0.7 },
+    ...guides.map((p) => ({
+      url: `${BASE_URL}${postHref(p)}`,
       lastModified: new Date(p.updated ?? p.date),
       changeFrequency: "monthly" as const,
       priority: 0.6,

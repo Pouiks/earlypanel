@@ -25,7 +25,7 @@ export default function Nav({ audience }: { audience?: NavAudience }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [session, setSession] = useState<SessionState | null>(null);
 
-  const resolved: NavAudience = audience ?? (pathname === "/testeurs" ? "tester" : "business");
+  const resolved: NavAudience = audience ?? (pathname === "/testeurs" || pathname.startsWith("/testeurs/") ? "tester" : "business");
   const isTester = resolved === "tester";
 
   useEffect(() => { setMenuOpen(false); }, [pathname]);
@@ -58,9 +58,10 @@ export default function Nav({ audience }: { audience?: NavAudience }) {
 
   const links = isTester
     ? [
-        { href: "#how", label: "Comment ça marche" },
-        { href: "#pay", label: "Rémunération" },
-        { href: "#faq", label: "FAQ" },
+        { href: "/testeurs#how", label: "Comment ça marche" },
+        { href: "/testeurs#pay", label: "Rémunération" },
+        { href: "/testeurs/guides", label: "Guides" },
+        { href: "/testeurs#faq", label: "FAQ" },
       ]
     : [
         { href: "/#process", label: "Comment ça marche" },
@@ -81,7 +82,7 @@ export default function Nav({ audience }: { audience?: NavAudience }) {
   );
 
   const primaryCta = isTester ? (
-    <a href="#register" className="nav-cta" onClick={close}>Rejoindre le panel</a>
+    <a href="/testeurs#register" className="nav-cta" onClick={close}>Rejoindre le panel</a>
   ) : (
     <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="nav-cta" onClick={close}>Réserver un appel</a>
   );

@@ -9,7 +9,7 @@ function esc(s: string): string {
 }
 
 export async function GET() {
-  const posts = await getAllPosts();
+  const posts = await getAllPosts({ audience: "entreprise" });
   const items = posts.map((p) => {
     const url = `${SITE_URL}/blog/${p.slug}`;
     return `    <item>

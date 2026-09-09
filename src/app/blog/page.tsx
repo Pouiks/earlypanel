@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import Image from "next/image";
 import Nav from "@/components/layout/Nav";
 import Footer from "@/components/layout/Footer";
 import BreadcrumbJsonLd from "@/components/ui/BreadcrumbJsonLd";
+import PostList from "@/components/blog/PostList";
 import { getAllPosts } from "@/lib/blog";
-import { formatPostDate } from "@/lib/blog-content";
 import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -23,7 +21,7 @@ export const metadata: Metadata = {
 };
 
 export default async function BlogIndexPage() {
-  const posts = await getAllPosts();
+  const posts = await getAllPosts({ audience: "entreprise" });
   return (
     <>
       <BreadcrumbJsonLd items={[{ name: "Accueil", url: SITE_URL }, { name: "Blog", url: `${SITE_URL}/blog` }]} />
@@ -40,31 +38,7 @@ export default async function BlogIndexPage() {
         {posts.length === 0 ? (
           <p className="blog-empty">Premiers articles en préparation.</p>
         ) : (
-          <ul className="blog-list">
-            {posts.map((p) => (
-              <li key={p.slug} className={p.cover ? "blog-card has-cover" : "blog-card"}>
-                {p.cover && (
-                  <Link href={`/blog/${p.slug}`} className="blog-card-thumb" aria-hidden tabIndex={-1}>
-                    <Image src={p.cover} alt="" fill sizes="(max-width: 640px) 100vw, 220px" />
-                  </Link>
-                )}
-                <div className="blog-card-body">
-                <div className="blog-card-meta">
-                  <time dateTime={p.date}>{formatPostDate(p.date)}</time>
-                  <span aria-hidden>·</span>
-                  <span>{p.readingMinutes} min de lecture</span>
-                </div>
-                <h2><Link href={`/blog/${p.slug}`}>{p.title}</Link></h2>
-                <p>{p.description}</p>
-                {p.tags.length > 0 && (
-                  <div className="blog-tags">
-                    {p.tags.map((t) => <span key={t} className="blog-tag">{t}</span>)}
-                  </div>
-                )}
-                </div>
-              </li>
-            ))}
-          </ul>
+          <PostList posts={posts} />
         )}
       </main>
       <Footer variant="b2b" />

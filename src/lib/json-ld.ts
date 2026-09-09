@@ -134,6 +134,8 @@ export interface ArticleJsonLdInput {
   tags?: string[];
   /** URL absolue de l'image de couverture ; sinon l'image OG du site. */
   image?: string;
+  /** Rubrique parente (Blog entreprise par defaut, ou Guides testeurs). */
+  section?: { name: string; url: string };
 }
 
 /** Article de blog : auteur et editeur = l'organisation, image OG par defaut. */
@@ -153,7 +155,12 @@ export function articleJsonLd(a: ArticleJsonLdInput) {
     publisher: { "@id": ORGANIZATION_ID },
     image: a.image ?? `${SITE_URL}/og-image.png`,
     ...(a.tags && a.tags.length > 0 ? { keywords: a.tags.join(", ") } : {}),
-    isPartOf: { "@type": "Blog", "@id": `${SITE_URL}/blog#blog`, name: "Blog earlypanel", url: `${SITE_URL}/blog` },
+    isPartOf: {
+      "@type": "Blog",
+      "@id": `${a.section?.url ?? `${SITE_URL}/blog`}#blog`,
+      name: a.section?.name ?? "Blog earlypanel",
+      url: a.section?.url ?? `${SITE_URL}/blog`,
+    },
   };
 }
 

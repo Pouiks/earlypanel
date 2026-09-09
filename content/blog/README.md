@@ -17,6 +17,7 @@ cover_alt: "Ce que montre l'image, en une phrase."
 ---
 ```
 
+- `audience` : `entreprise` (défaut, publié sous `/blog/<slug>`) ou `testeur` (publié sous `/testeurs/guides/<slug>`, navigation et appel à l'action testeurs). Les deux univers ne se mélangent jamais : un guide testeur n'apparaît pas dans le blog entreprise, ni dans son flux RSS.
 - `title`, `description`, `date` sont obligatoires.
 - `updated` : optionnel, uniquement pour une vraie mise à jour de fond.
 - `tags` : 1 à 3, en minuscules. Le premier s'affiche sous le titre.
@@ -41,7 +42,7 @@ cover_alt: "Ce que montre l'image, en une phrase."
 - Markdown standard : `##` pour les sections (elles alimentent le sommaire automatique), `###` pour les sous-parties, listes, gras, liens. Pas de HTML.
 - Pas de `#` de niveau 1 : le titre vient du frontmatter.
 - Longueur utile : 900 à 1 500 mots. Au-delà, couper en deux articles qui se lient.
-- Liens internes en chemin relatif : `/entreprises`, `/test-maquette-figma`, `/test-pre-lancement-staging`, `/test-conversion-funnel`, `/agences`, `/blog/<autre-slug>`.
+- Liens internes en chemin relatif : `/entreprises`, `/test-maquette-figma`, `/test-pre-lancement-staging`, `/test-conversion-funnel`, `/agences`, `/blog/<autre-slug>`. Côté testeur : `/testeurs`, `/testeurs#register`, `/securite`, `/testeurs/guides/<autre-slug>`.
 - Le bouton « Réserver un appel » et les articles suivants sont ajoutés automatiquement en fin d'article : ne pas les écrire dans le corps.
 
 ## Règles de fond
