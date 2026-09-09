@@ -24,7 +24,7 @@ export async function GET(
 
   const { data: pts } = await admin
     .from("project_testers")
-    .select("id, tester_id, status, started_at, submitted_at, staff_rating, staff_note, tester:testers(id, first_name, last_name, email, quality_score, tier)")
+    .select("id, tester_id, status, started_at, submitted_at, staff_rating, staff_note, tester:testers(id, first_name, last_name, email, quality_score, tier, job_title, devices)")
     .eq("project_id", projectId)
     .in("status", ["in_progress", "completed"])
     .order("submitted_at", { ascending: false });
@@ -41,7 +41,7 @@ export async function GET(
     pts.map(async (pt) => {
       const { data: rawAnswers } = await admin
         .from("project_tester_answers")
-        .select("question_id, answer_text, image_urls, updated_at")
+        .select("question_id, answer_text, image_urls, updated_at, reviewed_at")
         .eq("project_id", projectId)
         .eq("tester_id", pt.tester_id);
 
