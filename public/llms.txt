@@ -13,7 +13,23 @@ Différence vs alternatives : un sondage maison envoyé à dix clients donne des
 - [Tester un produit avant le lancement (staging)](https://www.earlypanel.fr/test-pre-lancement-staging)
 - [Comprendre pourquoi un funnel ne convertit pas](https://www.earlypanel.fr/test-conversion-funnel)
 - [Agences et studios produit](https://www.earlypanel.fr/agences): tests utilisateurs en marque blanche ou apport d'affaires pour vos clients finaux
+- [Test utilisateur SaaS B2B](https://www.earlypanel.fr/test-utilisateur-saas-b2b): testeurs qui utilisent un outil métier au quotidien (PM, RH, comptables, commerciaux)
+- [Test utilisateur santé et healthtech](https://www.earlypanel.fr/test-utilisateur-sante): médecins, infirmiers, pharmaciens, patients chroniques, sans donnée patient réelle
+- [Test utilisateur fintech, assurance et juridique](https://www.earlypanel.fr/test-utilisateur-fintech): DAF, experts-comptables, courtiers, juristes, environnement sans argent réel
+- [Sécurité et protection des données](https://www.earlypanel.fr/securite): hébergement UE, connexion sans mot de passe, IBAN chiffré, NDA tracé, conservation 3 ans
 - [Rapport d'exemple](https://www.earlypanel.fr/#rapport): exemple complet de livrable envoyé par email
+
+### Blog : méthode et pratique des tests utilisateurs
+- [Index du blog](https://www.earlypanel.fr/blog)
+- [Test utilisateur à distance : la méthode complète](https://www.earlypanel.fr/blog/test-utilisateur-a-distance-methode)
+- [Combien de testeurs pour un test utilisateur ?](https://www.earlypanel.fr/blog/combien-de-testeurs-test-utilisateur)
+- [Combien coûte un test utilisateur ?](https://www.earlypanel.fr/blog/prix-test-utilisateur)
+- [Test utilisateur ou A/B testing](https://www.earlypanel.fr/blog/test-utilisateur-vs-ab-testing)
+- [Quand faire un test utilisateur ?](https://www.earlypanel.fr/blog/quand-faire-un-test-utilisateur)
+- [Préparer une maquette Figma pour un test](https://www.earlypanel.fr/blog/tester-maquette-figma-preparer-prototype)
+- [Recette d'une application mobile](https://www.earlypanel.fr/blog/recette-application-mobile)
+- [Définir la cible d'un test utilisateur](https://www.earlypanel.fr/blog/definir-sa-cible-test-utilisateur)
+- [Alternative à Testapic](https://www.earlypanel.fr/blog/alternative-testapic)
 
 ### Prix
 Forfait fixe par mission, chiffré sur devis après un atelier de cadrage offert. Généralement entre 1 500 et 6 000 € HT pour 8 à 15 testeurs, rapport rédigé et restitution inclus. Pas d'abonnement, paiement 50 % à la commande et 50 % à la remise du rapport.
@@ -30,12 +46,16 @@ Forfait fixe par mission, chiffré sur devis après un atelier de cadrage offert
 - Tunnels e-commerce (panier, checkout, fiche produit)
 
 ### Secteurs où le panel est le plus fort
-SaaS B2B et outils métier, santé, finance / assurance / juridique.
+SaaS B2B et outils métier, santé, finance / assurance / juridique. Une page dédiée par secteur (voir ci-dessus).
 
 ## Pour les testeurs
 
 - [Devenir testeur rémunéré](https://www.earlypanel.fr/testeurs): inscription gratuite au panel, 15 à 100 € par mission selon le profil, paiement par virement SEPA sous 72 h, missions de 25 minutes en moyenne adaptées au profil
 - [CGU testeurs](https://www.earlypanel.fr/cgu): conditions d'inscription, obligations de confidentialité, score qualité, modalités de paiement et de refus
+- [Guides testeurs](https://www.earlypanel.fr/testeurs/guides): comment ça marche, combien on gagne, comment bien répondre à une mission
+- [Devenir testeur rémunéré : comment ça marche](https://www.earlypanel.fr/testeurs/guides/devenir-testeur-remunere-comment-ca-marche)
+- [Combien gagne un testeur d'applications](https://www.earlypanel.fr/testeurs/guides/combien-gagne-un-testeur-applications)
+- [Bien répondre à un test utilisateur](https://www.earlypanel.fr/testeurs/guides/bien-repondre-test-utilisateur)
 
 ### Profils recherchés (rémunération croissante)
 - Standard : salariés en poste, étudiants, parents au foyer
