@@ -76,6 +76,9 @@ export interface Tester {
   // authentifiee (granularite 1 h). NULL = jamais connecte.
   last_login_at: string | null;
   last_seen_at: string | null;
+  // Retention RGPD (migration 044) : avertissement envoye / compte anonymise.
+  retention_warning_sent_at: string | null;
+  anonymized_at: string | null;
 }
 
 export type TesterInsert = Pick<Tester, "email" | "auth_user_id"> &

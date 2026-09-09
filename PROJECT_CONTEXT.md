@@ -386,6 +386,8 @@ POST /api/testers/documents/:projectId/sign
 
 POST /api/testers/missions/:id/start
   ├─ Garde: status ∈ {"nda_signed", "invited"}, projet "active"
+  ├─ Garde: tester_payment_info existe (IBAN), sinon 409 code=payment_info_missing
+  │   (decision fondateur 2026-09-09 : bloquer au demarrage, pas a l'invitation)
   ├─ Garde: start_date non futur, end_date non passé
   └─ UPDATE project_testers: status="in_progress", started_at=now
 
@@ -503,6 +505,8 @@ GET /api/cron/project-reminders (cron quotidien, 09h00 UTC)
 
 > Idempotence garantie par les colonnes `nda_reminder_sent_at` (cooldown 3j) et `project_midway_reminder_sent_at` (one-shot par projet/testeur).
 >
+> **Rétention RGPD** (`/api/cron/retention`, appelé par `daily-reminders`, migrations 043/044) : cible les testeurs non anonymisés inactifs depuis ≥ 2 ans 9 mois (`COALESCE(last_seen_at, last_login_at, created_at)`). Étape 1 : email d'avertissement (`retention_warning_sent_at`), ré-envoyé seulement si le testeur est revenu puis redevenu inactif. Étape 2 : à 3 ans, averti depuis ≥ 90 j sans retour → suppression `tester_payment_info`, UPDATE atomique `anonymized_at IS NULL` avec `anonymizedTesterPatch()` (identité/coordonnées/naissance effacées, `status='inactive'`), suppression de l'auth user, audit `tester.anonymized` sans donnée nominative. Jamais anonymisé si un versement > 0 € est encore dû (`skipped_pending_payout` dans le compte-rendu). Réponses, payouts, ledger et PDF NDA conservés. `?dry_run=1`, `?limit=N`. Logique pure dans `src/lib/tester-retention.ts` (tests).
+
 > **Relance profil incomplet** (`/api/cron/profile-reminders`, appelé par `daily-reminders`) : testeurs `status='pending'`, `profile_completed=false`, inscrits depuis plus de 2 jours. Magic link vers `/app/onboarding`, liste des champs manquants (`computeProfileCompleteness`). Cooldown 5j (`profile_reminder_sent_at`), plafond 3 relances (`profile_reminder_count`), le 3e email annonce la mise en pause. 5j après la 3e relance sans complétion : `pending → inactive` (filtre atomique sur le statut précédent). Réversible : à la fin de l'onboarding, un testeur `inactive` est repassé `pending` dans le même UPDATE pour que le trigger puisse l'activer. `?dry_run=1` liste les cibles sans rien envoyer, `?limit=N` borne un passage.
 >
 > Logique partagée dans `src/lib/profile-reminder.ts` (`sendProfileReminder`, `describeReminderState`). Vue staff `/staff/dashboard/relances` (API `GET /api/staff/testers/profile-reminders`) : état de relance par testeur, champs manquants, bouton « Relancer maintenant » (`POST /api/staff/testers/[id]/profile-reminder`, plafond 3 respecté, audit `tester.profile_reminder_manual`).
@@ -743,7 +747,8 @@ RETURN v_new_score;
 - Un seul NDA par projet (UNIQUE sur `project_id`).
 - Variables : syntaxe `{{variable_name}}` dans le HTML.
 - Signature : statut `nda_sent` requis. Génère PDF + hash SHA-256 + upload.
-- Bucket `documents` : créé comme public si absent.
+- Bucket `documents` : **privé**, forcé par `ensureDocumentsBucketPrivate()` à chaque signature (jamais public, cf. C-règle plus bas).
+- Consultation staff : `GET /api/staff/projects/[id]/testers/[testerId]/nda` (URL signée 5 min, `?download=1` pour forcer le téléchargement, audit `nda.viewed_by_staff`). Lien « Voir le NDA signé » + IP + empreinte dans `ProjectTestersTab`.
 
 ### 7.10 Notifications testeur
 
@@ -801,6 +806,7 @@ profil = 1 si (address OR city OR postal_code OR birth_date) manquant, sinon 0
 | profile_reminder_sent_at | TIMESTAMPTZ | migration 037, idempotence cron profile-reminders |
 | profile_reminder_count | INTEGER | NOT NULL DEFAULT 0, plafond 3 relances |
 | last_login_at | TIMESTAMPTZ | migration 043, ouverture de session (callback magic link). NULL = jamais connecté |
+| retention_warning_sent_at, anonymized_at | TIMESTAMPTZ | migration 044, idempotence du cron `/api/cron/retention` (avertissement 90 j avant, anonymisation one-shot à 3 ans d'inactivité). Un testeur anonymisé a `status='inactive'`, email `anonyme-<id>@earlypanel.invalid`, plus d'auth user |
 | last_seen_at | TIMESTAMPTZ | migration 043, dernière requête authentifiée, écrit au plus 1×/h par `getAuthedTester` via `after()`. Base du filtre `activity` staff et de la rétention RGPD 3 ans (`src/lib/tester-activity.ts`) |
 
 #### `staff_members`

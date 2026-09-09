@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function ConfidentialitePage() {
   return (
-    <LegalLayout title="Politique de confidentialité" lastUpdated="7 septembre 2026">
+    <LegalLayout title="Politique de confidentialité" lastUpdated="9 septembre 2026">
       <h2>1. Responsable du traitement</h2>
       <p>
         Le responsable du traitement de vos données personnelles est l&apos;éditeur du site earlypanel.fr (cf. <a href="/mentions-legales">Mentions légales</a>). Il est joignable à l&apos;adresse <a href="mailto:contact@earlypanel.fr">contact@earlypanel.fr</a>.
@@ -60,7 +60,8 @@ export default function ConfidentialitePage() {
 
       <h2>4. Durée de conservation</h2>
       <ul>
-        <li><strong>Données de profil</strong> : pendant la durée d&apos;inscription au panel + 3 ans après la dernière connexion. Vous pouvez supprimer votre compte à tout moment, ce qui déclenche l&apos;effacement immédiat (sauf obligation légale contraire).</li>
+        <li><strong>Données de profil</strong> : pendant la durée d&apos;inscription au panel + 3 ans après la dernière connexion. 90 jours avant l&apos;échéance, un email vous prévient ; sans connexion de votre part, le compte est anonymisé automatiquement (identité, coordonnées, date de naissance et IBAN effacés, accès supprimé). Vous pouvez supprimer votre compte à tout moment depuis votre espace, ce qui déclenche l&apos;effacement immédiat (sauf obligation légale contraire).</li>
+        <li><strong>Documents contractuels et écritures de paiement</strong> (NDA signés, historique des versements) : conservés pendant les durées légales de conservation (preuve contractuelle, obligations comptables), rattachés à un identifiant anonyme une fois le compte anonymisé.</li>
         <li><strong>Logs techniques</strong> : 12 mois maximum.</li>
         <li><strong>Emails transactionnels</strong> : conservation par Resend selon leur politique (7 jours par défaut).</li>
       </ul>
@@ -112,7 +113,7 @@ export default function ConfidentialitePage() {
 
       <h2>9. Sécurité</h2>
       <p>
-        Nous mettons en œuvre des mesures techniques et organisationnelles pour protéger vos données : chiffrement TLS, contrôle d&apos;accès strict (Row Level Security côté base), audit log des actions sensibles, sauvegardes chiffrées, principe du moindre privilège.
+        Nous mettons en œuvre des mesures techniques et organisationnelles pour protéger vos données : chiffrement TLS, contrôle d&apos;accès strict (Row Level Security côté base), audit log des actions sensibles, sauvegardes chiffrées, principe du moindre privilège. Le détail est décrit sur la page <a href="/securite">Sécurité et données</a>.
       </p>
 
       <h2>10. Modifications</h2>
