@@ -78,6 +78,7 @@ export default function Footer({ variant = "index" }: FooterProps) {
                 <ul>
                   <li><Link href="/mentions-legales">Mentions légales</Link></li>
                   <li><Link href="/confidentialite">Politique de confidentialité</Link></li>
+                  <li><Link href="/securite">Sécurité et données</Link></li>
                   <li><Link href="/cgv">CGV</Link></li>
                   <li><Link href="/cgu">CGU</Link></li>
                   <li><a href="mailto:contact@earlypanel.fr">contact@earlypanel.fr</a></li>
@@ -104,6 +105,7 @@ export default function Footer({ variant = "index" }: FooterProps) {
                 <ul>
                   <li><Link href="/mentions-legales">Mentions légales</Link></li>
                   <li><Link href="/confidentialite">Confidentialité</Link></li>
+                  <li><Link href="/securite">Sécurité et données</Link></li>
                   <li><Link href="/cgv">CGV</Link></li>
                   <li><a href="mailto:contact@earlypanel.fr">contact@earlypanel.fr</a></li>
                 </ul>
@@ -136,6 +138,7 @@ export default function Footer({ variant = "index" }: FooterProps) {
                 <ul>
                   <li><Link href="/mentions-legales">Mentions légales</Link></li>
                   <li><Link href="/confidentialite">Confidentialité</Link></li>
+                  <li><Link href="/securite">Sécurité et données</Link></li>
                   <li><Link href="/cgu">CGU</Link></li>
                   <li><a href="mailto:contact@earlypanel.fr">contact@earlypanel.fr</a></li>
                 </ul>

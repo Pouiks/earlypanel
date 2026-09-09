@@ -9,10 +9,13 @@ import Footer from "@/components/layout/Footer";
 export default function LegalLayout({
   title,
   lastUpdated,
+  eyebrow = "Document légal",
   children,
 }: {
   title: string;
   lastUpdated: string;
+  /** Surtitre : « Document légal » par defaut, « Sécurité et données » pour /securite. */
+  eyebrow?: string;
   children: React.ReactNode;
 }) {
   return (
@@ -20,7 +23,7 @@ export default function LegalLayout({
       <Nav />
       <main className="legal-main">
         <div className="legal-inner">
-          <div className="legal-eyebrow">Document légal</div>
+          <div className="legal-eyebrow">{eyebrow}</div>
           <h1 className="legal-title">{title}</h1>
           <p className="legal-updated">Dernière mise à jour : {lastUpdated}</p>
           <div className="legal-content">{children}</div>
