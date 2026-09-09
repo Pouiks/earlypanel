@@ -14,7 +14,10 @@
     "e2e:run": "node scripts/e2e/run.mjs",
     "e2e:journey": "node scripts/e2e/user-journey.mjs",
     "e2e:availability": "node scripts/e2e/availability-campaign.mjs",
-    "e2e:cleanup": "node scripts/e2e/cleanup.mjs"
+    "e2e:cleanup": "node scripts/e2e/cleanup.mjs",
+    "demo:seed": "node --no-warnings scripts/seed-demo-project.mjs",
+    "demo:recreate": "node --no-warnings scripts/seed-demo-project.mjs --recreate",
+    "demo:delete": "node --no-warnings scripts/seed-demo-project.mjs --delete"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

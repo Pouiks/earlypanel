@@ -1402,6 +1402,7 @@ Doc complète : [`tests/CLAUDE.md`](tests/CLAUDE.md). CLAUDE.md ciblés par zone
 | **GitHub Actions** | CI sur push toutes branches + PR vers main | ✅ Implémenté |
 | **CLAUDE.md ciblés** | Règles non-négociables par zone (lus auto par les agents) | ✅ Implémenté |
 | **Scripts E2E API** (`scripts/e2e/`) | Parcours complet client→projet→scénario→NDA→mission→notation→payout via les vraies routes, 21 étapes assertées. `npm run e2e:run` / `npm run e2e:cleanup` (cascade + vérif zéro reste). Cf. [`scripts/e2e/README.md`](scripts/e2e/README.md) | ✅ Implémenté |
+| **Jeu de démo** (`scripts/seed-demo-project.mjs`) | Client fictif « Kalvi » + projet actif 3 mois « Parcours de création de devis (v2) » (3 scénarios, critères, questions typées + 1 conditionnelle, 2 questions générales, NDA par défaut). `npm run demo:seed` / `demo:recreate` (recale les dates sur aujourd'hui) / `demo:delete`. Insère en direct via service role, aucun testeur assigné. | ✅ Implémenté |
 | Playwright (E2E navigateur) | Parcours critiques via UI réelle (inscription, login, NDA) | ❌ À venir |
 | Tests "guards" | Cohérence code ↔ CLAUDE.md (ex: search_path migrations) | ❌ À venir |
 | Smoke post-deploy | Healthcheck + POST IBAN test après deploy | ❌ À venir |
