@@ -1036,9 +1036,10 @@ a.announce { display: block; text-decoration: none; }
 .gl-wrap { position: relative; display: inline; }
 .gl-term, .blog-prose a.gl-term { color: inherit; text-decoration: underline dotted; text-decoration-color: rgba(10,122,90,.6); text-decoration-thickness: 1px; text-underline-offset: 3px; cursor: help; transition: color .15s, text-decoration-color .15s; }
 .gl-term:hover, .gl-term:focus-visible, .blog-prose a.gl-term:hover, .blog-prose a.gl-term:focus-visible { color: var(--green); text-decoration-style: solid; text-decoration-color: var(--green); outline: none; }
-.gl-tip { position: absolute; top: calc(100% + 8px); left: 0; z-index: 60; width: min(320px, calc(100vw - 2rem)); padding: 12px 14px 11px; background: var(--black); color: rgba(255,255,255,.88); font-size: 13.5px; font-weight: 400; font-style: normal; line-height: 1.5; letter-spacing: 0; text-align: left; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.18); animation: gl-tip-in .14s ease; }
+.gl-tip { position: fixed; z-index: 1000; padding: 12px 14px 11px; background: var(--black); color: rgba(255,255,255,.88); font-size: 13.5px; font-weight: 400; font-style: normal; line-height: 1.5; letter-spacing: 0; text-align: left; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.18); animation: gl-tip-in .14s ease; }
+/* Pont invisible entre le mot et la carte, pour que la souris puisse traverser l'ecart. */
 .gl-tip::before { content: ""; position: absolute; left: 0; right: 0; top: -10px; height: 10px; }
-.gl-tip-right { left: auto; right: 0; }
+.gl-tip-above::before { top: auto; bottom: -10px; }
 .gl-tip strong { display: block; color: #fff; font-size: 13px; font-weight: 700; margin-bottom: 4px; }
 .gl-tip-more { display: block; margin-top: 8px; font-size: 12px; font-weight: 600; color: #7fd6bb; text-decoration: none; }
 .gl-tip-more:hover, .gl-tip-more:focus-visible { color: #fff; text-decoration: underline; outline: none; }
