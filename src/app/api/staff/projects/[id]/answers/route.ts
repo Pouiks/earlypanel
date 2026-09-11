@@ -4,6 +4,10 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { computeDefaultRewardCents, type TierRewardsMap } from "@/lib/reward-calculator";
 import { checkOrigin, forbiddenOriginResponse } from "@/lib/csrf";
 import { logStaffAction } from "@/lib/audit";
+import { sendEmail } from "@/lib/email";
+import { buildMissionRefusedEmail } from "@/lib/mission-refusal-email";
+import { CONTACT_EMAIL } from "@/lib/cta-links";
+import { SITE_URL } from "@/lib/site";
 
 const BUCKET = "mission-images";
 
@@ -272,6 +276,33 @@ export async function PATCH(
       .eq("id", existingPayout.id);
   }
 
+  // Refus (travail bacle) : le testeur est prevenu par email, avec la note
+  // du staff comme motif (CGU art. 4). Une seule fois, a la premiere notation ;
+  // l'echec d'envoi n'annule pas la notation mais est trace dans l'audit.
+  let refusalEmail: "sent" | "failed" | "skipped" = "skipped";
+  if (sloppy && isFirstRating) {
+    const [{ data: testerRow }, { data: projectMeta }] = await Promise.all([
+      admin.from("testers").select("email, first_name").eq("id", pt.tester_id).maybeSingle(),
+      admin.from("projects").select("title").eq("id", projectId).maybeSingle(),
+    ]);
+    if (testerRow?.email) {
+      const { subject, html } = buildMissionRefusedEmail({
+        firstName: testerRow.first_name ?? null,
+        projectTitle: projectMeta?.title ?? "Mission de test",
+        note,
+        contactEmail: CONTACT_EMAIL,
+        guideUrl: `${SITE_URL}/testeurs/guides/bien-repondre-test-utilisateur`,
+      });
+      try {
+        await sendEmail({ to: testerRow.email, toName: testerRow.first_name ?? undefined, subject, html });
+        refusalEmail = "sent";
+      } catch (err) {
+        console.error("[answers/PATCH] email de refus non envoye:", err instanceof Error ? err.message : err);
+        refusalEmail = "failed";
+      }
+    }
+  }
+
   await logStaffAction(
     {
       staff_id: staff.id,
@@ -287,6 +318,7 @@ export async function PATCH(
         has_note: !!note,
         is_first_rating: isFirstRating,
         reward_tier: rewardTier,
+        refusal_email: refusalEmail,
       },
     },
     request,
@@ -314,5 +346,5 @@ export async function PATCH(
     );
   }
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ success: true, refusal_email: refusalEmail });
 }

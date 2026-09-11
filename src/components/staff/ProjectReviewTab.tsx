@@ -564,10 +564,15 @@ function AnswerCard({
               Travail bâclé : test refusé, non payé, malus de 20 points
             </label>
           )}
+          {sloppy && !alreadyRated && (
+            <p style={{ fontSize: 12, color: "#b45309", margin: 0 }}>
+              Le testeur recevra un email de refus : la note ci-dessous lui sera transmise comme motif.
+            </p>
+          )}
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="Note interne (optionnelle)"
+            placeholder={sloppy ? "Motif du refus (envoyé au testeur par email)" : "Note interne (optionnelle)"}
             rows={2}
             style={{ width: "100%", boxSizing: "border-box", padding: "10px 12px", fontSize: 13, border: "0.5px solid rgba(0,0,0,0.12)", borderRadius: 10, fontFamily: "inherit", resize: "vertical", background: "#fff" }}
           />

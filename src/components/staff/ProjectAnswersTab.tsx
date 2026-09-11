@@ -314,11 +314,16 @@ function SubmissionViewer({
             />
             Marquer comme <strong>travail bâclé</strong> (malus -20)
           </label>
+          {sloppy && (
+            <p style={{ fontSize: 12, color: "#b45309", margin: "-6px 0 10px" }}>
+              Le testeur recevra un email de refus : la note ci-dessous lui sera transmise comme motif.
+            </p>
+          )}
 
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            placeholder="Note interne (optionnelle)"
+            placeholder={sloppy ? "Motif du refus (envoyé au testeur par email)" : "Note interne (optionnelle)"}
             rows={2}
             disabled={saving || !editing}
             style={{

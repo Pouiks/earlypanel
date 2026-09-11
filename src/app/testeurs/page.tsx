@@ -71,7 +71,7 @@ const faqB2C = [
   },
   {
     q: "Que se passe-t-il si mon test est refusé ?",
-    a: "Nous vous écrivons par email pour expliquer précisément pourquoi : réponses trop courtes, hors-sujet, ou copier-coller détecté. Le test n'est pas payé. Votre compte reste actif sauf en cas de récidive (politique 3-strikes). Si vous estimez la décision injustifiée, vous pouvez demander une revue par un autre membre de l'équipe. Tous les retours bâclés sont rejetés pour préserver la qualité du panel.",
+    a: "Nous vous écrivons par email avec le motif : réponses trop courtes, hors sujet, copiées, ou test visiblement non réalisé. Le test n'est pas payé et votre score de qualité baisse. Votre compte reste actif, sauf en cas de récidive. Si vous estimez la décision injustifiée, répondez à cet email : nous réexaminons vos réponses et vous répondons. Tous les retours bâclés sont refusés pour préserver la qualité du panel.",
   },
   {
     q: "Comment earlypanel protège-t-il mes données personnelles ?",

@@ -61,7 +61,7 @@ export default function CguPage() {
 
       <h2>6. Score qualité</h2>
       <p>
-        Chaque testeur dispose d&apos;un score qualité. Ce score évolue selon la qualité des contributions (réponses complètes, précises, dans les délais) et conditionne l&apos;accès à certaines missions et niveaux de rémunération. Les réponses jugées insuffisantes sont refusées, non payées, et peuvent entraîner une suspension du compte en cas de récidive.
+        Chaque testeur dispose d&apos;un score qualité. Ce score évolue selon la qualité des contributions (réponses complètes, précises, dans les délais) et conditionne l&apos;accès à certaines missions et niveaux de rémunération. Les réponses jugées insuffisantes sont refusées, non payées, et peuvent entraîner une suspension du compte en cas de récidive. Le testeur est informé du motif par email et peut contester en y répondant : earlypanel réexamine les réponses.
       </p>
 
       <h2>7. Propriété intellectuelle</h2>
