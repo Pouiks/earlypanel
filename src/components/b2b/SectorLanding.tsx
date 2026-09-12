@@ -132,10 +132,14 @@ export default function SectorLanding(p: SectorLandingProps) {
         {p.problem && (
           <>
             <section className="usecases">
-              <div className="uc-inner">
-                <div className="sec-eye">{p.problem.eyebrow ?? "Le problème"}</div>
-                <h2 className="sec-title">{p.problem.title}</h2>
-                {p.problem.paragraphs.map((t) => <p className="sec-sub" key={t}>{glossify(t)}</p>)}
+              <div className="uc-inner problem-inner">
+                <div>
+                  <div className="sec-eye">{p.problem.eyebrow ?? "Le problème"}</div>
+                  <h2 className="sec-title">{p.problem.title}</h2>
+                </div>
+                <div className="problem-text">
+                  {p.problem.paragraphs.map((t) => <p key={t}>{glossify(t)}</p>)}
+                </div>
               </div>
             </section>
             <Separator />
