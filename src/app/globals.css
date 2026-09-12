@@ -170,6 +170,7 @@ body { font-family: var(--font); background: #fff; color: var(--black); overflow
 .process { padding: 6rem clamp(1.5rem,5vw,4rem); }
 .process-inner { max-width: var(--content-width); margin: 0 auto; }
 .steps-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 0.5px solid var(--border); border-radius: 20px; overflow: hidden; margin-top: 3rem; }
+.steps-grid.steps-grid--3 { grid-template-columns: repeat(3,1fr); }
 .step-card { background: #fff; padding: 2rem; }
 .step-card:hover { background: #fafafa; }
 .step-num { font-size: 11px; font-weight: 700; color: var(--green); letter-spacing: .08em; margin-bottom: 1rem; display: flex; align-items: center; gap: 6px; }
@@ -475,7 +476,7 @@ body { font-family: var(--font); background: #fff; color: var(--black); overflow
   .hero-sub-index { max-width: 100%; }
 
   /* Grilles */
-  .steps-grid { grid-template-columns: 1fr; }
+  .steps-grid, .steps-grid.steps-grid--3 { grid-template-columns: 1fr; }
   .proof-grid { grid-template-columns: 1fr; }
   .diff-inner { grid-template-columns: 1fr; }
   .diff-right { display: none; }

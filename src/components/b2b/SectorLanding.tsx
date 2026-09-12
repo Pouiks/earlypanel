@@ -14,7 +14,9 @@ import { SITE_URL } from "@/lib/site";
 import { glossify } from "@/components/ui/glossify";
 
 export interface FaqItem { q: string; a: string }
-export interface Card { title: string; desc: string; example?: string }
+export type CardIcon =
+  | "person" | "flow" | "user-plus" | "sliders" | "zap" | "card" | "tag" | "layout" | "server" | "trending-down";
+export interface Card { title: string; desc: string; example?: string; /** Pictogramme de la carte (defaut : person / flow selon la grille). */ icon?: CardIcon }
 export interface Step { title: string; body: string; pill: string }
 
 export interface SectorLandingProps {
@@ -31,7 +33,13 @@ export interface SectorLandingProps {
    * hero, avant les grilles de cartes.
    */
   problem?: { eyebrow?: string; title: string; paragraphs: string[] };
-  profiles: { eyebrow: string; title: string; sub: string; cards: Card[] };
+  /**
+   * Grille "qui teste". Pertinente quand le secteur definit les profils
+   * (DAF, infirmier...). Omise sur les landings par situation, ou les
+   * testeurs dependent du client et la grille ne dirait rien de specifique.
+   */
+  profiles?: { eyebrow: string; title: string; sub: string; cards: Card[] };
+  /** Grille "ce qu'on teste" : 3 a 6 cartes concretes, un pictogramme par carte. */
   parcours: { eyebrow: string; title: string; sub: string; cards: Card[] };
   steps: { eyebrow: string; title: string; sub: string; items: Step[] };
   deliverable: { title: string; items: { title: string; body: string }[] };
@@ -50,12 +58,27 @@ const DEFAULT_STATS = [
   { n: "NDA", l: "Signé avant tout échange, côté client et testeurs" },
 ];
 
-const PersonIcon = (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A7A5A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
-);
-const FlowIcon = (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A7A5A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="3" /><path d="M7 12h10M13 8l4 4-4 4" /></svg>
-);
+/** Pictogrammes des cartes (trait 2px, vert du site). */
+const ICON_PATHS: Record<CardIcon, ReactNode> = {
+  person: <><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></>,
+  flow: <><rect x="3" y="3" width="18" height="18" rx="3" /><path d="M7 12h10M13 8l4 4-4 4" /></>,
+  "user-plus": <><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="8.5" cy="7" r="4" /><path d="M20 8v6M23 11h-6" /></>,
+  sliders: <><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" /></>,
+  zap: <><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" /></>,
+  card: <><rect x="1" y="4" width="22" height="16" rx="2" /><path d="M1 10h22" /></>,
+  tag: <><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" /><path d="M7 7h.01" /></>,
+  layout: <><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M3 9h18M9 21V9" /></>,
+  server: <><rect x="2" y="2" width="20" height="8" rx="2" /><rect x="2" y="14" width="20" height="8" rx="2" /><path d="M6 6h.01M6 18h.01" /></>,
+  "trending-down": <><path d="M23 18l-9.5-9.5-5 5L1 6" /><path d="M17 18h6v-6" /></>,
+};
+
+function CardIconSvg({ name }: { name: CardIcon }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A7A5A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      {ICON_PATHS[name]}
+    </svg>
+  );
+}
 const CheckIcon = (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0A7A5A" strokeWidth="2.5" strokeLinecap="round"><path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
 );
@@ -119,25 +142,28 @@ export default function SectorLanding(p: SectorLandingProps) {
           </>
         )}
 
-        <section className="usecases">
-          <div className="uc-inner">
-            <div className="sec-eye">{p.profiles.eyebrow}</div>
-            <h2 className="sec-title">{p.profiles.title}</h2>
-            <p className="sec-sub">{glossify(p.profiles.sub)}</p>
-            <div className="uc-grid">
-              {p.profiles.cards.map((c) => (
-                <div className="uc-card" key={c.title}>
-                  <div className="uc-icon">{PersonIcon}</div>
-                  <h3>{c.title}</h3>
-                  <p>{glossify(c.desc)}</p>
-                  {c.example && <span className="uc-example">{c.example}</span>}
+        {p.profiles && (
+          <>
+            <section className="usecases">
+              <div className="uc-inner">
+                <div className="sec-eye">{p.profiles.eyebrow}</div>
+                <h2 className="sec-title">{p.profiles.title}</h2>
+                <p className="sec-sub">{glossify(p.profiles.sub)}</p>
+                <div className="uc-grid">
+                  {p.profiles.cards.map((c) => (
+                    <div className="uc-card" key={c.title}>
+                      <div className="uc-icon"><CardIconSvg name={c.icon ?? "person"} /></div>
+                      <h3>{c.title}</h3>
+                      <p>{glossify(c.desc)}</p>
+                      {c.example && <span className="uc-example">{c.example}</span>}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <Separator />
+              </div>
+            </section>
+            <Separator />
+          </>
+        )}
 
         <section className="usecases">
           <div className="uc-inner">
@@ -147,7 +173,7 @@ export default function SectorLanding(p: SectorLandingProps) {
             <div className="uc-grid">
               {p.parcours.cards.map((c) => (
                 <div className="uc-card" key={c.title}>
-                  <div className="uc-icon">{FlowIcon}</div>
+                  <div className="uc-icon"><CardIconSvg name={c.icon ?? "flow"} /></div>
                   <h3>{c.title}</h3>
                   <p>{glossify(c.desc)}</p>
                   {c.example && <span className="uc-example">{c.example}</span>}
@@ -164,9 +190,9 @@ export default function SectorLanding(p: SectorLandingProps) {
             <div className="sec-eye">{p.steps.eyebrow}</div>
             <h2 className="sec-title">{p.steps.title}</h2>
             <p className="sec-sub">{glossify(p.steps.sub)}</p>
-            <div className="steps-grid">
+            <div className={`steps-grid${p.steps.items.length === 3 ? " steps-grid--3" : ""}`}>
               {p.steps.items.map((s, i) => (
-                <div className="step-card" key={s.title} style={i === p.steps.items.length - 1 && p.steps.items.length % 2 === 1 ? { gridColumn: "1 / -1", borderTop: "0.5px solid var(--border)" } : undefined}>
+                <div className="step-card" key={s.title} style={p.steps.items.length !== 3 && i === p.steps.items.length - 1 && p.steps.items.length % 2 === 1 ? { gridColumn: "1 / -1", borderTop: "0.5px solid var(--border)" } : undefined}>
                   <div className="step-num">Étape {String(i + 1).padStart(2, "0")}</div>
                   <h3>{s.title}</h3>
                   <p>{glossify(s.body)}</p>

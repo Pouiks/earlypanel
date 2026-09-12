@@ -60,30 +60,14 @@ export default function TestPreLancementPage() {
           "Un test avant lancement earlypanel envoie sur votre staging des profils qui ressemblent à vos futurs clients, avec un parcours précis à effectuer, et documente chaque point où ils hésitent, se trompent ou abandonnent.",
         ],
       }}
-      profiles={{
-        eyebrow: "Qui teste votre produit avant le lancement",
-        title: "Des profils qui ressemblent à vos futurs clients, un groupe par rôle.",
-        sub: "Des gens qui n'ont jamais vu le produit, sélectionnés sur le métier, le niveau digital et l'équipement de votre cible.",
-        cards: [
-          { title: "Vos futurs clients, pas votre équipe", desc: "Métier, taille de structure, contexte d'usage : on part de votre cible de lancement et on pioche à la main dans le panel.", example: "Sélection manuelle" },
-          { title: "Un petit groupe par rôle", desc: "Admin, utilisateur final, invité : chaque rôle a son parcours et ses testeurs, pour couvrir le produit tel qu'il sera vécu.", example: "Admin · Utilisateur · Invité" },
-          { title: "Des découvreurs", desc: "Aucun testeur ne connaît vos libellés ni vos raccourcis. Ils font ce que fera un inscrit le jour du lancement.", example: "Regard neuf" },
-          { title: "Le niveau digital de votre cible", desc: "Des profils à l'aise ou non avec les outils, pour que les frictions trouvées soient celles de vos vrais utilisateurs.", example: "Novice · Expert" },
-          { title: "Sur leur vrai équipement", desc: "Windows, Mac, mobile personnel, navigateur imposé par l'entreprise : le contexte réel, pas un poste de démo.", example: "Windows · Mac · Mobile" },
-          { title: "Sous NDA, accès temporaires", desc: "Chaque testeur signe avant de recevoir ses identifiants. Les comptes sont créés pour la mission et supprimés après.", example: "NDA · Comptes de test" },
-        ],
-      }}
       parcours={{
         eyebrow: "Ce qu'on teste avant le go-live",
         title: "Les parcours qui décident du lancement.",
-        sub: "Un ou plusieurs parcours cadrés ensemble, chacun avec un critère de réussite observable, sur votre environnement de staging.",
+        sub: "Un ou plusieurs parcours cadrés ensemble, chacun avec un critère de réussite observable, sur votre environnement de staging. Plusieurs rôles utilisateurs ? Un petit groupe de testeurs par rôle.",
         cards: [
-          { title: "Onboarding et premier accès", desc: "De l'invitation à l'écran d'accueil : ce qui est compris, ce qui fait hésiter, où l'on abandonne.", example: "Inscription" },
-          { title: "Première valeur", desc: "L'action qui justifie le produit, réalisée seule, sans documentation ni collègue à côté.", example: "Activation" },
-          { title: "Paiement et souscription", desc: "Choix de l'offre, saisie, confirmation : la compréhension du prix et des engagements avant de cliquer.", example: "Checkout" },
-          { title: "Parcours par rôle", desc: "Un admin qui invite, un utilisateur qui reçoit, un invité qui consulte : chaque rôle vit un produit différent.", example: "Multi-rôles" },
-          { title: "Libellés et messages", desc: "Erreurs, états vides, confirmations : ce que le testeur comprend quand quelque chose ne se passe pas comme prévu.", example: "Messages · États" },
-          { title: "Parcours mobile", desc: "Le même scénario sur téléphone, si votre cible l'utilise ainsi. Les frictions changent avec l'écran.", example: "Mobile" },
+          { icon: "user-plus", title: "Onboarding et premier accès", desc: "De l'invitation à l'écran d'accueil : ce qui est compris, ce qui fait hésiter, où l'on abandonne dans les trente premières secondes.", example: "Inscription" },
+          { icon: "zap", title: "Première valeur", desc: "L'action qui justifie le produit, réalisée seule, sans documentation ni collègue à côté. Y compris les états vides et les messages d'erreur rencontrés en chemin.", example: "Activation" },
+          { icon: "card", title: "Paiement et souscription", desc: "Choix de l'offre, saisie, confirmation : la compréhension du prix et des engagements avant de cliquer.", example: "Checkout" },
         ],
       }}
       steps={{

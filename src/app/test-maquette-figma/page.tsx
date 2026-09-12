@@ -60,30 +60,14 @@ export default function TestMaquetteFigmaPage() {
           "Un test de maquette earlypanel met devant votre prototype des gens qui ne vous connaissent pas, qui exercent le métier de votre cible, et qui sont payés pour dire précisément où ils ont bloqué.",
         ],
       }}
-      profiles={{
-        eyebrow: "Qui teste votre maquette",
-        title: "Des inconnus qui exercent le métier de votre cible.",
-        sub: "Pas vos associés, pas vos amis, pas vos premiers clients : des profils qui découvrent l'écran et qui sont payés pour dire où ils ont bloqué.",
-        cards: [
-          { title: "Le métier de votre cible", desc: "Responsable RH, gérant, acheteur, infirmier : on part de la fiche de votre utilisateur idéal et on pioche à la main dans le panel.", example: "Sélection manuelle" },
-          { title: "Des découvreurs, pas des convaincus", desc: "Aucun testeur ne connaît votre produit ni votre pitch. Ils voient la maquette comme la verra votre premier utilisateur.", example: "Regard neuf" },
-          { title: "Le niveau digital qui vous ressemble", desc: "Des profils à l'aise ou non avec les outils, selon votre cible réelle. Un expert ne bloque pas au même endroit qu'un débutant.", example: "Novice · Intermédiaire · Expert" },
-          { title: "Le contexte d'usage", desc: "Bureau, mobile dans le train, poste partagé : on retient les testeurs dont le quotidien correspond à la situation où votre produit sera utilisé.", example: "Desktop · Mobile" },
-          { title: "Deux groupes pour deux variantes", desc: "Si vous hésitez entre deux versions de la maquette, on répartit dix à douze testeurs en deux groupes comparables.", example: "Variante A · Variante B" },
-          { title: "Recrutés pour la mission si besoin", desc: "Un profil rare qui n'est pas dans le panel ? On l'annonce au cadrage et on le recrute pour vous, délai annoncé avant engagement.", example: "Recrutement ciblé" },
-        ],
-      }}
       parcours={{
         eyebrow: "Ce qu'on teste sur une maquette Figma",
         title: "Trois à cinq écrans, le chemin critique, rien d'autre.",
-        sub: "On ne teste pas la finition du prototype : on mesure si un utilisateur comprend ce qu'il doit faire et y arrive.",
+        sub: "On ne teste pas la finition du prototype : on mesure si un utilisateur qui découvre l'écran comprend ce qu'il doit faire et y arrive.",
         cards: [
-          { title: "Inscription et premier écran", desc: "La promesse est-elle comprise en dix secondes ? Que croit-on pouvoir faire ici, et par quoi commence-t-on ?", example: "Onboarding" },
-          { title: "Configuration initiale", desc: "Les choix demandés sont-ils compréhensibles ? Quels champs font hésiter, lesquels semblent inutiles ?", example: "Paramétrage" },
-          { title: "L'action principale", desc: "Le geste qui fait la valeur du produit : créer, envoyer, réserver. Trouvé ? Compris ? Terminé sans aide ?", example: "Cœur du produit" },
-          { title: "Navigation et vocabulaire", desc: "Les libellés de menu et de boutons parlent-ils à la cible ? Ce qu'ils ont cherché et n'ont pas trouvé.", example: "Libellés · Menus" },
-          { title: "Page tarifaire ou offre", desc: "Ce que le testeur comprend de l'offre et ce qu'il pense payer, avant tout engagement.", example: "Pricing" },
-          { title: "Comparaison de deux maquettes", desc: "Deux variantes d'un même parcours, deux groupes de testeurs, et une réponse : laquelle est comprise.", example: "Test comparatif" },
+          { icon: "user-plus", title: "Inscription et premier écran", desc: "La promesse est-elle comprise en dix secondes ? Que croit-on pouvoir faire ici, et par quoi commence-t-on ?", example: "Onboarding" },
+          { icon: "sliders", title: "Configuration initiale", desc: "Les choix demandés sont-ils compréhensibles ? Quels champs font hésiter, lesquels semblent inutiles ?", example: "Paramétrage" },
+          { icon: "zap", title: "L'action principale", desc: "Le geste qui fait la valeur du produit : créer, envoyer, réserver. Trouvé ? Compris ? Terminé sans aide ? Si vous hésitez entre deux variantes, deux groupes de testeurs tranchent.", example: "Cœur du produit · Variante A/B" },
         ],
       }}
       steps={{

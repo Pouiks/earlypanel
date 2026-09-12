@@ -60,30 +60,14 @@ export default function TestConversionFunnelPage() {
           "Un test earlypanel cible précisément la zone qui décroche (checkout, onboarding, écran de configuration, page tarifaire), y envoie des profils qui ressemblent à vos utilisateurs réels, et leur demande de décrire ce qu'ils ont compris, cherché et ressenti à chaque étape.",
         ],
       }}
-      profiles={{
-        eyebrow: "Qui teste votre funnel",
-        title: "Des profils qui ressemblent à votre base utilisateur réelle.",
-        sub: "Tester un checkout B2B avec des testeurs grand public donnerait des frictions qui ne sont pas les vôtres. On part de vos utilisateurs.",
-        cards: [
-          { title: "Le métier de vos utilisateurs", desc: "Gérant, acheteur, responsable marketing : on pioche à la main dans le panel les profils qui exercent le métier de ceux qui décrochent.", example: "Sélection manuelle" },
-          { title: "La taille d'entreprise", desc: "Indépendant, PME, grand compte : le même tunnel n'est pas vécu pareil selon qui paie et qui décide.", example: "TPE · PME · ETI" },
-          { title: "Le niveau digital", desc: "Des profils à l'aise ou non, selon votre trafic réel. Un utilisateur pressé n'abandonne pas au même endroit qu'un expert.", example: "Novice · Expert" },
-          { title: "Le contexte d'usage", desc: "Mobile entre deux réunions, poste de bureau, tablette : on retient les testeurs dont le quotidien correspond à votre trafic.", example: "Desktop · Mobile" },
-          { title: "Des inconnus qui n'ont rien à vous prouver", desc: "Ils ne connaissent pas votre produit ni vos hypothèses. Ils décrivent ce qu'ils ont compris, cherché et ressenti.", example: "Regard neuf" },
-          { title: "Sur leur vrai équipement", desc: "Navigateur personnel, bloqueur de pub, téléphone de trois ans : les conditions réelles de votre trafic.", example: "Windows · Mac · Mobile" },
-        ],
-      }}
       parcours={{
         eyebrow: "Ce qu'on teste sur un funnel",
         title: "La zone précise qui décroche, pas tout le produit.",
-        sub: "On part de vos analytics pour isoler l'étape à problème et on y envoie des testeurs avec un scénario précis.",
+        sub: "On part de vos analytics pour isoler l'étape à problème, et on y envoie des testeurs qui ressemblent à votre trafic réel, avec un scénario précis. Chaque hypothèse de la réunion devient une question du scénario, posée sans orienter la réponse.",
         cards: [
-          { title: "Checkout et paiement", desc: "Choix de l'offre, saisie, confirmation : ce qui fait hésiter avant de cliquer, jusqu'à l'étape de paiement sans la finaliser.", example: "Panier · Paiement" },
-          { title: "Onboarding après inscription", desc: "Les premières minutes : ce que l'utilisateur croit devoir faire, ce qu'il cherche, où il ferme l'onglet.", example: "Activation" },
-          { title: "Page tarifaire", desc: "Ce qu'il comprend de l'offre, ce qu'il pense payer, et pourquoi il ne choisit pas.", example: "Pricing" },
-          { title: "Écran de configuration", desc: "L'étape technique qui fait fuir : champs, choix, vocabulaire. Ce qui est compris et ce qui bloque.", example: "Paramétrage" },
-          { title: "Landing page vers l'essai", desc: "De l'arrivée à la conversion : promesse comprise, bouton trouvé, formulaire terminé.", example: "Acquisition" },
-          { title: "Vos hypothèses, mises à l'épreuve", desc: "Chaque hypothèse de la réunion devient une question du scénario, posée sans orienter la réponse.", example: "Hypothèses" },
+          { icon: "card", title: "Checkout et paiement", desc: "Choix de l'offre, saisie, confirmation : ce qui fait hésiter avant de cliquer, jusqu'à l'étape de paiement sans la finaliser.", example: "Panier · Paiement" },
+          { icon: "user-plus", title: "Onboarding après inscription", desc: "Les premières minutes : ce que l'utilisateur croit devoir faire, ce qu'il cherche, où il ferme l'onglet.", example: "Activation" },
+          { icon: "tag", title: "Page tarifaire", desc: "Ce qu'il comprend de l'offre, ce qu'il pense payer, et pourquoi il ne choisit pas.", example: "Pricing" },
         ],
       }}
       steps={{

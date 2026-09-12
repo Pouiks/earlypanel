@@ -60,30 +60,14 @@ export default function AgencesPage() {
           "Avec earlypanel, le test devient une prestation cadrée, avec un livrable que votre client peut tenir en main : profils sélectionnés selon sa cible, questionnaire co-construit, relecture humaine, rapport rédigé, restitution. Vous la revendez, on la produit.",
         ],
       }}
-      profiles={{
-        eyebrow: "Pour qui",
-        title: "Agences, studios et indépendants qui livrent des produits à des clients finaux.",
-        sub: "Vous concevez et développez. Le test utilisateur, on le produit pour vous, sous votre identité ou en apport d'affaires.",
-        cards: [
-          { title: "Agences digitales", desc: "Sites, plateformes, applications pour des clients finaux. Une ligne test utilisateur dans le devis, entre la maquette et le développement.", example: "Web · Mobile" },
-          { title: "Studios produit et design", desc: "Vous livrez des maquettes et des parcours. Le test valide la compréhension avant que le client ne paie le code.", example: "UX · UI" },
-          { title: "ESN et intégrateurs", desc: "Refonte, migration, nouvel outil métier : un test avant la mise en production évite les tickets du premier mois.", example: "Refonte · Migration" },
-          { title: "Freelances et collectifs", desc: "Vous n'avez pas de pôle recherche. Vous revendez une prestation cadrée, on la produit.", example: "Indépendants" },
-          { title: "Agences growth et CRO", desc: "Vos recommandations de conversion appuyées sur des verbatims d'utilisateurs, pas seulement sur des heatmaps.", example: "Conversion" },
-          { title: "Vos clients finaux, jamais sollicités", desc: "En marque blanche, votre client ne voit qu'un interlocuteur : vous. earlypanel reste invisible.", example: "Marque blanche" },
-        ],
-      }}
       parcours={{
         eyebrow: "Ce qu'on teste pour vos clients",
         title: "Les mêmes moments à fort ROI que pour un client direct.",
-        sub: "Un test se place là où il évite le plus d'allers-retours : avant le développement, avant la mise en production, ou quand le funnel décroche.",
+        sub: "Agence digitale, studio produit, ESN ou freelance : un test se place là où il évite le plus d'allers-retours à votre client, avant le développement, avant la mise en production, ou quand le funnel décroche.",
         cards: [
-          { title: "Maquette Figma avant développement", desc: "Le parcours est-il compris avant que le client ne paie six mois de code ? Cinq à dix testeurs, trois à cinq écrans.", example: "Prototype" },
-          { title: "Staging avant mise en production", desc: "Dix à vingt profils sur l'environnement de test du client, accès créés pour la mission et supprimés après.", example: "Pré-lancement" },
-          { title: "Funnel qui décroche", desc: "La zone précise qui perd des utilisateurs en production, testée avec des profils proches de la base réelle.", example: "Conversion" },
-          { title: "Refonte ou migration", desc: "L'ancien parcours contre le nouveau, avec des utilisateurs qui connaissent le métier, pas le produit.", example: "Avant / après" },
-          { title: "Application mobile", desc: "Recette d'usage sur le vrai téléphone des testeurs, en complément de votre recette technique.", example: "iOS · Android" },
-          { title: "Outil métier interne", desc: "Des testeurs qui exercent le métier des futurs utilisateurs, recrutés pour la mission si le profil est rare.", example: "Métier · Interne" },
+          { icon: "layout", title: "Maquette Figma avant développement", desc: "Le parcours est-il compris avant que le client ne paie six mois de code ? Cinq à dix testeurs, trois à cinq écrans.", example: "Prototype" },
+          { icon: "server", title: "Staging avant mise en production", desc: "Dix à vingt profils sur l'environnement de test du client, accès créés pour la mission et supprimés après. Refonte, migration ou outil métier inclus.", example: "Pré-lancement" },
+          { icon: "trending-down", title: "Funnel qui décroche", desc: "La zone précise qui perd des utilisateurs en production, testée avec des profils proches de la base réelle de votre client.", example: "Conversion" },
         ],
       }}
       steps={{
