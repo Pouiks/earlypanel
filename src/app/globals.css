@@ -925,18 +925,6 @@ a.announce { display: block; text-decoration: none; }
 /* ── MOMENTS : lien vers landing ── */
 .moment-link { display: inline-block; margin-top: 1rem; font-size: 13px; font-weight: 600; color: var(--green); text-decoration: none; }
 .moment-link:hover { text-decoration: underline; }
-
-/* ── LANDING SITUATION (pages /test-*, /agences) ── */
-.situation-hero { padding: clamp(3rem,8vh,6rem) clamp(1.5rem,5vw,3rem) clamp(2rem,5vh,4rem); max-width: var(--content); margin: 0 auto; }
-.situation-hero h1 { font-size: clamp(30px,4vw,50px); font-weight: 700; line-height: 1.08; letter-spacing: -.04em; color: var(--black); margin: 0 0 1.25rem; }
-.situation-hero h1 em { font-style: normal; color: var(--green); }
-.situation-lede { font-size: clamp(15px,1.5vw,18px); color: var(--gray); line-height: 1.6; max-width: 62ch; margin-bottom: 2rem; }
-.situation-section { padding: clamp(2.5rem,6vh,4.5rem) clamp(1.5rem,5vw,3rem); }
-.situation-section.alt { background: var(--bg-secondary); }
-.situation-inner { max-width: var(--content); margin: 0 auto; }
-.situation-inner h2 { font-size: clamp(24px,3vw,34px); font-weight: 700; letter-spacing: -.03em; line-height: 1.15; margin-bottom: 1rem; }
-.situation-inner p, .situation-inner li { font-size: 15.5px; color: #3a3a3c; line-height: 1.65; }
-
 /* ---------- Blog ---------- */
 .blog-main { max-width: 760px; margin: 0 auto; padding: clamp(3rem,8vh,5rem) clamp(1.5rem,5vw,3rem) clamp(3rem,6vh,5rem); font-family: var(--font); }
 .blog-header h1, .blog-article-header h1 { font-size: clamp(30px,4vw,44px); font-weight: 700; line-height: 1.1; letter-spacing: -.04em; color: var(--black); margin: 0 0 1rem; }
@@ -1014,17 +1002,6 @@ a.announce { display: block; text-decoration: none; }
 .blog-list.blog-grid .blog-tags { margin-top: auto; padding-top: .9rem; }
 @media (max-width: 1024px) { .blog-list.blog-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 640px) { .blog-prose { font-size: 16px; } .blog-card { padding: 1.1rem 1.2rem; } .blog-card.has-cover { grid-template-columns: 1fr; } .blog-list.blog-grid { grid-template-columns: 1fr; } }
-.situation-inner p { margin-bottom: 1rem; max-width: 70ch; }
-.situation-inner ul { padding-left: 1.25rem; margin: 0 0 1rem; max-width: 70ch; }
-.situation-inner li { margin-bottom: .5rem; }
-.situation-steps { display: grid; grid-template-columns: 1fr; gap: 1rem; margin-top: 1.5rem; }
-@media (min-width: 800px) { .situation-steps { grid-template-columns: repeat(3, 1fr); } }
-.situation-step { background: #fff; border: 0.5px solid var(--border); border-radius: 16px; padding: 1.25rem; }
-.situation-step .step-num { margin-bottom: .5rem; }
-.situation-step h3 { font-size: 16px; font-weight: 700; margin-bottom: .4rem; letter-spacing: -.01em; }
-.situation-step p { font-size: 14px; margin: 0; }
-.situation-cta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 1.5rem; }
-
 /* ── NAV : lien secondaire texte + rappel testeurs sur la home ── */
 .nav-textlink { font-size: 13px; color: var(--gray); text-decoration: none; padding: 7px 4px; }
 .nav-textlink:hover { color: var(--black); }

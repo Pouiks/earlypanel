@@ -25,12 +25,20 @@ export interface SectorLandingProps {
   sub: string;
   /** 4 chiffres du hero, meme gabarit que /entreprises. */
   stats?: { n: string; l: string }[];
+  /**
+   * Section optionnelle "le probleme" (landings par situation) : un H2
+   * porteur du mot-cle et deux ou trois paragraphes. Placee juste apres le
+   * hero, avant les grilles de cartes.
+   */
+  problem?: { eyebrow?: string; title: string; paragraphs: string[] };
   profiles: { eyebrow: string; title: string; sub: string; cards: Card[] };
   parcours: { eyebrow: string; title: string; sub: string; cards: Card[] };
   steps: { eyebrow: string; title: string; sub: string; items: Step[] };
   deliverable: { title: string; items: { title: string; body: string }[] };
   guarantees: { title: string; items: { title: string; body: string }[] };
   faq: FaqItem[];
+  /** Titre du bloc FAQ. Defaut : "Vos questions sur ce secteur." */
+  faqTitle?: string;
   /** Articles et pages a lire ensuite (maillage interne). */
   related?: { href: string; label: string }[];
 }
@@ -53,12 +61,14 @@ const CheckIcon = (
 );
 
 /**
- * Gabarit des landings par secteur (SaaS B2B, sante, fintech).
+ * Gabarit unique des landings B2B : par secteur (SaaS B2B, sante, fintech)
+ * et par situation (/test-*, /agences).
  *
  * Meme structure visuelle que /entreprises : hero centre avec badge et
- * chiffres, grilles de cartes (qui teste, ce qu'on teste), etapes, livrable
- * et garanties, formulaire de brief, FAQ balisee, CTA final. Le mot-cle de
- * la page doit apparaitre dans `sub` (100 premiers mots) et dans un H2.
+ * chiffres, section "probleme" optionnelle, grilles de cartes (qui teste,
+ * ce qu'on teste), etapes, livrable et garanties, formulaire de brief, FAQ
+ * balisee, CTA final. Le mot-cle de la page doit apparaitre dans `sub`
+ * (100 premiers mots) et dans un H2.
  */
 export default function SectorLanding(p: SectorLandingProps) {
   const url = `${SITE_URL}${p.path}`;
@@ -95,6 +105,19 @@ export default function SectorLanding(p: SectorLandingProps) {
         </section>
 
         <Separator />
+
+        {p.problem && (
+          <>
+            <section className="usecases">
+              <div className="uc-inner">
+                <div className="sec-eye">{p.problem.eyebrow ?? "Le problème"}</div>
+                <h2 className="sec-title">{p.problem.title}</h2>
+                {p.problem.paragraphs.map((t) => <p className="sec-sub" key={t}>{glossify(t)}</p>)}
+              </div>
+            </section>
+            <Separator />
+          </>
+        )}
 
         <section className="usecases">
           <div className="uc-inner">
@@ -194,7 +217,7 @@ export default function SectorLanding(p: SectorLandingProps) {
         <BriefSection />
         <Separator />
 
-        <FaqAccordion eyebrow="Questions fréquentes" title="Vos questions sur ce secteur." items={p.faq} />
+        <FaqAccordion eyebrow="Questions fréquentes" title={p.faqTitle ?? "Vos questions sur ce secteur."} items={p.faq} />
         {p.related && p.related.length > 0 && (
           <section className="landing-related">
             <div className="landing-related-inner">
