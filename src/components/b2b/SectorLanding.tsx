@@ -9,6 +9,7 @@ import FaqJsonLd from "@/components/ui/FaqJsonLd";
 import BreadcrumbJsonLd from "@/components/ui/BreadcrumbJsonLd";
 import BriefSection from "@/components/b2b/BriefSection";
 import CtaFinal from "@/components/b2b/CtaFinal";
+import RelatedReading, { type RelatedLink } from "@/components/b2b/RelatedReading";
 import { BOOKING_URL, PRICE_RANGE_LABEL } from "@/lib/cta-links";
 import { SITE_URL } from "@/lib/site";
 import { glossify } from "@/components/ui/glossify";
@@ -47,8 +48,8 @@ export interface SectorLandingProps {
   faq: FaqItem[];
   /** Titre du bloc FAQ. Defaut : "Vos questions sur ce secteur." */
   faqTitle?: string;
-  /** Articles et pages a lire ensuite (maillage interne). */
-  related?: { href: string; label: string }[];
+  /** Articles et pages a lire ensuite (maillage interne), affiches avec apercu. */
+  related?: RelatedLink[];
 }
 
 const DEFAULT_STATS = [
@@ -248,14 +249,7 @@ export default function SectorLanding(p: SectorLandingProps) {
         <Separator />
 
         <FaqAccordion eyebrow="Questions fréquentes" title={p.faqTitle ?? "Vos questions sur ce secteur."} items={p.faq} />
-        {p.related && p.related.length > 0 && (
-          <section className="landing-related">
-            <div className="landing-related-inner">
-              <h2>Pour aller plus loin</h2>
-              <ul>{p.related.map((r) => <li key={r.href}><Link href={r.href}>{r.label} →</Link></li>)}</ul>
-            </div>
-          </section>
-        )}
+        {p.related && p.related.length > 0 && <RelatedReading items={p.related} />}
         <CtaFinal />
       </main>
       <Footer variant="b2b" />

@@ -962,10 +962,17 @@ a.announce { display: block; text-decoration: none; }
 .landing-related { padding: clamp(2.5rem,6vh,4rem) clamp(1.5rem,5vw,3rem); }
 .landing-related-inner { max-width: var(--content-wide); margin: 0 auto; }
 .landing-related h2 { font-size: 20px; font-weight: 700; letter-spacing: -.02em; margin: 0 0 1rem; color: var(--black); }
-.landing-related ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-.landing-related li a { display: block; padding: 14px 16px; border: 0.5px solid var(--border); border-radius: 12px; color: var(--black); text-decoration: none; font-size: 14px; font-weight: 600; line-height: 1.4; }
-.landing-related li a:hover { border-color: rgba(10,122,90,.35); color: var(--green); }
-@media (max-width: 768px) { .landing-related ul { grid-template-columns: 1fr; } }
+.landing-related-sub { font-size: 15px; color: var(--gray); margin: 0 0 1.25rem; }
+.related-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.related-card { display: flex; flex-direction: column; gap: .5rem; height: 100%; padding: 1.25rem 1.4rem; border: 0.5px solid var(--border); border-radius: 16px; background: #fff; color: var(--black); text-decoration: none; transition: border-color .15s ease; }
+.related-card:hover { border-color: rgba(10,122,90,.35); }
+.related-card:hover h3 { color: var(--green); }
+.related-kind { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--green); }
+.related-meta { font-weight: 500; letter-spacing: 0; text-transform: none; color: var(--gray-light); }
+.related-card h3 { font-size: 17px; font-weight: 700; letter-spacing: -.02em; line-height: 1.25; margin: 0; }
+.related-card p { font-size: 14px; color: var(--gray); line-height: 1.55; margin: 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.related-more { margin-top: auto; padding-top: .5rem; font-size: 13px; font-weight: 600; color: var(--green); }
+@media (max-width: 900px) { .related-grid { grid-template-columns: 1fr; } }
 .blog-toc { background: var(--bg-secondary); border-radius: 14px; padding: 1rem 1.4rem; margin: 0 0 2rem; }
 .blog-toc-title { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--gray-light); margin-bottom: .5rem; }
 .blog-toc ol { margin: 0; padding-left: 1.2rem; font-size: 14px; line-height: 1.7; }
