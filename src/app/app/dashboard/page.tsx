@@ -80,6 +80,11 @@ export default function DashboardHome() {
     return notExpired && ["nda_signed", "invited", "in_progress"].includes(m.tester_status);
   });
   const featured = activeMissions[0];
+  // Jamais contacté : aucune mission (quel que soit son état) et aucun compteur
+  // de missions validées. Réservé aux comptes actifs, les autres statuts ont
+  // déjà leur bandeau.
+  const neverContacted =
+    !missionsLoading && missions.length === 0 && tester.missions_completed === 0 && tester.status === "active";
 
   return (
     <div>
@@ -234,16 +239,30 @@ export default function DashboardHome() {
           ) : activeMissions.length === 0 ? (
             <EmptyState
               icon="•"
-              title="Aucune mission active"
-              description="Vous serez notifié par email dès qu'un test correspond à votre profil."
+              title={neverContacted ? "Pas encore de mission proposée" : "Aucune mission active"}
+              description={
+                neverContacted
+                  ? "Si vous n'avez pas encore été contacté, c'est qu'aucun client n'a demandé un profil comme le vôtre pour le moment. earlypanel évolue et de nouveaux projets arrivent : vous serez probablement sollicité prochainement."
+                  : "Vous serez notifié par email dès qu'un test correspond à votre profil."
+              }
               extra={
-                <span style={{
-                  display: "inline-block", padding: "6px 16px",
-                  background: "#f0faf5", color: "#0A7A5A",
-                  borderRadius: 980, fontSize: 13, fontWeight: 600,
-                }}>
-                  Profil {tester.tier === "standard" ? "Standard" : tester.tier === "expert" ? "Expert" : "Premium"}
-                </span>
+                <>
+                  {neverContacted && (
+                    <p style={{
+                      fontSize: 13, color: "#92600A", background: "#FEF3C7", borderRadius: 10,
+                      padding: "10px 14px", margin: "0 auto 14px", maxWidth: 360, lineHeight: 1.5,
+                    }}>
+                      Le jour où nous vous contactons, soyez réactif : une mission se pourvoit en quelques jours et une réponse tardive peut vous faire manquer votre place.
+                    </p>
+                  )}
+                  <span style={{
+                    display: "inline-block", padding: "6px 16px",
+                    background: "#f0faf5", color: "#0A7A5A",
+                    borderRadius: 980, fontSize: 13, fontWeight: 600,
+                  }}>
+                    Profil {tester.tier === "standard" ? "Standard" : tester.tier === "expert" ? "Expert" : "Premium"}
+                  </span>
+                </>
               }
             />
           ) : (
