@@ -7,9 +7,9 @@ Neuf posts, un par article. Chacun raconte une idée de l'article et renvoie ver
 - **Un post tous les deux ou trois jours**, pas plus. Neuf posts couvrent trois à quatre semaines.
 - **Le lien va dans le premier commentaire**, pas dans le post : LinkedIn diffuse moins les posts qui contiennent un lien sortant. Le texte du commentaire est donné sous chaque post.
 - **Pas de hashtag dans le texte**, deux ou trois en fin de post au maximum, toujours les mêmes : #TestUtilisateur #UXResearch #Produit.
-- **Aucun chiffre inventé.** Le seul chiffre cité est la règle des cinq du Nielsen Norman Group. Quand tu auras un cas réel anonymisé, il remplacera le post 3.
+- **Aucun chiffre ni affirmation de méthode sans source.** Chaque source est nommée dans le post et liée dans le premier commentaire. Tout ce qui est dit d'earlypanel décrit ce que le produit fait réellement aujourd'hui, rien d'autre. Quand tu auras un cas réel anonymisé, il remplacera le post 3.
 - **Réponds à chaque commentaire dans l'heure** le jour de publication : c'est ce qui décide de la portée.
-- Les posts sont écrits à la première personne. Ajuste le ton si une phrase ne te ressemble pas, mais garde une idée par post.
+- Les posts parlent au nom d'earlypanel, avec « on », jamais « je ». Ajuste le ton si une phrase ne sonne pas juste, mais garde une idée par post.
 
 ---
 
@@ -25,7 +25,7 @@ En production, quand un parcours décroche et que les analytics disent où, mais
 
 Le moment où il ne sert à rien : quand on connaît déjà la conclusion, ou quand on veut « avoir des retours » sans décision à prendre derrière.
 
-Avant de lancer un test, je pose trois questions.
+Avant de lancer un test, on pose trois questions.
 Quelle décision devez-vous prendre dans six semaines ?
 Que coûte une erreur maintenant ?
 Que ne pouvez-vous plus voir ?
@@ -44,7 +44,7 @@ Si aucune réponse n'est claire, ce n'est pas le moment.
 
 Non. Pas pour ce que vous cherchez.
 
-Pour trouver les frictions d'un parcours, cinq personnes révèlent la plupart des problèmes. C'est la règle du Nielsen Norman Group, et elle tient depuis vingt ans. À distance, sans animateur, huit à douze participants est le bon format : on absorbe une ou deux réponses inutilisables sans perdre le test.
+Pour trouver les frictions d'un parcours, cinq personnes révèlent la plupart des problèmes. C'est la règle publiée par Jakob Nielsen en 2000, à partir d'un modèle de 1993, et elle tient toujours pour un public homogène. À distance, sans animateur, huit à douze participants est le bon format : on absorbe une ou deux réponses inutilisables sans perdre le test.
 
 Pour comparer deux versions, il faut doubler.
 
@@ -57,6 +57,7 @@ Douze bons testeurs battent cinquante testeurs tirés au hasard. À chaque fois.
 #TestUtilisateur #UXResearch #Produit
 
 **Premier commentaire :** Le raisonnement complet, par objectif de test : https://www.earlypanel.fr/blog/combien-de-testeurs-test-utilisateur
+Source citée : Jakob Nielsen, « Why You Only Need to Test with 5 Users », 2000 : https://www.nngroup.com/articles/why-you-only-need-to-test-with-5-users/
 
 ---
 
@@ -70,7 +71,7 @@ Ce qu'on y trouve : des réponses en trois mots. Des avis sur les couleurs quand
 
 Si ces réponses restent dans l'analyse, le taux de réussite du scénario ne veut plus rien dire. « 9 sur 12 ont réussi » devient « 9 sur 12 ont cliqué sur envoyer ».
 
-C'est pour ça que je lis tout, et qu'une mission bâclée n'est ni payée au testeur ni comptée dans le rapport.
+C'est pour ça que chez earlypanel on relit toutes les réponses, et qu'une mission bâclée n'est ni payée au testeur ni comptée dans le rapport.
 
 Un test dont personne n'a relu les réponses n'a pas de prix. Il n'a pas de valeur.
 
@@ -84,24 +85,20 @@ Un test dont personne n'a relu les réponses n'a pas de prix. Il n'a pas de vale
 
 « Marie, 34 ans, responsable marketing dans une PME, dynamique et connectée. »
 
-C'est un persona. Ce n'est pas un profil de testeur.
+C'est un persona. Il sert à vendre. Il ne dit pas qui recruter pour un test.
 
-Un persona décrit une personne à qui l'on vend. Un profil de testeur décrit une personne qui doit vivre la situation du scénario. Ce qu'elle fait déjà, avec quoi, et ce qu'elle n'a jamais fait.
+Le Nielsen Norman Group, dans son guide de recrutement de participants, filtre sur des comportements : les outils que la personne utilise, son expérience, ce qu'elle fait déjà. Pas seulement sur des cases démographiques.
 
-Les critères qui changent les résultats, dans l'ordre :
-la tâche vécue ou le métier,
-ne pas connaître le produit,
-l'aisance numérique décrite par des faits, pas par des adjectifs,
-l'équipement réel,
-le contexte d'usage.
+C'est ce que le profil testeur earlypanel enregistre : métier, secteur, taille d'entreprise, outils du quotidien, appareils, navigateurs, connexion, et si la personne a déjà participé à des tests utilisateurs.
 
-Ceux qui ne servent presque jamais : l'âge, le genre, le secteur au sens large, l'intérêt déclaré pour le produit.
+Pour chaque projet, la cible du client est décrite avec ces mêmes critères. Ceux marqués obligatoires excluent. Les autres classent. Puis on choisit à la main, profil par profil.
 
-Un bon profil tient en cinq lignes, et chaque ligne est vérifiable au recrutement. « Fait ses factures sur tableur » se vérifie. « Aime la simplicité » ne se vérifie pas.
+« Dynamique et connectée » n'est pas un critère. « Microsoft 365, Pennylane, n'a jamais testé un produit pour donner son avis » en sont trois, cochés dans le profil.
 
 #TestUtilisateur #UXResearch #Produit
 
 **Premier commentaire :** Comment passer de « nos utilisateurs » à un profil recrutable : https://www.earlypanel.fr/blog/definir-sa-cible-test-utilisateur
+Source citée : Nielsen Norman Group, « How to Recruit Participants for Usability Studies » : https://media.nngroup.com/media/reports/free/How_To_Recruit_Participants_for_Usability_Studies.pdf
 
 ---
 
@@ -110,22 +107,25 @@ Un bon profil tient en cinq lignes, et chaque ligne est vérifiable au recruteme
 Douze testeurs ne donnent jamais un pourcentage.
 Des milliers de visiteurs ne disent jamais pourquoi.
 
-C'est toute la différence entre un test utilisateur et un A/B test, et c'est pour ça que la question « lequel choisir » est mal posée.
+Le Nielsen Norman Group le formule ainsi depuis des années : l'A/B test mesure ce que les gens font, le test utilisateur explique pourquoi ils le font.
 
-L'A/B test mesure quelle variante convertit le mieux. Il lui faut du trafic, des variantes crédibles, et une page en production.
+L'A/B test a besoin de trafic, de variantes déjà écrites et d'une page en production. Il désigne un gagnant. Il ne dit pas si le gagnant est bon.
 
-Le test utilisateur explique pourquoi les gens réussissent ou échouent. Il fonctionne sans trafic, sur une maquette, avant d'avoir une hypothèse.
+Le test utilisateur fonctionne sans trafic, sur une maquette, avant d'avoir une hypothèse. Il ne mesure rien. Il explique.
+
+Sur les petits échantillons, Jeff Sauro et James Lewis montrent dans « Quantifying the User Experience » qu'on peut conclure avec moins de dix participants sur ce qui bloque, à condition de ne pas leur demander un taux de conversion.
 
 La séquence qui marche :
 test utilisateur pour trouver les frictions,
 A/B test pour départager les corrections,
 test utilisateur court quand le résultat surprend.
 
-Si vous n'avez pas de trafic, la question ne se pose pas. Si vous en avez, elle ne se pose pas non plus : il vous faut les deux.
+Chez earlypanel, on fait le premier et le troisième. Le deuxième, c'est votre outil d'A/B test et votre trafic.
 
 #TestUtilisateur #UXResearch #Produit
 
 **Premier commentaire :** Les cas où un seul des deux est utilisable : https://www.earlypanel.fr/blog/test-utilisateur-vs-ab-testing
+Sources citées : Nielsen Norman Group, « Putting A/B Testing in Its Place » : https://www.nngroup.com/articles/putting-ab-testing-in-its-place/ · Sauro & Lewis, « Quantifying the User Experience » : https://measuringu.com/book/quantifying-the-user-experience-practical-statistics-for-user-research/
 
 ---
 
@@ -133,19 +133,19 @@ Si vous n'avez pas de trafic, la question ne se pose pas. Si vous en avez, elle 
 
 Un prototype qui impressionne en réunion casse en cinq minutes entre les mains d'un inconnu.
 
-En démo, celui qui présente sait où cliquer. Le testeur, lui, clique partout où il s'attend à pouvoir cliquer. Un bouton retour qui ne mène nulle part, un lien mort, et le test est fini avant d'avoir commencé.
+En démo, celui qui présente sait où cliquer. Le testeur, lui, clique là où il s'attend à pouvoir cliquer.
 
-Avant de faire tester une maquette Figma, quatre choses :
+Voilà comment un test de maquette Figma se passe chez earlypanel :
 
-Fermer les parcours. Au moins deux chemins vers l'objectif, un retour depuis chaque écran, des sorties pour annuler.
+Un parcours de trois à cinq écrans. Le chemin critique, rien d'autre.
+Cinq à dix testeurs choisis à la main, qui signent un NDA avant de recevoir le lien du prototype.
+Le lien est intégré au questionnaire. Le testeur répond étape par étape et peut joindre jusqu'à trois captures d'écran par question.
+Chaque réponse est relue. Une réponse bâclée est refusée, non payée, non facturée.
+Un rapport sous cinq jours ouvrés : ce qui a été compris, ce qui a été cherché sans être trouvé, les mots des testeurs rattachés à chaque friction, trois niveaux de gravité, et une recommandation : lancer le développement, corriger d'abord, ou retester une variante.
 
-Dessiner les états. L'erreur de saisie, le chargement, l'écran vide, la confirmation de fin.
+Ce qui reste de votre côté, avant d'envoyer le lien : un parcours qu'on peut dérouler de bout en bout, les écrans d'erreur et de confirmation dessinés, des données plausibles à la place du faux texte.
 
-Remplacer le faux texte par des données plausibles, sans donner la réponse du scénario.
-
-Dire ce que la maquette ne teste pas : la performance, les données réelles, les cas limites.
-
-Une maquette bien préparée se teste avant d'écrire une ligne de code. C'est le test le moins cher que vous ferez.
+Sinon la première réponse sera « ça ne marche pas ». Et elle ne vous apprendra rien.
 
 #TestUtilisateur #UXResearch #Figma
 
@@ -157,17 +157,18 @@ Une maquette bien préparée se teste avant d'écrire une ligne de code. C'est l
 
 « On a testé sur nos téléphones, ça marche. »
 
-Puis les premiers avis à une étoile arrivent, sur un modèle que personne dans l'équipe ne possède.
+Traduction : sur des téléphones récents, bien configurés, entre les mains de gens qui connaissent l'application par cœur.
 
-Une bonne recette d'application mobile, ce sont deux exercices, dans cet ordre.
+Chez earlypanel, un test d'application mobile se fait sur le téléphone du testeur. Son profil indique ses appareils, son système mobile, son modèle de téléphone et sa connexion : fibre, ADSL ou 4G/5G. Ces critères servent à composer le panel. On peut exiger Android, imposer un mélange, et classer le reste.
 
-La recette technique, par l'équipe, avec une liste écrite : parcours complets, connexion perdue au milieu d'une action, permission refusée, nom avec une apostrophe, mise à jour depuis la version précédente, suppression de compte.
+Chaque scénario a une consigne et un critère de réussite observable. Le testeur répond question par question, joint jusqu'à trois captures d'écran par question, et son travail est relu avant d'être compté.
 
-Le test utilisateur, par des inconnus qui ressemblent à la cible, sur leur propre téléphone. Un appareil ancien, un petit écran, une connexion médiocre. Des scénarios, pas des instructions. Des captures d'écran à chaque hésitation.
+Le rapport sépare ce qui ne se mélange pas :
+les bugs, avec l'appareil concerné et les testeurs touchés,
+les frictions, ce qui marche mais que personne ne comprend, en trois niveaux de gravité,
+les actions prioritaires.
 
-La première dit que l'application marche. La seconde dit si quelqu'un arrivera à s'en servir.
-
-Comptez deux semaines entre la fin du développement et la soumission aux stores. Si le calendrier ne les laisse pas, ce n'est pas la recette qu'il faut raccourcir.
+La recette technique reste chez vous. Elle dit que l'application marche. Le test utilisateur dit si quelqu'un arrivera à s'en servir.
 
 #TestUtilisateur #ApplicationMobile #Produit
 
@@ -176,6 +177,7 @@ Comptez deux semaines entre la fin du développement et la soumission aux stores
 ---
 
 ## Post 8 · Combien ça coûte
+
 
 Combien coûte un test utilisateur ? La réponse honnête : ça dépend de qui fait le travail.
 
@@ -197,13 +199,13 @@ Le coût caché, c'est toujours le même : la relecture. Un test dont les répon
 
 ## Post 9 · Outil ou service
 
-Beaucoup d'équipes cherchent « une alternative à Testapic ». Ce qu'elles cherchent, en général, c'est autre chose qu'un outil.
+Une plateforme de tests vous donne les moyens de tester. Un service vous donne le résultat. Ce n'est pas le même achat.
 
-Une plateforme vous donne un panel et un outil de collecte. Le cadrage, les scénarios, la relecture de chaque réponse et le rapport restent à votre charge. Si vous avez un UX researcher, c'est parfait.
+Une plateforme : un panel, un outil de collecte, parfois des experts en option. Le cadrage, les scénarios, la relecture de chaque réponse et le rapport restent à votre charge. Si vous avez un UX researcher, c'est parfait.
 
 Si vous n'en avez pas, le test s'arrête souvent à « on a des vidéos, il faudrait les regarder ».
 
-Un service clé en main livre le résultat : recrutement à la main, questionnaire construit avec vous, relecture humaine, rapport rédigé, restitution en visio.
+Un service clé en main livre le résultat : recrutement à la main, questionnaire construit avec vous, relecture humaine, rapport rédigé, restitution en visio. C'est ce qu'earlypanel fait, et rien d'autre.
 
 Trois questions pour choisir :
 avez-vous quelqu'un pour faire le travail,
@@ -214,7 +216,7 @@ Les deux peuvent coexister. L'outil pour le quotidien, le service pour les tests
 
 #TestUtilisateur #UXResearch #Produit
 
-**Premier commentaire :** Les différences concrètes, sans comparatif de prix : https://www.earlypanel.fr/blog/alternative-testapic
+**Premier commentaire :** Les différences concrètes, sans comparatif de prix : https://www.earlypanel.fr/blog/plateforme-ou-service-cle-en-main
 
 ---
 

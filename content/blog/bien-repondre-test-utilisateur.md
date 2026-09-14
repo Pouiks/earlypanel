@@ -41,7 +41,7 @@ Ces trois phrases suffisent. Elles disent où vous êtes allé, ce que le produi
 
 ## Les questions fermées et les échelles
 
-Une question « oui / non / partiellement » ou une note de 1 à 5 se répond en une seconde, mais elle est souvent suivie d'une question ouverte qui demande pourquoi. C'est là que se joue la validation. « 3/5, c'était moyen » sera refusé. « 3/5 : j'ai réussi mais j'ai dû revenir en arrière deux fois parce que le bouton Suivant était caché sous le clavier de mon téléphone » sera validé et probablement bien évalué.
+Une question « oui / non » ou une note de 1 à 5 se répond en une seconde, mais elle est souvent suivie d'une question ouverte qui demande pourquoi. C'est là que se joue la validation. « 3/5, c'était moyen » sera refusé. « 3/5 : j'ai réussi mais j'ai dû revenir en arrière deux fois parce que le bouton Suivant était caché sous le clavier de mon téléphone » sera validé et probablement bien évalué.
 
 ## Les captures d'écran
 
@@ -53,9 +53,9 @@ Quand la mission le permet, joignez une capture à chaque endroit où vous avez 
 - **Hors sujet.** Un avis général sur le design ou les couleurs quand la question porte sur une étape précise.
 - **Répétitif.** La même phrase copiée d'une question à l'autre.
 - **Faux.** Un test visiblement pas fait, ou fait sur un autre appareil que celui déclaré, ou par quelqu'un d'autre.
-- **En retard.** Une mission soumise après la date limite n'est plus relue.
+- **En retard.** Une fois la date limite passée, la mission est fermée et ne peut plus être soumise.
 
-Une mission refusée n'est pas payée et fait baisser votre score. Ce n'est pas une punition : c'est ce qui garantit que les testeurs qui font le travail sont sélectionnés en priorité pour les missions suivantes, et mieux rémunérés. Le fonctionnement de la rémunération est détaillé dans [combien gagne un testeur d'applications](/testeurs/guides/combien-gagne-un-testeur-applications).
+Une mission refusée n'est pas payée, le motif vous est envoyé par email, et votre score baisse. Ce n'est pas une punition : c'est ce qui garantit que les testeurs qui font le travail sont sélectionnés en priorité pour les missions suivantes, et mieux rémunérés. Le fonctionnement de la rémunération est détaillé dans [combien gagne un testeur d'applications](/testeurs/guides/combien-gagne-un-testeur-applications).
 
 ## Trois habitudes qui font la différence
 
@@ -81,4 +81,4 @@ Oui, quand la mission le permet, à chaque hésitation ou problème, prise au mo
 
 ### Une mission bien répondue rapporte-t-elle plus ?
 
-Oui. Chaque mission validée est évaluée après relecture ; une mission jugée de bonne qualité est mieux rémunérée, et des missions régulièrement bien évaluées font passer le testeur dans des niveaux supérieurs, sélectionnés en priorité.
+Oui. Chaque mission validée reçoit une note de 1 à 5 après relecture : à partir de 4, la rémunération de base est majorée de 10 %, à 1 ou 2 elle est réduite de 15 %. Des missions régulièrement bien évaluées font passer le testeur dans des niveaux supérieurs, avec une rémunération de base plus élevée.

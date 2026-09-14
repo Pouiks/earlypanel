@@ -23,7 +23,7 @@ Voici ce qu'il faut préparer, et ce qu'il faut accepter de ne pas pouvoir teste
 Un prototype de démo relie les écrans dans l'ordre prévu. Un prototype de test doit aussi prévoir les écarts raisonnables :
 
 - **Les chemins alternatifs.** Si deux boutons peuvent mener à la création d'un devis, les deux doivent fonctionner. Sinon, vous ne saurez jamais lequel est le plus naturel.
-- **Les retours en arrière.** Le bouton retour du navigateur ne fonctionne pas dans un prototype. Prévoyez un retour visible sur chaque écran, sinon un testeur perdu reste perdu.
+- **Les retours en arrière.** Prévoyez un retour visible sur chaque écran, sinon un testeur perdu reste perdu.
 - **Les sorties.** Fermer un panneau, annuler, quitter un formulaire. Ce sont des actions que les gens font constamment et qui, absentes, bloquent le test.
 
 Le critère : un testeur doit pouvoir atteindre l'objectif du scénario par au moins deux chemins et revenir en arrière depuis n'importe quel écran sans se retrouver dans une impasse.
@@ -70,11 +70,21 @@ Soyez lucide sur les limites, et dites-le dans le scénario pour ne pas polluer 
 
 Ce qu'une maquette teste très bien, en revanche, c'est l'essentiel : la compréhension des libellés, la logique de navigation, l'ordre des étapes, la hiérarchie visuelle, et la capacité d'un nouvel arrivant à atteindre un objectif sans aide. C'est là que se jouent la plupart des abandons, et c'est là qu'une correction coûte encore quelques heures plutôt que quelques sprints.
 
+## Comment se passe un test de maquette avec earlypanel
+
+Une fois la maquette prête, voici ce qui se passe de notre côté, et rien d'autre :
+
+- **Le cadrage.** Une heure de visio pour identifier le chemin critique à tester, trois à cinq écrans, et la question à laquelle le test doit répondre : lance-t-on le développement ou pas ?
+- **Le panel.** Cinq à dix testeurs choisis à la main parmi les profils qui ressemblent à votre cible. Chacun signe un accord de confidentialité avant de recevoir le lien du prototype.
+- **Le questionnaire.** Le lien de prototype est intégré au questionnaire, écrit avec vous. Le testeur répond étape par étape, et peut joindre jusqu'à trois captures d'écran par question.
+- **La relecture.** Chaque réponse est relue. Une réponse bâclée est refusée, non payée, non facturée, et n'entre pas dans le rapport.
+- **Le rapport.** Sous cinq jours ouvrés après le lancement : ce qui a été compris, ce qui a été cherché sans être trouvé, les mots des testeurs rattachés à chaque friction, une gravité en trois niveaux, et une recommandation : lancer le développement, corriger d'abord, ou retester une variante. Il est restitué en visio.
+
 ## Le bon moment
 
 Le meilleur moment pour tester une maquette est celui où elle est assez complète pour qu'un inconnu puisse dérouler un scénario de bout en bout, et encore assez légère pour que vous acceptiez de la changer. Si l'équipe de développement a déjà commencé, vous testerez quand même, mais vous écouterez moins.
 
-Pour le déroulé complet d'une mission sur maquette, du cadrage au rapport, voir [tester une maquette Figma avec earlypanel](/test-maquette-figma).
+Le déroulé complet, du cadrage au rapport, est décrit sur [tester une maquette Figma avec earlypanel](/test-maquette-figma).
 
 ## Questions fréquentes
 
@@ -92,4 +102,4 @@ La rapidité perçue, le comportement avec de vraies données, les cas limites n
 
 ### Combien de testeurs pour une maquette Figma ?
 
-Cinq à dix participants proches de la cible suffisent pour voir les gros problèmes d'un parcours avant le développement, avec trois ou quatre par profil si la cible en compte plusieurs.
+Chez earlypanel, un test de maquette réunit cinq à dix testeurs choisis à la main sur un parcours de trois à cinq écrans. Le raisonnement sur le nombre est détaillé dans l'article sur le nombre de testeurs.

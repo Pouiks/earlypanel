@@ -53,7 +53,7 @@ Un bon scénario a trois parties :
 - **La tâche**, formulée comme un objectif et jamais comme un chemin : « Créez votre premier devis pour un client, avec trois prestations et une remise. »
 - **Les questions**, posées après la tâche, qui forcent à décrire plutôt qu'à juger : « Décrivez ce que vous avez fait à partir du moment où vous avez cherché à ajouter la remise. Où avez-vous hésité ? »
 
-Alternez les formats. Une question fermée (« Avez-vous réussi à envoyer le devis ? Oui / Non / Partiellement ») donne un chiffre. Une échelle de 1 à 5 donne une tendance. Une question ouverte donne la raison. Les trois ensemble donnent un rapport.
+Alternez les formats. Une question fermée (« Avez-vous réussi à envoyer le devis ? Oui / Non ») donne un chiffre. Une échelle de 1 à 5 donne une tendance. Une question ouverte donne la raison. Les trois ensemble donnent un rapport.
 
 Évitez les questions de satisfaction générale (« Avez-vous aimé ? »). Les gens sont polis. Demandez ce qu'ils ont fait et ce qu'ils ont compris : c'est là que les problèmes apparaissent.
 
@@ -68,7 +68,7 @@ Relire sérieusement, c'est :
 - **Écarter les réponses qui n'en sont pas.** Une réponse trop courte, hors sujet ou visiblement copiée d'un autre champ ne doit pas entrer dans l'analyse. Chez earlypanel, elle n'est pas payée au testeur et n'est pas comptabilisée dans le rapport. C'est ce qui garantit qu'un « 9 sur 12 » veut dire quelque chose.
 - **Garder les verbatims avec leur question.** Une citation sans la question qui l'a provoquée perd l'essentiel de son sens.
 
-Comptez une bonne demi-journée de lecture pour dix testeurs et une vingtaine de questions. C'est le vrai coût d'un test utilisateur, et c'est celui qu'on ne doit pas économiser.
+Chez earlypanel, on compte une bonne demi-journée de lecture pour dix testeurs et une vingtaine de questions. C'est le vrai coût d'un test utilisateur, et c'est celui qu'on ne doit pas économiser.
 
 ## 5. Restituer pour décider
 
@@ -88,6 +88,11 @@ Tout ce qui précède peut se faire en interne. Ce qui manque le plus souvent, c
 
 C'est exactement le périmètre d'un [test utilisateur clés en main](/entreprises) : vous apportez l'objectif et le produit, le reste est pris en charge, du recrutement à la restitution.
 
+## Sources
+
+- Le déroulé, la structure du rapport et la règle de relecture décrits ici sont ceux des missions earlypanel au moment de la publication.
+- Sur le nombre de participants, les références sont rassemblées dans [combien de testeurs pour un test utilisateur](/blog/combien-de-testeurs-test-utilisateur).
+
 ## Questions fréquentes
 
 ### Qu'est-ce qu'un test utilisateur à distance ?
@@ -96,7 +101,7 @@ C'est un test où chaque participant réalise des scénarios sur le produit depu
 
 ### Combien de temps dure un test utilisateur à distance ?
 
-Pour le participant, quinze à quarante minutes selon le nombre de scénarios. Pour l'équipe, comptez une heure de cadrage, quelques jours de recrutement et de collecte, puis une demi-journée de relecture pour dix testeurs. Chez earlypanel, le rapport est livré cinq jours ouvrés après le lancement.
+Pour le participant, environ 25 minutes en moyenne sur les missions earlypanel, davantage quand les scénarios sont nombreux. Pour l'équipe, comptez une heure de cadrage, quelques jours de recrutement et de collecte, puis une demi-journée de relecture pour dix testeurs. Chez earlypanel, le rapport est livré cinq jours ouvrés après le lancement.
 
 ### Test modéré ou non modéré : lequel choisir ?
 

@@ -41,7 +41,7 @@ C'est le modèle d'earlypanel. Nos missions sont chiffrées après un atelier de
 Quel que soit le modèle, cinq variables expliquent l'essentiel des écarts.
 
 1. **La rareté des profils.** Recruter dix personnes qui utilisent un smartphone ne coûte presque rien. Recruter dix directeurs financiers ou dix infirmiers libéraux qui n'ont jamais vu votre produit demande du temps, un réseau et une rémunération plus élevée par participant. C'est la première variable, et de loin.
-2. **Le nombre de participants.** Chaque testeur supplémentaire coûte sa rémunération et, surtout, son temps de relecture. Au-delà de douze, le coût monte plus vite que ce que vous apprenez. Nous en parlons dans [combien de testeurs pour un test utilisateur](/blog/combien-de-testeurs-test-utilisateur).
+2. **Le nombre de participants.** Chaque testeur supplémentaire coûte sa rémunération et, surtout, son temps de relecture. Passé la quinzaine, chaque participant apporte peu de problèmes nouveaux et autant de relecture. Nous en parlons dans [combien de testeurs pour un test utilisateur](/blog/combien-de-testeurs-test-utilisateur).
 3. **Le nombre de scénarios.** Deux à quatre scénarios bien cadrés valent mieux que huit. Au-delà, la fatigue dégrade les réponses et la relecture s'allonge sans rien apprendre de plus.
 4. **Le mode de test.** Un test non modéré, où chaque participant travaille seul à distance, coûte nettement moins qu'une série d'entretiens animés en visio, qui immobilisent un animateur une heure par participant, plus la transcription.
 5. **Le niveau de livrable.** Des données brutes exportées d'un outil, un tableau de synthèse, ou un rapport rédigé avec frictions priorisées, verbatims et recommandations : ce sont trois quantités de travail très différentes, et trois prix.
@@ -61,9 +61,14 @@ Demandez à tout prestataire, plateforme comprise, ce qui arrive à une réponse
 
 ## En résumé
 
-Le prix d'un test utilisateur va de quelques dizaines d'euros par mois pour un outil que vous pilotez seul, à plusieurs milliers d'euros pour un service ou une agence qui livre un rapport prêt à décider. La bonne question n'est pas « combien ça coûte », mais « combien coûte une décision prise sans test ». Sur un onboarding, un checkout ou un lancement, elle est rarement inférieure.
+Le prix d'un test utilisateur va d'un abonnement ou de crédits pour un outil que vous pilotez seul, à plusieurs milliers d'euros pour un service ou une agence qui livre un rapport prêt à décider. La bonne question n'est pas « combien ça coûte », mais « combien coûte une décision prise sans test ». Sur un onboarding, un checkout ou un lancement, elle est rarement inférieure.
 
 Pour situer votre projet, décrivez-le en quelques lignes sur la page [entreprises](/entreprises#brief) : vous recevez un devis sous 48 heures, après un atelier de cadrage offert.
+
+## Sources
+
+- Les prix, délais et conditions earlypanel cités ici sont ceux affichés sur la page [entreprises](/entreprises) au moment de la publication. Les autres modèles sont décrits dans leur principe, sans tarif chiffré : les grilles des plateformes et des agences changent, vérifiez-les sur leurs sites.
+- Sur le rendement décroissant des participants, voir [combien de testeurs pour un test utilisateur](/blog/combien-de-testeurs-test-utilisateur) et ses références.
 
 ## Questions fréquentes
 

@@ -67,7 +67,7 @@ Posez trois questions dans l'ordre :
 2. **Que coûte une erreur à ce stade ?** Quelques heures de design, quelques sprints, ou des clients perdus. Plus le coût est élevé, plus le test se justifie tôt.
 3. **Qu'est-ce que l'équipe ne peut plus voir ?** Ce que vous ne pouvez pas mesurer en interne est ce qu'un regard extérieur apporte.
 
-Si la réponse pointe vers l'un des trois moments décrits, un test de huit à douze participants, cadré sur cette décision, est presque toujours le meilleur investissement du trimestre. Pour situer votre cas, la page [entreprises](/entreprises) décrit ce qu'on teste et comment.
+Si la réponse pointe vers l'un des trois moments décrits, un test cadré sur cette décision, de cinq à vingt participants selon le format, est presque toujours le meilleur investissement du trimestre. Pour situer votre cas, la page [entreprises](/entreprises) décrit ce qu'on teste et comment.
 
 ## Questions fréquentes
 

@@ -22,12 +22,12 @@ Combien de testeurs pour un test utilisateur ? C'est la première question que p
 
 Vous cherchez à découvrir les frictions d'un parcours : les endroits où les gens hésitent, se trompent, abandonnent ou comprennent autre chose que ce que vous vouliez dire. C'est le cas le plus fréquent, et c'est celui où l'on a besoin de moins de monde qu'on ne le croit.
 
-La règle des « cinq utilisateurs », popularisée par le Nielsen Norman Group, repose sur une observation simple : les premiers participants révèlent la majorité des problèmes, et chaque participant supplémentaire en découvre de moins en moins de nouveaux. Cinq personnes suffisent pour trouver les problèmes les plus fréquents d'un parcours donné, pour un public homogène.
+La règle des « cinq utilisateurs » vient d'un modèle publié par Jakob Nielsen et Thomas Landauer en 1993 : sur les projets qu'ils ont étudiés, un participant révèle en moyenne 31 % des problèmes d'utilisabilité, et chaque participant supplémentaire en découvre de moins en moins de nouveaux. Robert Virzi avait observé la même chose en 1992 : 80 % des problèmes trouvés avec quatre ou cinq participants. Nielsen en a tiré en 2000 la règle que tout le monde cite : cinq personnes suffisent pour trouver la plupart des problèmes d'un parcours donné, pour un public homogène.
 
 Dans la pratique d'un test à distance, nous recommandons plutôt **huit à douze participants**, pour trois raisons :
 
-- **À distance, il y a de la perte.** Sans animateur, une réponse sur dix est inutilisable, trop courte ou hors sujet. Il faut de la marge pour que le panel final reste solide.
-- **Votre cible n'est presque jamais homogène.** Si votre produit s'adresse à des gérants de TPE et à des freelances, à des gens à l'aise avec le numérique et à d'autres qui ne le sont pas, chaque sous-groupe doit compter au moins trois ou quatre personnes pour qu'un problème observé ne soit pas un cas isolé.
+- **À distance, il y a de la perte.** Sans animateur, il y a toujours des réponses inutilisables, trop courtes ou hors sujet, qui sont écartées à la relecture. Il faut de la marge pour que le panel final reste solide.
+- **Votre cible n'est presque jamais homogène.** Si votre produit s'adresse à des gérants de TPE et à des freelances, à des gens à l'aise avec le numérique et à d'autres qui ne le sont pas, chaque sous-groupe doit compter au moins trois ou quatre personnes pour qu'un problème observé ne soit pas un cas isolé. Laura Faulkner l'a mesuré en 2003 : des groupes de cinq tirés au hasard parmi soixante participants trouvaient entre 55 % et 99 % des problèmes selon les personnes du groupe. Avec dix, aucun groupe ne descendait sous 80 %.
 - **Un chiffre par scénario devient lisible.** « 9 sur 12 ont envoyé le devis » se comprend immédiatement. « 3 sur 4 » laisse un doute.
 
 Au-delà de quinze, le rendement chute : vous relisez deux fois plus de réponses pour apprendre à peine plus. Si vous avez le budget pour trente testeurs, faites plutôt deux tests de douze à un mois d'intervalle, avant et après vos correctifs.
@@ -40,7 +40,7 @@ Avant de lancer ce type de test, posez-vous une question honnête : la différen
 
 ### « Quel pourcentage de nos utilisateurs réussit ? » : une mesure
 
-Vous voulez un chiffre fiable, avec une marge d'erreur, pour le présenter à un comité ou le suivre dans le temps. C'est de la mesure quantitative, et ses règles sont celles des statistiques : à trente participants, une proportion observée reste entourée d'une marge d'erreur de l'ordre de quinze points. Pour descendre sous cinq points, il faut plusieurs centaines de réponses.
+Vous voulez un chiffre fiable, avec une marge d'erreur, pour le présenter à un comité ou le suivre dans le temps. C'est de la mesure quantitative, et ses règles sont celles des statistiques : à trente participants, une proportion observée autour de 50 % reste entourée d'une marge d'erreur de quinze à vingt points. Pour descendre sous cinq points, il faut plusieurs centaines de réponses. Le calcul est détaillé dans « Quantifying the User Experience » de Jeff Sauro et James Lewis.
 
 Un test utilisateur à distance, avec recrutement à la main et relecture humaine, n'est pas l'outil adapté pour ça. Les analytics de votre produit le sont. Le test utilisateur vous dit **pourquoi** le chiffre est ce qu'il est ; les analytics vous disent **combien**.
 
@@ -59,7 +59,15 @@ Le nombre de participants est la variable la plus visible et la moins détermina
 2. **La qualité des scénarios.** Un scénario qui guide la réponse ne produit rien, quel que soit le panel.
 3. **La discipline de relecture.** Écarter les réponses insuffisantes et ne garder que les participations complètes est ce qui donne du sens au « 9 sur 12 ». Un chiffre qui compte tout le monde, y compris ceux qui n'ont pas fini, ne veut rien dire.
 
-C'est pour cette raison que nos missions partent sur huit à douze profils recrutés à la main, avec une relecture de chaque réponse avant qu'elle n'entre dans le rapport. Pour savoir si c'est le bon format pour votre cas, le plus simple est d'en [parler quinze minutes](/entreprises#brief).
+C'est pour cette raison que les missions earlypanel sont dimensionnées selon le format, cinq à dix testeurs sur une maquette, huit à quinze sur un funnel, dix à vingt avant un lancement, tous choisis à la main, avec une relecture de chaque réponse avant qu'elle n'entre dans le rapport. Pour savoir quel format convient à votre cas, décrivez-le sur la page [entreprises](/entreprises#brief).
+
+## Sources
+
+- Jakob Nielsen et Thomas K. Landauer, « A mathematical model of the finding of usability problems », CHI 1993 : [dl.acm.org](https://dl.acm.org/doi/10.1145/169059.169166)
+- Robert A. Virzi, « Refining the Test Phase of Usability Evaluation: How Many Subjects Is Enough? », Human Factors, 1992 : [journals.sagepub.com](https://journals.sagepub.com/doi/10.1177/001872089203400407)
+- Jakob Nielsen, « Why You Only Need to Test with 5 Users », Nielsen Norman Group, 2000 : [nngroup.com](https://www.nngroup.com/articles/why-you-only-need-to-test-with-5-users/)
+- Laura Faulkner, « Beyond the five-user assumption: Benefits of increased sample sizes in usability testing », Behavior Research Methods, Instruments, & Computers, 2003 : [link.springer.com](https://link.springer.com/article/10.3758/BF03195514)
+- Jeff Sauro et James R. Lewis, « Quantifying the User Experience: Practical Statistics for User Research », 2e édition, 2016 : [measuringu.com](https://measuringu.com/book/quantifying-the-user-experience-practical-statistics-for-user-research/)
 
 ## Questions fréquentes
 

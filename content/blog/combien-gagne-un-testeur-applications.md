@@ -7,15 +7,15 @@ tags: [rémunération, devenir testeur]
 draft: false
 ---
 
-Combien gagne un testeur d'applications ? La réponse honnête tient en deux parties. Par mission, la rémunération est correcte pour quinze à quarante minutes de travail sérieux. Par mois, elle dépend entièrement du nombre de missions pour lesquelles votre profil est sélectionné, et ce nombre ne dépend pas de vous. Ce guide explique ce qui fait varier le montant, ce qui fait qu'une mission est payée ou refusée, et comment se situent les ordres de grandeur, sans promesse.
+Combien gagne un testeur d'applications ? La réponse honnête tient en deux parties. Par mission, la rémunération va de 15 à 100 € pour environ 25 minutes de travail sérieux. Par mois, elle dépend entièrement du nombre de missions pour lesquelles votre profil est sélectionné, et ce nombre ne dépend pas de vous. Ce guide explique ce qui fait varier le montant, ce qui fait qu'une mission est payée ou refusée, et comment se situent les ordres de grandeur, sans promesse.
 
 ## En bref
 
-- Par mission validée, la rémunération va de quelques dizaines d'euros à une centaine pour les missions longues sur profils rares.
+- Par mission validée, la rémunération va de 15 à 100 € selon la mission, la rareté du profil et la qualité des réponses.
 - Par mois, tout dépend du nombre de missions pour lesquelles le profil est sélectionné, et ce nombre n'est jamais garanti.
 - Trois variables : la mission elle-même, la rareté du profil, la qualité des réponses après relecture.
 - Une mission bâclée n'est pas payée ; une mission bien évaluée est mieux rémunérée et ouvre des niveaux supérieurs.
-- Le paiement se fait par virement sur l'IBAN renseigné, après validation ; ces revenus se déclarent.
+- Le paiement se fait par virement SEPA sous 72 heures après validation, sur l'IBAN renseigné ; ces revenus se déclarent.
 
 ## Ce qui est payé
 
@@ -29,7 +29,7 @@ Trois choses.
 
 1. **La mission elle-même.** Sa durée, le nombre de scénarios, ce qu'elle demande. Un test de dix minutes sur un formulaire ne se paie pas comme quarante minutes sur un logiciel métier avec captures d'écran.
 2. **La rareté de votre profil.** Les entreprises paient plus pour des profils précis et difficiles à trouver : un métier particulier, un équipement spécifique, une situation rare. Un profil complet et précis est sélectionné plus souvent et pour des missions mieux rémunérées.
-3. **La qualité de vos réponses.** Après relecture, chaque mission reçoit une évaluation. Une mission jugée de bonne qualité est mieux rémunérée qu'une mission juste acceptable. Une mission bâclée n'est pas payée du tout.
+3. **La qualité de vos réponses.** Après relecture, chaque mission reçoit une note de 1 à 5. À partir de 4, la rémunération de base est majorée de 10 %. À 3, elle est versée telle quelle. À 1 ou 2, elle est réduite de 15 %. Une mission bâclée n'est pas payée du tout.
 
 Avec le temps, les testeurs dont les missions sont régulièrement bien évaluées passent dans des niveaux supérieurs, avec une rémunération de base plus élevée. C'est le seul levier qui dépend de vous : la précision.
 
@@ -41,7 +41,7 @@ C'est pour cette raison que tester des applications est un complément de revenu
 
 ## Comment et quand on est payé
 
-Par virement bancaire, sur l'IBAN renseigné dans votre espace. Le virement est déclenché après validation de la mission, généralement sous quelques jours ouvrés. Sans IBAN, aucune mission ne peut être démarrée : c'est la seule condition bloquante de la plateforme, et elle existe précisément pour que chaque mission validée puisse être payée.
+Par virement SEPA, sur l'IBAN renseigné dans votre espace, sous 72 heures après validation de la mission. Sans IBAN, aucune mission ne peut être démarrée : cette condition existe précisément pour que chaque mission validée puisse être payée.
 
 Votre espace affiche l'historique de vos missions, leur statut et les montants correspondants. Aucun montant en attente n'est perdu : il reste dû jusqu'au paiement.
 
@@ -51,7 +51,7 @@ Oui. Les rémunérations de tests utilisateurs sont des revenus et doivent être
 
 ## Ordres de grandeur, sans promesse
 
-Pour vous situer : une mission validée rapporte de l'ordre de quelques dizaines d'euros, jusqu'à une centaine pour les missions longues sur des profils rares, comme indiqué sur la page [devenir testeur](/testeurs). Sur un mois, le total va de zéro, quand aucun projet ne correspond à votre profil, à plusieurs missions pour les profils recherchés. Personne ne vit de tests utilisateurs. Beaucoup en font un complément agréable, à condition de prendre chaque mission au sérieux.
+Pour vous situer : une mission validée rapporte entre 15 et 100 € selon le profil et la durée du test, comme indiqué sur la page [devenir testeur](/testeurs). Sur un mois, le total va de zéro, quand aucun projet ne correspond à votre profil, à plusieurs missions pour les profils recherchés. Personne ne vit de tests utilisateurs. Beaucoup en font un complément agréable, à condition de prendre chaque mission au sérieux.
 
 Le déroulé complet d'une mission, de l'invitation au paiement, est décrit dans [devenir testeur rémunéré : comment ça marche](/testeurs/guides/devenir-testeur-remunere-comment-ca-marche).
 
@@ -59,7 +59,7 @@ Le déroulé complet d'une mission, de l'invitation au paiement, est décrit dan
 
 ### Combien gagne un testeur d'applications par mission ?
 
-De quelques dizaines d'euros à une centaine selon la durée de la mission, la rareté du profil et la qualité des réponses, comme indiqué sur la page d'inscription. Une mission refusée après relecture n'est pas payée.
+De 15 à 100 € selon la durée de la mission, la rareté du profil et la qualité des réponses, comme indiqué sur la page d'inscription. Une mission refusée après relecture n'est pas payée.
 
 ### Combien de missions par mois peut-on espérer ?
 
@@ -67,7 +67,7 @@ Cela dépend des projets des entreprises et de la correspondance avec votre prof
 
 ### Quand et comment est-on payé ?
 
-Par virement bancaire sur l'IBAN renseigné dans l'espace testeur, après validation de la mission, généralement sous quelques jours ouvrés. Sans IBAN, une mission ne peut pas être démarrée.
+Par virement SEPA sur l'IBAN renseigné dans l'espace testeur, sous 72 heures après validation de la mission. Sans IBAN, une mission ne peut pas être démarrée.
 
 ### Faut-il déclarer les revenus de tests utilisateurs ?
 

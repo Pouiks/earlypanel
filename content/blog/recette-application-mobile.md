@@ -14,7 +14,7 @@ La recette d'une application mobile est l'étape où l'on vérifie, avant de pub
 - La recette technique se fait avec une liste écrite : parcours complets, états intermédiaires, permissions refusées, entrées inattendues, mise à jour, suppression de compte.
 - Testez sur un appareil ancien ou d'entrée de gamme, un petit et un grand écran, les deux systèmes, une connexion dégradée.
 - Le test utilisateur se fait sur le vrai téléphone du testeur, avec des scénarios et non des instructions, et des captures d'écran.
-- Comptez au moins deux semaines entre la fin du développement et la soumission aux stores.
+- Notre conseil : au moins deux semaines entre la fin du développement et la soumission aux stores.
 
 ## Deux recettes, pas une
 
@@ -35,7 +35,7 @@ Le principe est simple et rarement appliqué : écrire la liste de ce qu'il faut
 - **Les permissions** : l'utilisateur refuse l'accès à la caméra, aux notifications, à la localisation. L'application doit continuer à fonctionner et expliquer ce qu'il perd.
 - **Les entrées inattendues** : un nom avec un apostrophe, une adresse très longue, un montant à virgule, un clavier dans une autre langue.
 - **La reprise après mise à jour** : installer la version précédente, créer des données, mettre à jour, vérifier que tout est encore là.
-- **La suppression de compte** et l'export des données, obligatoires et souvent oubliés.
+- **La suppression de compte**, exigée par l'App Store et Google Play pour toute application qui crée des comptes, et l'export des données. Les deux sont souvent oubliés.
 
 Chaque point est vérifié, daté, avec la version testée. Ce qui échoue devient un ticket avec les étapes pour reproduire, l'appareil et la version du système.
 
@@ -61,28 +61,34 @@ Une fois la recette technique passée, l'application est stable mais rien ne dit
 Ce qui fait la différence dans un test utilisateur d'application mobile :
 
 - **La distribution.** Une version de test (TestFlight, lien de test interne sur le Play Store, fichier d'installation) que les testeurs peuvent installer seuls, avec une consigne d'installation vérifiée avant l'envoi. Un testeur qui n'arrive pas à installer l'application n'est pas un résultat, c'est un test perdu.
-- **Le vrai téléphone.** Le testeur utilise son appareil, avec ses paramètres, sa connexion, son clavier. C'est exactement ce que vous ne pouvez pas reproduire en interne.
+- **Le vrai téléphone.** Le testeur utilise son appareil, avec ses paramètres, sa connexion, son clavier. C'est exactement ce que vous ne pouvez pas reproduire en interne. Le profil de chaque testeur earlypanel indique ses appareils, son système mobile, son modèle de téléphone et son type de connexion, fibre, ADSL ou 4G/5G, et le panel se compose sur ces critères.
 - **Des scénarios, pas des instructions.** « Vous venez de télécharger l'application pour réserver votre prochain cours. Réservez celui de jeudi soir. » Rien sur où cliquer. La méthode complète est décrite dans [test utilisateur à distance : la méthode](/blog/test-utilisateur-a-distance-methode).
-- **Des captures d'écran.** Demandez aux testeurs de capturer l'écran à chaque hésitation. Sur mobile, une capture vaut souvent mieux qu'un paragraphe.
-- **Un critère de réussite par scénario.** « La réservation apparaît dans l'onglet Mes cours. » C'est ce qui permet de dire combien ont réussi.
+- **Des captures d'écran.** Sur mobile, une capture vaut souvent mieux qu'un paragraphe. Dans une mission earlypanel, chaque question accepte jusqu'à trois captures.
+- **Un critère de réussite par scénario.** « La réservation apparaît dans l'onglet Mes cours. » C'est ce qui permet de dire combien ont réussi. Chez earlypanel, chaque scénario est écrit avec vous, avec sa consigne et ses critères de réussite, et le rapport donne le résultat scénario par scénario.
 
-Huit à douze testeurs proches de votre cible suffisent pour voir les frictions principales d'une application avant publication. Le déroulé d'une mission sur une préversion est décrit sur [tester son produit avant le lancement](/test-pre-lancement-staging).
+Un test avant lancement earlypanel réunit dix à vingt testeurs, avec un petit groupe par rôle utilisateur quand l'application en compte plusieurs, sur des accès créés pour l'occasion et supprimés après. Le déroulé est décrit sur [tester son produit avant le lancement](/test-pre-lancement-staging).
 
 ## Ce qu'une bonne recette produit
 
 À la fin, vous devez avoir trois listes, et pas une seule :
 
-1. **Les bugs**, issus de la recette technique et du test utilisateur, avec appareil, version et étapes pour reproduire. À corriger avant publication ou à documenter comme limitation connue.
-2. **Les frictions**, issues du test utilisateur : ce qui fonctionne mais que les gens ne comprennent pas. Classées par gravité : bloque le parcours, ralentit, agace.
+1. **Les bugs**, issus de la recette technique et du test utilisateur, avec l'appareil concerné, les testeurs touchés et l'étape du parcours. À corriger avant publication ou à documenter comme limitation connue.
+2. **Les frictions**, issues du test utilisateur : ce qui fonctionne mais que les gens ne comprennent pas. Classées en trois niveaux de gravité : bloque le parcours, gêne, cosmétique.
 3. **Les décisions** : ce qui bloque la publication, ce qui attend la version suivante, ce que le support doit savoir dès le premier jour.
 
 Une recette qui ne produit que la première liste vous dira que l'application marche. Elle ne vous dira pas si quelqu'un arrivera à s'en servir.
 
 ## Le calendrier réaliste
 
-Comptez au moins deux semaines entre la fin du développement et la soumission aux stores : quelques jours de recette technique et de corrections, une semaine de test utilisateur sur une version stabilisée, quelques jours pour corriger ce qui bloque. Ajoutez le délai de validation des stores, qui n'est pas sous votre contrôle.
+Nous conseillons au moins deux semaines entre la fin du développement et la soumission aux stores : quelques jours de recette technique et de corrections, une semaine de test utilisateur sur une version stabilisée, quelques jours pour corriger ce qui bloque. Ajoutez le délai de validation des stores, qui n'est pas sous votre contrôle.
 
 Si le calendrier ne laisse pas cette place, ce n'est pas la recette qu'il faut raccourcir, c'est la publication qu'il faut décaler. Une application publiée avec un parcours que personne ne comprend coûte plus cher en avis négatifs et en support qu'une semaine de retard.
+
+## Sources
+
+- Apple, App Store Review Guidelines, section 5.1.1 sur la suppression de compte : [developer.apple.com](https://developer.apple.com/app-store/review/guidelines/#5.1.1)
+- Google Play, politique sur la suppression de compte : [support.google.com](https://support.google.com/googleplay/android-developer/answer/13327111)
+- Le déroulé d'une mission décrit ici est celui d'earlypanel au moment de la publication.
 
 ## Questions fréquentes
 
@@ -96,7 +102,7 @@ Sur la répartition réelle de votre cible si vous avez des analytics, sinon au 
 
 ### Combien de testeurs pour tester une application mobile avant publication ?
 
-Huit à douze personnes proches de votre cible, sur leur propre téléphone, suffisent pour voir les frictions principales. Prévoyez des profils sur les deux systèmes et sur des appareils de gammes différentes.
+Chez earlypanel, un test avant lancement réunit dix à vingt personnes proches de votre cible, sur leur propre téléphone, avec un petit groupe par rôle utilisateur. Prévoyez des profils sur les deux systèmes et sur des appareils de gammes différentes.
 
 ### Combien de temps prévoir pour la recette ?
 

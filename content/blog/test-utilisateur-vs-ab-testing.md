@@ -22,9 +22,9 @@ Un A/B test expose deux versions d'une page ou d'un parcours à des utilisateurs
 
 Ses limites sont tout aussi nettes :
 
-- **Il faut du trafic.** Détecter une différence de quelques points entre deux variantes demande des milliers de visiteurs par branche. Sur un produit B2B qui reçoit deux cents inscriptions par mois, le test dure des mois ou ne conclut jamais.
+- **Il faut du trafic.** Le volume nécessaire se calcule avant de lancer, à partir de l'écart qu'on espère détecter et du taux de conversion actuel : plus l'écart attendu est petit, plus il faut de visiteurs par variante. Sur un produit B2B à faible trafic, le test dure des mois ou ne conclut jamais.
 - **Il faut des variantes.** L'A/B test compare des hypothèses que vous avez déjà. Il ne vous dit pas quoi tester. Si vos deux variantes sont mauvaises, il vous dira laquelle l'est le moins.
-- **Il ne dit jamais pourquoi.** Une variante gagne. Vous ne savez pas si c'est le libellé, la position, la couleur ou le fait qu'un bug affectait l'autre branche.
+- **Il ne dit jamais pourquoi.** Une variante gagne. Vous ne savez pas si c'est le libellé, la position, la couleur ou le fait qu'un bug affectait l'autre branche. C'est la réserve que formule le Nielsen Norman Group dans « Putting A/B Testing in Its Place » : la méthode mesure un comportement, elle n'en donne pas la raison.
 - **Il faut un produit en production.** Rien à tester sur une maquette ou une préversion.
 
 ## Ce que fait vraiment un test utilisateur
@@ -33,7 +33,7 @@ Un test utilisateur place un petit nombre de personnes, choisies pour ressembler
 
 Ses limites :
 
-- **Il ne mesure pas.** « 9 testeurs sur 12 ont réussi » décrit un panel, pas votre base d'utilisateurs. Aucune marge d'erreur, aucune extrapolation possible à un pourcentage de conversion.
+- **Il ne mesure pas.** « 9 testeurs sur 12 ont réussi » décrit un panel, pas votre base d'utilisateurs. Jeff Sauro et James Lewis consacrent un chapitre de « Quantifying the User Experience » aux tailles d'échantillon des études qui cherchent des problèmes : on peut y conclure avec moins de dix participants, mais sur ce qui bloque, pas sur un taux de conversion.
 - **Il dépend du recrutement.** Dix personnes qui ne ressemblent pas à vos clients produisent dix mauvaises réponses. La qualité du panel fait la qualité du test.
 - **Il dépend de la relecture.** Les réponses doivent être lues, triées, confrontées. Un test dont les réponses bâclées sont comptées comme les autres ne vaut rien.
 
@@ -65,11 +65,17 @@ Cette boucle coûte moins cher qu'une série d'A/B tests à l'aveugle, parce qu'
 - **Faire des A/B tests sans trafic.** Le test ne conclut jamais, l'équipe finit par choisir « au feeling » et appelle ça de la data.
 - **Demander à un test utilisateur un pourcentage.** Douze personnes ne donnent pas un taux de conversion. Elles donnent des raisons.
 - **Tester des variantes que personne n'a comprises.** Un A/B test entre deux formulations obscures désigne un gagnant obscur.
-- **Compter toutes les réponses d'un test utilisateur.** Une réponse expédiée en trois mots n'est pas une donnée. Elle doit être refusée et exclue.
+- **Compter toutes les réponses d'un test utilisateur.** Une réponse expédiée en trois mots n'est pas une donnée. Chez earlypanel, elle est refusée après relecture, non payée, et n'entre pas dans le rapport.
 
 ## En résumé
 
 L'A/B testing mesure, le test utilisateur explique. Sans trafic, sans hypothèses ou avant la production, le test utilisateur est la seule méthode utilisable. Avec du trafic et des variantes crédibles, l'A/B test tranche. Le meilleur programme produit fait précéder chaque A/B test important d'un test utilisateur court, et le fait suivre d'un autre quand le résultat surprend.
+
+## Sources
+
+- Nielsen Norman Group, « Putting A/B Testing in Its Place » : [nngroup.com](https://www.nngroup.com/articles/putting-ab-testing-in-its-place/)
+- Nielsen Norman Group, « When to Use Which User-Experience Research Methods » : [nngroup.com](https://www.nngroup.com/articles/which-ux-research-methods/)
+- Jeff Sauro et James R. Lewis, « Quantifying the User Experience: Practical Statistics for User Research », 2e édition, Morgan Kaufmann, 2016 : [measuringu.com](https://measuringu.com/book/quantifying-the-user-experience-practical-statistics-for-user-research/)
 
 ## Questions fréquentes
 
@@ -87,4 +93,4 @@ Oui, et c'est la meilleure pratique : un test utilisateur court avant pour ident
 
 ### Combien de trafic faut-il pour un A/B test ?
 
-Assez pour détecter la différence attendue avec une confiance raisonnable : quelques milliers de visiteurs par variante pour des écarts de quelques points. Sur un produit B2B à faible trafic, le test dure des mois ou ne conclut jamais.
+Cela se calcule avant le test, à partir de l'écart attendu et du taux de conversion actuel, avec un calculateur de taille d'échantillon. Plus l'écart attendu est petit, plus il faut de visiteurs par variante. Sur un produit B2B à faible trafic, le test dure des mois ou ne conclut jamais.
