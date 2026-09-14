@@ -147,3 +147,45 @@ export function shouldPauseAfterReminders(t: ReminderLoopFields, now: Date = new
 export function isLastReminder(t: ReminderLoopFields): boolean {
   return reminderCount(t) + 1 >= AVAILABILITY_REMINDER_MAX;
 }
+
+export type AvailabilityReminderStateKind =
+  | "due"        // relance au prochain passage du cron
+  | "cooldown"   // relance envoyee, prochaine a `next_at`
+  | "exhausted"  // 3 relances envoyees ; pause a `next_at`
+  | "paused";    // status inactive apres 3 relances sans reponse
+
+export interface AvailabilityReminderState {
+  kind: AvailabilityReminderStateKind;
+  /** Date de la prochaine action automatique (relance ou pause), null si aucune. */
+  next_at: string | null;
+  count: number;
+}
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Etat de la boucle pour un testeur SANS disponibilite confirmee, tel que le
+ * cron le verrait a `now`. Miroir de describeReminderState (relance profil)
+ * pour la vue staff. Pur, teste dans tests/unit/tester-engagement.test.ts.
+ */
+export function describeAvailabilityReminderState(
+  t: ReminderLoopFields & { status?: string | null },
+  now: Date = new Date()
+): AvailabilityReminderState {
+  const count = reminderCount(t);
+  const lastAt = t.availability_check_sent_at ? new Date(t.availability_check_sent_at) : null;
+
+  if (t.status === "inactive") return { kind: "paused", next_at: null, count };
+
+  if (count >= AVAILABILITY_REMINDER_MAX) {
+    const pauseAt = new Date((lastAt ?? now).getTime() + AVAILABILITY_REMINDER_COOLDOWN_DAYS * DAY_MS);
+    return { kind: "exhausted", next_at: pauseAt.toISOString(), count };
+  }
+
+  if (!lastAt) return { kind: "due", next_at: null, count };
+
+  const nextAt = new Date(lastAt.getTime() + AVAILABILITY_REMINDER_COOLDOWN_DAYS * DAY_MS);
+  return nextAt <= now
+    ? { kind: "due", next_at: null, count }
+    : { kind: "cooldown", next_at: nextAt.toISOString(), count };
+}

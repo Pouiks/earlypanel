@@ -3,6 +3,7 @@ import {
   AVAILABILITY_REMINDER_COOLDOWN_DAYS,
   AVAILABILITY_REMINDER_MAX,
   DORMANT_AFTER_DAYS,
+  describeAvailabilityReminderState,
   engagementState,
   engagementSortBonus,
   isLastReminder,
@@ -91,6 +92,18 @@ describe("boucle de relance de disponibilite", () => {
     // que 0 relance + cooldown ecoule = relance due, meme avec une ancienne
     // date de relance.
     expect(shouldAutoRemind({ ...base, availability_check_count: 0, availability_check_sent_at: daysAgo(20) }, now)).toBe(true);
+  });
+
+  it("vue staff : etat de la boucle tel que le cron le verrait", () => {
+    expect(describeAvailabilityReminderState({ ...base, availability_check_count: 0 }, now)).toMatchObject({ kind: "due", count: 0 });
+    const cooling = describeAvailabilityReminderState({ ...base, availability_check_count: 1, availability_check_sent_at: daysAgo(3) }, now);
+    expect(cooling.kind).toBe("cooldown");
+    expect(cooling.next_at).toBe(daysAgo(3 - AVAILABILITY_REMINDER_COOLDOWN_DAYS));
+    expect(describeAvailabilityReminderState({ ...base, availability_check_count: 1, availability_check_sent_at: daysAgo(15) }, now).kind).toBe("due");
+    const exhausted = describeAvailabilityReminderState({ ...base, availability_check_count: 3, availability_check_sent_at: daysAgo(5) }, now);
+    expect(exhausted.kind).toBe("exhausted");
+    expect(exhausted.next_at).toBe(daysAgo(5 - AVAILABILITY_REMINDER_COOLDOWN_DAYS));
+    expect(describeAvailabilityReminderState({ ...base, status: "inactive", availability_check_count: 3, availability_check_sent_at: daysAgo(30) }, now).kind).toBe("paused");
   });
 
   it("les cas de la capture du 14/09 : inscrits en avril, jamais relances (marquage perdu) = relance 1/3", () => {
