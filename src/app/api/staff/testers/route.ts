@@ -12,7 +12,7 @@ export const runtime = "edge";
 export const preferredRegion = "arn1";
 
 const SELECT_COLUMNS =
-  "id, email, first_name, last_name, phone, gender, city, postal_code, job_title, sector, company_size, digital_level, csp, birth_date, tools, browsers, devices, phone_model, mobile_os, connection, availability, interests, ux_experience, status, profile_completed, created_at, tier, quality_score, missions_completed, total_earned, available_until, availability_responded_at, availability_check_sent_at, last_login_at, last_seen_at, persona_id, persona_locked, persona:tester_personas(id, slug, name)";
+  "id, email, first_name, last_name, phone, gender, city, postal_code, job_title, sector, company_size, digital_level, csp, birth_date, tools, browsers, devices, phone_model, mobile_os, connection, availability, interests, ux_experience, status, profile_completed, created_at, tier, quality_score, missions_completed, total_earned, available_until, availability_responded_at, availability_check_sent_at, availability_check_count, last_login_at, last_seen_at, persona_id, persona_locked, persona:tester_personas(id, slug, name)";
 
 /**
  * GET /api/staff/testers

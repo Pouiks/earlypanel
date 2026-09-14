@@ -72,6 +72,8 @@ export interface Tester {
   available_until: string | null;
   availability_responded_at: string | null;
   availability_check_sent_at: string | null;
+  /** Relances de disponibilite envoyees depuis la derniere reponse (migration 046). */
+  availability_check_count?: number | null;
   // Activite (migration 043) : ouverture de session / derniere requete
   // authentifiee (granularite 1 h). NULL = jamais connecte.
   last_login_at: string | null;

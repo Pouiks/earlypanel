@@ -46,7 +46,8 @@ export async function POST(request: NextRequest) {
   if (!tester) return NextResponse.json({ error: "Profil introuvable" }, { status: 404 });
 
   const nowIso = new Date().toISOString();
-  const patch: Record<string, unknown> = { availability_responded_at: nowIso, updated_at: nowIso };
+  // Toute action du testeur est une reponse : la boucle de relance repart de zero.
+  const patch: Record<string, unknown> = { availability_responded_at: nowIso, availability_check_count: 0, updated_at: nowIso };
   let statusFilter: string | null = null; // garde atomique si transition de statut
 
   if (action === "confirm_available") {

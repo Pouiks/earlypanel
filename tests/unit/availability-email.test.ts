@@ -26,6 +26,14 @@ describe("buildAvailabilityCampaignEmail", () => {
     expect(html).toContain("Bonjour,");
   });
 
+  it("la dernière relance annonce la mise en pause, pas les autres", () => {
+    const last = buildAvailabilityCampaignEmail({ firstName: "Marie", ouiUrl: OUI, nonUrl: NON, isLast: true });
+    const normal = buildAvailabilityCampaignEmail({ firstName: "Marie", ouiUrl: OUI, nonUrl: NON });
+    expect(last).toContain("dernière relance");
+    expect(last).toContain("mis en pause");
+    expect(normal).not.toContain("dernière relance");
+  });
+
   it("échappe le HTML du prénom (anti-XSS)", () => {
     const html = buildAvailabilityCampaignEmail({
       firstName: "<script>alert(1)</script>",

@@ -305,8 +305,13 @@ export function buildAvailabilityCampaignEmail(opts: {
   firstName?: string | null;
   ouiUrl: string;
   nonUrl: string;
+  /** 3e et derniere relance de la boucle : annonce la mise en pause. */
+  isLast?: boolean;
 }): string {
   const greeting = opts.firstName ? `Bonjour ${escapeHtml(opts.firstName)},` : "Bonjour,";
+  const lastNotice = opts.isLast
+    ? `<p style="font-size:14px;color:#92600A;background:#FEF3C7;border-radius:10px;padding:12px 14px;line-height:1.6;margin:0 0 24px;">C'est notre dernière relance. Sans réponse d'ici deux semaines, votre compte sera mis en pause et vous ne recevrez plus d'offres. Vous pourrez le réactiver à tout moment en cliquant sur « Oui, je suis disponible » ou depuis votre espace.</p>`
+    : "";
   return `
 <!DOCTYPE html>
 <html lang="fr">
@@ -322,6 +327,7 @@ export function buildAvailabilityCampaignEmail(opts: {
           <p style="font-size:16px;color:#1d1d1f;margin:0 0 16px;font-weight:600;">${greeting}</p>
           <p style="font-size:14px;color:#6e6e73;line-height:1.6;margin:0 0 8px;">Êtes-vous toujours disponible pour réaliser des tests utilisateurs ?</p>
           <p style="font-size:14px;color:#6e6e73;line-height:1.6;margin:0 0 24px;">Quand une mission correspond à votre profil, il faut pouvoir y répondre vite. Confirmez votre disponibilité pour les <strong>3 prochains mois</strong>, ou indiquez que vous ne souhaitez plus recevoir d'offres.</p>
+          ${lastNotice}
 
           <table cellpadding="0" cellspacing="0" style="margin:0 0 12px;"><tr><td>
             <a href="${opts.ouiUrl}" style="display:inline-block;background:#0A7A5A;color:#fff;padding:14px 28px;border-radius:980px;font-size:15px;font-weight:700;text-decoration:none;">Oui, je suis disponible (3 mois) →</a>

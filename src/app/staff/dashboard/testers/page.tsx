@@ -10,6 +10,7 @@ import {
   type TesterAdvancedFilterState,
 } from "@/lib/tester-filters";
 import { ACTIVITY_FILTERS, formatLastSeen, isPastRgpdRetention } from "@/lib/tester-activity";
+import { engagementState, reminderCount, AVAILABILITY_REMINDER_MAX, ENGAGEMENT_LABELS, ENGAGEMENT_ORDER, ENGAGEMENT_TITLES, type EngagementState } from "@/lib/tester-engagement";
 
 interface TesterRow {
   id: string;
@@ -35,6 +36,8 @@ interface TesterRow {
   persona: { id: string; slug: string; name: string } | null;
   payment_info_configured?: boolean;
   available_until?: string | null;
+  availability_check_sent_at?: string | null;
+  availability_check_count?: number | null;
   last_login_at?: string | null;
   last_seen_at?: string | null;
 }
@@ -52,6 +55,15 @@ const STATUS_COLORS: Record<string, { bg: string; fg: string }> = {
   suspended: { bg: "#fef2f2", fg: "#b91c1c" },
   rejected: { bg: "#f5f5f7", fg: "#6e6e73" },
   inactive: { bg: "#f1f1f3", fg: "#6e6e73" },
+};
+
+// Pastille d'engagement (etat calcule, cf. src/lib/tester-engagement.ts) :
+// remplace « Actif » pour les testeurs actifs, qui ne veut dire que « profil
+// complet » et n'expire jamais.
+const ENGAGEMENT_COLORS: Record<EngagementState, { bg: string; fg: string }> = {
+  available: { bg: "#f0faf5", fg: "#0A7A5A" },
+  to_remind: { bg: "#FEF3C7", fg: "#92600A" },
+  dormant: { bg: "#f1f1f3", fg: "#6e6e73" },
 };
 
 const FILTERS = [
@@ -148,16 +160,21 @@ export default function StaffTestersPage() {
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return testers;
-    return testers.filter((t) => {
-      const name = `${t.first_name ?? ""} ${t.last_name ?? ""}`.toLowerCase();
-      return (
-        name.includes(q) ||
-        t.email.toLowerCase().includes(q) ||
-        (t.job_title ?? "").toLowerCase().includes(q) ||
-        (t.sector ?? "").toLowerCase().includes(q)
-      );
-    });
+    const list = !q
+      ? testers
+      : testers.filter((t) => {
+          const name = `${t.first_name ?? ""} ${t.last_name ?? ""}`.toLowerCase();
+          return (
+            name.includes(q) ||
+            t.email.toLowerCase().includes(q) ||
+            (t.job_title ?? "").toLowerCase().includes(q) ||
+            (t.sector ?? "").toLowerCase().includes(q)
+          );
+        });
+    // Disponibles d'abord, dormants en dernier ; tri stable, l'ordre de
+    // l'API (inscription) est conserve a l'interieur de chaque groupe.
+    const order = (t: TesterRow) => (t.status === "active" ? ENGAGEMENT_ORDER[engagementState(t)] : 1);
+    return [...list].sort((a, b) => order(a) - order(b));
   }, [testers, search]);
 
   const advancedCount = countActiveTesterFilters(filters);
@@ -395,9 +412,40 @@ export default function StaffTestersPage() {
                   )}
                 </div>
                 <div>
-                  <span style={{ padding: "3px 10px", fontSize: 11, fontWeight: 600, borderRadius: 980, background: sc.bg, color: sc.fg }}>
-                    {STATUS_LABELS[t.status] || t.status}
-                  </span>
+                  {t.status === "active" ? (() => {
+                    const state = engagementState(t);
+                    const ec = ENGAGEMENT_COLORS[state];
+                    const n = reminderCount(t);
+                    return (
+                      <>
+                        <span
+                          title={ENGAGEMENT_TITLES[state]}
+                          style={{ padding: "3px 10px", fontSize: 11, fontWeight: 600, borderRadius: 980, background: ec.bg, color: ec.fg, cursor: "help" }}
+                        >
+                          {ENGAGEMENT_LABELS[state]}
+                        </span>
+                        {state !== "available" && n > 0 && (
+                          <div
+                            style={{ fontSize: 10, color: "#92600A", marginTop: 3, fontWeight: 600 }}
+                            title={t.availability_check_sent_at ? `Dernière relance : ${new Date(t.availability_check_sent_at).toLocaleDateString("fr-FR")}` : undefined}
+                          >
+                            relancé {n}/{AVAILABILITY_REMINDER_MAX}
+                          </div>
+                        )}
+                      </>
+                    );
+                  })() : (
+                    <>
+                      <span style={{ padding: "3px 10px", fontSize: 11, fontWeight: 600, borderRadius: 980, background: sc.bg, color: sc.fg }}>
+                        {STATUS_LABELS[t.status] || t.status}
+                      </span>
+                      {t.status === "inactive" && reminderCount(t) >= AVAILABILITY_REMINDER_MAX && (
+                        <div style={{ fontSize: 10, color: "#6e6e73", marginTop: 3, fontWeight: 600 }} title="Mis en pause par le cron après 3 relances de disponibilité sans réponse. Un clic « Oui » depuis l'email le réactive.">
+                          pause après {AVAILABILITY_REMINDER_MAX} relances
+                        </div>
+                      )}
+                    </>
+                  )}
                   {availConfirmed && (
                     <div style={{ fontSize: 10, color: "#0A7A5A", marginTop: 3, fontWeight: 600 }}>
                       dispo → {new Date(t.available_until!).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" })}
@@ -418,7 +466,7 @@ export default function StaffTestersPage() {
           <div style={{ background: "#fff", borderRadius: 20, padding: 28, width: "100%", maxWidth: 440 }} onClick={(e) => e.stopPropagation()}>
             <h3 style={{ fontSize: 17, fontWeight: 700, color: "#1d1d1f", margin: "0 0 8px" }}>Envoyer la relance de disponibilité ?</h3>
             <p style={{ fontSize: 13, color: "#6e6e73", lineHeight: 1.6, margin: "0 0 16px" }}>
-              Un email « êtes-vous toujours disponible ? » (2 boutons Oui / gérer mon compte) sera envoyé à <strong>tous les testeurs actifs</strong> au profil complet, sauf ceux déjà relancés il y a moins de 7 jours. Ré-appelable pour drainer un gros volume.
+              Un email « êtes-vous toujours disponible ? » (2 boutons Oui / gérer mon compte) sera envoyé à <strong>tous les testeurs actifs</strong> au profil complet <strong>sans disponibilité confirmée en cours</strong>, sauf ceux relancés il y a moins de 14 jours ou déjà relancés 3 fois. Chaque envoi compte dans la boucle : 3 relances espacées de 14 jours, puis mise en pause automatique par le cron hebdomadaire, réversible dès que le testeur clique « Oui ».
             </p>
 
             {/* Envoi test à un seul destinataire — valider le rendu + les liens avant le tir de masse. */}

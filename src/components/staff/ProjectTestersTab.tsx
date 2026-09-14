@@ -6,6 +6,7 @@ import TesterDrawer from "./TesterDrawer";
 import TesterAdvancedFilters from "./TesterAdvancedFilters";
 import { LEGACY_GENDER_MAP, LEGACY_CSP_MAP } from "@/lib/tester-vocab";
 import { buildTarget, evaluateTester, requiredServerParams, activeCriteria, type ProjectTarget } from "@/lib/target-match";
+import { engagementState, engagementSortBonus, ENGAGEMENT_LABELS, ENGAGEMENT_TITLES } from "@/lib/tester-engagement";
 import { CRITERION_LABELS } from "@/lib/target-criteria";
 import {
   emptyTesterFilters,
@@ -264,12 +265,17 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
   }
 
   // Evaluation face a la cible : obligatoires -> exclusion (sauf « Voir hors
-  // cible »), souhaites -> score. Tri par score decroissant puis nom.
+  // cible »), souhaites -> score. Tri par score decroissant, ajuste par
+  // l'engagement (+1 disponible, -1 dormant : un bonus de tri, jamais une
+  // exclusion), puis nom.
   const evaluated = allTesters
     .filter((t) => !assignedTesterIds.has(t.id))
-    .map((t) => ({ t, ev: projectTargeting ? evaluateTester(t, projectTargeting) : null }))
+    .map((t) => ({ t, ev: projectTargeting ? evaluateTester(t, projectTargeting) : null, eng: engagementState(t) }))
     .filter(({ ev }) => showOutOfTarget || !ev || ev.requiredOk)
-    .sort((a, b) => ((b.ev?.score ?? 0) - (a.ev?.score ?? 0)) || (a.t.last_name ?? "").localeCompare(b.t.last_name ?? ""));
+    .sort((a, b) =>
+      (((b.ev?.score ?? 0) + engagementSortBonus(b.eng)) - ((a.ev?.score ?? 0) + engagementSortBonus(a.eng))) ||
+      (a.t.last_name ?? "").localeCompare(b.t.last_name ?? "")
+    );
   const filteredCatalog = evaluated.map((x) => x.t);
   const evalById = new Map(evaluated.map((x) => [x.t.id, x.ev]));
   const criteriaKeys = projectTargeting ? activeCriteria(projectTargeting) : [];
@@ -532,6 +538,19 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
                       <span style={{ padding: "2px 8px", fontSize: 10, fontWeight: 600, borderRadius: 980, background: "#f5f5f7", color: "#6e6e73" }}>
                         {t.digital_level || "?"}
                       </span>
+                      {(() => {
+                        const state = engagementState(t);
+                        const colors = state === "available"
+                          ? { bg: "#f0faf5", fg: "#0A7A5A" }
+                          : state === "to_remind"
+                          ? { bg: "#FEF3C7", fg: "#92600A" }
+                          : { bg: "#f1f1f3", fg: "#6e6e73" };
+                        return (
+                          <span title={ENGAGEMENT_TITLES[state]} style={{ padding: "2px 8px", fontSize: 10, fontWeight: 600, borderRadius: 980, background: colors.bg, color: colors.fg, cursor: "help" }}>
+                            {ENGAGEMENT_LABELS[state]}
+                          </span>
+                        );
+                      })()}
                     </div>
                   </div>
                 );

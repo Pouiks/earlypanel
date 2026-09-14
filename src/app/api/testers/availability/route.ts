@@ -57,6 +57,7 @@ export async function GET(request: NextRequest) {
     const patch: Record<string, unknown> = {
       available_until: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(),
       availability_responded_at: nowIso,
+      availability_check_count: 0, // la boucle de relance repart de zero
       updated_at: nowIso,
     };
     // "Je suis dispo" réactive un compte désactivé (si profil complet).
@@ -69,7 +70,7 @@ export async function GET(request: NextRequest) {
     // availability_manage : on trace juste l'engagement, aucune mutation de dispo.
     await admin
       .from("testers")
-      .update({ availability_responded_at: nowIso, updated_at: nowIso })
+      .update({ availability_responded_at: nowIso, availability_check_count: 0, updated_at: nowIso })
       .eq("id", payload.tid);
     next = "/app/dashboard/profil?section=disponibilite";
   }
