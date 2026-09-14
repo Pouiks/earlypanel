@@ -4,7 +4,7 @@
 
 earlypanel s'adresse aux équipes produit (fondateurs, CPO, Product Managers, designers) de startups et scale-ups SaaS, ainsi qu'aux agences digitales et studios produit qui construisent pour des clients finaux. Le service recrute des testeurs rémunérés en France qui ressemblent aux vrais utilisateurs du produit, les fait tester (maquette Figma, staging, production), lit chaque réponse et remet un rapport actionnable.
 
-Différence vs alternatives : un sondage maison envoyé à dix clients donne des retours biaisés et un tableur à dépouiller ; un freelance UX research coûte 300 à 600 € par jour et livre en 2 à 4 semaines ; les plateformes self-service (UserTesting, Maze, Lookback) livrent des vidéos brutes en 24-48 h que l'équipe doit analyser elle-même. earlypanel livre le rapport, pas les données brutes.
+Différence avec les autres façons de tester : un sondage maison envoyé à ses propres clients donne des retours biaisés et un tableur à dépouiller ; un freelance UX research doit d'abord recruter les testeurs dans son réseau ou le vôtre ; une plateforme en libre-service livre des réponses ou des vidéos brutes que l'équipe doit analyser elle-même. earlypanel livre le rapport rédigé, pas les données brutes.
 
 ## Pour les entreprises clientes
 
@@ -31,7 +31,7 @@ Différence vs alternatives : un sondage maison envoyé à dix clients donne des
 - [Préparer une maquette Figma pour un test](https://www.earlypanel.fr/blog/tester-maquette-figma-preparer-prototype)
 - [Recette d'une application mobile](https://www.earlypanel.fr/blog/recette-application-mobile)
 - [Définir la cible d'un test utilisateur](https://www.earlypanel.fr/blog/definir-sa-cible-test-utilisateur)
-- [Alternative à Testapic](https://www.earlypanel.fr/blog/alternative-testapic)
+- [Plateforme de tests ou service clé en main](https://www.earlypanel.fr/blog/plateforme-ou-service-cle-en-main)
 
 ### Prix
 Forfait fixe par mission, chiffré sur devis après un atelier de cadrage offert. Généralement entre 1 500 et 6 000 € HT pour 8 à 15 testeurs, rapport rédigé et restitution inclus. Pas d'abonnement, paiement 50 % à la commande et 50 % à la remise du rapport.

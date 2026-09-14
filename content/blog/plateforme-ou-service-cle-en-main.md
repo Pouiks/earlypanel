@@ -1,30 +1,28 @@
 ---
-title: "Alternative à Testapic : service de test UX clé en main"
-description: "Vous cherchez une alternative à Testapic ? Plateforme de tests à distance ou service clé en main : les différences concrètes, pour choisir selon votre besoin."
-date: 2026-09-10
-tags: [comparatif, outils]
+title: "Plateforme de tests utilisateurs ou service clé en main : comment choisir"
+description: "Outil en libre-service ou service qui livre le résultat : ce que chacun demande de votre côté, les différences qui comptent, et trois questions pour choisir selon votre situation."
+date: 2026-09-14
+tags: [méthode, outils]
 draft: false
 ---
 
-Chercher une alternative à Testapic, c'est le plus souvent chercher autre chose qu'une plateforme : non pas un meilleur outil pour faire soi-même, mais quelqu'un qui fasse le travail. Cet article ne classe pas les outils entre eux. Il décrit la différence entre une plateforme de tests utilisateurs à distance et un service clé en main comme earlypanel, ce que chacun demande de votre côté, et comment choisir selon votre situation. Les offres évoluent : vérifiez toujours les conditions en vigueur sur le site de chaque acteur.
+Il y a deux façons de faire un test utilisateur à distance. Une plateforme en libre-service vous donne les moyens de tester : un panel, un outil de collecte, parfois des analyses assistées. Un service clé en main vous donne le résultat du test. Cet article ne classe aucun outil. Il décrit ce que chaque modèle demande de votre côté, les différences qui comptent vraiment, et comment choisir selon votre situation.
 
 ## En bref
 
-- Chercher une alternative à Testapic, c'est souvent chercher un service qui fait le travail plutôt qu'un outil pour le faire soi-même.
 - Une plateforme fournit un panel et un outil de collecte ; le cadrage, les scénarios, la relecture et le rapport restent à votre charge.
 - Un service clé en main livre le résultat : recrutement à la main, questionnaire co-construit, relecture humaine, rapport rédigé, restitution.
+- La différence la moins visible et la plus importante est la relecture : qui écarte les réponses bâclées, et ce qu'il en advient.
 - Le choix dépend de trois choses : avez-vous un UX researcher, votre cible est-elle précise, avez-vous besoin d'un rapport ou d'un outil.
 - Les deux peuvent coexister : l'outil pour le quotidien, le service pour les tests qui engagent une décision.
 
 ## Deux façons de faire un test utilisateur à distance
 
-Testapic est une plateforme française de tests utilisateurs à distance, connue pour son panel et ses outils de collecte. Comme toute plateforme, elle vous donne les moyens de tester. Un service clé en main vous donne le résultat du test.
-
-La distinction paraît mince. Elle change tout dans le travail que vous avez à faire.
+La distinction entre « les moyens de tester » et « le résultat du test » paraît mince. Elle change tout dans le travail que vous avez à faire.
 
 ### Ce qu'une plateforme vous demande
 
-Une plateforme met à disposition un panel, un outil pour construire le test et collecter les réponses, parfois des vidéos et des analyses assistées. Elle vous laisse le reste, qui est l'essentiel du travail :
+Une plateforme met à disposition un panel, un outil pour construire le test et collecter les réponses, souvent des vidéos et des analyses assistées, parfois un accompagnement en option. Le cœur du modèle reste le libre-service, et il vous laisse l'essentiel du travail :
 
 - **Définir l'objectif** et la décision que le test doit éclairer.
 - **Écrire les scénarios** de façon à ne pas orienter les réponses, ce qui est un métier.
@@ -39,7 +37,7 @@ Pour une équipe qui a un UX researcher et teste chaque mois, cette organisation
 Un service comme earlypanel vend le test complet, pour un forfait fixé avant de commencer :
 
 - **Un atelier de cadrage** pour transformer votre question en objectif de test et en critères de réussite.
-- **Un recrutement à la main**, participant par participant, selon le métier, la situation, l'équipement, dans notre panel et par recrutement ciblé quand le profil est rare.
+- **Un recrutement à la main**, participant par participant, selon le métier, la situation, l'équipement, dans notre panel et par recrutement ciblé pour la mission quand le profil est rare.
 - **Un questionnaire co-construit**, écrit avec vous, relu pour ne pas guider les réponses.
 - **Une relecture humaine de chaque réponse.** Les réponses bâclées sont refusées, non payées et exclues du rapport.
 - **Un rapport rédigé**, avec les résultats par scénario, les frictions priorisées, les verbatims rattachés à leur question, les captures d'écran, et des recommandations classées par impact et effort.
@@ -51,7 +49,7 @@ De votre côté : deux réunions et un accès au produit. Le reste est fait.
 
 ### Le recrutement
 
-Un grand panel est un atout quand votre cible est large. Quand elle est étroite (des directeurs financiers, des infirmiers libéraux, des responsables RH d'entreprises de cinquante personnes), ce qui compte n'est pas la taille du panel mais la capacité à trouver et à vérifier dix personnes précises. C'est du travail manuel, et c'est celui qu'un service fait pour vous.
+Un grand panel est un atout quand votre cible est large. Quand elle est étroite (des directeurs financiers, des infirmiers libéraux, des responsables RH d'entreprises de cinquante personnes), ce qui compte n'est pas la taille du panel mais la capacité à trouver et à vérifier dix personnes précises. C'est du travail manuel, et c'est celui qu'un service fait pour vous. La façon de décrire cette cible est détaillée dans [définir la cible d'un test utilisateur](/blog/definir-sa-cible-test-utilisateur).
 
 ### La relecture
 
@@ -75,7 +73,12 @@ Les deux peuvent coexister : une plateforme pour les vérifications rapides du q
 
 ## En résumé
 
-L'alternative à Testapic n'est pas forcément une autre plateforme. Si votre difficulté n'est pas l'outil mais le temps, le recrutement de profils précis et la relecture, un service clé en main répond à un besoin différent : vous recevez le résultat, pas les moyens de le produire. La page [entreprises](/entreprises) décrit ce qu'earlypanel fait exactement et comment obtenir un devis sous 48 heures.
+Si votre difficulté n'est pas l'outil mais le temps, le recrutement de profils précis et la relecture, un service clé en main répond à un besoin différent d'une plateforme : vous recevez le résultat, pas les moyens de le produire. La page [entreprises](/entreprises) décrit ce qu'earlypanel fait exactement et comment obtenir un devis sous 48 heures.
+
+## Sources
+
+- Ce qui est dit d'earlypanel décrit le service au moment de la publication : cadrage, sélection à la main, relecture, rapport et restitution tels que présentés sur la page [entreprises](/entreprises).
+- Les plateformes en libre-service sont décrites dans leur principe général, sans nommer ni évaluer un acteur.
 
 ## Questions fréquentes
 

@@ -103,7 +103,7 @@ export default function AgencesPage() {
       faqTitle="Vos questions sur ce cas précis."
       related={[
         { href: "/blog/prix-test-utilisateur", label: "Combien coûte un test utilisateur ?" },
-        { href: "/blog/alternative-testapic", label: "Plateforme ou service clé en main ?" },
+        { href: "/blog/plateforme-ou-service-cle-en-main", label: "Plateforme ou service clé en main ?" },
         { href: "/glossaire", label: "Glossaire des tests utilisateurs" },
       ]}
     />

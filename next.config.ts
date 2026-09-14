@@ -55,6 +55,18 @@ const nextConfig: NextConfig = {
     ],
   },
 
+  async redirects() {
+    return [
+      // Ancien article comparatif retire le 2026-09-14 (on ne se compare pas
+      // a un produit nomme) : l'URL renvoie vers la version neutre.
+      {
+        source: "/blog/alternative-testapic",
+        destination: "/blog/plateforme-ou-service-cle-en-main",
+        permanent: true,
+      },
+    ];
+  },
+
   async headers() {
     return [
       {
