@@ -90,6 +90,26 @@ export default function StaffTestersPage() {
   const [campaignBusy, setCampaignBusy] = useState(false);
   const [campaignMsg, setCampaignMsg] = useState<string | null>(null);
   const [testEmail, setTestEmail] = useState("");
+  const [showTest, setShowTest] = useState(false);
+  // Nombre de destinataires reels de l'envoi groupe (independant du filtre
+  // affiche) : lu sur la vue Relances > Disponibilite a l'ouverture de la modale.
+  const [campaignDue, setCampaignDue] = useState<number | null>(null);
+
+  async function openCampaign() {
+    setCampaignOpen(true);
+    setCampaignMsg(null);
+    setShowTest(false);
+    setCampaignDue(null);
+    try {
+      const res = await fetch("/api/staff/testers/availability-reminders", { cache: "no-store" });
+      if (res.ok) {
+        const data = (await res.json()) as { summary?: { due?: number } };
+        setCampaignDue(data.summary?.due ?? null);
+      }
+    } catch {
+      /* le bouton reste utilisable sans le compteur */
+    }
+  }
 
   const load = useCallback(async (signal?: AbortSignal) => {
     setLoading(true);
@@ -191,7 +211,7 @@ export default function StaffTestersPage() {
           </p>
         </div>
         <button
-          onClick={() => { setCampaignOpen(true); setCampaignMsg(null); }}
+          onClick={openCampaign}
           style={{
             padding: "10px 20px", fontSize: 13, fontWeight: 700, color: "#fff",
             background: "#0A7A5A", border: "none", borderRadius: 980, cursor: "pointer", fontFamily: "inherit",
@@ -464,41 +484,63 @@ export default function StaffTestersPage() {
           onClick={() => !campaignBusy && setCampaignOpen(false)}
         >
           <div style={{ background: "#fff", borderRadius: 20, padding: 28, width: "100%", maxWidth: 440 }} onClick={(e) => e.stopPropagation()}>
-            <h3 style={{ fontSize: 17, fontWeight: 700, color: "#1d1d1f", margin: "0 0 8px" }}>Envoyer la relance de disponibilité ?</h3>
-            <p style={{ fontSize: 13, color: "#6e6e73", lineHeight: 1.6, margin: "0 0 16px" }}>
-              Un email « êtes-vous toujours disponible ? » (2 boutons Oui / gérer mon compte) sera envoyé à <strong>tous les testeurs actifs</strong> au profil complet <strong>sans disponibilité confirmée en cours</strong>, sauf ceux relancés il y a moins de 14 jours ou déjà relancés 3 fois. Chaque envoi compte dans la boucle : 3 relances espacées de 14 jours, puis mise en pause automatique par le cron hebdomadaire, réversible dès que le testeur clique « Oui ».
+            <h3 style={{ fontSize: 17, fontWeight: 700, color: "#1d1d1f", margin: "0 0 8px" }}>Relancer la disponibilité</h3>
+            <p style={{ fontSize: 13, color: "#6e6e73", lineHeight: 1.6, margin: "0 0 12px" }}>
+              Envoie en une fois l&apos;email « êtes-vous toujours disponible ? » à tous les testeurs actifs qui n&apos;ont pas confirmé leur disponibilité et sont dus dans la boucle (14 jours entre deux relances, 3 maximum). Rien à saisir.
+            </p>
+            <div style={{ background: "#f0faf5", border: "1px solid rgba(10,122,90,0.2)", borderRadius: 12, padding: "12px 14px", marginBottom: 12 }}>
+              <div style={{ fontSize: 22, fontWeight: 800, color: "#0A7A5A", letterSpacing: "-0.02em" }}>
+                {campaignDue === null ? "…" : campaignDue} <span style={{ fontSize: 13, fontWeight: 600 }}>destinataire{campaignDue === 1 ? "" : "s"}</span>
+              </div>
+              <div style={{ fontSize: 12, color: "#6e6e73", marginTop: 2 }}>
+                Indépendant du filtre affiché dans la liste. Le détail par testeur est dans Relances › Disponibilité.
+              </div>
+            </div>
+            <p style={{ fontSize: 12, color: "#86868B", lineHeight: 1.5, margin: "0 0 14px" }}>
+              Chaque envoi compte dans la boucle. Après 3 relances sans réponse, le cron du lundi met le compte en pause ; un clic « Oui » le réactive.
             </p>
 
-            {/* Envoi test à un seul destinataire — valider le rendu + les liens avant le tir de masse. */}
-            <div style={{ background: "#f5f5f7", borderRadius: 12, padding: 12, marginBottom: 18 }}>
-              <label style={{ fontSize: 12, fontWeight: 600, color: "#6e6e73", display: "block", marginBottom: 6 }}>
-                Envoi test à un testeur (email) — ne consomme pas le cooldown
-              </label>
-              <div style={{ display: "flex", gap: 8 }}>
-                <input
-                  type="email"
-                  value={testEmail}
-                  onChange={(e) => setTestEmail(e.target.value)}
-                  placeholder="email d'un testeur existant"
-                  style={{ flex: 1, padding: "8px 10px", fontSize: 13, borderRadius: 8, border: "1px solid rgba(0,0,0,0.12)", fontFamily: "inherit" }}
-                />
-                <button
-                  type="button"
-                  disabled={campaignBusy || !testEmail.includes("@")}
-                  onClick={() => sendCampaign(testEmail)}
-                  style={{ padding: "8px 14px", fontSize: 13, fontWeight: 600, color: "#0A7A5A", background: "#fff", border: "1px solid #0A7A5A", borderRadius: 980, cursor: campaignBusy || !testEmail.includes("@") ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: campaignBusy || !testEmail.includes("@") ? 0.5 : 1, whiteSpace: "nowrap" }}
-                >
-                  Test
-                </button>
-              </div>
+            {/* Test de rendu, facultatif : un seul email, a l'adresse d'un testeur existant, sans toucher a sa boucle. */}
+            <div style={{ marginBottom: 18 }}>
+              <button
+                type="button"
+                onClick={() => setShowTest((v) => !v)}
+                style={{ background: "none", border: "none", padding: 0, fontSize: 12, fontWeight: 600, color: "#6e6e73", cursor: "pointer", fontFamily: "inherit", textDecoration: "underline" }}
+              >
+                {showTest ? "Masquer le test de rendu" : "Voir d'abord l'email sur une adresse (facultatif)"}
+              </button>
+              {showTest && (
+                <div style={{ background: "#f5f5f7", borderRadius: 12, padding: 12, marginTop: 8 }}>
+                  <div style={{ fontSize: 12, color: "#6e6e73", marginBottom: 6, lineHeight: 1.5 }}>
+                    Envoie un seul email à l&apos;adresse d&apos;un testeur existant, sans compter dans sa boucle. Utile pour vérifier le rendu et les deux boutons avant l&apos;envoi groupé.
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <input
+                      type="email"
+                      value={testEmail}
+                      onChange={(e) => setTestEmail(e.target.value)}
+                      placeholder="adresse d'un testeur existant"
+                      style={{ flex: 1, padding: "8px 10px", fontSize: 13, borderRadius: 8, border: "1px solid rgba(0,0,0,0.12)", fontFamily: "inherit" }}
+                    />
+                    <button
+                      type="button"
+                      disabled={campaignBusy || !testEmail.includes("@")}
+                      onClick={() => sendCampaign(testEmail)}
+                      style={{ padding: "8px 14px", fontSize: 13, fontWeight: 600, color: "#0A7A5A", background: "#fff", border: "1px solid #0A7A5A", borderRadius: 980, cursor: campaignBusy || !testEmail.includes("@") ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: campaignBusy || !testEmail.includes("@") ? 0.5 : 1, whiteSpace: "nowrap" }}
+                    >
+                      Envoyer le test
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
               <button type="button" disabled={campaignBusy} onClick={() => setCampaignOpen(false)} style={{ padding: "10px 20px", fontSize: 13, fontWeight: 600, color: "#6e6e73", background: "#fff", border: "1px solid rgba(0,0,0,0.12)", borderRadius: 980, cursor: "pointer", fontFamily: "inherit" }}>
                 Annuler
               </button>
-              <button type="button" disabled={campaignBusy} onClick={() => sendCampaign()} style={{ padding: "10px 22px", fontSize: 13, fontWeight: 700, color: "#fff", background: "#0A7A5A", border: "none", borderRadius: 980, cursor: campaignBusy ? "wait" : "pointer", fontFamily: "inherit", opacity: campaignBusy ? 0.6 : 1 }}>
-                {campaignBusy ? "Envoi…" : "Envoyer la relance"}
+              <button type="button" disabled={campaignBusy || campaignDue === 0} onClick={() => sendCampaign()} style={{ padding: "10px 22px", fontSize: 13, fontWeight: 700, color: "#fff", background: "#0A7A5A", border: "none", borderRadius: 980, cursor: campaignBusy ? "wait" : campaignDue === 0 ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: campaignBusy || campaignDue === 0 ? 0.6 : 1 }}>
+                {campaignBusy ? "Envoi…" : campaignDue === null ? "Envoyer à tous les éligibles" : `Envoyer à ${campaignDue} testeur${campaignDue === 1 ? "" : "s"}`}
               </button>
             </div>
           </div>
