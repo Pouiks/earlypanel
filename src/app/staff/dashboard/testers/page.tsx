@@ -11,6 +11,7 @@ import {
 } from "@/lib/tester-filters";
 import { ACTIVITY_FILTERS, formatLastSeen, isPastRgpdRetention } from "@/lib/tester-activity";
 import { engagementState, reminderCount, AVAILABILITY_REMINDER_MAX, ENGAGEMENT_LABELS, ENGAGEMENT_ORDER, ENGAGEMENT_TITLES, type EngagementState } from "@/lib/tester-engagement";
+import { runAvailabilityCampaign, type CampaignProgress } from "@/lib/client/availability-campaign-client";
 
 interface TesterRow {
   id: string;
@@ -94,6 +95,7 @@ export default function StaffTestersPage() {
   // Nombre de destinataires reels de l'envoi groupe (independant du filtre
   // affiche) : lu sur la vue Relances > Disponibilite a l'ouverture de la modale.
   const [campaignDue, setCampaignDue] = useState<number | null>(null);
+  const [campaignProgress, setCampaignProgress] = useState<CampaignProgress | null>(null);
 
   async function openCampaign() {
     setCampaignOpen(true);
@@ -145,24 +147,34 @@ export default function StaffTestersPage() {
     const isTest = typeof testEmailArg === "string" && testEmailArg.includes("@");
     setCampaignBusy(true);
     setCampaignMsg(null);
+    setCampaignProgress(null);
     try {
-      const res = await fetch("/api/staff/testers/availability-campaign", {
-        method: "POST",
-        headers: isTest ? { "Content-Type": "application/json" } : undefined,
-        body: isTest ? JSON.stringify({ test_email: testEmailArg.trim() }) : undefined,
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error((data as { error?: string }).error || `Erreur ${res.status}`);
       if (isTest) {
-        setCampaignMsg(`Test envoyé à ${data.sent} destinataire(s) — ${testEmailArg.trim()}. Vérifie ta boîte + les 2 boutons.`);
+        const res = await fetch("/api/staff/testers/availability-campaign", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ test_email: testEmailArg.trim() }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error((data as { error?: string }).error || `Erreur ${res.status}`);
+        setCampaignMsg(`Test envoyé à ${testEmailArg.trim()}. Vérifie ta boîte et les 2 boutons.`);
       } else {
-        setCampaignMsg(`Relance envoyée à ${data.sent} testeur(s) sur ${data.total} ciblé(s).`);
+        // Envoi par lots pilote par le navigateur : progression reelle, puis
+        // rechargement de la liste pour que les pastilles refletent l'envoi.
+        const r = await runAvailabilityCampaign({ onProgress: setCampaignProgress });
+        setCampaignMsg(
+          `Relance envoyée à ${r.sent} testeur${r.sent > 1 ? "s" : ""} sur ${r.total}.` +
+            (r.errors > 0 ? ` ${r.errors} en erreur.` : "") +
+            (r.unmarked > 0 ? ` ${r.unmarked} envoyé(s) mais non marqué(s), à vérifier dans le journal d'audit.` : "")
+        );
         setCampaignOpen(false);
+        await load();
       }
     } catch (e) {
       setCampaignMsg(e instanceof Error ? e.message : "Erreur");
     } finally {
       setCampaignBusy(false);
+      setCampaignProgress(null);
     }
   }
 
@@ -496,9 +508,23 @@ export default function StaffTestersPage() {
                 Indépendant du filtre affiché dans la liste. Le détail par testeur est dans Relances › Disponibilité.
               </div>
             </div>
-            <p style={{ fontSize: 12, color: "#86868B", lineHeight: 1.5, margin: "0 0 14px" }}>
-              Chaque envoi compte dans la boucle. Après 3 relances sans réponse, le cron du lundi met le compte en pause ; un clic « Oui » le réactive.
-            </p>
+            {campaignProgress ? (
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#6e6e73", marginBottom: 6 }}>
+                  <span>Envoi en cours, par lots de 5. Ne fermez pas la page.</span>
+                  <span style={{ fontVariantNumeric: "tabular-nums", fontWeight: 600, color: "#1d1d1f" }}>
+                    {campaignProgress.done} / {campaignProgress.total}{campaignProgress.errors > 0 ? ` · ${campaignProgress.errors} en erreur` : ""}
+                  </span>
+                </div>
+                <div style={{ height: 8, borderRadius: 4, background: "#e5e5ea", overflow: "hidden" }}>
+                  <div style={{ height: "100%", width: `${campaignProgress.total === 0 ? 100 : Math.round((campaignProgress.done / campaignProgress.total) * 100)}%`, background: "#0A7A5A", transition: "width 300ms" }} />
+                </div>
+              </div>
+            ) : (
+              <p style={{ fontSize: 12, color: "#86868B", lineHeight: 1.5, margin: "0 0 14px" }}>
+                Chaque envoi compte dans la boucle. Après 3 relances sans réponse, le cron du lundi met le compte en pause ; un clic « Oui » le réactive.
+              </p>
+            )}
 
             {/* Test de rendu, facultatif : un seul email, a l'adresse d'un testeur existant, sans toucher a sa boucle. */}
             <div style={{ marginBottom: 18 }}>
@@ -540,7 +566,9 @@ export default function StaffTestersPage() {
                 Annuler
               </button>
               <button type="button" disabled={campaignBusy || campaignDue === 0} onClick={() => sendCampaign()} style={{ padding: "10px 22px", fontSize: 13, fontWeight: 700, color: "#fff", background: "#0A7A5A", border: "none", borderRadius: 980, cursor: campaignBusy ? "wait" : campaignDue === 0 ? "not-allowed" : "pointer", fontFamily: "inherit", opacity: campaignBusy || campaignDue === 0 ? 0.6 : 1 }}>
-                {campaignBusy ? "Envoi…" : campaignDue === null ? "Envoyer à tous les éligibles" : `Envoyer à ${campaignDue} testeur${campaignDue === 1 ? "" : "s"}`}
+                {campaignBusy
+                  ? (campaignProgress ? `Envoi ${campaignProgress.done} / ${campaignProgress.total}…` : "Préparation…")
+                  : campaignDue === null ? "Envoyer à tous les éligibles" : `Envoyer à ${campaignDue} testeur${campaignDue === 1 ? "" : "s"}`}
               </button>
             </div>
           </div>

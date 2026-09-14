@@ -49,6 +49,9 @@ export async function POST(request: NextRequest) {
     : null;
   const testEmail =
     typeof body?.test_email === "string" && body.test_email.trim() ? body.test_email.trim() : null;
+  // Identifiant d'envoi groupe pilote par le navigateur (lots de quelques ids) :
+  // relie les entrees d'audit d'un meme clic.
+  const batchId = typeof body?.batch_id === "string" && body.batch_id.trim() ? body.batch_id.trim().slice(0, 64) : null;
   const isTest = !!testEmail;
 
   let recipients: { id: string; email: string | null; first_name: string | null }[];
@@ -86,6 +89,7 @@ export async function POST(request: NextRequest) {
       metadata: {
         ...summary,
         targeted_subset: !!testerIds,
+        batch_id: batchId ?? undefined,
         test_email: testEmail ?? undefined,
       },
     },

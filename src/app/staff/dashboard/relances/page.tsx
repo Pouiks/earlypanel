@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import TesterDrawer from "@/components/staff/TesterDrawer";
+import { runAvailabilityCampaign, type CampaignProgress } from "@/lib/client/availability-campaign-client";
 
 /**
  * Page staff « Relances » : deux boucles automatiques, chacune avec son etat
@@ -359,6 +360,7 @@ function AvailabilityRemindersView() {
   const [drawerId, setDrawerId] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [bulkBusy, setBulkBusy] = useState(false);
+  const [progress, setProgress] = useState<CampaignProgress | null>(null);
   const [msg, setMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
 
   const load = useCallback(async () => {
@@ -410,25 +412,20 @@ function AvailabilityRemindersView() {
     if (!confirm(`Envoyer maintenant la relance de disponibilité aux ${due} testeur(s) « à relancer » ? Chaque envoi compte dans la boucle de 3.`)) return;
     setBulkBusy(true);
     setMsg(null);
+    setProgress(null);
     try {
-      const res = await fetch("/api/staff/testers/availability-campaign", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({}),
-      });
-      const body = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error((body as { error?: string }).error || `Erreur ${res.status}`);
-      const b = body as { sent?: number; unmarked?: number; total?: number };
-      const unmarked = b.unmarked ?? 0;
+      const r = await runAvailabilityCampaign({ onProgress: setProgress });
+      const problems = r.unmarked + r.errors;
       setMsg({
-        kind: unmarked > 0 ? "err" : "ok",
-        text: `${b.sent ?? 0} email(s) envoyé(s) sur ${b.total ?? 0}.${unmarked > 0 ? ` Attention : ${unmarked} non marqué(s), à vérifier dans le journal d'audit.` : ""}`,
+        kind: problems > 0 ? "err" : "ok",
+        text: `${r.sent} email(s) envoyé(s) sur ${r.total}.${r.errors > 0 ? ` ${r.errors} en erreur.` : ""}${r.unmarked > 0 ? ` ${r.unmarked} envoyé(s) mais non marqué(s), à vérifier dans le journal d'audit.` : ""}`,
       });
       await load();
     } catch (e) {
       setMsg({ kind: "err", text: e instanceof Error ? e.message : "Erreur" });
     } finally {
       setBulkBusy(false);
+      setProgress(null);
     }
   }
 
@@ -455,10 +452,12 @@ function AvailabilityRemindersView() {
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <button onClick={load} disabled={loading} style={btnGhost}>Actualiser</button>
           <button onClick={remindAllDue} disabled={bulkBusy || !s || s.due === 0} style={{ ...btnGhost, color: "#fff", background: "#0A7A5A", border: "none", opacity: bulkBusy || !s || s.due === 0 ? 0.6 : 1 }}>
-            {bulkBusy ? "Envoi…" : `Relancer les « à relancer » (${s?.due ?? 0})`}
+            {bulkBusy ? (progress ? `Envoi ${progress.done} / ${progress.total}…` : "Préparation…") : `Relancer les « à relancer » (${s?.due ?? 0})`}
           </button>
         </div>
       </div>
+
+      {progress && <ProgressBar progress={progress} />}
 
       {s && (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12, marginBottom: 20 }}>
@@ -558,6 +557,23 @@ function Stat({ label, value, accent }: { label: string; value: number; accent?:
     <div style={{ background: accent ? "#f0faf5" : "#fff", border: `0.5px solid ${accent ? "rgba(10,122,90,0.25)" : "rgba(0,0,0,0.08)"}`, borderRadius: 14, padding: "14px 16px" }}>
       <div style={{ fontSize: 11, color: "#86868B", textTransform: "uppercase", letterSpacing: "0.05em", fontWeight: 600 }}>{label}</div>
       <div style={{ fontSize: 24, fontWeight: 700, color: accent ? "#0A7A5A" : "#1d1d1f", marginTop: 4 }}>{value}</div>
+    </div>
+  );
+}
+
+function ProgressBar({ progress }: { progress: CampaignProgress }) {
+  const pct = progress.total === 0 ? 100 : Math.round((progress.done / progress.total) * 100);
+  return (
+    <div style={{ background: "#fff", border: "0.5px solid rgba(0,0,0,0.08)", borderRadius: 12, padding: "12px 16px", marginBottom: 16 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#6e6e73", marginBottom: 6 }}>
+        <span>Envoi en cours, par lots de 5. Vous pouvez rester sur la page.</span>
+        <span style={{ fontVariantNumeric: "tabular-nums", fontWeight: 600, color: "#1d1d1f" }}>
+          {progress.done} / {progress.total} · {progress.sent} envoyé{progress.sent > 1 ? "s" : ""}{progress.errors > 0 ? ` · ${progress.errors} en erreur` : ""}
+        </span>
+      </div>
+      <div style={{ height: 8, borderRadius: 4, background: "#e5e5ea", overflow: "hidden" }}>
+        <div style={{ height: "100%", width: `${pct}%`, background: "#0A7A5A", transition: "width 300ms" }} />
+      </div>
     </div>
   );
 }
