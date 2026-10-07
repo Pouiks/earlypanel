@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Rapport earlypanel · Clearflow (exemple)</title>
+<!--
+  Source du PDF public/earlypanel-rapport-exemple.pdf (lead magnet).
+  Regenerer avec : npm run rapport:exemple
+  Regle editoriale : aucun tiret long ni demi-cadratin dans ce document
+  (le script de build refuse de generer le PDF s'il en trouve).
+  Cas fictif : Clearflow n'existe pas.
+-->
+<style>
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+    color: #1d1d1f;
+    font-size: 13.5px;
+    line-height: 1.5;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  .page {
+    position: relative;
+    width: 210mm;
+    height: 297mm;
+    overflow: hidden;
+    padding: 13mm 22mm 16mm;
+    background: #fff;
+    break-after: page;
+    page-break-after: always;
+  }
+  .page.last { break-after: auto; page-break-after: auto; }
+  .page > * { position: relative; z-index: 1; }
+
+  /* Filigrane EXEMPLE (une seule fois par page, en diagonale) */
+  .wm {
+    position: absolute;
+    z-index: 0;
+    left: -26mm;
+    top: 228mm;
+    transform: rotate(-34deg);
+    transform-origin: left center;
+    font-size: 305px;
+    font-weight: 800;
+    letter-spacing: 14px;
+    line-height: 1;
+    white-space: nowrap;
+    color: rgba(10, 122, 90, 0.055);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* En-tete / pied de page des pages interieures */
+  .hd { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
+  .logo { font-weight: 700; font-size: 14px; color: #0A7A5A; letter-spacing: -0.3px; line-height: 1.1; }
+  .logo .dot { color: #2DD4A0; }
+  .sec { display: block; font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #0A7A5A; margin-top: 3px; }
+  .ref { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: #6e6e73; padding-top: 3px; }
+  .ft {
+    position: absolute; left: 22mm; right: 22mm; bottom: 12mm;
+    display: flex; justify-content: space-between;
+    font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: #86868B;
+  }
+
+  h1 { font-size: 32px; font-weight: 700; letter-spacing: -0.8px; line-height: 1.15; margin: 0 0 12px; }
+  h1.small { font-size: 24px; padding-bottom: 12px; border-bottom: 0.5px solid rgba(0,0,0,0.12); margin-bottom: 4px; }
+  h2 { font-size: 19px; font-weight: 700; letter-spacing: -0.3px; margin: 0 0 6px; }
+  .lead { color: #6e6e73; font-size: 14px; line-height: 1.55; margin: 0 0 24px; }
+  .lead.it { font-style: italic; }
+  p { margin: 0; }
+
+  .kicker { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #0A7A5A; }
+  .label { font-size: 10.5px; letter-spacing: 2.5px; text-transform: uppercase; color: #6e6e73; margin-bottom: 14px; }
+  .h3 { font-size: 10.5px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: #0A7A5A; margin: 20px 0 8px; }
+  .h3:first-of-type { margin-top: 0; }
+  .txt { font-size: 13.5px; line-height: 1.65; color: #3a3a3c; }
+  .txt + .txt { margin-top: 10px; }
+  .muted-it { font-style: italic; color: #6e6e73; }
+
+  .pill { display: inline-block; font-size: 8.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 5px 10px; border-radius: 999px; white-space: nowrap; line-height: 1; }
+  .p-red { background: #fef2f2; color: #dc2626; }
+  .p-amb { background: #fffbeb; color: #d97706; }
+  .p-grey { background: #f0f0f2; color: #6e6e73; }
+  .p-green { background: #e6f4ef; color: #0A7A5A; }
+  .pill.tc { text-transform: none; letter-spacing: 0; font-size: 10.5px; padding: 5px 12px; }
+
+  /* Page de couverture */
+  .cover { background: linear-gradient(180deg, #edf6f2 0%, #ffffff 26%); padding: 27mm 22mm 20mm; }
+  .cover .top { display: flex; justify-content: space-between; align-items: flex-start; }
+  .cover .logo { font-size: 20px; }
+  .cover .tag { text-align: right; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: #6e6e73; line-height: 1.9; }
+  .cover .hero { margin-top: 62mm; }
+  .cover .kicker { font-size: 11px; letter-spacing: 3px; }
+  .cover .t1 { font-size: 66px; font-weight: 700; letter-spacing: -3px; line-height: 1.02; margin-top: 12px; }
+  .cover .t2 { font-size: 56px; font-style: italic; font-weight: 400; color: #0A7A5A; letter-spacing: -2px; line-height: 1.05; margin-top: 2px; }
+  .cover .desc { font-size: 19px; color: #6e6e73; line-height: 1.4; margin-top: 22px; max-width: 480px; }
+  .cover .meta { position: absolute; left: 22mm; right: 22mm; top: 236mm; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; padding-top: 24px; border-top: 0.5px solid rgba(0,0,0,0.15); }
+  .cover .meta .l { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: #86868B; }
+  .cover .meta .v { font-size: 14px; margin-top: 6px; }
+  .cover .bottom { position: absolute; left: 22mm; right: 22mm; bottom: 20mm; display: flex; justify-content: space-between; align-items: center; }
+  .cover .site { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: #86868B; }
+  .cover .conf { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: #3a3a3c; border: 0.5px solid rgba(0,0,0,0.25); border-radius: 6px; padding: 8px 16px; }
+
+  /* Synthese */
+  .verdict { background: #f5f5f7; border-left: 3px solid #0A7A5A; border-radius: 0 12px 12px 0; padding: 22px 36px 26px; margin-bottom: 40px; }
+  .verdict .kicker { display: block; margin-bottom: 10px; }
+  .verdict p { font-size: 19px; line-height: 1.45; }
+  .stats3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .stat { border: 0.5px solid rgba(0,0,0,0.13); border-radius: 10px; padding: 26px 22px 22px; }
+  .stat .n { font-size: 40px; font-weight: 700; color: #0A7A5A; line-height: 1; letter-spacing: -1.5px; margin-bottom: 12px; }
+  .stat .c { font-size: 11px; color: #6e6e73; line-height: 1.5; }
+  .actions { margin-top: 44px; }
+  .act { display: flex; gap: 22px; padding: 15px 0; border-bottom: 0.5px solid rgba(0,0,0,0.1); }
+  .act:last-child { border-bottom: 0; }
+  .act .num { flex: none; width: 28px; font-size: 20px; font-weight: 300; color: #0A7A5A; line-height: 1.2; }
+  .act p { font-size: 13px; line-height: 1.55; }
+
+  /* Contexte */
+  ul.dots { list-style: none; padding: 0; margin: 4px 0 10px; }
+  ul.dots li { position: relative; padding-left: 22px; margin: 5px 0; font-size: 13.5px; color: #3a3a3c; }
+  ul.dots li::before { content: ""; position: absolute; left: 0; top: 7px; width: 7px; height: 7px; border-radius: 50%; background: #2DD4A0; }
+  .tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .tag-pill { background: #e6f4ef; color: #0A7A5A; font-size: 11px; padding: 6px 14px; border-radius: 999px; }
+
+  /* Tableaux */
+  table.tbl { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+  .tbl th { text-align: left; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: #6e6e73; font-weight: 700; padding: 8px 10px; border-bottom: 1px solid rgba(0,0,0,0.15); vertical-align: bottom; }
+  .tbl td { padding: 9px 10px; border-bottom: 0.5px solid rgba(0,0,0,0.08); vertical-align: top; color: #3a3a3c; line-height: 1.5; }
+  .tbl td.id { color: #0A7A5A; font-weight: 700; }
+  .tbl td .sub { display: block; font-size: 10px; color: #86868B; margin-top: 2px; }
+  .stats4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 30px; padding-top: 28px; border-top: 0.5px solid rgba(0,0,0,0.12); }
+  .big { font-size: 30px; font-weight: 700; color: #0A7A5A; letter-spacing: -1px; line-height: 1; }
+  .cap { font-size: 10.5px; color: #6e6e73; margin-top: 8px; line-height: 1.4; }
+
+  /* Scenarios */
+  .uc { background: #f5f5f7; border-radius: 12px; padding: 22px 28px 20px; margin-bottom: 22px; }
+  .uc h3 { font-size: 16px; margin: 4px 0 14px; font-weight: 700; letter-spacing: -0.2px; }
+  .row { display: grid; grid-template-columns: 92px 1fr; gap: 10px; margin-bottom: 10px; font-size: 12.5px; line-height: 1.55; color: #3a3a3c; }
+  .row:last-child { margin-bottom: 0; }
+  .row .l { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: #6e6e73; padding-top: 4px; }
+  .row .it { font-style: italic; }
+  .row .grey { color: #86868B; }
+
+  /* Bugs */
+  .note { background: #f5f5f7; border-radius: 12px; padding: 20px 22px; margin-top: 32px; }
+  .note .t { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; margin-bottom: 8px; }
+  .note p { font-size: 11.5px; line-height: 1.6; color: #3a3a3c; }
+
+  /* Frictions */
+  .fr { padding: 20px 0 22px; border-bottom: 0.5px solid rgba(0,0,0,0.12); }
+  .fr:last-of-type { border-bottom: 0; }
+  .fr-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+  .fr-head h3 { font-size: 17px; margin: 0; font-weight: 700; line-height: 1.3; letter-spacing: -0.2px; }
+  .fr-head h3 .id { color: #0A7A5A; font-weight: 400; margin-right: 10px; }
+  .pills { display: flex; gap: 8px; flex: none; padding-top: 4px; }
+  .step { font-size: 10.5px; letter-spacing: 1.5px; text-transform: uppercase; color: #86868B; margin: 10px 0 14px; }
+  .step b { color: #3a3a3c; font-weight: 700; }
+  .quotes { background: #f5f5f7; border-radius: 12px; padding: 6px 22px; }
+  .q { position: relative; padding: 12px 0 12px 24px; border-bottom: 0.5px solid rgba(0,0,0,0.08); font-style: italic; font-size: 12.5px; line-height: 1.6; color: #3a3a3c; }
+  .q:last-child { border-bottom: 0; }
+  .q::before { content: "\201C"; position: absolute; left: 0; top: 10px; font-family: Georgia, "Liberation Serif", serif; font-size: 28px; line-height: 1; color: #0A7A5A; }
+  .who { display: inline-block; font-style: normal; font-weight: 700; font-size: 9.5px; letter-spacing: 1px; color: #0A7A5A; background: #e6f4ef; border-radius: 999px; padding: 3px 8px; margin-left: 8px; vertical-align: 1px; }
+  .read { border-left: 3px solid #0A7A5A; padding: 4px 0 4px 14px; margin-top: 16px; font-size: 12px; line-height: 1.6; color: #3a3a3c; }
+  .read b { color: #1d1d1f; }
+
+  /* Audit */
+  .scores { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .score { border: 0.5px solid rgba(0,0,0,0.13); border-radius: 10px; padding: 26px 10px 22px; text-align: center; }
+  .score .v { font-size: 38px; font-weight: 700; letter-spacing: -1.5px; line-height: 1; }
+  .score .v small { font-size: 14px; color: #86868B; font-weight: 400; letter-spacing: 0; }
+  .score .name { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #6e6e73; margin: 12px 0 12px; line-height: 1.4; min-height: 28px; }
+  .c-amb { color: #d97706; } .c-red { color: #dc2626; } .c-green { color: #0A7A5A; }
+  .disclaimer { background: #f5f5f7; border-radius: 10px; padding: 16px 18px; font-size: 11px; font-style: italic; color: #6e6e73; line-height: 1.55; margin: 36px 0 30px; }
+  .find { display: flex; gap: 14px; padding: 14px 0; border-bottom: 0.5px solid rgba(0,0,0,0.1); font-size: 12.5px; line-height: 1.55; color: #3a3a3c; }
+  .find::before { content: ""; flex: none; width: 7px; height: 7px; border-radius: 50%; background: #2DD4A0; margin-top: 6px; }
+  .find b { color: #1d1d1f; }
+
+  /* Recommandations */
+  .prio { display: flex; align-items: center; gap: 16px; margin: 18px 0 8px; font-size: 13.5px; }
+  .badge { display: inline-block; padding: 6px 14px; border-radius: 999px; font-size: 10px; font-weight: 700; letter-spacing: 1px; line-height: 1; }
+  .b1 { background: #0A7A5A; color: #fff; } .b2 { background: #1d1d1f; color: #fff; } .b3 { background: #e5e5ea; color: #6e6e73; }
+  .reco { padding: 13px 0 14px; border-top: 0.5px solid rgba(0,0,0,0.12); }
+  .reco:last-child { border-bottom: 0.5px solid rgba(0,0,0,0.12); }
+  .reco h3 { font-size: 14.5px; margin: 0 0 9px; font-weight: 700; letter-spacing: -0.2px; }
+  .reco h3 .id { color: #0A7A5A; font-weight: 400; margin-right: 10px; }
+  .cols3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .cols3 .l { font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: #86868B; margin-bottom: 5px; }
+  .cols3 .v { font-size: 12px; color: #3a3a3c; }
+
+  /* Matrice */
+  .mbox { background: #f5f5f7; border-radius: 14px; padding: 26px 30px 30px 18px; margin-bottom: 40px; }
+  .mgrid { display: grid; grid-template-columns: 22px 1fr 1fr; grid-template-rows: auto 1fr 1fr; gap: 0; }
+  .mgrid .ch { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #6e6e73; font-weight: 700; text-align: center; padding-bottom: 12px; }
+  .mgrid .rh { display: flex; align-items: center; justify-content: center; }
+  .mgrid .rh span { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #6e6e73; font-weight: 700; }
+  .cell { background: #fff; border: 0.5px solid rgba(0,0,0,0.12); padding: 20px 22px 22px; min-height: 160px; }
+  .cell.qw { background: #e6f4ef; border-color: #9fdcc4; }
+  .cell .ct { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; color: #6e6e73; }
+  .cell.qw .ct { color: #0A7A5A; }
+  .cell .ids { font-size: 14px; font-weight: 700; margin: 10px 0 14px; }
+  .cell .cd { font-size: 11px; color: #6e6e73; line-height: 1.55; }
+  .meth { background: #f5f5f7; border-radius: 14px; padding: 24px 26px; }
+  .meth .kicker { display: block; font-size: 10.5px; margin-bottom: 10px; }
+  .meth p { font-size: 12px; line-height: 1.65; color: #3a3a3c; }
+
+  /* Derniere page */
+  .close { background: linear-gradient(180deg, #edf6f2 0%, #ffffff 30%); padding: 54mm 22mm 20mm; }
+  .eyebrow { display: flex; align-items: center; gap: 12px; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #0A7A5A; font-weight: 700; }
+  .eyebrow::before { content: ""; width: 16px; height: 2px; background: #0A7A5A; }
+  .close .t1 { font-size: 52px; font-weight: 700; letter-spacing: -2.5px; line-height: 1.05; margin-top: 30px; }
+  .close .t1 em { font-style: italic; font-weight: 400; color: #0A7A5A; }
+  .close .desc { font-size: 17px; color: #6e6e73; line-height: 1.5; margin-top: 24px; max-width: 520px; }
+  .why { display: grid; grid-template-columns: 1fr 1fr; gap: 26px 40px; margin-top: 40px; }
+  .why .it { display: flex; gap: 16px; }
+  .why .n { flex: none; font-size: 24px; font-weight: 300; color: #0A7A5A; line-height: 1.1; }
+  .why b { display: block; font-size: 13px; margin-bottom: 4px; }
+  .why p { font-size: 12.5px; color: #6e6e73; line-height: 1.5; }
+  .btn { display: inline-block; background: #0A7A5A; color: #fff; font-weight: 700; font-size: 15px; padding: 20px 36px; border-radius: 999px; margin-top: 46px; }
+  .alt { font-size: 12.5px; color: #6e6e73; margin-top: 22px; }
+  .alt a { color: #0A7A5A; font-weight: 700; }
+  .close .bottom { position: absolute; left: 22mm; right: 22mm; bottom: 20mm; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 22px; border-top: 0.5px solid rgba(0,0,0,0.12); }
+  .close .bottom .logo { font-size: 18px; }
+  .close .bottom .site { font-size: 10px; color: #86868B; margin-top: 6px; }
+  .close .legal { text-align: right; font-size: 10px; color: #86868B; line-height: 1.5; }
+</style>
+</head>
+<body>
+
+<!-- ============================== PAGE 1 : COUVERTURE ============================== -->
+<section class="page cover">
+  <div class="wm">EXEMPLE</div>
+  <div class="top">
+    <div class="logo">earlypanel<span class="dot">.</span></div>
+    <div class="tag">Test utilisateurs<br>Rapport d'analyse UX</div>
+  </div>
+  <div class="hero">
+    <div class="kicker">Rapport de test utilisateurs</div>
+    <div class="t1">Clearflow</div>
+    <div class="t2">parcours de création<br>et d'envoi de devis</div>
+    <p class="desc">Analyse qualitative et quantitative conduite sur 15 testeurs entre le 8 et le 12 avril 2026.</p>
+  </div>
+  <div class="meta">
+    <div><div class="l">Client</div><div class="v">Clearflow SAS</div></div>
+    <div><div class="l">Référence</div><div class="v">PROJ-00142</div></div>
+    <div><div class="l">Livré le</div><div class="v">15 avril 2026</div></div>
+  </div>
+  <div class="bottom">
+    <div class="site">earlypanel.fr</div>
+    <div class="conf">Confidentiel</div>
+  </div>
+</section>
+
+<!-- ============================== PAGE 2 : SYNTHESE ============================== -->
+<section class="page">
+  <div class="wm">EXEMPLE</div>
+  <header class="hd">
+    <div><div class="logo">earlypanel<span class="dot">.</span></div><span class="sec">01 · Synthèse</span></div>
+    <div class="ref">Clearflow · PROJ-00142</div>
+  </header>
+
+  <h1>Ce qu'il faut retenir</h1>
+
+  <div class="verdict">
+    <span class="kicker">Verdict</span>
+    <p>Le parcours de création de devis est globalement fluide et apprécié pour sa prévisualisation en temps réel, mais <b>3 frictions critiques</b> pénalisent la conversion des nouveaux utilisateurs : inscription trop exigeante, absence de feedback à l'envoi et duplication de devis impossible.</p>
+  </div>
+
+  <div class="label">Les 3 chiffres qui comptent</div>
+  <div class="stats3">
+    <div class="stat"><div class="n">73%</div><div class="c">des testeurs ont terminé le parcours complet jusqu'à l'envoi du devis</div></div>
+    <div class="stat"><div class="n">3</div><div class="c">frictions critiques identifiées sur 5 points de friction relevés</div></div>
+    <div class="stat"><div class="n">7</div><div class="c">recommandations priorisées, dont 3 à traiter en priorité absolue</div></div>
+  </div>
+
+  <div class="actions">
+    <div class="label">À faire en premier</div>
+    <div class="act"><div class="num">01</div><p>Réduire les champs obligatoires à l'inscription à l'essentiel (email et mot de passe) et différer la collecte du SIRET et des coordonnées bancaires après le premier devis créé.</p></div>
+    <div class="act"><div class="num">02</div><p>Ajouter une confirmation explicite d'envoi d'email au client avec horodatage visible dans l'interface, pour lever l'ambiguïté après clic sur « Envoyer ».</p></div>
+    <div class="act"><div class="num">03</div><p>Permettre la duplication d'un devis existant en un clic, première demande explicite de 8 testeurs sur 15.</p></div>
+  </div>
+
+  <footer class="ft"><span>earlypanel · Clearflow · 15 avril 2026</span><span>Page 2 / 12</span></footer>
+</section>
+
+<!-- ============================== PAGE 3 : CONTEXTE ============================== -->
+<section class="page">
+  <div class="wm">EXEMPLE</div>
+  <header class="hd">
+    <div><div class="logo">earlypanel<span class="dot">.</span></div><span class="sec">02 · Contexte</span></div>
+    <div class="ref">Clearflow · PROJ-00142</div>
+  </header>
+
+  <h1>Le contexte du projet</h1>
+
+  <div class="h3">Le produit testé</div>
+  <p class="txt">Clearflow est un SaaS de gestion de devis et de facturation destiné aux freelances, indépendants et petites structures (1 à 15 collaborateurs). L'outil est disponible en version web et couvre le cycle complet : devis, acceptation client, facturation, relances. Le produit est en phase de lancement commercial après une bêta privée de trois mois.</p>
+
+  <div class="h3">Pourquoi ce test</div>
+  <p class="txt">Clearflow souhaite valider, avant l'ouverture publique, la fluidité du parcours d'activation, de l'inscription à l'envoi du premier devis. L'enjeu est de mesurer le taux de complétion réel, d'identifier les points de chute, et d'obtenir des retours qualitatifs sur la perception du produit par des utilisateurs qui le découvrent sans aucune préparation.</p>
+
+  <div class="h3">Ce qui a été testé</div>
+  <ul class="dots">
+    <li>Inscription et création de compte (parcours complet depuis la landing page)</li>
+    <li>Configuration initiale : profil, logo, coordonnées de facturation</li>
+    <li>Création d'un premier devis : ajout de lignes, calcul automatique, prévisualisation</li>
+    <li>Envoi du devis par email au client destinataire et suivi de statut</li>
+  </ul>
+  <p class="txt muted-it">Hors périmètre : gestion des factures, relances automatiques, exports comptables, intégrations tierces.</p>
+
+  <div class="h3">Les consignes du client</div>
+  <p class="txt">Clearflow a demandé une attention particulière à la clarté du vocabulaire (devis, proforma, facture), au confort de la prévisualisation PDF, et au moment précis où l'utilisateur estime que son devis « est parti » chez le client. Le ton souhaité pour les retours est direct et non complaisant, y compris sur les retours positifs.</p>
+
+  <div class="h3">Comment on a procédé</div>
+  <p class="txt">Test non modéré à distance, sur une durée de 5 jours, avec un questionnaire scénarisé administré à 15 testeurs sélectionnés sur profils.</p>
+  <div class="tags">
+    <span class="tag-pill">Non modéré</span><span class="tag-pill">À distance</span><span class="tag-pill">5 jours</span><span class="tag-pill">15 testeurs</span><span class="tag-pill">Questionnaire scénarisé</span>
+  </div>
+
+  <footer class="ft"><span>earlypanel · Clearflow · 15 avril 2026</span><span>Page 3 / 12</span></footer>
+</section>
+
+<!-- ============================== PAGE 4 : PANEL ============================== -->
+<section class="page">
+  <div class="wm">EXEMPLE</div>
+  <header class="hd">
+    <div><div class="logo">earlypanel<span class="dot">.</span></div><span class="sec">03 · Panel</span></div>
+    <div class="ref">Clearflow · PROJ-00142</div>
+  </header>
+
+  <h1>Qui a testé</h1>
+  <p class="lead">Panel de 15 testeurs sélectionnés pour refléter la cible commerciale de Clearflow : indépendants, freelances, TPE. Mix générationnel et technologique voulu.</p>
+
+  <table class="tbl">
+    <thead><tr><th>ID</th><th>Âge</th><th>Genre</th><th>Profession</th><th>Niveau digital</th><th>Device</th></tr></thead>
+    <tbody>
+      <tr><td class="id">T01</td><td>29</td><td>F</td><td>Graphiste freelance</td><td>Avancé</td><td>MacBook / Safari</td></tr>
+      <tr><td class="id">T02</td><td>45</td><td>M</td><td>Artisan plombier</td><td>Novice</td><td>iPhone SE / Safari</td></tr>
+      <tr><td class="id">T03</td><td>34</td><td>F</td><td>Consultante RH</td><td>Intermédiaire</td><td>Windows / Chrome</td></tr>
+      <tr><td class="id">T04</td><td>52</td><td>M</td><td>Comptable libéral</td><td>Intermédiaire</td><td>Windows / Firefox</td></tr>
+      <tr><td class="id">T05</td><td>27</td><td>F</td><td>Développeuse freelance</td><td>Avancé</td><td>Linux / Chrome</td></tr>
+      <tr><td class="id">T06</td><td>41</td><td>M</td><td>Gérant agence web (4 pers.)</td><td>Avancé</td><td>MacBook / Chrome</td></tr>
+      <tr><td class="id">T07</td><td>38</td><td>F</td><td>Photographe indépendante</td><td>Intermédiaire</td><td>iPad / Safari</td></tr>
+      <tr><td class="id">T08</td><td>49</td><td>M</td><td>Électricien (TPE 3 pers.)</td><td>Novice</td><td>Android / Chrome</td></tr>
+      <tr><td class="id">T09</td><td>31</td><td>F</td><td>Coach professionnelle</td><td>Intermédiaire</td><td>MacBook / Safari</td></tr>
+      <tr><td class="id">T10</td><td>26</td><td>M</td><td>Rédacteur freelance</td><td>Avancé</td><td>Windows / Chrome</td></tr>
+      <tr><td class="id">T11</td><td>43</td><td>F</td><td>Architecte d'intérieur</td><td>Intermédiaire</td><td>MacBook / Chrome</td></tr>
+      <tr><td class="id">T12</td><td>36</td><td>M</td><td>Consultant IT</td><td>Avancé</td><td>Windows / Edge</td></tr>
+      <tr><td class="id">T13</td><td>47</td><td>F</td><td>Traductrice indépendante</td><td>Intermédiaire</td><td>Windows / Chrome</td></tr>
+      <tr><td class="id">T14</td><td>32</td><td>M</td><td>Kinésithérapeute libéral</td><td>Novice</td><td>iPhone 15 / Safari</td></tr>
+      <tr><td class="id">T15</td><td>40</td><td>F</td><td>Gérante restaurant</td><td>Novice</td><td>iPad / Safari</td></tr>
+    </tbody>
+  </table>
+
+  <div class="stats4">
+    <div><div class="big">15</div><div class="cap">testeurs au total</div></div>
+    <div><div class="big">38 ans</div><div class="cap">âge moyen du panel</div></div>
+    <div><div class="big">4 / 6 / 5</div><div class="cap">novices / intermédiaires / avancés</div></div>
+    <div><div class="big">9</div><div class="cap">configurations device / navigateur</div></div>
+  </div>
+
+  <footer class="ft"><span>earlypanel · Clearflow · 15 avril 2026</span><span>Page 4 / 12</span></footer>
+</section>
+
+<!-- ============================== PAGE 5 : SCENARIOS ============================== -->
+<section class="page">
+  <div class="wm">EXEMPLE</div>
+  <header class="hd">
+    <div><div class="logo">earlypanel<span class="dot">.</span></div><span class="sec">04 · Scénarios</span></div>
+    <div class="ref">Clearflow · PROJ-00142</div>
+  </header>
+
+  <h1>Ce qu'on leur a demandé de faire</h1>
+  <p class="lead">Chaque testeur a déroulé les trois scénarios suivants dans l'ordre, sans préparation préalable et sans assistance.</p>
+
+  <div class="uc">
+    <span class="kicker">Cas d'usage 01</span>
+    <h3>S'inscrire sur Clearflow et compléter son profil professionnel</h3>
+    <div class="row"><div class="l">Tâche</div><div class="it">« Vous lancez votre activité et avez entendu parler de Clearflow. Inscrivez-vous et configurez votre compte pour pouvoir émettre vos premiers devis. »</div></div>
+    <div class="row"><div class="l">Succès</div><div>Compte activé avec profil renseigné (identité, coordonnées, logo optionnel) et accès au tableau de bord.</div></div>
+    <div class="row"><div class="l">Testeurs</div><div>15 sur 15</div></div>
+  </div>
+
+  <div class="uc">
+    <span class="kicker">Cas d'usage 02</span>
+    <h3>Créer un premier devis avec trois lignes et une remise globale</h3>
+    <div class="row"><div class="l">Tâche</div><div class="it">« Vous venez de décrocher un prospect. Créez un devis à son nom avec trois prestations différentes, dont deux au forfait et une en taux horaire, et appliquez une remise commerciale de 5 %. »</div></div>
+    <div class="row"><div class="l">Succès</div><div>Devis enregistré avec les trois lignes correctes, calculs automatiques validés, prévisualisation PDF fidèle.</div></div>
+    <div class="row"><div class="l">Testeurs</div><div>14 sur 15 <span class="grey">(1 testeur a abandonné en cours de cas 02)</span></div></div>
+  </div>
+
+  <div class="uc">
+    <span class="kicker">Cas d'usage 03</span>
+    <h3>Envoyer le devis au client par email et vérifier son statut</h3>
+    <div class="row"><div class="l">Tâche</div><div class="it">« Envoyez ce devis à votre prospect (une adresse test fournie) et assurez-vous qu'il a bien reçu le document. »</div></div>
+    <div class="row"><div class="l">Succès</div><div>Devis envoyé, accusé de réception affiché dans l'interface, statut du devis actualisé correctement.</div></div>
+    <div class="row"><div class="l">Testeurs</div><div>11 sur 15 <span class="grey">(3 testeurs n'ont pas su confirmer l'envoi, 1 abandon en cas 02)</span></div></div>
+  </div>
+
+  <footer class="ft"><span>earlypanel · Clearflow · 15 avril 2026</span><span>Page 5 / 12</span></footer>
+</section>
+
+<!-- ============================== PAGE 6 : BUGS ============================== -->
+<section class="page">
+  <div class="wm">EXEMPLE</div>
+  <header class="hd">
+    <div><div class="logo">earlypanel<span class="dot">.</span></div><span class="sec">05 · Bugs</span></div>
+    <div class="ref">Clearflow · PROJ-00142</div>
+  </header>
+
+  <h1>Ce qui est cassé techniquement</h1>
+  <p class="lead">Bugs objectifs, reproductibles, indépendants de la perception utilisateur. À distinguer des frictions UX traitées dans la section suivante.</p>
+
+  <table class="tbl">
+    <thead><tr><th style="width:44px">ID</th><th>Description</th><th style="width:108px">Device / navigateur</th><th style="width:78px">Testeurs</th><th style="width:88px">Gravité</th></tr></thead>
+    <tbody>
+      <tr><td class="id">B01</td><td>L'upload d'un logo au format SVG provoque un crash de la page. L'utilisateur est renvoyé à l'écran d'accueil sans message d'erreur.</td><td>Safari desktop<span class="sub">(macOS 14)</span></td><td>T01, T06 (2/15)</td><td><span class="pill p-amb">Majeur</span></td></tr>
+      <tr><td class="id">B02</td><td>Le PDF généré du devis coupe le pied de page (mentions légales, numéro de SIRET) lorsque le devis dépasse deux pages.</td><td>Tous navigateurs</td><td>T04, T06, T11 (3/15)</td><td><span class="pill p-amb">Majeur</span></td></tr>
+      <tr><td class="id">B03</td><td>La soumission du formulaire de création de devis échoue (erreur 500) si le numéro de devis saisi manuellement contient une barre oblique.</td><td>Tous navigateurs</td><td>T04 (1/15)</td><td><span class="pill p-red">Bloquant</span></td></tr>
+      <tr><td class="id">B04</td><td>Affichage cassé des lignes du tableau de devis sur écran de 375 pixels de large ou moins : les colonnes Quantité et Total se superposent.</td><td>iPhone SE et équivalents</td><td>T02 (1/15)</td><td><span class="pill p-grey">Mineur</span></td></tr>
+      <tr><td class="id">B05</td><td>La réception de l'email de confirmation d'inscription est intermittente : 2 testeurs ont dû demander un renvoi (délai observé entre 3 et 12 minutes).</td><td>Non reproductible côté device</td><td>T02, T14 (2/15)</td><td><span class="pill p-amb">Majeur</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <div class="t">À noter</div>
+    <p>Aucun bug bloquant côté base de données ou côté authentification n'a été remonté. Les incidents identifiés se concentrent sur les couches de présentation et d'export PDF. Les bugs B01 et B02 touchent des cas d'usage fréquents et devraient être corrigés avant l'ouverture publique.</p>
+  </div>
+
+  <footer class="ft"><span>earlypanel · Clearflow · 15 avril 2026</span><span>Page 6 / 12</span></footer>
+</section>
+
+<!-- ============================== PAGE 7 : FRICTIONS (1/2) ============================== -->
+<section class="page">
+  <div class="wm">EXEMPLE</div>
+  <header class="hd">
+    <div><div class="logo">earlypanel<span class="dot">.</span></div><span class="sec">06 · Frictions UX</span></div>
+    <div class="ref">Clearflow · PROJ-00142</div>
+  </header>
+
+  <h1>Ce qui a bloqué les utilisateurs</h1>
+  <p class="lead" style="margin-bottom:6px;padding-bottom:16px;border-bottom:0.5px solid rgba(0,0,0,0.12)">Frictions subjectives et comportementales : hésitations, incompréhensions, abandons, parcours contre-intuitifs. Complément factuel aux bugs.</p>
+
+  <div class="fr">
+    <div class="fr-head">
+      <h3><span class="id">F1.</span>Inscription perçue comme excessive pour « juste essayer »</h3>
+      <div class="pills"><span class="pill p-green tc">9 / 15 · 60%</span><span class="pill p-red">Bloquant</span></div>
+    </div>
+    <div class="step"><b>Étape concernée :</b> formulaire d'inscription · champs obligatoires</div>
+    <div class="quotes">
+      <div class="q">J'ai renseigné mon SIRET, mon adresse postale, mon RIB… je voulais juste tester, pas ouvrir un compte chez vous. J'ai failli fermer l'onglet trois fois.<span class="who">T03</span></div>
+      <div class="q">On demande le SIRET en obligatoire à l'inscription. Moi je démarrais mon activité, je l'avais pas encore. J'ai mis des chiffres au hasard pour continuer.<span class="who">T10</span></div>
+      <div class="q">Pourquoi j'ai besoin d'un IBAN pour faire un devis ? Je comprends pour une facture, mais un devis c'est une proposition, pas un paiement.<span class="who">T06</span></div>
+    </div>
+    <div class="read"><b>Lecture.</b> Les testeurs distinguent clairement l'acte d'essayer le produit de l'acte de l'adopter. La demande d'informations sensibles dès l'inscription est vécue comme un engagement prématuré et, pour certains, un signal de méfiance. Cette friction est le principal contributeur du taux d'abandon à l'activation.</div>
+  </div>
+
+  <div class="fr">
+    <div class="fr-head">
+      <h3><span class="id">F2.</span>Incertitude à l'envoi : « est-ce que c'est vraiment parti ? »</h3>
+      <div class="pills"><span class="pill p-green tc">11 / 15 · 73%</span><span class="pill p-red">Bloquant</span></div>
+    </div>
+    <div class="step"><b>Étape concernée :</b> bouton « Envoyer le devis » · retour de confirmation</div>
+    <div class="quotes">
+      <div class="q">J'ai cliqué « Envoyer », la page a juste rechargé. Rien d'autre. J'ai renvoyé deux fois pour être sûr, le client a dû recevoir trois mails.<span class="who">T04</span></div>
+      <div class="q">Pas de petit message « envoyé avec succès », pas de date, rien. En 2026 c'est surprenant.<span class="who">T01</span></div>
+    </div>
+    <div class="read"><b>Lecture.</b> Le système fonctionne correctement mais ne communique pas. L'absence de feedback visuel immédiat après une action engageante crée une anxiété que les testeurs compensent par des actions redondantes, ici plusieurs envois successifs du même devis, un comportement potentiellement dommageable pour la relation client.</div>
+  </div>
+
+  <footer class="ft"><span>earlypanel · Clearflow · 15 avril 2026</span><span>Page 7 / 12</span></footer>
+</section>
+
+<!-- ============================== PAGE 8 : FRICTIONS (2/2) ============================== -->
+<section class="page">
+  <div class="wm">EXEMPLE</div>
+  <header class="hd">
+    <div><div class="logo">earlypanel<span class="dot">.</span></div><span class="sec">06 · Frictions UX (suite)</span></div>
+    <div class="ref">Clearflow · PROJ-00142</div>
+  </header>
+
+  <h1 class="small">Ce qui a bloqué les utilisateurs</h1>
+
+  <div class="fr">
+    <div class="fr-head">
+      <h3><span class="id">F3.</span>Impossible de dupliquer un devis existant</h3>
+      <div class="pills"><span class="pill p-green tc">8 / 15 · 53%</span><span class="pill p-red">Bloquant</span></div>
+    </div>
+    <div class="step"><b>Étape concernée :</b> liste des devis · actions disponibles par ligne</div>
+    <div class="quotes">
+      <div class="q">Mon deuxième devis ressemblait à 90 % au premier. J'ai dû tout retaper. Normalement je clique droit, duplique, je change le client, terminé.<span class="who">T11</span></div>
+      <div class="q">Là je reproduis ça pour vingt clients par mois, je perds un temps fou. Ça m'a fait douter que l'outil soit vraiment pensé pour les pros.<span class="who">T06</span></div>
+    </div>
+    <div class="read"><b>Lecture.</b> Absence d'une fonction attendue par défaut sur ce type d'outil. Sans possibilité de contourner le problème, l'utilisateur aguerri perd confiance dans la maturité du produit. Frustration forte chez les profils avancés, qui sont pourtant les premiers prescripteurs.</div>
+  </div>
+
+  <div class="fr">
+    <div class="fr-head">
+      <h3><span class="id">F4.</span>Vocabulaire métier non expliqué (devis, proforma, facture)</h3>
+      <div class="pills"><span class="pill p-green tc">7 / 15 · 47%</span><span class="pill p-amb">Ralentisseur</span></div>
+    </div>
+    <div class="step"><b>Étape concernée :</b> tableau de bord · choix du type de document à créer</div>
+    <div class="quotes">
+      <div class="q">La différence devis / proforma, c'est quoi ? Je suis kiné, moi je fais un devis, point.<span class="who">T14</span></div>
+      <div class="q">J'aurais aimé un petit « ? » à côté de chaque terme, comme sur les autres outils que j'utilise.<span class="who">T15</span></div>
+    </div>
+    <div class="read"><b>Lecture.</b> Gêne modérée touchant principalement les profils novices et les professions non commerciales. Pas bloquant mais contribue à une impression de produit « pour initiés » qui peut freiner la recommandation.</div>
+  </div>
+
+  <div class="fr">
+    <div class="fr-head">
+      <h3><span class="id">F5.</span>Mot de passe : contraintes jugées excessives</h3>
+      <div class="pills"><span class="pill p-green tc">5 / 15 · 33%</span><span class="pill p-grey">Gêne</span></div>
+    </div>
+    <div class="step"><b>Étape concernée :</b> choix du mot de passe à la création de compte</div>
+    <div class="quotes">
+      <div class="q">12 caractères, majuscule, chiffre, symbole. On est sur un outil de devis, pas sur un compte bancaire.<span class="who">T09</span></div>
+    </div>
+    <div class="read"><b>Lecture.</b> Contraintes de sécurité pertinentes dans l'absolu mais perçues comme disproportionnées au regard du contexte d'usage et des autres outils du même segment.</div>
+  </div>
+
+  <footer class="ft"><span>earlypanel · Clearflow · 15 avril 2026</span><span>Page 8 / 12</span></footer>
+</section>
+
+<!-- ============================== PAGE 9 : AUDIT ============================== -->
+<section class="page">
+  <div class="wm">EXEMPLE</div>
+  <header class="hd">
+    <div><div class="logo">earlypanel<span class="dot">.</span></div><span class="sec">07 · Audit technique</span></div>
+    <div class="ref">Clearflow · PROJ-00142</div>
+  </header>
+
+  <h1>Audit Lighthouse</h1>
+  <p class="lead">Audit automatisé effectué sur la page d'inscription et le tableau de bord, en conditions mobile simulées. Scores moyens sur les deux pages.</p>
+
+  <div class="scores">
+    <div class="score"><div class="v c-amb">78<small> / 100</small></div><div class="name">Performance</div><span class="pill p-amb">À surveiller</span></div>
+    <div class="score"><div class="v c-red">64<small> / 100</small></div><div class="name">Accessibilité</div><span class="pill p-red">Critique</span></div>
+    <div class="score"><div class="v c-green">92<small> / 100</small></div><div class="name">SEO</div><span class="pill p-green">Bon</span></div>
+    <div class="score"><div class="v c-green">83<small> / 100</small></div><div class="name">Bonnes<br>pratiques</div><span class="pill p-green">Bon</span></div>
+  </div>
+
+  <div class="disclaimer">Audit automatisé via Lighthouse. earlypanel restitue ici les points les plus fréquemment signalés par l'outil, en langage non technique. Cette liste ne constitue pas un audit d'expertise SEO ou accessibilité, et ne préjuge pas de la priorité de chaque point dans le contexte de votre produit.</div>
+
+  <h2>Ce que l'outil a remonté</h2>
+  <div class="find"><p><b>Images non optimisées :</b> 14 images servies dans un format et une taille non adaptés au viewport. Économie estimée par l'outil : environ 940 Ko au chargement initial.</p></div>
+  <div class="find"><p><b>Contraste insuffisant :</b> 6 éléments textuels (principalement boutons secondaires et labels de champs) ne respectent pas le ratio WCAG AA. Impact potentiel pour les utilisateurs malvoyants.</p></div>
+  <div class="find"><p><b>Champs de formulaire sans label associé :</b> 4 champs sur le formulaire d'inscription ne sont pas correctement lisibles par les lecteurs d'écran.</p></div>
+  <div class="find"><p><b>CSS bloquant le rendu :</b> 3 feuilles de style externes ralentissent le premier affichage utile de 600 à 900 ms selon la connexion.</p></div>
+  <div class="find"><p><b>Absence de cache navigateur :</b> les ressources statiques ne sont pas mises en cache côté navigateur, ce qui augmente le temps de chargement des visites récurrentes.</p></div>
+  <div class="find"><p><b>Pas de meta-description :</b> deux pages publiques n'ont pas de meta-description, élément utile pour le référencement naturel.</p></div>
+
+  <footer class="ft"><span>earlypanel · Clearflow · 15 avril 2026</span><span>Page 9 / 12</span></footer>
+</section>
+
+<!-- ============================== PAGE 10 : RECOMMANDATIONS ============================== -->
+<section class="page">
+  <div class="wm">EXEMPLE</div>
+  <header class="hd">
+    <div><div class="logo">earlypanel<span class="dot">.</span></div><span class="sec">08 · Recommandations</span></div>
+    <div class="ref">Clearflow · PROJ-00142</div>
+  </header>
+
+  <h1>Ce qu'on recommande</h1>
+  <p class="lead it" style="margin-bottom:6px">L'effort technique est une estimation indicative côté implémentation. Il ne tient pas compte des contraintes internes de Clearflow, qu'il appartient à vos équipes d'intégrer à leur arbitrage.</p>
+
+  <div class="prio"><span class="badge b1">P1</span><span>À traiter avant l'ouverture publique</span></div>
+  <div class="reco">
+    <h3><span class="id">R1.</span>Réduire l'inscription à l'essentiel</h3>
+    <div class="cols3">
+      <div><div class="l">Résout</div><div class="v">Friction F1</div></div>
+      <div><div class="l">Impact estimé</div><div class="v">+12 à +18 pts de complétion</div></div>
+      <div><div class="l">Effort technique</div><span class="pill p-green tc">Faible</span></div>
+    </div>
+  </div>
+  <div class="reco">
+    <h3><span class="id">R2.</span>Confirmation explicite d'envoi de devis</h3>
+    <div class="cols3">
+      <div><div class="l">Résout</div><div class="v">Friction F2</div></div>
+      <div><div class="l">Impact estimé</div><div class="v">Élimine les envois redondants</div></div>
+      <div><div class="l">Effort technique</div><span class="pill p-green tc">Faible</span></div>
+    </div>
+  </div>
+  <div class="reco">
+    <h3><span class="id">R3.</span>Duplication d'un devis existant en un clic</h3>
+    <div class="cols3">
+      <div><div class="l">Résout</div><div class="v">Friction F3</div></div>
+      <div><div class="l">Impact estimé</div><div class="v">Rétention profils pros</div></div>
+      <div><div class="l">Effort technique</div><span class="pill p-amb tc">Moyen</span></div>
+    </div>
+  </div>
+
+  <div class="prio"><span class="badge b2">P2</span><span>Important, dans les 4 à 8 semaines</span></div>
+  <div class="reco">
+    <h3><span class="id">R4.</span>Expliquer les termes métier (tooltips contextuels)</h3>
+    <div class="cols3">
+      <div><div class="l">Résout</div><div class="v">Friction F4</div></div>
+      <div><div class="l">Impact estimé</div><div class="v">Meilleure acquisition novices</div></div>
+      <div><div class="l">Effort technique</div><span class="pill p-green tc">Faible</span></div>
+    </div>
+  </div>
+  <div class="reco">
+    <h3><span class="id">R5.</span>Corriger l'upload SVG et le pied de page du PDF multi-pages</h3>
+    <div class="cols3">
+      <div><div class="l">Résout</div><div class="v">Bugs B01, B02</div></div>
+      <div><div class="l">Impact estimé</div><div class="v">Fiabilité perçue</div></div>
+      <div><div class="l">Effort technique</div><span class="pill p-amb tc">Moyen</span></div>
+    </div>
+  </div>
+  <div class="reco">
+    <h3><span class="id">R6.</span>Mise en conformité accessibilité (contrastes, labels)</h3>
+    <div class="cols3">
+      <div><div class="l">Résout</div><div class="v">Audit Lighthouse</div></div>
+      <div><div class="l">Impact estimé</div><div class="v">Conformité WCAG AA</div></div>
+      <div><div class="l">Effort technique</div><span class="pill p-amb tc">Moyen</span></div>
+    </div>
+  </div>
+
+  <div class="prio"><span class="badge b3">P3</span><span>À envisager</span></div>
+  <div class="reco">
+    <h3><span class="id">R7.</span>Revoir les contraintes de mot de passe</h3>
+    <div class="cols3">
+      <div><div class="l">Résout</div><div class="v">Friction F5</div></div>
+      <div><div class="l">Impact estimé</div><div class="v">Réduit l'abandon à l'activation</div></div>
+      <div><div class="l">Effort technique</div><span class="pill p-green tc">Faible</span></div>
+    </div>
+  </div>
+
+  <footer class="ft"><span>earlypanel · Clearflow · 15 avril 2026</span><span>Page 10 / 12</span></footer>
+</section>
+
+<!-- ============================== PAGE 11 : PRIORISATION ============================== -->
+<section class="page">
+  <div class="wm">EXEMPLE</div>
+  <header class="hd">
+    <div><div class="logo">earlypanel<span class="dot">.</span></div><span class="sec">09 · Priorisation</span></div>
+    <div class="ref">Clearflow · PROJ-00142</div>
+  </header>
+
+  <h1>Vue impact / effort</h1>
+  <p class="lead">Les sept recommandations positionnées selon leur impact utilisateur estimé et l'effort technique brut requis. Les « quick wins » concentrent deux recommandations, à prioriser absolument.</p>
+
+  <div class="mbox">
+    <div class="mgrid">
+      <div></div>
+      <div class="ch">Effort faible</div>
+      <div class="ch">Effort moyen ou élevé</div>
+
+      <div class="rh"><span>Impact fort</span></div>
+      <div class="cell qw">
+        <div class="ct">Quick wins</div>
+        <div class="ids">R1 · R2</div>
+        <div class="cd">Réduction des champs d'inscription et feedback d'envoi. Impact immédiat sur la conversion, effort de développement minimal.</div>
+      </div>
+      <div class="cell">
+        <div class="ct">Chantiers stratégiques</div>
+        <div class="ids">R3 · R5</div>
+        <div class="cd">Duplication de devis et corrections techniques. À intégrer dans la roadmap produit dès le prochain sprint.</div>
+      </div>
+
+      <div class="rh"><span>Impact faible</span></div>
+      <div class="cell">
+        <div class="ct">À planifier</div>
+        <div class="ids">R4 · R7</div>
+        <div class="cd">Tooltips métier et revue du mot de passe. Gains d'expérience réels sur des segments secondaires.</div>
+      </div>
+      <div class="cell">
+        <div class="ct">Backlog</div>
+        <div class="ids">R6</div>
+        <div class="cd">Mise en conformité accessibilité. Projet transverse à cadrer globalement, pas uniquement sur les pages auditées.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="meth">
+    <span class="kicker">Méthodologie earlypanel</span>
+    <p>earlypanel sélectionne un panel qualifié à partir d'une base de testeurs profilés (âge, secteur, niveau digital, devices). Les scénarios de test sont co-construits avec le client pour couvrir les parcours critiques du produit. Les testeurs réalisent les tâches à distance dans leurs conditions réelles d'usage, et répondent à un questionnaire structuré à chaque étape. Chaque réponse est relue et validée à la main, puis les retours sont consolidés, recoupés et analysés pour produire ce rapport, livré en 5 jours ouvrés à partir du lancement des tests.</p>
+  </div>
+
+  <footer class="ft"><span>earlypanel · Clearflow · 15 avril 2026</span><span>Page 11 / 12</span></footer>
+</section>
+
+<!-- ============================== PAGE 12 : A VOTRE TOUR ============================== -->
+<section class="page close last">
+  <div class="wm">EXEMPLE</div>
+  <div class="eyebrow">À votre tour</div>
+  <div class="t1">Le prochain rapport<br>pourrait être <em>le vôtre.</em></div>
+  <p class="desc">En 5 jours ouvrés, earlypanel teste votre produit auprès d'un panel qualifié, identifie les frictions qui freinent votre conversion, et vous livre un rapport actionnable comme celui-ci.</p>
+
+  <div class="why">
+    <div class="it"><div class="n">01</div><div><b>Panel sur-mesure</b><p>Sélection de testeurs sur critères métier, digital et device, pour refléter votre cible réelle.</p></div></div>
+    <div class="it"><div class="n">02</div><div><b>5 jours ouvrés</b><p>Du lancement des tests à la livraison du rapport. Pensé pour s'insérer dans vos sprints.</p></div></div>
+    <div class="it"><div class="n">03</div><div><b>Rapport actionnable</b><p>Bugs, frictions, verbatims, priorisation. Utilisable en comité dès réception.</p></div></div>
+    <div class="it"><div class="n">04</div><div><b>Clé en main</b><p>Nous gérons le recrutement, la scénarisation, la collecte et l'analyse. Vous recevez le livrable.</p></div></div>
+  </div>
+
+  <a class="btn" href="{{BOOKING_URL}}">Réserver un appel avec earlypanel</a>
+  <p class="alt">ou écrivez-nous à <a href="mailto:{{CONTACT_EMAIL}}">{{CONTACT_EMAIL}}</a></p>
+
+  <div class="bottom">
+    <div><div class="logo">earlypanel<span class="dot">.</span></div><div class="site">earlypanel.fr</div></div>
+    <div class="legal">Document exemple · non contractuel<br>Cas fictif à visée illustrative</div>
+  </div>
+</section>
+
+</body>
+</html>

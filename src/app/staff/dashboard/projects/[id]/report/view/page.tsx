@@ -73,9 +73,9 @@ const SEVERITY = {
 };
 const IMPACT = { blocking: "Bloquant", slow: "Ralentissant", minor: "Mineur" };
 const PRIORITY = {
-  P1: { label: "P1 — Critique", bg: "#fef2f2", color: "#dc2626" },
-  P2: { label: "P2 — Important", bg: "#fffbeb", color: "#d97706" },
-  P3: { label: "P3 — Souhaitable", bg: "#f5f5f7", color: "#6e6e73" },
+  P1: { label: "P1 · Critique", bg: "#fef2f2", color: "#dc2626" },
+  P2: { label: "P2 · Important", bg: "#fffbeb", color: "#d97706" },
+  P3: { label: "P3 · Souhaitable", bg: "#f5f5f7", color: "#6e6e73" },
 };
 const EFFORT = { low: "Effort faible", medium: "Effort moyen", high: "Effort élevé" };
 const QUADRANTS: { key: keyof Matrix; label: string; desc: string; color: string }[] = [
@@ -341,7 +341,7 @@ export default function ReportViewPage({ params }: { params: Promise<{ id: strin
                             « {v.text} »
                             {(v.tester_readable || v.question_text) && (
                               <span style={{ fontStyle: "normal", color: "#86868B" }}>
-                                {" "}— {v.tester_readable ?? "Testeur"}{v.question_text ? `, à propos de : ${v.question_text}` : ""}
+                                {" "}({v.tester_readable ?? "Testeur"}{v.question_text ? `, à propos de : ${v.question_text}` : ""})
                               </span>
                             )}
                           </div>

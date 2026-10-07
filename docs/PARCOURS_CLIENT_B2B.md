@@ -61,6 +61,7 @@ Document de référence pour produire un diaporama. Chaque section numérotée c
 
 - Le visiteur saisit son email.
 - La plateforme envoie automatiquement l'email « Votre exemple de rapport earlypanel » avec le PDF `earlypanel-rapport-exemple.pdf` en pièce jointe.
+- Source du PDF : `content/rapport-exemple/index.html`, régénéré par `npm run rapport:exemple` (Chromium de Playwright, A4, 12 pages). Le script refuse tout tiret long ou demi-cadratin dans la source : ce livrable ne doit jamais en contenir.
 - Aucun compte créé, aucune relance automatique.
 
 ### 1.4 Formulaire de brief
