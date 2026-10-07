@@ -198,15 +198,18 @@ function groupByCategory(
 
 /**
  * Garde booleenne pratique pour les routes serveur.
- * Renvoie true UNIQUEMENT si le testeur est `active` ET a tous les champs
- * requis. Defense en profondeur : meme si `profile_completed` est mal mis
- * a jour cote DB (edge case), cette fonction recalcule sur le contenu reel.
+ * Renvoie true UNIQUEMENT si le testeur est `active`, n'est pas desinscrit
+ * des emails (une invitation est une sollicitation, migration 047) ET a tous
+ * les champs requis. Defense en profondeur : meme si `profile_completed` est
+ * mal mis a jour cote DB (edge case), cette fonction recalcule sur le contenu
+ * reel. L'appelant doit selectionner `email_opt_out_at`.
  */
 export function isTesterEligibleForInvitation(
   tester: Record<string, unknown> | null | undefined
 ): boolean {
   if (!tester) return false;
   if (tester.status !== "active") return false;
+  if (tester.email_opt_out_at) return false;
   if (tester.profile_completed !== true) return false;
   return computeProfileCompleteness(tester).isComplete;
 }

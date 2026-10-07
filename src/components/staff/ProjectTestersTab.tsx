@@ -457,7 +457,8 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
               </div>
             ) : (
               filteredCatalog.map((t) => {
-                const eligible = t.status === "active" && t.profile_completed === true;
+                const optedOut = !!t.email_opt_out_at;
+                const eligible = t.status === "active" && t.profile_completed === true && !optedOut;
                 const isSelected = selected.has(t.id);
                 return (
                   <div
@@ -480,7 +481,7 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
                         checked={isSelected}
                         onChange={() => toggleSelect(t.id)}
                         disabled={!eligible}
-                        title={eligible ? undefined : "Profil incomplet : ce testeur n'est pas eligible"}
+                        title={eligible ? undefined : optedOut ? "Désabonné des communications : ce testeur ne peut pas être invité" : "Profil incomplet : ce testeur n'est pas eligible"}
                         style={{ accentColor: "#0A7A5A", cursor: eligible ? "pointer" : "not-allowed" }}
                       />
                     </div>
@@ -492,7 +493,7 @@ export default function ProjectTestersTab({ projectId }: ProjectTestersTabProps)
                             marginLeft: 6, fontSize: 10, fontWeight: 600,
                             padding: "1px 6px", borderRadius: 980,
                             background: "#f5f5f7", color: "#1d1d1f",
-                          }}>incomplet</span>
+                          }}>{optedOut ? "désabonné" : "incomplet"}</span>
                         )}
                       </div>
                       <div style={{ fontSize: 11, color: "#86868B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>

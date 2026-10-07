@@ -810,6 +810,7 @@ profil = 1 si (address OR city OR postal_code OR birth_date) manquant, sinon 0
 | last_login_at | TIMESTAMPTZ | migration 043, ouverture de session (callback magic link). NULL = jamais connecté |
 | retention_warning_sent_at, anonymized_at | TIMESTAMPTZ | migration 044, idempotence du cron `/api/cron/retention` (avertissement 90 j avant, anonymisation one-shot à 3 ans d'inactivité). Un testeur anonymisé a `status='inactive'`, email `anonyme-<id>@earlypanel.invalid`, plus d'auth user |
 | last_seen_at | TIMESTAMPTZ | migration 043, dernière requête authentifiée, écrit au plus 1×/h par `getAuthedTester` via `after()`. Base du filtre `activity` staff et de la rétention RGPD 3 ans (`src/lib/tester-activity.ts`) |
+| email_opt_out_at | TIMESTAMPTZ | migration 047, désabonnement de l'ensemble des communications. NULL = abonné (défaut, aucun backfill). Remis à NULL uniquement par le testeur. Cf. C25 |
 
 #### `staff_members`
 | Colonne | Type | Contraintes |
@@ -925,6 +926,7 @@ profil = 1 si (address OR city OR postal_code OR birth_date) manquant, sinon 0
 - `tester_score_events` : historique scoring avec delta, reason, new_score.
 - `tester_personas` : slug UNIQUE, matching_rules JSONB, priority, is_fallback.
 - `b2b_clients` : company_name NOT NULL, status CHECK ∈ (active, archived).
+- `email_opt_outs` (migration 047) : adresses hors compte testeur désabonnées. `email_hash` PK (SHA-256 de l'adresse normalisée, jamais l'adresse en clair), `opted_out_at`, `source` (page / one_click). RLS fermée, service_role uniquement. Cf. C25.
 
 ### Storage Buckets
 
@@ -1066,6 +1068,17 @@ Utilisé par :
 `/api/staff/testers?status=active` filtre **automatiquement** `profile_completed=true` côté serveur. Sans ça, un edge case (admin DB direct, bug futur) pourrait laisser un tester `active` mais incomplet apparaître dans la liste de sélection projet.
 > **RÈGLE** : Ne jamais retirer ce filtre. La liste "actifs" exposée au staff doit être strictement = "invitable maintenant".
 
+### C25 — Désabonnement de l'ensemble des communications (migration 047, 2026-09-16)
+Chaque email envoyé à un testeur ou à un prospect se termine par « Si vous souhaitez vous désabonner de l'ensemble des communications, cliquez ici ». Le clic ouvre `/desabonnement`, qui enregistre l'opposition dès l'ouverture et affiche « Vous ne recevrez plus de communication de la part d'earlypanel ».
+- **Envoi** : point de passage unique `sendUserEmail()` ([`src/lib/email-unsubscribe.ts`](src/lib/email-unsubscribe.ts)). Insère la ligne avant `</body>`, pose `List-Unsubscribe` + `List-Unsubscribe-Post: List-Unsubscribe=One-Click` (RFC 8058). `sendEmail()` direct réservé aux emails internes staff (brief, inscription, connexion/récupération staff), liste figée par `tests/unit/email-unsubscribe.test.ts`.
+- **Blocage** : personne désabonnée ⇒ plus aucun email, sauf `requested: true` (lien de connexion testeur, bienvenue à l'inscription, exemple de rapport demandé). Paiement émis, signature NDA, refus de mission, relances, invitations, campagnes : non envoyés (l'information reste dans l'espace testeur). Refusé aussi si `email_opt_out_at` est `undefined` (colonne oubliée dans le select) ou si `ACTION_TOKEN_SECRET` manque (sauf email demandé, qui part alors sans la ligne).
+- **Avertissement RGPD (cron retention)** : désabonné ⇒ pas d'email, mais `retention_warning_sent_at` est posé pour que l'anonymisation reste à l'échéance promise (politique de confidentialité mise à jour).
+- **Testeur** (token `email_unsubscribe`, id) : `testers.email_opt_out_at` + `available_until = NULL`. Statut du compte inchangé. Non invitable (`isTesterEligibleForInvitation`), exclu des relances et des vues Relances, badge « désabonné » côté staff.
+- **Prospect / adresse hors compte** (token `email_unsubscribe_address`, empreinte SHA-256) : ligne dans `email_opt_outs` (RLS fermée, jamais l'adresse en clair). Toute future communication prospect non demandée la vérifie via `sendUserEmail`.
+- **Enregistrement** : `POST /api/unsubscribe?token=` (page ou messagerie en un clic). Token HMAC valable 5 ans, sans login. Idempotent (date d'origine conservée), audit `email.unsubscribed` (IP, user-agent, `via: page | one_click`). GET ne modifie rien.
+- **Réactivation** : uniquement par le testeur. `POST /api/testers/me/availability` actions `resubscribe_emails`, `confirm_available`, `reactivate`, ou clic « Oui, je suis disponible » dans un ancien email.
+> **RÈGLE** : Aucun email testeur ou prospect via `sendEmail()` en direct. Aucun chemin staff/cron ne remet `email_opt_out_at` à NULL. Migration 047 à appliquer **avant** le déploiement du code. Ne jamais changer `ACTION_TOKEN_SECRET` (liens déjà envoyés invalidés).
+
 ### C21 — Bucket `documents` privé obligatoire
 `ensureDocumentsBucketPrivate()` force le bucket à `public: false` à chaque signature, et bascule un bucket historique public vers privé. Les NDA signés contiennent des données personnelles (adresse, date de naissance, IP).
 > **RÈGLE** : Ne jamais créer le bucket `documents` en `public: true`. Ne jamais retirer cette garde. Les valeurs `nda_document_url` préfixées `storage:<path>` sont résolues en URL signées 1h à la volée — ne pas stocker d'URL publique.
@@ -1148,6 +1161,7 @@ Avant toute modification, vérifier :
 - [ ] Toute action sensible (NDA signé, paiement, suppression, changement de rôle, recovery) a-t-elle un `logStaffAction(...)` ?
 - [ ] Toute nouvelle table sensible a-t-elle `ENABLE ROW LEVEL SECURITY` + politiques explicites ?
 - [ ] Toute nouvelle RPC `SECURITY DEFINER` a-t-elle un `search_path` explicite + `REVOKE FROM PUBLIC` (cf. migration 023) ?
+- [ ] Tout nouvel email à un testeur ou un prospect passe-t-il par `sendUserEmail()` (ligne de désabonnement + en-têtes one-click + blocage des désabonnés, cf. C25) ?
 
 ---
 

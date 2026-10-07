@@ -30,6 +30,7 @@ if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
 - `/api/internal/ping-indexnow` — interne (pas exposé publiquement)
 - `/api/webhooks/stripe` — auth via signature, pas via cookie
 - `/api/testers/availability` — clic email campagne dispo. Auth via **token signé HMAC** (`verifyActionToken`, `src/lib/action-token.ts`), pas via cookie. Actions idempotentes/non destructives uniquement.
+- `/api/unsubscribe` — désabonnement de l'ensemble des communications (lien en pied de chaque email). Auth via **token signé HMAC** (actions `email_unsubscribe` / `email_unsubscribe_address`), pas de cookie ni de `checkOrigin` : le POST « en un clic » (RFC 8058) vient du serveur de messagerie. GET ne modifie rien (redirige vers `/desabonnement`). Rate-limit IP + destinataire, audit `email.unsubscribed`.
 
 ## 2. Anti-énumération sur les routes auth
 

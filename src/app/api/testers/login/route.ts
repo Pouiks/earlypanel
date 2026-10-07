@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { sendEmail } from "@/lib/email";
+import { sendUserEmail } from "@/lib/email-unsubscribe";
 import { tryGetAppUrl } from "@/lib/app-url";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
@@ -87,8 +87,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true });
     }
 
-    await sendEmail({
-      to: emailNormalized,
+    // Lien demande a l'instant (`requested`) : part meme apres desabonnement.
+    // Ligne de desabonnement liee au compte testeur s'il existe, sinon a
+    // l'adresse (compte auth sans fiche testeur).
+    const { data: testerRow } = await adminClient
+      .from("testers")
+      .select("id")
+      .eq("email", emailNormalized)
+      .maybeSingle();
+    await sendUserEmail({
+      recipient: testerRow
+        ? { kind: "tester", id: testerRow.id, email: emailNormalized, email_opt_out_at: null }
+        : { kind: "address", email: emailNormalized },
+      appUrl,
+      requested: true,
       subject: "Votre lien de connexion earlypanel",
       html: buildLoginEmail(magicLink),
     });

@@ -36,6 +36,8 @@ export async function GET() {
     .or(
       `and(status.eq.active,profile_completed.eq.true,or(available_until.is.null,available_until.lt.${nowIso})),and(status.eq.inactive,availability_check_count.gte.${AVAILABILITY_REMINDER_MAX})`
     )
+    // Desabonnes des communications : hors boucle de relance (cf. email-unsubscribe.ts).
+    .is("email_opt_out_at", null)
     .order("created_at", { ascending: true });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

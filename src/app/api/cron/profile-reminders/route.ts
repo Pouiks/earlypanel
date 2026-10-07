@@ -73,6 +73,7 @@ export async function GET(request: Request) {
     .select("*")
     .eq("status", "pending")
     .eq("profile_completed", false)
+    .is("email_opt_out_at", null)
     .lt("created_at", createdBefore)
     .lt("profile_reminder_count", PROFILE_REMINDER_MAX)
     .or(`profile_reminder_sent_at.is.null,profile_reminder_sent_at.lt.${reminderBefore}`)

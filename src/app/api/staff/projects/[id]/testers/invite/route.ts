@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStaffMember } from "@/lib/staff-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { sendEmail } from "@/lib/email";
+import { sendUserEmail } from "@/lib/email-unsubscribe";
 import {
   projectAllowsNdaSend,
   projectAllowsStaffAssignTesters,
@@ -22,7 +22,7 @@ import {
 //
 // Conserve toutes les gardes existantes :
 //   - Projet non clos / archive
-//   - Testeurs actifs avec profil complet uniquement
+//   - Testeurs actifs avec profil complet, non desabonnes des communications
 //   - Au moins une question avant activation auto du projet
 //   - Email envoye AVANT la transition (rollback impossible si DB plante apres)
 //   - Auto-creation du NDA via defaultNdaHtml() si aucun configure
@@ -95,6 +95,7 @@ export async function POST(
     "last_name",
     "status",
     "profile_completed",
+    "email_opt_out_at",
     ...REQUIRED_FIELDS.map((f) => f.key),
   ].join(", ");
 
@@ -110,6 +111,7 @@ export async function POST(
     last_name: string | null;
     status: string;
     profile_completed: boolean;
+    email_opt_out_at: string | null;
     [key: string]: unknown;
   };
 
@@ -123,7 +125,7 @@ export async function POST(
     return NextResponse.json(
       {
         error:
-          "Aucun testeur eligible : seuls les testeurs actifs avec un profil complet (incluant adresse, ville, code postal, date de naissance) peuvent etre invites.",
+          "Aucun testeur eligible : seuls les testeurs actifs avec un profil complet (incluant adresse, ville, code postal, date de naissance) et non desabonnes des communications peuvent etre invites.",
         rejected_tester_ids: rejectedIds,
       },
       { status: 400 }
@@ -204,8 +206,9 @@ export async function POST(
 
       // Envoi email d'abord (G5 : pas de transition avant envoi reussi)
       try {
-        await sendEmail({
-          to: candidate.email as string,
+        await sendUserEmail({
+          recipient: { kind: "tester", id: candidate.id, email: candidate.email, email_opt_out_at: candidate.email_opt_out_at },
+          appUrl,
           toName: `${candidate.first_name ?? ""} ${candidate.last_name ?? ""}`.trim() || undefined,
           subject: `NDA a signer - ${proj.title ?? "Mission earlypanel"}`,
           html: buildNdaInviteEmail({

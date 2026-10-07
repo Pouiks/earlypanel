@@ -54,11 +54,11 @@ export async function POST(request: NextRequest) {
   const batchId = typeof body?.batch_id === "string" && body.batch_id.trim() ? body.batch_id.trim().slice(0, 64) : null;
   const isTest = !!testEmail;
 
-  let recipients: { id: string; email: string | null; first_name: string | null }[];
+  let recipients: { id: string; email: string | null; first_name: string | null; email_opt_out_at: string | null }[];
   if (isTest) {
     const { data, error } = await admin
       .from("testers")
-      .select("id, email, first_name")
+      .select("id, email, first_name, email_opt_out_at")
       .ilike("email", testEmail!)
       .limit(1);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });

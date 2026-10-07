@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendEmail, buildWelcomeEmail, buildNewTesterAdminEmail } from "@/lib/email";
+import { sendUserEmail } from "@/lib/email-unsubscribe";
 import { tryGetAppUrl } from "@/lib/app-url";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 import { checkJunkFields } from "@/lib/junk-detection";
@@ -203,7 +204,7 @@ export async function POST(request: NextRequest) {
       ? Array.from(new Set(devices.filter((d): d is string => typeof d === "string" && ALLOWED_DEVICES.has(d))))
       : [];
 
-    const { error: insertError } = await adminClient
+    const { data: inserted, error: insertError } = await adminClient
       .from("testers")
       .insert({
         email: emailNormalized,
@@ -223,10 +224,12 @@ export async function POST(request: NextRequest) {
         profile_completed: false,
         profile_step: 1,
         source: "landing",
-      });
+      })
+      .select("id")
+      .single();
 
-    if (insertError) {
-      console.error("[Register] testers insert failed, rolling back auth user", insertError.message);
+    if (insertError || !inserted) {
+      console.error("[Register] testers insert failed, rolling back auth user", insertError?.message);
       try {
         await adminClient.auth.admin.deleteUser(userId);
       } catch (rollbackErr) {
@@ -263,8 +266,12 @@ export async function POST(request: NextRequest) {
       ? `${appUrl}/app/auth/callback?token_hash=${encodeURIComponent(hashedToken)}&type=magiclink`
       : linkData.properties?.action_link || "";
 
-    await sendEmail({
-      to: emailNormalized,
+    // Bienvenue : repond a l'inscription (`requested`), avec la ligne de
+    // desabonnement comme tout email testeur.
+    await sendUserEmail({
+      recipient: { kind: "tester", id: inserted.id, email: emailNormalized, email_opt_out_at: null },
+      appUrl,
+      requested: true,
       toName: first_name ? `${first_name} ${last_name || ""}`.trim() : undefined,
       subject: first_name
         ? `${first_name}, complétez votre profil earlypanel →`

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { sendEmail } from "@/lib/email";
+import { hasOptedOutOfEmails, sendUserEmail } from "@/lib/email-unsubscribe";
 import { tryGetAppUrl } from "@/lib/app-url";
 import { logStaffAction } from "@/lib/audit";
 import { logger } from "@/lib/logger";
@@ -14,7 +14,8 @@ export const runtime = "nodejs";
 // le "trou" de testeurs en fin de campagne.
 //
 // Idempotence : la colonne project_midway_reminder_sent_at est posee a
-// l'envoi. Une seule relance "mi-parcours" par testeur/projet.
+// l'envoi. Une seule relance "mi-parcours" par testeur/projet. Jamais de
+// relance a un testeur desabonne (cf. src/lib/email-unsubscribe.ts).
 //
 // Calcul "mi-parcours" : on selectionne les projets actifs dont la date
 // courante a depasse start_date + (end_date - start_date) / 2. Pour les
@@ -95,7 +96,7 @@ export async function GET(request: Request) {
         id,
         tester_id,
         status,
-        tester:testers(email, first_name, last_name)
+        tester:testers(email, first_name, last_name, email_opt_out_at)
       `)
       .eq("project_id", project.id)
       .in("status", ["nda_signed", "invited", "in_progress"])
@@ -110,16 +111,17 @@ export async function GET(request: Request) {
 
     for (const row of testers) {
       const tester = (Array.isArray(row.tester) ? row.tester[0] : row.tester) as
-        | { email: string; first_name: string | null; last_name: string | null }
+        | { email: string; first_name: string | null; last_name: string | null; email_opt_out_at: string | null }
         | null;
-      if (!tester) {
+      if (!tester || hasOptedOutOfEmails(tester)) {
         skipped++;
         continue;
       }
 
       try {
-        await sendEmail({
-          to: tester.email,
+        await sendUserEmail({
+          recipient: { kind: "tester", id: row.tester_id, email: tester.email, email_opt_out_at: tester.email_opt_out_at },
+          appUrl,
           toName: `${tester.first_name ?? ""} ${tester.last_name ?? ""}`.trim() || undefined,
           subject: `Mi-parcours : pensez à compléter votre mission ${project.title}`,
           html: buildMidwayEmail({

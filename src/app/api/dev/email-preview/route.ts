@@ -5,6 +5,7 @@ import {
   buildLeadMagnetEmail,
   buildNewTesterAdminEmail,
 } from "@/lib/email";
+import { withUnsubscribeFooter } from "@/lib/email-unsubscribe";
 
 export const runtime = "nodejs";
 
@@ -19,25 +20,34 @@ export const runtime = "nodejs";
  * Sans `type` : page d'index listant les emails prévisualisables.
  */
 const SAMPLE_BASE = "https://www.earlypanel.fr";
+// Les emails testeur / prospect recoivent la ligne de desabonnement a l'envoi
+// (sendUserEmail) : l'apercu l'ajoute pareil pour montrer le rendu reel.
+const SAMPLE_UNSUBSCRIBE = `${SAMPLE_BASE}/desabonnement?token=SAMPLE_TOKEN`;
 
 const TEMPLATES: Record<string, { label: string; render: () => string }> = {
   availability: {
     label: "Campagne de disponibilité (2 boutons Oui / Non)",
     render: () =>
-      buildAvailabilityCampaignEmail({
-        firstName: "Camille",
-        ouiUrl: `${SAMPLE_BASE}/app/auth/availability?token=SAMPLE_TOKEN&choice=oui`,
-        nonUrl: `${SAMPLE_BASE}/app/auth/availability?token=SAMPLE_TOKEN&choice=non`,
-      }),
+      withUnsubscribeFooter(
+        buildAvailabilityCampaignEmail({
+          firstName: "Camille",
+          ouiUrl: `${SAMPLE_BASE}/app/auth/availability?token=SAMPLE_TOKEN&choice=oui`,
+          nonUrl: `${SAMPLE_BASE}/app/auth/availability?token=SAMPLE_TOKEN&choice=non`,
+        }),
+        SAMPLE_UNSUBSCRIBE
+      ),
   },
   welcome: {
     label: "Bienvenue testeur (magic link d'inscription)",
     render: () =>
-      buildWelcomeEmail(`${SAMPLE_BASE}/app/auth/callback?token_hash=SAMPLE&type=magiclink`, "Camille"),
+      withUnsubscribeFooter(
+        buildWelcomeEmail(`${SAMPLE_BASE}/app/auth/callback?token_hash=SAMPLE&type=magiclink`, "Camille"),
+        SAMPLE_UNSUBSCRIBE
+      ),
   },
   "lead-magnet": {
     label: "Lead magnet (exemple de rapport)",
-    render: () => buildLeadMagnetEmail(),
+    render: () => withUnsubscribeFooter(buildLeadMagnetEmail(), SAMPLE_UNSUBSCRIBE),
   },
   "new-tester-admin": {
     label: "Notification admin (nouvelle inscription)",

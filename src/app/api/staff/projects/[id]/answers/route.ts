@@ -4,7 +4,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { computeDefaultRewardCents, type TierRewardsMap } from "@/lib/reward-calculator";
 import { checkOrigin, forbiddenOriginResponse } from "@/lib/csrf";
 import { logStaffAction } from "@/lib/audit";
-import { sendEmail } from "@/lib/email";
+import { hasOptedOutOfEmails, sendUserEmail } from "@/lib/email-unsubscribe";
+import { tryGetAppUrl } from "@/lib/app-url";
 import { buildMissionRefusedEmail } from "@/lib/mission-refusal-email";
 import { CONTACT_EMAIL } from "@/lib/cta-links";
 import { SITE_URL } from "@/lib/site";
@@ -279,13 +280,16 @@ export async function PATCH(
   // Refus (travail bacle) : le testeur est prevenu par email, avec la note
   // du staff comme motif (CGU art. 4). Une seule fois, a la premiere notation ;
   // l'echec d'envoi n'annule pas la notation mais est trace dans l'audit.
-  let refusalEmail: "sent" | "failed" | "skipped" = "skipped";
+  let refusalEmail: "sent" | "failed" | "skipped" | "opted_out" = "skipped";
   if (sloppy && isFirstRating) {
     const [{ data: testerRow }, { data: projectMeta }] = await Promise.all([
-      admin.from("testers").select("email, first_name").eq("id", pt.tester_id).maybeSingle(),
+      admin.from("testers").select("id, email, first_name, email_opt_out_at").eq("id", pt.tester_id).maybeSingle(),
       admin.from("projects").select("title").eq("id", projectId).maybeSingle(),
     ]);
-    if (testerRow?.email) {
+    const appUrl = tryGetAppUrl() ?? SITE_URL;
+    if (testerRow?.email && hasOptedOutOfEmails(testerRow)) {
+      refusalEmail = "opted_out";
+    } else if (testerRow?.email && appUrl) {
       const { subject, html } = buildMissionRefusedEmail({
         firstName: testerRow.first_name ?? null,
         projectTitle: projectMeta?.title ?? "Mission de test",
@@ -294,7 +298,13 @@ export async function PATCH(
         guideUrl: `${SITE_URL}/testeurs/guides/bien-repondre-test-utilisateur`,
       });
       try {
-        await sendEmail({ to: testerRow.email, toName: testerRow.first_name ?? undefined, subject, html });
+        await sendUserEmail({
+          recipient: { kind: "tester", id: testerRow.id, email: testerRow.email, email_opt_out_at: testerRow.email_opt_out_at },
+          appUrl,
+          toName: testerRow.first_name ?? undefined,
+          subject,
+          html,
+        });
         refusalEmail = "sent";
       } catch (err) {
         console.error("[answers/PATCH] email de refus non envoye:", err instanceof Error ? err.message : err);

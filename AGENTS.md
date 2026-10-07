@@ -100,6 +100,15 @@ Tout cron qui produit un side effect doit avoir une colonne d'idempotence :
 
 Le bucket Supabase `documents` (NDA signés, données personnelles) doit toujours être en `public: false`. `ensureDocumentsBucketPrivate()` force cet état à chaque signature. Les paths sont stockés en DB sous `storage:<path>` et résolus en URLs signées 1h à la volée. Ne jamais y stocker une URL publique.
 
+## Emails : ligne de désabonnement obligatoire
+
+Tout email envoyé à un testeur ou à un prospect passe par `sendUserEmail()` (`src/lib/email-unsubscribe.ts`), **jamais** par `sendEmail()` en direct. `sendUserEmail()` :
+- ajoute en bas la ligne « Si vous souhaitez vous désabonner de l'ensemble des communications, cliquez ici » vers `/desabonnement` ;
+- ajoute les en-têtes `List-Unsubscribe` + `List-Unsubscribe-Post` (désabonnement en un clic depuis la messagerie) ;
+- refuse l'envoi à une personne désabonnée, sauf email `requested: true` (demandé à l'instant : lien de connexion, bienvenue, document demandé).
+
+`sendEmail()` direct : uniquement les emails internes au staff. La liste est figée par `tests/unit/email-unsubscribe.test.ts`, qui échoue si un nouvel appel apparaît. Pour un testeur, sélectionner `email_opt_out_at` (sinon l'envoi est refusé). Seul le testeur peut annuler son désabonnement ; aucun chemin staff ou cron ne remet `email_opt_out_at` à NULL. Détails : `PROJECT_CONTEXT.md` C25.
+
 ## Webhooks externes
 
 Tout webhook (Stripe, Yousign, …) :
@@ -117,3 +126,4 @@ Checklist sécurité (section 12 de `PROJECT_CONTEXT.md`) :
 - [ ] Toute action sensible a son `logStaffAction(...)`
 - [ ] Toute nouvelle table a `ENABLE ROW LEVEL SECURITY` + policies
 - [ ] Toute nouvelle RPC `SECURITY DEFINER` a `search_path` + `REVOKE FROM PUBLIC`
+- [ ] Tout nouvel email à un testeur ou un prospect passe par `sendUserEmail()` (ligne de désabonnement + opposition)

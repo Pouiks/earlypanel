@@ -3,7 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { tryGetAppUrl } from "@/lib/app-url";
 import { logStaffAction } from "@/lib/audit";
 import { logger } from "@/lib/logger";
-import { sendEmail } from "@/lib/email";
+import { hasOptedOutOfEmails, sendUserEmail } from "@/lib/email-unsubscribe";
 import { activityFilterToOr, lastActivityAt, RGPD_RETENTION_DAYS } from "@/lib/tester-activity";
 import {
   RETENTION_WARN_AFTER_DAYS,
@@ -25,7 +25,9 @@ export const runtime = "nodejs";
 //   1. warn      : 90 j avant l'echeance, email « connectez-vous pour garder
 //                  votre compte ». Idempotence : retention_warning_sent_at
 //                  (re-envoye seulement apres un retour puis une nouvelle
-//                  periode d'inactivite, cf. retentionStage).
+//                  periode d'inactivite, cf. retentionStage). Testeur
+//                  desabonne des communications : pas d'email, mais le
+//                  marqueur est pose pour que l'echeance reste tenue.
 //   2. anonymize : echeance atteinte, averti depuis >= 90 j sans retour.
 //                  Identite / coordonnees / IBAN effaces, compte auth
 //                  supprime. One-shot : anonymized_at.
@@ -48,6 +50,7 @@ type SelectedTester = RetentionTester & {
   email: string | null;
   first_name: string | null;
   auth_user_id: string | null;
+  email_opt_out_at: string | null;
 };
 
 export async function GET(request: Request) {
@@ -85,7 +88,7 @@ export async function GET(request: Request) {
 
   const { data: candidates, error } = await admin
     .from("testers")
-    .select("id, email, first_name, auth_user_id, created_at, last_login_at, last_seen_at, retention_warning_sent_at, anonymized_at")
+    .select("id, email, first_name, auth_user_id, created_at, last_login_at, last_seen_at, retention_warning_sent_at, anonymized_at, email_opt_out_at")
     .is("anonymized_at", null)
     .or(orClause)
     .order("created_at", { ascending: true })
@@ -123,6 +126,7 @@ export async function GET(request: Request) {
   }
 
   let warned = 0;
+  let warnedSilently = 0;
   let anonymized = 0;
   const skippedPendingPayout: string[] = [];
   const errors: { tester_id: string; reason: string }[] = [];
@@ -130,14 +134,22 @@ export async function GET(request: Request) {
   // ---- Passe 1 : avertissements (email d'abord, marqueur ensuite) --------
   for (const t of toWarn) {
     if (!t.email) continue;
+    const optedOut = hasOptedOutOfEmails(t);
     try {
-      const { subject, html } = buildRetentionWarningEmail({
-        firstName: t.first_name,
-        anonymizeOn: anonymizationDate(t, now),
-        loginUrl: `${appUrl}/app/login`,
-      });
-      const sent = await sendEmail({ to: t.email, subject, html });
-      if (!sent.success) throw new Error("email_failed");
+      if (!optedOut) {
+        const { subject, html } = buildRetentionWarningEmail({
+          firstName: t.first_name,
+          anonymizeOn: anonymizationDate(t, now),
+          loginUrl: `${appUrl}/app/login`,
+        });
+        const sent = await sendUserEmail({
+          recipient: { kind: "tester", id: t.id, email: t.email, email_opt_out_at: t.email_opt_out_at },
+          appUrl,
+          subject,
+          html,
+        });
+        if (!sent.success) throw new Error("email_failed");
+      }
       const { error: updErr } = await admin
         .from("testers")
         .update({ retention_warning_sent_at: nowIso })
@@ -147,7 +159,8 @@ export async function GET(request: Request) {
         // Email parti, marqueur non pose : au pire un second email demain.
         errors.push({ tester_id: t.id, reason: "update_failed_post_email" });
       }
-      warned++;
+      if (optedOut) warnedSilently++;
+      else warned++;
     } catch (mailErr) {
       errors.push({ tester_id: t.id, reason: mailErr instanceof Error ? mailErr.message : "email_failed" });
     }
@@ -209,6 +222,7 @@ export async function GET(request: Request) {
     metadata: {
       candidates: rows.length,
       warned,
+      warned_silently_opted_out: warnedSilently,
       anonymized,
       skipped_pending_payout: skippedPendingPayout,
       errors,
@@ -219,5 +233,5 @@ export async function GET(request: Request) {
     },
   });
 
-  return NextResponse.json({ candidates: rows.length, warned, anonymized, skipped_pending_payout: skippedPendingPayout, errors });
+  return NextResponse.json({ candidates: rows.length, warned, warned_silently_opted_out: warnedSilently, anonymized, skipped_pending_payout: skippedPendingPayout, errors });
 }

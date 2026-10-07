@@ -16,7 +16,7 @@ const sectionStyle: React.CSSProperties = {
   marginBottom: 16,
 };
 
-type Action = "confirm_available" | "set_unavailable" | "deactivate" | "reactivate";
+type Action = "confirm_available" | "set_unavailable" | "deactivate" | "reactivate" | "resubscribe_emails";
 
 function fmt(iso: string | null): string {
   if (!iso) return "";
@@ -30,6 +30,7 @@ export default function AvailabilitySection({ tester, onChanged }: Props) {
   const [confirmDeactivate, setConfirmDeactivate] = useState(false);
 
   const isInactive = tester.status === "inactive";
+  const optedOut = !!tester.email_opt_out_at;
   const availableUntil = tester.available_until;
   const confirmed = !!availableUntil && new Date(availableUntil).getTime() >= Date.now();
 
@@ -48,6 +49,7 @@ export default function AvailabilitySection({ tester, onChanged }: Props) {
         action === "confirm_available" ? "Disponibilité confirmée pour 3 mois." :
         action === "set_unavailable" ? "Vous ne recevrez plus d'offres jusqu'à réactivation." :
         action === "deactivate" ? "Compte désactivé. Vous pourrez le réactiver à tout moment." :
+        action === "resubscribe_emails" ? "Communications réactivées : vous recevrez à nouveau les offres de mission par email." :
         "Compte réactivé.";
       setMsg({ text: label, error: false });
       setConfirmDeactivate(false);
@@ -90,6 +92,17 @@ export default function AvailabilitySection({ tester, onChanged }: Props) {
           </span>
         )}
       </div>
+
+      {optedOut && (
+        <div style={{ marginBottom: 18, padding: "14px 16px", borderRadius: 12, background: "#f5f5f7" }}>
+          <p style={{ fontSize: 13, color: "#1d1d1f", lineHeight: 1.6, margin: "0 0 12px" }}>
+            Vous vous êtes désabonné(e) de l&apos;ensemble des communications le {fmt(tester.email_opt_out_at ?? null)} : plus aucun email ne vous est envoyé, offres de mission comprises.
+          </p>
+          <button type="button" disabled={busy !== null} onClick={() => run("resubscribe_emails")} style={{ ...primaryBtn, opacity: busy ? 0.6 : 1 }}>
+            {busy === "resubscribe_emails" ? "…" : "Réactiver les communications"}
+          </button>
+        </div>
+      )}
 
       {msg && (
         <div role={msg.error ? "alert" : "status"} style={{

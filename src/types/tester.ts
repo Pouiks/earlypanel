@@ -74,6 +74,8 @@ export interface Tester {
   availability_check_sent_at: string | null;
   /** Relances de disponibilite envoyees depuis la derniere reponse (migration 046). */
   availability_check_count?: number | null;
+  /** Desinscription des emails de sollicitation (migration 047). NULL = inscrit. */
+  email_opt_out_at?: string | null;
   // Activite (migration 043) : ouverture de session / derniere requete
   // authentifiee (granularite 1 h). NULL = jamais connecte.
   last_login_at: string | null;

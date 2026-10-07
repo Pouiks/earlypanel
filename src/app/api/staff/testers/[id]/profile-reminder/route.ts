@@ -5,6 +5,7 @@ import { tryGetAppUrl } from "@/lib/app-url";
 import { logStaffAction } from "@/lib/audit";
 import { computeProfileCompleteness } from "@/lib/profile-completeness";
 import { sendProfileReminder, PROFILE_REMINDER_MAX } from "@/lib/profile-reminder";
+import { hasOptedOutOfEmails } from "@/lib/email-unsubscribe";
 
 export const runtime = "nodejs";
 
@@ -30,6 +31,9 @@ export async function POST(request: NextRequest, ctx: { params: Promise<{ id: st
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   if (!tester) return NextResponse.json({ error: "Testeur introuvable" }, { status: 404 });
 
+  if (hasOptedOutOfEmails(tester)) {
+    return NextResponse.json({ error: "Ce testeur s'est désabonné des communications" }, { status: 409 });
+  }
   if (tester.status !== "pending" || tester.profile_completed) {
     return NextResponse.json({ error: "Ce testeur n'est pas en attente de complétion de profil" }, { status: 409 });
   }

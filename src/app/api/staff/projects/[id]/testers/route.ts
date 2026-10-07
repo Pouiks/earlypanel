@@ -80,6 +80,7 @@ export async function POST(
     "id",
     "status",
     "profile_completed",
+    "email_opt_out_at",
     ...REQUIRED_FIELDS.map((f) => f.key),
   ].join(", ");
 

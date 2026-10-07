@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { generateNdaPdf, buildNdaVariables } from "@/lib/nda-pdf";
 import { logStaffAction } from "@/lib/audit";
-import { sendEmail } from "@/lib/email";
+import { hasOptedOutOfEmails, sendUserEmail } from "@/lib/email-unsubscribe";
 import { tryGetAppUrl } from "@/lib/app-url";
 
 async function getSupabaseClient() {
@@ -230,10 +230,11 @@ export async function POST(
   after(async () => {
     try {
       const appUrl = tryGetAppUrl();
-      if (!appUrl) return;
+      if (!appUrl || hasOptedOutOfEmails(tester)) return;
       const missionLink = `${appUrl}/app/dashboard/missions`;
-      await sendEmail({
-        to: tester.email as string,
+      await sendUserEmail({
+        recipient: { kind: "tester", id: tester.id, email: tester.email, email_opt_out_at: tester.email_opt_out_at },
+        appUrl,
         toName: `${tester.first_name ?? ""} ${tester.last_name ?? ""}`.trim() || undefined,
         subject: `NDA validé - démarrez votre mission ${project?.title ?? ""}`,
         html: buildPostSignatureEmail({

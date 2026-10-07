@@ -1,7 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { readFileSync } from "fs";
 import { join } from "path";
-import { sendEmail, buildLeadMagnetEmail } from "@/lib/email";
+import { buildLeadMagnetEmail } from "@/lib/email";
+import { sendUserEmail } from "@/lib/email-unsubscribe";
+import { SITE_URL } from "@/lib/site";
+import { tryGetAppUrl } from "@/lib/app-url";
 import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 const PDF_PATH = join(process.cwd(), "public", "earlypanel-rapport-exemple.pdf");
@@ -34,8 +37,11 @@ export async function POST(request: NextRequest) {
 
     const pdf = getPdf();
 
-    await sendEmail({
-      to: email.trim(),
+    // Document demande a l'instant (`requested`), avec la ligne de desabonnement.
+    await sendUserEmail({
+      recipient: { kind: "address", email: email.trim() },
+      appUrl: tryGetAppUrl() ?? SITE_URL,
+      requested: true,
       subject: "Votre exemple de rapport earlypanel",
       html: buildLeadMagnetEmail(),
       attachments: [

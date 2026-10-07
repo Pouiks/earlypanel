@@ -64,6 +64,8 @@ export async function GET(request: NextRequest) {
     if (tester.status === "inactive" && computeProfileCompleteness(tester).isComplete) {
       patch.status = "active";
     }
+    // Demande explicite de recevoir des offres : annule un désabonnement des communications.
+    if (tester.email_opt_out_at) patch.email_opt_out_at = null;
     await admin.from("testers").update(patch).eq("id", payload.tid);
     next = "/app/dashboard?availability=confirmed";
   } else {
@@ -82,6 +84,9 @@ export async function GET(request: NextRequest) {
       action: `tester.availability.email_${payload.act === "availability_confirm" ? "confirm" : "manage"}`,
       entity_type: "tester",
       entity_id: payload.tid,
+      metadata: {
+        email_resubscribed: payload.act === "availability_confirm" && !!tester.email_opt_out_at,
+      },
     },
     request
   );

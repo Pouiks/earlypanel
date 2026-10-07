@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { sendEmail } from "@/lib/email";
+import { hasOptedOutOfEmails, sendUserEmail } from "@/lib/email-unsubscribe";
 import { tryGetAppUrl } from "@/lib/app-url";
 import { logStaffAction } from "@/lib/audit";
 import { logger } from "@/lib/logger";
@@ -18,7 +18,8 @@ export const runtime = "nodejs";
 //
 // On ne relance que si le projet est encore actif et que la deadline n'est
 // pas passee (sinon le malus de cloture s'applique deja - inutile de
-// relancer un testeur qui ne pourra plus signer a temps).
+// relancer un testeur qui ne pourra plus signer a temps). Jamais de relance a
+// un testeur desabonne (cf. src/lib/email-unsubscribe.ts).
 
 const NDA_REMINDER_AFTER_DAYS = 3;
 const NDA_REMINDER_COOLDOWN_DAYS = 3;
@@ -61,7 +62,7 @@ export async function GET(request: Request) {
       nda_sent_at,
       nda_reminder_sent_at,
       project:projects(id, title, company_name, status, end_date),
-      tester:testers(email, first_name, last_name)
+      tester:testers(email, first_name, last_name, email_opt_out_at)
     `)
     .eq("status", "nda_sent")
     .lt("nda_sent_at", sentBefore)
@@ -89,10 +90,10 @@ export async function GET(request: Request) {
       | { id: string; title: string; company_name: string | null; status: string; end_date: string | null }
       | null;
     const tester = (Array.isArray(row.tester) ? row.tester[0] : row.tester) as
-      | { email: string; first_name: string | null; last_name: string | null }
+      | { email: string; first_name: string | null; last_name: string | null; email_opt_out_at: string | null }
       | null;
 
-    if (!project || !tester) {
+    if (!project || !tester || hasOptedOutOfEmails(tester)) {
       skipped++;
       continue;
     }
@@ -110,8 +111,9 @@ export async function GET(request: Request) {
     }
 
     try {
-      await sendEmail({
-        to: tester.email,
+      await sendUserEmail({
+        recipient: { kind: "tester", id: row.tester_id, email: tester.email, email_opt_out_at: tester.email_opt_out_at },
+        appUrl,
         toName: `${tester.first_name ?? ""} ${tester.last_name ?? ""}`.trim() || undefined,
         subject: `Relance : NDA en attente de signature - ${project.title}`,
         html: buildReminderEmail({

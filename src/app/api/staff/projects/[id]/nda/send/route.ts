@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStaffMember } from "@/lib/staff-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { sendEmail } from "@/lib/email";
+import { hasOptedOutOfEmails, sendUserEmail } from "@/lib/email-unsubscribe";
 import { projectAllowsNdaSend, projectIsClosedForCampaign } from "@/lib/project-lifecycle";
 import { tryGetAppUrl } from "@/lib/app-url";
 import { logStaffAction } from "@/lib/audit";
@@ -100,12 +100,16 @@ export async function POST(
 
       const { data: tester } = await admin
         .from("testers")
-        .select("email, first_name, last_name")
+        .select("id, email, first_name, last_name, email_opt_out_at")
         .eq("id", testerId)
         .single();
 
       if (!tester) {
         results.push({ tester_id: testerId, success: false, error: "Testeur introuvable" });
+        continue;
+      }
+      if (hasOptedOutOfEmails(tester)) {
+        results.push({ tester_id: testerId, success: false, error: "Testeur désabonné des communications" });
         continue;
       }
 
@@ -122,8 +126,9 @@ export async function POST(
       // re-tentative ulterieure sans laisser le testeur en etat "envoye sans
       // email".
       try {
-        await sendEmail({
-          to: tester.email,
+        await sendUserEmail({
+          recipient: { kind: "tester", id: tester.id, email: tester.email, email_opt_out_at: tester.email_opt_out_at },
+          appUrl,
           toName: `${tester.first_name} ${tester.last_name}`,
           subject: `NDA a signer - ${project?.title || "Mission earlypanel"}`,
           html: buildNdaNotificationEmail(

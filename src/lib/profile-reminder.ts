@@ -6,9 +6,13 @@
  * Cadence : 1re relance AFTER_DAYS apres l'inscription, puis une tous les
  * COOLDOWN_DAYS, MAX relances au total ; COOLDOWN_DAYS apres la derniere
  * sans completion, le testeur passe en status='inactive'.
+ *
+ * Jamais envoyee a un testeur desabonne (`email_opt_out_at`,
+ * cf. src/lib/email-unsubscribe.ts).
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { sendEmail, buildProfileReminderEmail } from "@/lib/email";
+import { buildProfileReminderEmail } from "@/lib/email";
+import { EmailOptOutError, hasOptedOutOfEmails, sendUserEmail } from "@/lib/email-unsubscribe";
 import { computeProfileCompleteness } from "@/lib/profile-completeness";
 
 export const PROFILE_REMINDER_AFTER_DAYS = 2;
@@ -27,6 +31,7 @@ export interface ReminderTester {
   created_at?: string | null;
   profile_reminder_count?: number | null;
   profile_reminder_sent_at?: string | null;
+  email_opt_out_at?: string | null;
   [key: string]: unknown;
 }
 
@@ -85,6 +90,8 @@ export async function sendProfileReminder(
   appUrl: string,
 ): Promise<{ reminderNumber: number; missingCount: number }> {
   if (!tester.email) throw new Error("tester sans email");
+  // Avant de generer le magic link : inutile d'en creer un qui ne partira pas.
+  if (hasOptedOutOfEmails(tester)) throw new EmailOptOutError();
   const completeness = computeProfileCompleteness(tester);
 
   const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
@@ -101,8 +108,9 @@ export async function sendProfileReminder(
 
   const reminderNumber = (tester.profile_reminder_count ?? 0) + 1;
   const isLast = reminderNumber >= PROFILE_REMINDER_MAX;
-  await sendEmail({
-    to: tester.email,
+  await sendUserEmail({
+    recipient: { kind: "tester", id: tester.id, email: tester.email, email_opt_out_at: tester.email_opt_out_at },
+    appUrl,
     toName: `${tester.first_name ?? ""} ${tester.last_name ?? ""}`.trim() || undefined,
     subject: isLast
       ? "Dernier rappel : votre profil earlypanel est incomplet"

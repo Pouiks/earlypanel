@@ -24,6 +24,8 @@ export async function GET() {
     .from("testers")
     .select("*")
     .or(`and(status.eq.pending,profile_completed.eq.false),and(status.eq.inactive,profile_reminder_count.gte.${PROFILE_REMINDER_MAX})`)
+    // Desabonnes des communications : hors relances (cf. email-unsubscribe.ts).
+    .is("email_opt_out_at", null)
     .order("created_at", { ascending: true });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

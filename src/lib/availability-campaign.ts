@@ -10,6 +10,8 @@
  *   - boucle de 3 relances max espacees de 14 jours, comptees dans
  *     `availability_check_count` ; 14 jours apres la 3e sans reponse, le cron
  *     met le compte en pause (active -> inactive, reversible par un clic) ;
+ *   - jamais aux testeurs desabonnes (`email_opt_out_at`, migration 047) :
+ *     ils sortent de la boucle, donc aussi de la mise en pause ;
  *   - email-avant-DB : envoi, PUIS marquage (`availability_check_sent_at` +
  *     compteur). L'erreur de marquage est remontee (`marked: false`) au lieu
  *     d'etre avalee : en juillet 2026 la campagne est partie a 54 testeurs
@@ -17,7 +19,8 @@
  *     avait ete relance.
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { sendEmail, buildAvailabilityCampaignEmail } from "@/lib/email";
+import { buildAvailabilityCampaignEmail } from "@/lib/email";
+import { sendUserEmail } from "@/lib/email-unsubscribe";
 import { signActionToken } from "@/lib/action-token";
 import {
   AVAILABILITY_REMINDER_COOLDOWN_DAYS,
@@ -30,13 +33,14 @@ import {
 
 /** Colonnes necessaires a l'envoi ET aux regles de la boucle. */
 export const CAMPAIGN_RECIPIENT_SELECT =
-  "id, email, first_name, created_at, last_seen_at, last_login_at, available_until, availability_responded_at, availability_check_sent_at, availability_check_count";
+  "id, email, first_name, created_at, last_seen_at, last_login_at, available_until, availability_responded_at, availability_check_sent_at, availability_check_count, email_opt_out_at";
 
 export interface CampaignRecipient extends ReminderLoopFields {
   id: string;
   email: string | null;
   first_name: string | null;
   created_at: string;
+  email_opt_out_at: string | null;
 }
 
 export interface CampaignSendResult {
@@ -67,6 +71,7 @@ export async function selectCampaignCandidates(
     .select(CAMPAIGN_RECIPIENT_SELECT)
     .eq("status", "active")
     .eq("profile_completed", true)
+    .is("email_opt_out_at", null)
     .or(`available_until.is.null,available_until.lt.${now.toISOString()}`)
     .order("created_at", { ascending: true });
   if (opts.testerIds && opts.testerIds.length > 0) query = query.in("id", opts.testerIds);
@@ -84,7 +89,7 @@ export async function selectCampaignCandidates(
 export async function sendAvailabilityCampaign(
   admin: SupabaseClient,
   opts: {
-    recipients: (Pick<CampaignRecipient, "id" | "email" | "first_name"> & Partial<ReminderLoopFields>)[];
+    recipients: (Pick<CampaignRecipient, "id" | "email" | "first_name" | "email_opt_out_at"> & Partial<ReminderLoopFields>)[];
     appUrl: string;
     isTest?: boolean;
     throttle?: boolean;
@@ -105,9 +110,10 @@ export async function sendAvailabilityCampaign(
       const ouiUrl = `${opts.appUrl}/app/auth/availability?token=${encodeURIComponent(confirmToken)}&choice=oui`;
       const nonUrl = `${opts.appUrl}/app/auth/availability?token=${encodeURIComponent(manageToken)}&choice=non`;
 
-      // Email d'abord (email-avant-DB).
-      await sendEmail({
-        to: t.email,
+      // Email d'abord (email-avant-DB). Refuse si le testeur s'est desabonne.
+      await sendUserEmail({
+        recipient: { kind: "tester", id: t.id, email: t.email, email_opt_out_at: t.email_opt_out_at },
+        appUrl: opts.appUrl,
         toName: t.first_name || undefined,
         subject: "Êtes-vous toujours disponible pour des tests earlypanel ?",
         html: buildAvailabilityCampaignEmail({

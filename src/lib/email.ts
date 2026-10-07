@@ -14,6 +14,8 @@ interface SendEmailParams {
   html: string;
   toName?: string;
   attachments?: Attachment[];
+  /** En-tetes supplementaires (List-Unsubscribe, pose par sendUserEmail). */
+  headers?: Record<string, string>;
 }
 
 function getFrom(): string {
@@ -22,7 +24,7 @@ function getFrom(): string {
   return "earlypanel <noreply@earlypanel.fr>";
 }
 
-export async function sendEmail({ to, subject, html, toName, attachments }: SendEmailParams) {
+export async function sendEmail({ to, subject, html, toName, attachments, headers }: SendEmailParams) {
   const apiKey = process.env.RESEND_API_KEY?.trim();
   const from = getFrom();
 
@@ -59,6 +61,7 @@ export async function sendEmail({ to, subject, html, toName, attachments }: Send
     console.log(`│ To      : ${to}`);
     console.log(`│ Subject : ${subject}`);
     if (linkMatch) console.log(`│ Magic   : ${magicLink}`);
+    if (headers?.["List-Unsubscribe"]) console.log(`│ Unsub   : ${headers["List-Unsubscribe"]}`);
     console.log("└──────────────────────────────────────────────────────\n");
     return { success: true, mock: true as const };
   }
@@ -77,6 +80,7 @@ export async function sendEmail({ to, subject, html, toName, attachments }: Send
     subject,
     html,
     ...(attachments?.length ? { attachments } : {}),
+    ...(headers ? { headers } : {}),
   });
 
   if (error) {

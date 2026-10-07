@@ -13,14 +13,19 @@ import { logStaffAction } from "@/lib/audit";
  * (sécurité), ces transitions passent par cette route dédiée via le client
  * service-role.
  *
- * Body : { action: "confirm_available" | "set_unavailable" | "deactivate" | "reactivate" }
- *   - confirm_available : fenêtre de dispo 90 j (+ réactive si le compte était inactif).
- *   - set_unavailable   : plus d'offres (available_until = null), reste actif — réversible.
- *   - deactivate        : status = 'inactive' (soft opt-out réversible).
- *   - reactivate        : inactive → active (si profil complet).
+ * Body : { action: "confirm_available" | "set_unavailable" | "deactivate" | "reactivate" | "resubscribe_emails" }
+ *   - confirm_available  : fenêtre de dispo 90 j (+ réactive si le compte était inactif).
+ *   - set_unavailable    : plus d'offres (available_until = null), reste actif — réversible.
+ *   - deactivate         : status = 'inactive' (soft opt-out réversible).
+ *   - reactivate         : inactive → active (si profil complet).
+ *   - resubscribe_emails : annule un désabonnement des communications (migration 047).
+ *
+ * confirm_available, reactivate et resubscribe_emails sont des demandes
+ * explicites de recevoir des offres : elles annulent aussi le désabonnement
+ * des communications (`email_opt_out_at` → NULL).
  */
 const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
-const VALID = ["confirm_available", "set_unavailable", "deactivate", "reactivate"] as const;
+const VALID = ["confirm_available", "set_unavailable", "deactivate", "reactivate", "resubscribe_emails"] as const;
 type Action = (typeof VALID)[number];
 
 export async function POST(request: NextRequest) {
@@ -74,6 +79,9 @@ export async function POST(request: NextRequest) {
     statusFilter = "inactive"; // ne réactive que depuis inactive (anti-race)
   }
 
+  const resubscribed = !!tester.email_opt_out_at && action !== "set_unavailable" && action !== "deactivate";
+  if (resubscribed) patch.email_opt_out_at = null;
+
   let query = admin.from("testers").update(patch).eq("id", authed.testerId);
   if (statusFilter) query = query.eq("status", statusFilter);
   const { data: updated, error } = await query.select("id, status, available_until").maybeSingle();
@@ -93,7 +101,7 @@ export async function POST(request: NextRequest) {
       action: `tester.availability.${action}`,
       entity_type: "tester",
       entity_id: authed.testerId,
-      metadata: { status: updated.status, available_until: updated.available_until },
+      metadata: { status: updated.status, available_until: updated.available_until, email_resubscribed: resubscribed },
     },
     request
   );

@@ -60,7 +60,7 @@ export default function ConfidentialitePage() {
 
       <h2>4. Durée de conservation</h2>
       <ul>
-        <li><strong>Données de profil</strong> : pendant la durée d&apos;inscription au panel + 3 ans après la dernière connexion. 90 jours avant l&apos;échéance, un email vous prévient ; sans connexion de votre part, le compte est anonymisé automatiquement (identité, coordonnées, date de naissance et IBAN effacés, accès supprimé). Vous pouvez supprimer votre compte à tout moment depuis votre espace, ce qui déclenche l&apos;effacement immédiat (sauf obligation légale contraire).</li>
+        <li><strong>Données de profil</strong> : pendant la durée d&apos;inscription au panel + 3 ans après la dernière connexion. 90 jours avant l&apos;échéance, un email vous prévient, sauf si vous vous êtes désabonné(e) de nos communications ; sans connexion de votre part, le compte est anonymisé automatiquement (identité, coordonnées, date de naissance et IBAN effacés, accès supprimé). Vous pouvez supprimer votre compte à tout moment depuis votre espace, ce qui déclenche l&apos;effacement immédiat (sauf obligation légale contraire).</li>
         <li><strong>Documents contractuels et écritures de paiement</strong> (NDA signés, historique des versements) : conservés pendant les durées légales de conservation (preuve contractuelle, obligations comptables), rattachés à un identifiant anonyme une fois le compte anonymisé.</li>
         <li><strong>Logs techniques</strong> : 12 mois maximum.</li>
         <li><strong>Emails transactionnels</strong> : conservation par Resend selon leur politique (7 jours par défaut).</li>
@@ -95,6 +95,9 @@ export default function ConfidentialitePage() {
       </ul>
       <p>
         Pour exercer ces droits, écrivez à <a href="mailto:contact@earlypanel.fr">contact@earlypanel.fr</a>. Nous vous répondrons sous 30 jours maximum.
+      </p>
+      <p>
+        Chaque email que nous vous envoyons comporte en bas un lien pour vous désabonner de l&apos;ensemble de nos communications. Le désabonnement est pris en compte immédiatement ; seul un lien de connexion que vous demandez vous-même peut encore vous être envoyé.
       </p>
 
       <h2>8. Cookies</h2>

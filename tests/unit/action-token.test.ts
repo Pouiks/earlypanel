@@ -28,6 +28,11 @@ describe("action-token", () => {
     expect(verifyActionToken(signActionToken("t1", "availability_manage"))!.act).toBe("availability_manage");
   });
 
+  it("actions de désabonnement acceptées (testeur et adresse)", () => {
+    expect(verifyActionToken(signActionToken("t1", "email_unsubscribe"))!.act).toBe("email_unsubscribe");
+    expect(verifyActionToken(signActionToken("hash", "email_unsubscribe_address"))!.act).toBe("email_unsubscribe_address");
+  });
+
   it("token expiré → null", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date("2026-01-01T00:00:00Z"));

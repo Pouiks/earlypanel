@@ -39,6 +39,7 @@ interface TesterRow {
   available_until?: string | null;
   availability_check_sent_at?: string | null;
   availability_check_count?: number | null;
+  email_opt_out_at?: string | null;
   last_login_at?: string | null;
   last_seen_at?: string | null;
 }
@@ -481,6 +482,14 @@ export default function StaffTestersPage() {
                   {availConfirmed && (
                     <div style={{ fontSize: 10, color: "#0A7A5A", marginTop: 3, fontWeight: 600 }}>
                       dispo → {new Date(t.available_until!).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" })}
+                    </div>
+                  )}
+                  {t.email_opt_out_at && (
+                    <div
+                      style={{ fontSize: 10, color: "#b91c1c", marginTop: 3, fontWeight: 600 }}
+                      title={`Désabonné de l'ensemble des communications le ${new Date(t.email_opt_out_at).toLocaleDateString("fr-FR")} : plus aucun email, non invitable. Seul le testeur peut réactiver depuis son espace.`}
+                    >
+                      désabonné des emails
                     </div>
                   )}
                 </div>

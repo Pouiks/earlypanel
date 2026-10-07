@@ -6,6 +6,7 @@ import { logStaffAction } from "@/lib/audit";
 import { computeProfileCompleteness } from "@/lib/profile-completeness";
 import { CAMPAIGN_RECIPIENT_SELECT, sendAvailabilityCampaign, type CampaignRecipient } from "@/lib/availability-campaign";
 import { AVAILABILITY_REMINDER_MAX, isAvailabilityConfirmed, reminderCount } from "@/lib/tester-engagement";
+import { hasOptedOutOfEmails } from "@/lib/email-unsubscribe";
 
 export const runtime = "nodejs";
 
@@ -38,6 +39,10 @@ export async function POST(request: NextRequest, ctx: { params: Promise<{ id: st
     .maybeSingle();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   if (!tester) return NextResponse.json({ error: "Testeur introuvable" }, { status: 404 });
+
+  if (hasOptedOutOfEmails(tester)) {
+    return NextResponse.json({ error: "Ce testeur s'est désabonné des communications" }, { status: 409 });
+  }
 
   const count = reminderCount(tester);
   const pausedByLoop = tester.status === "inactive" && count >= AVAILABILITY_REMINDER_MAX;

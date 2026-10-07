@@ -2,7 +2,7 @@ import { NextRequest, NextResponse, after } from "next/server";
 import { getStaffMember } from "@/lib/staff-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { logStaffAction } from "@/lib/audit";
-import { sendEmail } from "@/lib/email";
+import { hasOptedOutOfEmails, sendUserEmail } from "@/lib/email-unsubscribe";
 import { tryGetAppUrl } from "@/lib/app-url";
 
 /**
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     .from("tester_payouts")
     .select(`
       id, tester_id, project_id, final_amount_cents, status, exported_at, sepa_batch_ref,
-      tester:testers(first_name, last_name, email),
+      tester:testers(id, first_name, last_name, email, email_opt_out_at),
       project:projects(title, company_name)
     `);
 
@@ -130,16 +130,19 @@ export async function POST(request: NextRequest) {
   // 4. Email de confirmation par testeur (non-bloquant).
   after(async () => {
     const appUrl = tryGetAppUrl();
-    const gainsUrl = appUrl ? `${appUrl}/app/dashboard/gains` : null;
+    if (!appUrl) return;
+    const gainsUrl = `${appUrl}/app/dashboard/gains`;
 
     for (const r of eligible) {
       const tester = Array.isArray(r.tester) ? r.tester[0] : r.tester;
       const project = Array.isArray(r.project) ? r.project[0] : r.project;
-      if (!tester?.email) continue;
+      // Desabonne : le paiement reste visible dans « Mes gains », pas d'email.
+      if (!tester?.email || hasOptedOutOfEmails(tester)) continue;
 
       try {
-        await sendEmail({
-          to: tester.email,
+        await sendUserEmail({
+          recipient: { kind: "tester", id: tester.id, email: tester.email, email_opt_out_at: tester.email_opt_out_at },
+          appUrl,
           toName: `${tester.first_name ?? ""} ${tester.last_name ?? ""}`.trim() || undefined,
           subject: `Votre paiement earlypanel a été émis · ${(r.final_amount_cents as number / 100).toFixed(2)} €`,
           html: buildPaymentConfirmedEmail({

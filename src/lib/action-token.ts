@@ -17,9 +17,19 @@ import { createHmac, timingSafeEqual } from "node:crypto";
  * idempotentes / non destructives (confirmer une dispo, atterrir sur une page).
  * Toute action destructive (désactiver/supprimer) reste en self-service
  * authentifié.
+ *
+ * `email_unsubscribe` / `email_unsubscribe_address` (lien « se désabonner de
+ * l'ensemble des communications » en pied de chaque email) : idempotents, et
+ * ils DOIVENT marcher sans login (un désabonnement qui exige de se connecter
+ * n'est pas simple). Pour `email_unsubscribe_address`, `tid` est l'empreinte
+ * SHA-256 de l'adresse, pas un id testeur. Cf. src/lib/email-unsubscribe.ts.
  */
 
-export type ActionName = "availability_confirm" | "availability_manage";
+export type ActionName =
+  | "availability_confirm"
+  | "availability_manage"
+  | "email_unsubscribe"
+  | "email_unsubscribe_address";
 
 interface Payload {
   tid: string;
@@ -28,7 +38,12 @@ interface Payload {
 }
 
 const DAY_SECONDS = 86_400;
-const VALID_ACTIONS: ActionName[] = ["availability_confirm", "availability_manage"];
+const VALID_ACTIONS: ActionName[] = [
+  "availability_confirm",
+  "availability_manage",
+  "email_unsubscribe",
+  "email_unsubscribe_address",
+];
 
 function getSecret(): string | undefined {
   return process.env.ACTION_TOKEN_SECRET?.trim() || undefined;

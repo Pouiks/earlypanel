@@ -109,6 +109,24 @@ export default function DashboardHome() {
 
       <StatusBanner status={tester.status} profileCompleted={tester.profile_completed} />
 
+      {tester.email_opt_out_at && (
+        <div style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap",
+          background: "#f5f5f7", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 14,
+          padding: "14px 18px", marginBottom: 16,
+        }}>
+          <span style={{ fontSize: 14, color: "#1d1d1f", fontWeight: 500 }}>
+            Vous êtes <strong>désabonné(e) des communications</strong> : plus aucune offre de mission ne vous est envoyée.
+          </span>
+          <Link href="/app/dashboard/profil?section=disponibilite" style={{
+            padding: "8px 18px", fontSize: 13, fontWeight: 700, color: "#fff", background: "#0A7A5A",
+            borderRadius: 980, textDecoration: "none", whiteSpace: "nowrap",
+          }}>
+            Réactiver →
+          </Link>
+        </div>
+      )}
+
       {/* Disponibilité (campagne) : bandeau réactivation si désactivé, sinon badge dispo */}
       {tester.status === "inactive" ? (
         <div style={{
