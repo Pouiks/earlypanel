@@ -38,10 +38,22 @@ export default function OnboardingTour({
   onSkip,
 }: OnboardingTourProps) {
   const driverRef = useRef<Driver | null>(null);
-  const finishedRef = useRef<"completed" | "skipped" | null>(null);
+  const finishedRef = useRef<"completed" | "skipped" | "unmounted" | null>(null);
 
-  // Initialise driver.js une seule fois. Les steps sont passes au build du
-  // driver, pas par .drive() — sinon le retrigger ne picke pas les nouveaux.
+  // Callbacks lus via des refs : le parent les recree a chaque rendu. S'ils
+  // etaient des dependances de l'effet d'init, chaque re-rendu du layout
+  // (polling des notifications toutes les 30 s, toast, rechargement du
+  // testeur) detruirait le driver : un tour ouvert se fermait tout seul et
+  // etait enregistre comme « passe » sans action de l'utilisateur.
+  const onCompleteRef = useRef(onComplete);
+  const onSkipRef = useRef(onSkip);
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+    onSkipRef.current = onSkip;
+  });
+
+  // Initialise driver.js une seule fois par montage. Les steps sont passes au
+  // build du driver, pas par .drive() — sinon le retrigger ne picke pas les nouveaux.
   useEffect(() => {
     const d = driver({
       showProgress: true,
@@ -69,10 +81,12 @@ export default function OnboardingTour({
         // derniere etape). On distingue via finishedRef qui est set
         // explicitement par onCloseClick / onNextClick sur derniere step.
         if (finishedRef.current === "completed") {
-          onComplete();
-        } else {
-          // Defaut : skip (X, ESC, click overlay).
-          onSkip();
+          onCompleteRef.current();
+        } else if (finishedRef.current !== "unmounted") {
+          // Defaut : skip (X, ESC, click overlay). Un demontage du layout
+          // (deconnexion, navigation hors dashboard) n'est pas un choix de
+          // l'utilisateur : rien n'est enregistre.
+          onSkipRef.current();
         }
         finishedRef.current = null;
       },
@@ -101,30 +115,41 @@ export default function OnboardingTour({
     driverRef.current = d;
 
     return () => {
+      finishedRef.current = "unmounted";
       d.destroy();
+      finishedRef.current = null;
       driverRef.current = null;
     };
-  }, [onComplete, onSkip]);
+  }, []);
 
-  // Trigger : autoStart au mount OU triggerKey change (bouton "?").
-  // On fait une condition combinée pour ne pas relancer 2x au mount initial.
-  const lastTriggerKeyRef = useRef<number>(-1);
+  // Lancement automatique : une seule fois par montage. Le marqueur n'est pose
+  // qu'au lancement effectif (dans le timer), pas a la planification : en
+  // StrictMode (dev), React monte, demonte puis remonte les effets ; l'ancienne
+  // logique (ref posee des la 1re execution) voyait le remontage comme « deja
+  // lance » et le tour ne demarrait jamais.
+  const autoStartedRef = useRef(false);
   useEffect(() => {
-    if (!driverRef.current) return;
-    const isInitial = lastTriggerKeyRef.current === -1;
-    const isManualRetrigger = triggerKey !== lastTriggerKeyRef.current && !isInitial;
-    lastTriggerKeyRef.current = triggerKey;
+    if (!autoStart || autoStartedRef.current) return;
+    // Petit delai : laisse le DOM se stabiliser (sidebar, badges, etc.)
+    // sinon driver.js calcule des positions sur des elements pas encore
+    // a leur taille finale.
+    const t = setTimeout(() => {
+      autoStartedRef.current = true;
+      driverRef.current?.drive();
+    }, 200);
+    return () => clearTimeout(t);
+  }, [autoStart]);
 
-    if ((isInitial && autoStart) || isManualRetrigger) {
-      // Petit delai : laisse le DOM se stabiliser (sidebar, badges, etc.)
-      // sinon driver.js calcule des positions sur des elements pas encore
-      // a leur taille finale.
-      const t = setTimeout(() => {
-        driverRef.current?.drive();
-      }, 200);
-      return () => clearTimeout(t);
-    }
-  }, [autoStart, triggerKey]);
+  // Relance manuelle (bouton "?") : a chaque changement de triggerKey par
+  // rapport a sa valeur au montage.
+  const initialTriggerKeyRef = useRef(triggerKey);
+  useEffect(() => {
+    if (triggerKey === initialTriggerKeyRef.current) return;
+    const t = setTimeout(() => {
+      driverRef.current?.drive();
+    }, 200);
+    return () => clearTimeout(t);
+  }, [triggerKey]);
 
   return null;
 }
