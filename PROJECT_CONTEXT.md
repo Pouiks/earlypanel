@@ -97,7 +97,9 @@ NEXT_PUBLIC_CONTACT_EMAIL         # Email contact (défaut: contact@earlypanel.f
 
 ## 2. MODULES — Rôles et responsabilités
 
-### `middleware.ts` — Garde de route (CRITIQUE)
+### `src/proxy.ts` (ex `middleware.ts`) — Garde de route (CRITIQUE)
+
+**Emplacement** : `src/proxy.ts`, export `proxy`. Avec un dossier `src/app`, Next.js ignore un `middleware.ts` a la racine : le fichier racine historique n a jamais ete execute (constate le 2026-10-07, pages `/app/*` et `/staff/*` servies sans session ; les donnees restaient protegees par l auth des routes API). Deplace et renomme le 2026-10-07.
 
 **Matcher** : `/app/:path*` et `/staff/:path*` uniquement.
 
@@ -252,7 +254,7 @@ SCORE_DELTA_NDA_UNSIGNED_AT_CLOSURE = -15
 | Rang | Module | Fichiers impactés | Risque |
 |------|--------|-------------------|--------|
 | 1 | `supabase/admin.ts` | ~35 | Casse tout le backend si signature change |
-| 2 | `middleware.ts` | Toutes pages /app /staff | Peut verrouiller ou exposer l'app |
+| 2 | `src/proxy.ts` | Toutes pages /app /staff | Peut verrouiller ou exposer l'app |
 | 3 | `types/staff.ts` | ~40 | Type `Project` (60+ champs) — rename propage partout |
 | 4 | `types/tester.ts` | ~25 | Type `Tester` (60+ champs) |
 | 5 | `staff-auth.ts` | 22 routes | Casse l'accès à tout le back-office |
@@ -939,7 +941,7 @@ profil = 1 si (address OR city OR postal_code OR birth_date) manquant, sinon 0
 
 | Fichier | Risque | Conséquence d'une erreur |
 |---------|--------|--------------------------|
-| `middleware.ts` | Expose ou bloque toute l'app | Accès non autorisé ou app inaccessible |
+| `src/proxy.ts` | Expose ou bloque toute l'app | Accès non autorisé ou app inaccessible |
 | `supabase/admin.ts` | Casse tout le backend | Toutes les API routes 500 |
 | `staff-auth.ts` / `tester-auth.ts` | Casse l'authentification | Accès non autorisé ou bloqué |
 | `project-lifecycle.ts` | Casse les permissions | Missions inaccessibles ou actions non autorisées |

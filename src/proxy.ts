@@ -3,6 +3,13 @@ import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseJwks } from "@/lib/supabase-jwks";
 import { STAFF_COOKIE_NAME, STAFF_COOKIE_TTL_S, signStaffCookie } from "@/lib/staff-session-cookie";
 
+// Garde de route /app/* et /staff/* (cf. PROJECT_CONTEXT.md section 2).
+//
+// Ce fichier DOIT vivre dans src/ : avec un dossier src/app, Next.js ignore
+// un middleware.ts/proxy.ts place a la racine du projet. L ancien
+// middleware.ts racine n a jamais ete execute (verifie le 2026-10-07 :
+// /app/dashboard et /staff/dashboard repondaient 200 sans session). La
+// convention `middleware` est deprecie au profit de `proxy` (runtime Node).
 const PUBLIC_PATHS = [
   "/",
   "/entreprises",
@@ -27,7 +34,7 @@ function isProtectedRoute(pathname: string) {
   return pathname.startsWith("/app") || pathname.startsWith("/staff");
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (!isProtectedRoute(pathname) || isPublic(pathname)) {
