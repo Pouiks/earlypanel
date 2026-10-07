@@ -48,7 +48,7 @@ export default function Sidebar({ notifications, onHelpClick }: SidebarProps) {
         borderBottom: "0.5px solid rgba(0,0,0,0.08)",
         marginBottom: 8,
       }}>
-        <Link href="/" style={{ textDecoration: "none", display: "block" }}>
+        <Link href="/app/dashboard" style={{ textDecoration: "none", display: "block" }}>
           <span style={{
             fontSize: 18,
             fontWeight: 700,

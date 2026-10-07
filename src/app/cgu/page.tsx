@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function CguPage() {
   return (
-    <LegalLayout title="Conditions générales d'utilisation" lastUpdated="7 septembre 2026">
+    <LegalLayout audience="tester" title="Conditions générales d'utilisation" lastUpdated="7 septembre 2026">
       <h2>1. Objet</h2>
       <p>
         Les présentes Conditions Générales d&apos;Utilisation (CGU) régissent l&apos;accès et l&apos;utilisation de la plateforme earlypanel, accessible à <a href="https://www.earlypanel.fr">earlypanel.fr</a>. earlypanel met en relation des entreprises souhaitant tester leurs produits numériques avec des testeurs rémunérés.

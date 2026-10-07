@@ -3,30 +3,29 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { BOOKING_URL } from "@/lib/cta-links";
+import { testerSpaceHref, useTesterSession } from "./useTesterSession";
 
-interface SessionState {
-  authenticated: boolean;
-  first_name?: string | null;
-  profile_completed?: boolean;
-}
-
-export type NavAudience = "business" | "tester";
+export type NavAudience = "business" | "tester" | "neutral";
 
 /**
- * Navigation marketing, deux variantes :
- *   - business (home, /entreprises, landings, pages legales) : 100 % entreprise,
- *     lien « Connexion » discret sans le mot testeur.
- *   - tester (/testeurs) : 100 % testeur, avec « Accéder à mon espace ».
+ * Navigation marketing, trois variantes :
+ *   - business (home, /entreprises, landings, blog) : 100 % entreprise,
+ *     CTA Calendly, lien « Connexion » discret sans le mot testeur.
+ *   - tester (/testeurs, guides, CGU) : 100 % testeur, avec « Accéder à mon espace ».
+ *   - neutral (pages legales partagees) : liens entreprise mais CTA interne
+ *     « Démarrer un projet ». Calendly est reserve aux entreprises et un
+ *     testeur arrive sur ces pages depuis son inscription ou son footer.
  * Si `audience` n'est pas fourni, on la deduit du pathname.
- * Un testeur deja connecte voit « Mon espace » dans les deux variantes.
+ * Un testeur deja connecte voit « Mon espace » dans toutes les variantes.
  */
 export default function Nav({ audience }: { audience?: NavAudience }) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [session, setSession] = useState<SessionState | null>(null);
+  const session = useTesterSession();
 
   const resolved: NavAudience = audience ?? (pathname === "/testeurs" || pathname.startsWith("/testeurs/") ? "tester" : "business");
   const isTester = resolved === "tester";
+  const isNeutral = resolved === "neutral";
 
   useEffect(() => { setMenuOpen(false); }, [pathname]);
 
@@ -37,23 +36,8 @@ export default function Nav({ audience }: { audience?: NavAudience }) {
     }
   }, [menuOpen]);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch("/api/testers/session", { cache: "no-store" });
-        if (!res.ok) return;
-        const data = (await res.json()) as SessionState;
-        if (!cancelled) setSession(data);
-      } catch {
-        /* silent */
-      }
-    })();
-    return () => { cancelled = true; };
-  }, [pathname]);
-
   const isAuthed = !!session?.authenticated;
-  const dashboardHref = session?.profile_completed ? "/app/dashboard" : "/app/onboarding";
+  const dashboardHref = testerSpaceHref(session);
   const close = () => setMenuOpen(false);
 
   const links = isTester
@@ -83,6 +67,8 @@ export default function Nav({ audience }: { audience?: NavAudience }) {
 
   const primaryCta = isTester ? (
     <a href="/testeurs#register" className="nav-cta" onClick={close}>Rejoindre le panel</a>
+  ) : isNeutral ? (
+    <Link href="/entreprises#brief" className="nav-cta" onClick={close}>Démarrer un projet</Link>
   ) : (
     <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="nav-cta" onClick={close}>Réserver un appel</a>
   );

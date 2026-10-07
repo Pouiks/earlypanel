@@ -1,5 +1,5 @@
 import QuestionnaireWidget from "./QuestionnaireWidget";
-import { BOOKING_URL } from "@/lib/cta-links";
+import BookingCta from "@/components/b2b/BookingCta";
 import { glossify } from "@/components/ui/glossify";
 
 /**
@@ -18,7 +18,7 @@ export default function HeroLanding() {
           <p className="hero-category">{"Un service de tests utilisateurs à distance\u00a0: panel sélectionné à la main, questionnaire écrit avec vous, rapport rédigé en 5 jours."}</p>
           <p className="hero-sub-index">{glossify("On recrute des testeurs qui ressemblent à vos vrais utilisateurs, on écrit le questionnaire avec vous, on lit chaque réponse, et vous recevez un rapport rédigé avec les frictions d'expérience utilisateur à corriger. Vous décidez, on fait le reste.")}</p>
           <div className="hero-btns">
-            <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn-dark">Réserver un appel gratuit →</a>
+            <BookingCta className="btn-dark" />
             <a href="#rapport" className="btn-outline">Voir un rapport d&apos;exemple</a>
           </div>
         </div>

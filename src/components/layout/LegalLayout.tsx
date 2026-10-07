@@ -1,26 +1,32 @@
-import Nav from "@/components/layout/Nav";
+import Nav, { type NavAudience } from "@/components/layout/Nav";
 import Footer from "@/components/layout/Footer";
 
 /**
  * Layout commun pour les pages legales (mentions legales, CGU, CGV,
  * confidentialite). Encadre le contenu avec Nav + Footer et applique
  * un style "long-form lisible" sobre.
+ *
+ * Nav neutre par defaut : ces pages sont lues autant par les testeurs
+ * (inscription, footer testeur) que par les clients, et Calendly est
+ * reserve aux entreprises. /cgu (testeurs) passe audience="tester".
  */
 export default function LegalLayout({
   title,
   lastUpdated,
   eyebrow = "Document légal",
+  audience = "neutral",
   children,
 }: {
   title: string;
   lastUpdated: string;
   /** Surtitre : « Document légal » par defaut, « Sécurité et données » pour /securite. */
   eyebrow?: string;
+  audience?: NavAudience;
   children: React.ReactNode;
 }) {
   return (
     <>
-      <Nav />
+      <Nav audience={audience} />
       <main className="legal-main">
         <div className="legal-inner">
           <div className="legal-eyebrow">{eyebrow}</div>

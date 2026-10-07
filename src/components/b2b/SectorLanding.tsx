@@ -10,7 +10,8 @@ import BreadcrumbJsonLd from "@/components/ui/BreadcrumbJsonLd";
 import BriefSection from "@/components/b2b/BriefSection";
 import CtaFinal from "@/components/b2b/CtaFinal";
 import RelatedReading, { type RelatedLink } from "@/components/b2b/RelatedReading";
-import { BOOKING_URL, PRICE_RANGE_LABEL } from "@/lib/cta-links";
+import { PRICE_RANGE_LABEL } from "@/lib/cta-links";
+import BookingCta from "@/components/b2b/BookingCta";
 import { SITE_URL } from "@/lib/site";
 import { glossify } from "@/components/ui/glossify";
 
@@ -118,7 +119,7 @@ export default function SectorLanding(p: SectorLandingProps) {
           <h1>{p.h1}</h1>
           <p className="hero-sub">{p.sub}</p>
           <div className="hero-ctas">
-            <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn-dark-b2b">Réserver un appel gratuit →</a>
+            <BookingCta className="btn-dark-b2b" />
             <Link href="/#rapport" className="btn-outline-b2b">Voir un rapport d&apos;exemple</Link>
           </div>
           <div className="hero-stats">

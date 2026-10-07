@@ -11,7 +11,8 @@ import { postHref, type BlogPost } from "@/lib/blog";
 import { formatPostDate } from "@/lib/blog-content";
 import { articleJsonLd } from "@/lib/json-ld";
 import { SITE_URL } from "@/lib/site";
-import { BOOKING_URL, BOOKING_DURATION_MIN } from "@/lib/cta-links";
+import { BOOKING_DURATION_MIN } from "@/lib/cta-links";
+import BookingCta from "@/components/b2b/BookingCta";
 import { glossify } from "@/components/ui/glossify";
 
 /**
@@ -115,7 +116,7 @@ export default function PostArticle({ post, others }: { post: BlogPost; others: 
                 Un appel de {BOOKING_DURATION_MIN} minutes suffit pour savoir si un test a du sens dans votre situation, et à quoi il ressemblerait. Pas d&apos;engagement, pas de présentation commerciale.
               </p>
               <div className="blog-cta-btns">
-                <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="btn-dark">Réserver un appel gratuit →</a>
+                <BookingCta className="btn-dark" />
                 <Link href="/entreprises" className="btn-outline">Voir l&apos;offre</Link>
               </div>
             </aside>
